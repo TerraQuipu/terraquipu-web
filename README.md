@@ -3,6 +3,11 @@
 > **Frontend GIS y Dashboard de Apoyo a la Toma de Decisiones en Rotación de Cultivos**  
 > *Parte del ecosistema [Terraquipu](https://github.com/TerraQuipu)*
 
+[![Live Demo](https://img.shields.io/badge/Demo%20en%20Vivo-GitHub%20Pages-22c55e?style=for-the-badge&logo=github)](https://terraquipu.github.io/terraquipu-web/)
+[![Status](https://img.shields.io/badge/Producci%C3%B3n-Online%20(200%20OK)-0284c7?style=for-the-badge)](https://terraquipu.github.io/terraquipu-web/)
+
+👉 **Acceso directo a producción:** [https://terraquipu.github.io/terraquipu-web/](https://terraquipu.github.io/terraquipu-web/)
+
 ---
 
 ## 📌 Propósito del Repositorio
