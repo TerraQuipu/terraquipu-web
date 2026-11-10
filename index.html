@@ -681,6 +681,10 @@
       });
       const activeBtnId = tabId.replace('tab-', 'btn-tab-');
       document.getElementById(activeBtnId).className = 'tab-btn py-1.5 rounded-xl bg-emerald-500 text-slate-950 font-bold shadow transition flex items-center justify-center gap-1';
+
+      if (tabId === 'tab-chart' && typeof soilChart !== 'undefined') {
+        setTimeout(() => soilChart.resize(), 50);
+      }
     }
 
     // Crop Selection Change
