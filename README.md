@@ -96,3 +96,4 @@ NEXT_PUBLIC_MAPBOX_TOKEN=tu_mapbox_token_aqui
 npm run dev
 ```
 La aplicación estará disponible en `http://localhost:3000`.
+
