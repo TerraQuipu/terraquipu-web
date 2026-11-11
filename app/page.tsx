@@ -49,7 +49,7 @@ export default function SuperpowerTerraquipuLanding() {
 
           {/* Center Brand Name (Exact Superpower Style: lowercase bold centered wordmark) */}
           <a href="#" className="flex items-center gap-2 group mx-auto lg:mx-0">
-            <span className="text-xl font-bold tracking-tight text-white lowercase">
+            <span className="brand-logo text-xl font-extrabold tracking-tight text-white lowercase">
               terraquipu
             </span>
           </a>
