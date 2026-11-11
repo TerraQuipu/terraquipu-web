@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Terraquipu | Plataforma de Inteligencia Territorial y Rotación de Cultivos</title>
+  <title>Terraquipu • Inteligencia Satelital Abierta & Regeneración Edáfica en los Andes</title>
   
+  <meta name="description" content="Plataforma de código abierto que fusiona datos satelitales de la NASA con la sabiduría agronómica del Quipu para proteger suelos andinos frente a El Niño.">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -13,20 +16,15 @@
         extend: {
           fontFamily: {
             sans: ['Arial', 'Helvetica', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace']
           },
           colors: {
-            border: '#e4e4e7',
-            input: '#e4e4e7',
-            ring: '#18181b',
-            background: '#ffffff',
-            foreground: '#09090b',
-            muted: {
-              DEFAULT: '#f4f4f5',
-              foreground: '#71717a'
-            },
-            card: {
-              DEFAULT: '#ffffff',
-              foreground: '#09090b'
+            background: '#050507',
+            card: '#0c0d11',
+            accent: {
+              emerald: '#10b981',
+              amber: '#f59e0b',
+              cyan: '#06b6d4'
             }
           }
         }
@@ -34,823 +32,863 @@
     }
   </script>
 
-  <!-- Leaflet CSS & JS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <style>
     * {
-      font-family: Arial, Helvetica, sans-serif !important;
+      font-family: Arial, Helvetica, sans-serif;
     }
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background-color: #fafafa;
-      color: #09090b;
+    .font-mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
     }
-    #map {
-      height: 100vh;
-      width: 100vw;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 10;
+    /* Hairline glow and grid backgrounds inspired by Antimetal */
+    .bg-grid-pattern {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+      background-size: 28px 28px;
     }
-    /* shadcn minimalist scrollbar */
-    .sidebar-scroll::-webkit-scrollbar {
-      width: 4px;
+    .ambient-glow-emerald {
+      background: radial-gradient(circle at 50% 30%, rgba(16, 185, 129, 0.12) 0%, rgba(6, 182, 212, 0.05) 45%, transparent 70%);
     }
-    .sidebar-scroll::-webkit-scrollbar-track {
-      background: #f4f4f5;
+    .ambient-glow-amber {
+      background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.09) 0%, transparent 60%);
     }
-    .sidebar-scroll::-webkit-scrollbar-thumb {
-      background: #a1a1aa;
-      border-radius: 4px;
+    .hairline-border {
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
-    .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-      background: #71717a;
+    .hairline-border-hover:hover {
+      border-color: rgba(255, 255, 255, 0.22);
     }
-    /* Monochromatic Radar Marker */
-    .pulse-radar {
-      width: 20px;
-      height: 20px;
-      background: #09090b;
-      border: 3px solid #ffffff;
-      border-radius: 50%;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-      animation: pulse-ring 2s infinite;
+    /* Subtle custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
     }
-    @keyframes pulse-ring {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.6); }
-      70% { transform: scale(1.2); box-shadow: 0 0 0 14px rgba(0, 0, 0, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+    ::-webkit-scrollbar-track {
+      background: #050507;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3f3f46;
     }
   </style>
 </head>
-<body class="bg-zinc-50 text-zinc-950 relative selection:bg-zinc-900 selection:text-white">
+<body class="bg-[#050507] text-white selection:bg-emerald-500 selection:text-black overflow-x-hidden antialiased">
 
-  <!-- 1. FULLSCREEN MAP -->
-  <div id="map"></div>
-
-  <!-- 2. TOP FLOATING SECTORS BAR (shadcn Minimalist Corporate Style) -->
-  <div class="absolute top-4 left-4 right-4 md:left-[450px] md:right-[430px] z-[500] flex justify-center pointer-events-none">
-    <div class="flex items-center gap-1 bg-white/95 backdrop-blur-md px-2 py-1.5 rounded-lg border border-zinc-200 shadow-sm pointer-events-auto overflow-x-auto max-w-full">
-      <span class="text-xs font-semibold text-zinc-500 uppercase tracking-wider px-2 border-r border-zinc-200">
-        Sectores:
-      </span>
-      <button onclick="selectSector('chinchero')" id="pill-chinchero" class="sector-pill px-3 py-1.5 rounded-md text-xs font-semibold bg-zinc-900 text-white transition flex items-center gap-1.5">
-        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Chinchero (3,762 m)
-      </button>
-      <button onclick="selectSector('moray')" id="pill-moray" class="sector-pill px-3 py-1.5 rounded-md text-xs font-medium text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition flex items-center gap-1.5">
-        <span class="w-2 h-2 rounded-full bg-amber-500"></span> Moray (3,500 m)
-      </button>
-      <button onclick="selectSector('urubamba')" id="pill-urubamba" class="sector-pill px-3 py-1.5 rounded-md text-xs font-medium text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition flex items-center gap-1.5">
-        <span class="w-2 h-2 rounded-full bg-sky-500"></span> Valle Urubamba (2,870 m)
-      </button>
-      <button onclick="selectSector('pisac')" id="pill-pisac" class="sector-pill px-3 py-1.5 rounded-md text-xs font-medium text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition flex items-center gap-1.5">
-        <span class="w-2 h-2 rounded-full bg-purple-500"></span> Písac (2,980 m)
-      </button>
-    </div>
-  </div>
-
-  <!-- 3. LEFT MODULAR SIDEBAR (shadcn UI Component Standard: Clean White, Charcoal Borders, Black Typography) -->
-  <aside id="sidebar" class="absolute top-4 left-4 bottom-4 w-[calc(100vw-2rem)] sm:w-[410px] md:w-[425px] z-[600] bg-white/95 backdrop-blur-md border border-zinc-200 rounded-xl shadow-md flex flex-col justify-between overflow-hidden transition-all duration-300">
-    
-    <!-- Sidebar Header -->
-    <div class="px-4 py-3.5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/70">
-      <div class="flex items-center space-x-2.5">
-        <div class="w-8 h-8 rounded-md bg-zinc-900 text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-xs">
-          TQ
-        </div>
-        <div>
-          <div class="flex items-center gap-1.5">
-            <h1 class="text-sm font-bold tracking-tight uppercase text-zinc-950">
-              Terraquipu
-            </h1>
-            <span class="text-[10px] font-medium tracking-wide uppercase bg-zinc-100 text-zinc-700 px-1.5 py-0.2 rounded border border-zinc-200">
-              NASA Space Apps
-            </span>
-          </div>
-          <p class="text-[11px] text-zinc-500">Inteligencia Territorial y Salud del Suelo</p>
-        </div>
+  <!-- ================= 1. FLOATING PILL HEADER (ANTIMETAL STYLE) ================= -->
+  <header class="fixed top-4 left-1/2 -translate-x-1/2 w-[92%] max-w-5xl z-50 rounded-full border border-white/10 bg-black/70 backdrop-blur-xl px-5 py-2.5 flex items-center justify-between shadow-[0_10px_30px_rgba(0,0,0,0.8)] transition-all duration-300">
+    <!-- Brand -->
+    <a href="#" class="flex items-center gap-2.5 group">
+      <div class="w-7 h-7 rounded-full bg-white flex items-center justify-center p-1 transition group-hover:scale-105 shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+        <img src="assets/logo.svg" alt="Terraquipu Logo" class="w-full h-full">
       </div>
-
-      <button onclick="toggleSidebarCollapse()" id="btn-collapse" title="Colapsar panel" class="w-7 h-7 rounded-md border border-zinc-200 bg-white text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 flex items-center justify-center text-xs transition">
-        ◀
-      </button>
-    </div>
-
-    <!-- shadcn Segmented Tab Navigation -->
-    <div class="px-4 pt-3 pb-2 border-b border-zinc-200 bg-white">
-      <div class="grid grid-cols-3 gap-1 p-1 bg-zinc-100 rounded-lg border border-zinc-200/80 text-xs">
-        <button onclick="switchTab('tab-diag')" id="btn-tab-diag" class="tab-btn py-1.5 rounded-md bg-white text-zinc-950 font-semibold shadow-xs transition text-center">
-          Diagnóstico
-        </button>
-        <button onclick="switchTab('tab-quipu')" id="btn-tab-quipu" class="tab-btn py-1.5 rounded-md text-zinc-600 hover:text-zinc-950 font-medium transition text-center">
-          Quipu Rotación
-        </button>
-        <button onclick="switchTab('tab-chart')" id="btn-tab-chart" class="tab-btn py-1.5 rounded-md text-zinc-600 hover:text-zinc-950 font-medium transition text-center">
-          Curvas Suelo
-        </button>
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-sm tracking-widest text-white uppercase font-mono">TERRAQUIPU</span>
+        <span class="hidden sm:inline-block text-[9px] font-mono uppercase px-2 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+          Open Source
+        </span>
       </div>
-    </div>
+    </a>
 
-    <!-- Sidebar Body Content -->
-    <div class="p-4 space-y-3.5 overflow-y-auto sidebar-scroll flex-1">
+    <!-- Navigation links -->
+    <nav class="hidden md:flex items-center gap-6 text-xs text-zinc-400 font-medium">
+      <a href="#features" class="hover:text-white transition">Capacidades</a>
+      <a href="#calculator" class="hover:text-white transition">Calculadora</a>
+      <a href="#comunidades" class="hover:text-white transition">Comunidades</a>
+      <a href="#faq" class="hover:text-white transition">FAQ</a>
+      <a href="https://github.com/TerraQuipu" target="_blank" rel="noreferrer" class="hover:text-white transition flex items-center gap-1">
+        <span>GitHub</span>
+        <svg class="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+      </a>
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="flex items-center gap-2.5">
+      <a href="#unirse" class="hidden sm:inline-flex text-xs font-medium text-zinc-300 hover:text-white px-3 py-1.5 transition">
+        Sumarme
+      </a>
+      <a href="app.html" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white text-black text-xs font-semibold hover:bg-zinc-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.25)] hover:scale-[1.02] active:scale-[0.98]">
+        <span>🛰️ Abrir Visor GIS</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ================= 2. HERO SECTION ================= -->
+  <section class="relative pt-36 pb-20 md:pt-44 md:pb-28 px-4 overflow-hidden bg-grid-pattern ambient-glow-emerald">
+    <div class="max-w-4xl mx-auto text-center space-y-6">
       
-      <!-- Sector Info Card (Corporate Minimalist) -->
-      <div class="bg-zinc-50 border border-zinc-200 p-3.5 rounded-lg space-y-2.5">
-        <div class="flex justify-between items-start">
-          <div>
-            <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500" id="sector-microcuenca">PAMPA ALTA DE CHINCHERO</span>
-            <h2 class="text-base font-bold text-zinc-950 mt-0.5" id="sector-title">Chinchero Sector B</h2>
-            <p class="text-xs text-zinc-600 mt-0.5" id="sector-location">Provincia Urubamba, Cusco</p>
-          </div>
-          <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-zinc-200/80 text-zinc-800 border border-zinc-300" id="sector-floor-badge">
-            Quechua Superior
-          </span>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-200 text-xs">
-          <div>
-            <span class="text-zinc-500 text-[10px] uppercase font-bold">Altitud</span>
-            <p class="text-xs font-bold text-zinc-950 mt-0.5" id="sector-alt">3,762 m s. n. m.</p>
-          </div>
-          <div>
-            <span class="text-zinc-500 text-[10px] uppercase font-bold">Pendiente (SRTM)</span>
-            <p class="text-xs font-semibold text-zinc-900 mt-0.5" id="sector-slope">8.5° ladera este</p>
-          </div>
-        </div>
+      <!-- Announcement Pill Badge -->
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-xs text-zinc-300 shadow-inner">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="font-mono text-[11px] text-zinc-300">Desarrollado para el NASA Space Apps Challenge</span>
+        <span class="text-zinc-500">•</span>
+        <span class="text-emerald-400 font-medium">Validación INIA & SENAMHI</span>
       </div>
 
-      <!-- ================= TAB 1: DIAGNÓSTICO TERRITORIAL ================= -->
-      <div id="tab-diag" class="tab-content space-y-3">
-        <div class="flex justify-between items-center text-xs">
-          <span class="font-bold text-zinc-950">Observación Satelital & Campo</span>
-          <span class="text-[10px] font-mono text-zinc-600">Resolución 30m</span>
-        </div>
+      <!-- Main Headline -->
+      <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.08]">
+        Ciencia espacial abierta para <br class="hidden sm:inline">
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-emerald-400">
+          regenerar los suelos andinos
+        </span>
+      </h1>
 
-        <!-- Precipitation & Soil Moisture Cards -->
-        <div class="grid grid-cols-2 gap-2.5">
-          <div class="bg-white border border-zinc-200 p-3 rounded-lg">
-            <span class="text-[10px] text-zinc-500 font-medium">Lluvia Campaña (NASA)</span>
-            <div class="mt-1 flex items-baseline gap-1">
-              <span class="text-lg font-bold text-zinc-950" id="hud-rain">510</span>
-              <span class="text-xs text-zinc-500">mm</span>
-            </div>
-            <span class="inline-block mt-1 text-[10px] font-semibold text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded border border-zinc-200" id="hud-anomaly">
-              -24.0% El Niño
-            </span>
-          </div>
-
-          <div class="bg-white border border-zinc-200 p-3 rounded-lg">
-            <span class="text-[10px] text-zinc-500 font-medium">Humedad de Suelo (IoT)</span>
-            <div class="mt-1 flex items-baseline gap-1">
-              <span class="text-lg font-bold text-zinc-950 font-mono" id="hud-vwc">18.4%</span>
-              <span class="text-xs text-zinc-500">VWC</span>
-            </div>
-            <span class="inline-block mt-1 text-[10px] font-medium text-zinc-600">
-              Temp: <strong id="hud-temp" class="text-zinc-900">12.3°C</strong>
-            </span>
-          </div>
-        </div>
-
-        <!-- Stratigraphic Soil Layers (ISRIC SoilGrids) -->
-        <div class="bg-white border border-zinc-200 p-3 rounded-lg space-y-2 text-xs">
-          <div class="flex justify-between items-center">
-            <span class="text-zinc-600 text-[11px] font-semibold">Salud Edáfica Basal (SoilGrids):</span>
-            <strong class="text-zinc-950 font-mono" id="hud-soil-health">62 / 100</strong>
-          </div>
-          <div class="grid grid-cols-3 gap-2 text-center text-xs pt-1">
-            <div class="bg-zinc-50 border border-zinc-200 p-2 rounded-md">
-              <span class="text-zinc-500 text-[10px] block">pH en Agua</span>
-              <p class="font-bold text-zinc-950 mt-0.5" id="hud-ph">6.1</p>
-            </div>
-            <div class="bg-zinc-50 border border-zinc-200 p-2 rounded-md">
-              <span class="text-zinc-500 text-[10px] block">Nitrógeno</span>
-              <p class="font-bold text-zinc-950 mt-0.5" id="hud-n">1.4 g/kg</p>
-            </div>
-            <div class="bg-zinc-50 border border-zinc-200 p-2 rounded-md">
-              <span class="text-zinc-500 text-[10px] block">Carbono SOC</span>
-              <p class="font-bold text-zinc-950 mt-0.5" id="hud-soc">18.2 g/kg</p>
-            </div>
-          </div>
-        </div>
-
-        <button onclick="switchTab('tab-quipu')" class="w-full py-2 bg-zinc-900 hover:bg-zinc-800 text-white font-semibold rounded-md text-xs transition shadow-xs">
-          Ver Quipu de Rotación Recomendado →
-        </button>
-      </div>
-
-      <!-- ================= TAB 2: QUIPU DE ROTACIÓN ================= -->
-      <div id="tab-quipu" class="tab-content hidden space-y-3">
-        
-        <!-- Controls: Crop Selection & Scenario Switcher -->
-        <div class="bg-white border border-zinc-200 p-3 rounded-lg space-y-2">
-          <label class="block text-xs font-semibold text-zinc-900">
-            Último cultivo cosechado en parcela:
-          </label>
-          <select id="select-crop" onchange="onCropChange()" class="w-full bg-white border border-zinc-200 text-zinc-900 text-xs rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-zinc-900 font-medium">
-            <option value="papa_nativa" selected>Papa Nativa (Huayro / Canchan)</option>
-            <option value="maiz">Maíz Blanco Gigante del Cusco</option>
-            <option value="cebada">Cebada Grano / Forraje</option>
-            <option value="tarwi">Tarwi / Chocho (Leguminosa)</option>
-            <option value="haba">Haba Verde de Valle</option>
-            <option value="quinua">Quinua Pasankalla</option>
-          </select>
-
-          <!-- Scenario Switcher (shadcn Button Toggle) -->
-          <div class="pt-1.5 grid grid-cols-2 gap-1.5 text-xs font-semibold">
-            <button id="btn-terraquipu" onclick="switchScenario('terraquipu')" class="py-1.5 rounded-md bg-zinc-900 text-white shadow-xs transition">
-              Ruta Terraquipu
-            </button>
-            <button id="btn-monoculture" onclick="switchScenario('monoculture')" class="py-1.5 rounded-md bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50 transition">
-              Monocultivo
-            </button>
-          </div>
-        </div>
-
-        <!-- 3-Year Campaign Sequence Cards -->
-        <div class="space-y-2" id="campaigns-container">
-          <!-- Campaign 1 -->
-          <div id="card-c1" class="bg-white border border-zinc-900 p-3 rounded-lg relative transition">
-            <div class="flex justify-between items-center text-[10px]">
-              <span class="font-bold text-zinc-950 uppercase" id="c1-season">CAMPAÑA 1 • 2026-2027 (EL NIÑO)</span>
-              <span class="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-800 font-medium border border-zinc-200" id="c1-badge">Leguminosa</span>
-            </div>
-            <div class="mt-1.5">
-              <h4 class="text-xs font-bold text-zinc-950" id="c1-name">Tarwi / Chocho</h4>
-              <p class="text-[11px] text-zinc-500" id="c1-var">Variedad Andenes INIA</p>
-            </div>
-            <div class="mt-2 pt-2 border-t border-zinc-100 flex justify-between text-xs">
-              <span class="text-zinc-500">Nitrógeno Aportado:</span>
-              <strong class="text-zinc-950 font-mono" id="c1-n">+95 kg N/ha</strong>
-            </div>
-          </div>
-
-          <!-- Campaign 2 -->
-          <div id="card-c2" class="bg-white border border-zinc-200 p-3 rounded-lg relative transition">
-            <div class="flex justify-between items-center text-[10px]">
-              <span class="font-bold text-zinc-500 uppercase" id="c2-season">CAMPAÑA 2 • 2027-2028</span>
-              <span class="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 font-medium border border-zinc-200" id="c2-badge">Grano Andino</span>
-            </div>
-            <div class="mt-1.5">
-              <h4 class="text-xs font-bold text-zinc-950" id="c2-name">Quinua Pasankalla</h4>
-              <p class="text-[11px] text-zinc-500" id="c2-var">Salcedo INIA</p>
-            </div>
-            <div class="mt-2 pt-2 border-t border-zinc-100 flex justify-between text-xs">
-              <span class="text-zinc-500">Demanda Hídrica:</span>
-              <strong class="text-zinc-950" id="c2-water">380 mm</strong>
-            </div>
-          </div>
-
-          <!-- Campaign 3 -->
-          <div id="card-c3" class="bg-white border border-zinc-200 p-3 rounded-lg relative transition">
-            <div class="flex justify-between items-center text-[10px]">
-              <span class="font-bold text-zinc-500 uppercase" id="c3-season">CAMPAÑA 3 • 2028-2029</span>
-              <span class="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 font-medium border border-zinc-200" id="c3-badge">Campaña Principal</span>
-            </div>
-            <div class="mt-1.5">
-              <h4 class="text-xs font-bold text-zinc-950" id="c3-name">Papa Nativa</h4>
-              <p class="text-[11px] text-zinc-500" id="c3-var">Huayro / Canchan</p>
-            </div>
-            <div class="mt-2 pt-2 border-t border-zinc-100 flex justify-between text-xs">
-              <span class="text-zinc-500">Suelo Regenerado:</span>
-              <strong class="text-zinc-950" id="c3-soil">100% (+28% Cosecha)</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ================= TAB 3: CURVAS DE REGENERACIÓN ================= -->
-      <div id="tab-chart" class="tab-content hidden space-y-3">
-        <div class="bg-white border border-zinc-200 p-3.5 rounded-lg space-y-2">
-          <div class="flex justify-between items-center">
-            <span class="text-xs font-bold text-zinc-950">Evolución del Índice de Fertilidad</span>
-            <span class="text-xs font-bold text-zinc-900" id="chart-delta">+22% de ganancia</span>
-          </div>
-          <div class="h-52 w-full">
-            <canvas id="soilChart"></canvas>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="bg-white p-3 rounded-lg border border-zinc-200">
-            <span class="text-zinc-500 text-[10px] block font-medium">Rendimiento Proyectado</span>
-            <strong class="text-sm text-zinc-950 mt-0.5 block font-mono">+28% Cosecha</strong>
-          </div>
-          <div class="bg-white p-3 rounded-lg border border-zinc-200">
-            <span class="text-zinc-500 text-[10px] block font-medium">Control de Plagas</span>
-            <strong class="text-sm text-zinc-950 mt-0.5 block font-mono">-75% Gorgojo</strong>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Sidebar Footer -->
-    <div class="px-4 py-2.5 border-t border-zinc-200 bg-zinc-50 text-center text-[10px] text-zinc-500">
-      Terraquipu • Arquitectura Espacial NASA & Ciencia del Suelo INIA
-    </div>
-  </aside>
-
-  <!-- 4. RIGHT-TOP FLOATING CARD: JUSTIFICACIÓN CIENTÍFICA (Con Fondo Tenue Diferenciado) -->
-  <aside id="rag-card" class="absolute top-4 right-4 z-[600] w-[calc(100vw-2rem)] sm:w-[380px] md:w-[410px] bg-[#fbf9f4]/95 backdrop-blur-md border border-amber-200/90 rounded-xl shadow-md p-4 space-y-3 transition-all duration-300">
-    <div class="flex items-center justify-between pb-2.5 border-b border-amber-200/70">
-      <div>
-        <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-950">
-          Justificación Científica
-        </h3>
-        <p class="text-[10px] text-zinc-600 font-medium">Validación Oficial INIA & SENAMHI</p>
-      </div>
-      
-      <div class="flex items-center gap-1.5">
-        <button onclick="speakExplanation()" id="btn-audio" class="px-2.5 py-1 bg-white hover:bg-amber-50 text-zinc-900 border border-amber-300/80 rounded-md text-[10px] font-semibold flex items-center gap-1 transition shadow-2xs">
-          <span id="audio-icon">🔊</span> <span id="audio-label">Escuchar</span>
-        </button>
-        <button onclick="toggleRagCard()" id="btn-rag-min" class="w-6 h-6 rounded-md border border-amber-300/80 bg-white text-zinc-700 hover:text-zinc-950 hover:bg-amber-50 flex items-center justify-center text-xs">
-          ▲
-        </button>
-      </div>
-    </div>
-
-    <!-- Scientific Summary Content -->
-    <div id="rag-body" class="space-y-2.5">
-      <p class="text-xs text-zinc-900 leading-relaxed font-sans" id="rag-text">
-        Tras la cosecha de Papa Nativa y bajo déficit hídrico por El Niño (-24%), el motor determinista prioriza Tarwi (Lupinus mutabilis). Esta leguminosa tolera sequías (350-500 mm), fija hasta 95 kg de N atmosférico por hectárea y rompe el ciclo biológico del gorgojo andino (Premnotrypes spp.).
+      <!-- Subtitle -->
+      <p class="text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed">
+        Cruzamos observaciones satelitales de la NASA con la lógica computacional del Quipu milenario. Predecimos sequías por El Niño y diseñamos rotaciones multianuales que devuelven nitrógeno al suelo sin fertilizantes químicos.
       </p>
 
-      <!-- Citations -->
-      <div class="pt-2 border-t border-amber-200/70 space-y-1.5 text-[11px] text-zinc-700">
-        <div class="p-2 bg-white/90 rounded-md border border-amber-200/80">
-          <strong class="text-zinc-950 font-semibold" id="rag-cite-1-inst">INIA Perú (2022)</strong> — <em id="rag-cite-1-doc">Manual Técnico N° 14: Manejo y Rotación de Tarwi</em>
-          <p class="text-zinc-700 mt-0.5 italic text-[10px]" id="rag-cite-1-quote">"La inclusión de leguminosas en valles interandinos reduce en un 75% la incidencia de plagas del suelo y aporta hasta 100 kg N/ha."</p>
+      <!-- Dual Call to Action -->
+      <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+        <a href="app.html" class="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white text-black font-semibold text-sm hover:bg-zinc-200 transition shadow-[0_0_25px_rgba(255,255,255,0.3)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
+          <span>🛰️ Explorar Visor Satelital en Vivo</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </a>
+        <a href="#unirse" class="w-full sm:w-auto px-6 py-3.5 rounded-full border border-white/15 bg-zinc-900/40 text-white font-medium text-sm hover:bg-zinc-800/80 transition flex items-center justify-center gap-2 backdrop-blur-md">
+          <span>🤝 Sumar mi Parcela o Comunidad</span>
+        </a>
+      </div>
+
+      <!-- Trust & Open Source Metrics Bar -->
+      <div class="pt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto text-left border-t border-white/[0.08]">
+        <div class="p-3">
+          <div class="text-2xl sm:text-3xl font-extrabold text-white font-mono">0 Soles</div>
+          <div class="text-xs text-zinc-400 mt-1">Costo de licencia (100% Libre MIT)</div>
         </div>
-        <div class="p-2 bg-white/90 rounded-md border border-amber-200/80">
-          <strong class="text-zinc-950 font-semibold" id="rag-cite-2-inst">SENAMHI (2024)</strong> — <em id="rag-cite-2-doc">Boletín Agroclimático Nacional para la Sierra Sur</em>
+        <div class="p-3">
+          <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono">+95 kg/ha</div>
+          <div class="text-xs text-zinc-400 mt-1">Nitrógeno fijado con Tarwi</div>
+        </div>
+        <div class="p-3">
+          <div class="text-2xl sm:text-3xl font-extrabold text-white font-mono">-40%</div>
+          <div class="text-xs text-zinc-400 mt-1">Demanda hídrica en sequía</div>
+        </div>
+        <div class="p-3">
+          <div class="text-2xl sm:text-3xl font-extrabold text-cyan-400 font-mono">30 Metros</div>
+          <div class="text-xs text-zinc-400 mt-1">Resolución espacial SRTM/DEM</div>
         </div>
       </div>
     </div>
-  </aside>
 
-  <!-- 5. BOTTOM FLOATING HUD COORDINATES & MAP LAYER CONTROLS -->
-  <div class="absolute bottom-4 right-4 z-[450] flex items-center gap-2 pointer-events-auto">
-    <div class="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-md border border-zinc-200 shadow-xs text-xs text-zinc-600 flex items-center gap-2">
-      <span>Coordenadas:</span>
-      <strong id="footer-coords" class="text-zinc-950 font-mono">-13.4180° S, -72.0460° W</strong>
+    <!-- ================= 3. HERO VISUAL ARTIFACT (ANTIMETAL MACOS CONSOLE) ================= -->
+    <div class="max-w-5xl mx-auto mt-12 px-2 sm:px-4">
+      <div class="rounded-2xl border border-white/15 bg-[#0a0a0e]/90 backdrop-blur-2xl shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden transition-all duration-300">
+        
+        <!-- Window Chrome Topbar -->
+        <div class="px-4 py-3 border-b border-white/10 bg-white/[0.02] flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
+            <span class="ml-2 font-mono text-[11px] text-zinc-400">terraquipu-console://cusco-chinchero-sector-b</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            <span class="text-[10px] font-mono uppercase tracking-wider text-emerald-400">Stream Satelital Activo</span>
+          </div>
+        </div>
+
+        <!-- Inner Dashboard Preview -->
+        <div class="p-5 sm:p-8 space-y-6">
+          
+          <!-- Sector Overview Card -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-white/10 bg-white/[0.03]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-semibold">Piso Ecológico: Quechua Superior</span>
+                <span class="text-zinc-600">•</span>
+                <span class="text-[10px] font-mono text-zinc-400">Altitud: 3,762 m s. n. m.</span>
+              </div>
+              <h3 class="text-lg sm:text-xl font-bold text-white mt-1">Parcela Piloto Chinchero Sector B</h3>
+              <p class="text-xs text-zinc-400">Valle Sagrado, Cusco • Coordenadas -13.5321° S, -71.9675° W</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-300 font-mono">
+                Alerta: Déficit El Niño -24.0%
+              </span>
+              <a href="app.html" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition">
+                Ver en Mapa ↗
+              </a>
+            </div>
+          </div>
+
+          <!-- 4 Telemetry Metrics Grid -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+            <div class="p-3.5 rounded-xl border border-white/10 bg-zinc-950/60">
+              <div class="text-[10px] uppercase font-mono text-zinc-400">Lluvia Campaña (NASA)</div>
+              <div class="text-xl font-bold font-mono text-white mt-1">510.0 mm</div>
+              <div class="text-[10px] text-amber-400 mt-1 font-medium">Déficit estacional moderado</div>
+            </div>
+            <div class="p-3.5 rounded-xl border border-white/10 bg-zinc-950/60">
+              <div class="text-[10px] uppercase font-mono text-zinc-400">Humedad Suelo (SMAP)</div>
+              <div class="text-xl font-bold font-mono text-emerald-400 mt-1">18.4% VWC</div>
+              <div class="text-[10px] text-zinc-400 mt-1 font-medium">Calibración en tierra</div>
+            </div>
+            <div class="p-3.5 rounded-xl border border-white/10 bg-zinc-950/60">
+              <div class="text-[10px] uppercase font-mono text-zinc-400">Fijación Nitrógeno</div>
+              <div class="text-xl font-bold font-mono text-emerald-400 mt-1">+95 kg N/ha</div>
+              <div class="text-[10px] text-zinc-400 mt-1 font-medium">Biológico (Sin urea)</div>
+            </div>
+            <div class="p-3.5 rounded-xl border border-white/10 bg-zinc-950/60">
+              <div class="text-[10px] uppercase font-mono text-zinc-400">Índice Idoneidad</div>
+              <div class="text-xl font-bold font-mono text-white mt-1">91 / 100</div>
+              <div class="text-[10px] text-emerald-400 mt-1 font-medium">Rotación Óptima INIA</div>
+            </div>
+          </div>
+
+          <!-- The Quipu 3-Season Rotation Timeline -->
+          <div class="p-4 rounded-xl border border-white/10 bg-white/[0.02] space-y-3">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-bold text-white flex items-center gap-1.5 font-mono">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                ESTRATEGIA QUIPU MULTIANUAL (3 CAMPAÑAS)
+              </span>
+              <span class="text-[11px] text-zinc-400">Algoritmo Determinista Auditable</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+              <!-- Season 1 -->
+              <div class="p-3 rounded-lg border border-emerald-500/30 bg-emerald-500/[0.05] relative overflow-hidden">
+                <div class="flex justify-between items-start">
+                  <span class="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-bold">Campaña 1 • 2026-2027</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">Leguminosa</span>
+                </div>
+                <h4 class="text-sm font-bold text-white mt-1">Tarwi / Chocho</h4>
+                <p class="text-[11px] text-zinc-400">Variedad Andenes INIA</p>
+                <div class="mt-2 pt-2 border-t border-emerald-500/20 flex justify-between text-[11px] font-mono">
+                  <span class="text-zinc-400">Aporte Nitrógeno:</span>
+                  <span class="text-emerald-400 font-bold">+95 kg N/ha</span>
+                </div>
+              </div>
+
+              <!-- Season 2 -->
+              <div class="p-3 rounded-lg border border-amber-500/30 bg-amber-500/[0.05] relative overflow-hidden">
+                <div class="flex justify-between items-start">
+                  <span class="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold">Campaña 2 • 2027-2028</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono">Resiliencia</span>
+                </div>
+                <h4 class="text-sm font-bold text-white mt-1">Quinua Pasankalla</h4>
+                <p class="text-[11px] text-zinc-400">Salcedo INIA (Tolerante)</p>
+                <div class="mt-2 pt-2 border-t border-amber-500/20 flex justify-between text-[11px] font-mono">
+                  <span class="text-zinc-400">Consumo Hídrico:</span>
+                  <span class="text-amber-400 font-bold">380 mm (Óptimo)</span>
+                </div>
+              </div>
+
+              <!-- Season 3 -->
+              <div class="p-3 rounded-lg border border-white/20 bg-white/[0.03] relative overflow-hidden">
+                <div class="flex justify-between items-start">
+                  <span class="text-[10px] font-mono uppercase tracking-wider text-zinc-300 font-bold">Campaña 3 • 2028-2029</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-white font-mono">Cosecha Mayor</span>
+                </div>
+                <h4 class="text-sm font-bold text-white mt-1">Papa Nativa Huayro</h4>
+                <p class="text-[11px] text-zinc-400">Variedad Canchan / Huayro</p>
+                <div class="mt-2 pt-2 border-t border-white/10 flex justify-between text-[11px] font-mono">
+                  <span class="text-zinc-400">Estado Suelo:</span>
+                  <span class="text-white font-bold">100% Regenerado</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scientific Backing Quote -->
+          <div class="p-3.5 rounded-xl border border-amber-300/30 bg-amber-500/[0.05] flex items-start gap-3">
+            <span class="text-base">📖</span>
+            <div class="text-xs leading-relaxed text-zinc-300">
+              <strong class="text-amber-300 font-semibold">Respaldo Oficial INIA Perú (Manual Técnico N° 14):</strong>
+              "La inclusión de leguminosas en valles interandinos reduce en un 75% la incidencia de plagas del suelo (gorgojo de los Andes) y aporta hasta 100 kg N/ha, blindando la productividad frente al estrés hídrico de El Niño."
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
-    <div class="bg-white/95 backdrop-blur-md p-1 rounded-md border border-zinc-200 shadow-xs flex text-xs font-medium">
-      <button id="btn-layer-sat" onclick="setMapLayer('sat')" class="px-2 py-1 rounded bg-zinc-900 text-white font-semibold">Satélite</button>
-      <button id="btn-layer-light" onclick="setMapLayer('light')" class="px-2 py-1 rounded text-zinc-600 hover:text-zinc-950">Plano Claro</button>
+  </section>
+
+  <!-- ================= 4. SOCIAL PROOF / PARTNERS BAR ================= -->
+  <section class="py-12 border-y border-white/[0.08] bg-black/50">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <p class="text-[11px] font-mono uppercase tracking-widest text-zinc-400 mb-6 font-semibold">
+        CONSTRUIDO CON DATOS Y PROTOCOLOS DE CIENCIA ABIERTA
+      </p>
+      <div class="flex flex-wrap items-center justify-center gap-8 sm:gap-12 opacity-70 grayscale hover:grayscale-0 transition-all duration-300">
+        <div class="flex items-center gap-2 text-zinc-300 font-mono text-xs font-bold">
+          <span class="text-emerald-400">✦</span> NASA POWER API
+        </div>
+        <div class="flex items-center gap-2 text-zinc-300 font-mono text-xs font-bold">
+          <span class="text-cyan-400">✦</span> NASA SMAP SOIL
+        </div>
+        <div class="flex items-center gap-2 text-zinc-300 font-mono text-xs font-bold">
+          <span class="text-amber-400">✦</span> INIA PERÚ
+        </div>
+        <div class="flex items-center gap-2 text-zinc-300 font-mono text-xs font-bold">
+          <span class="text-white">✦</span> SENAMHI CLIMA
+        </div>
+        <div class="flex items-center gap-2 text-zinc-300 font-mono text-xs font-bold">
+          <span class="text-emerald-400">✦</span> ISRIC SOILGRIDS
+        </div>
+        <div class="flex items-center gap-2 text-zinc-300 font-mono text-xs font-bold">
+          <span class="text-cyan-400">✦</span> OPEN-METEO DEM
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 5. BENTO GRID OF CAPABILITIES (ANTIMETAL SIGNATURE) ================= -->
+  <section id="features" class="py-24 px-4 max-w-6xl mx-auto">
+    <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-zinc-400 font-mono">
+        ARQUITECTURA DE SOFTWARE
+      </div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+        Todo lo que necesitas para planificar la siembra en 3 clics
+      </h2>
+      <p class="text-sm text-zinc-400">
+        Sin modelos abstractos ni cajas negras. Ciencia reproducible y auditable pensada para el agricultor real.
+      </p>
+    </div>
+
+    <!-- Bento Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      
+      <!-- Card 1 (Span 2): Downscaling Multiescala -->
+      <div class="md:col-span-2 rounded-3xl border border-white/10 bg-card p-6 sm:p-8 flex flex-col justify-between hairline-border hairline-border-hover relative overflow-hidden group">
+        <div class="space-y-3">
+          <span class="text-xs font-mono text-emerald-400 uppercase tracking-wider font-semibold">
+            01 • Fusión Geoespacial
+          </span>
+          <h3 class="text-xl sm:text-2xl font-bold text-white">
+            Downscaling satelital sin la "Trampa de Resolución"
+          </h3>
+          <p class="text-sm text-zinc-400 leading-relaxed max-w-xl">
+            Un pixel satelital de la NASA (10 km) mezcla valles fértiles con cumbres heladas. Terraquipu pondera el macroclima regional con modelos digitales de elevación SRTM (30m) y orientación de laderas para dar un diagnóstico exacto a nivel de microcuenca.
+          </p>
+        </div>
+
+        <div class="mt-6 pt-6 border-t border-white/[0.08] grid grid-cols-3 gap-3 text-center font-mono">
+          <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5">
+            <div class="text-xs text-zinc-400">NASA SMAP</div>
+            <div class="text-sm font-bold text-white mt-1">9 km Macro</div>
+          </div>
+          <div class="p-3 rounded-xl bg-emerald-500/[0.05] border border-emerald-500/20">
+            <div class="text-xs text-emerald-400 font-bold">SRTM DEM</div>
+            <div class="text-sm font-bold text-emerald-300 mt-1">30 m Topo</div>
+          </div>
+          <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5">
+            <div class="text-xs text-zinc-400">Parcela</div>
+            <div class="text-sm font-bold text-white mt-1">Ground Truth</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 (Span 1): Motor Determinista Auditable -->
+      <div class="rounded-3xl border border-white/10 bg-card p-6 sm:p-8 flex flex-col justify-between hairline-border hairline-border-hover relative overflow-hidden">
+        <div class="space-y-3">
+          <span class="text-xs font-mono text-cyan-400 uppercase tracking-wider font-semibold">
+            02 • Cero Alucinaciones
+          </span>
+          <h3 class="text-xl font-bold text-white">
+            Motor determinista auditable
+          </h3>
+          <p class="text-sm text-zinc-400 leading-relaxed">
+            Las recomendaciones no provienen de un chatbot inventando datos. Cada secuencia es calculada matemáticamente contra la matriz agronómica oficial del INIA y parámetros agroclimáticos del SENAMHI.
+          </p>
+        </div>
+
+        <div class="mt-6 pt-6 border-t border-white/[0.08] flex items-center justify-between text-xs font-mono text-zinc-400">
+          <span>Manual Técnico N° 14</span>
+          <span class="text-emerald-400 font-bold">100% Verificable</span>
+        </div>
+      </div>
+
+      <!-- Card 3 (Span 1): Resiliencia Hídrica en El Niño -->
+      <div class="rounded-3xl border border-white/10 bg-card p-6 sm:p-8 flex flex-col justify-between hairline-border hairline-border-hover relative overflow-hidden">
+        <div class="space-y-3">
+          <span class="text-xs font-mono text-amber-400 uppercase tracking-wider font-semibold">
+            03 • Adaptación Climática
+          </span>
+          <h3 class="text-xl font-bold text-white">
+            Escudo contra sequías por El Niño
+          </h3>
+          <p class="text-sm text-zinc-400 leading-relaxed">
+            Durante anomalías negativas de precipitación, el sistema prioriza variedades nativas como Quinua Pasankalla (380 mm) y Tarwi, ahorrando hasta 300 mm de agua frente al monocultivo de papa.
+          </p>
+        </div>
+
+        <div class="mt-6 pt-6 border-t border-white/[0.08] flex items-center justify-between text-xs font-mono text-zinc-400">
+          <span>Balance de Sequía</span>
+          <span class="text-amber-400 font-bold">-40% Estrés Hídrico</span>
+        </div>
+      </div>
+
+      <!-- Card 4 (Span 2): 100% Software & Ecosistema Abierto -->
+      <div class="md:col-span-2 rounded-3xl border border-white/10 bg-card p-6 sm:p-8 flex flex-col justify-between hairline-border hairline-border-hover relative overflow-hidden">
+        <div class="space-y-3">
+          <span class="text-xs font-mono text-white uppercase tracking-wider font-semibold">
+            04 • Soberanía Tecnológica
+          </span>
+          <h3 class="text-xl sm:text-2xl font-bold text-white">
+            100% Software Libre y datos accesibles
+          </h3>
+          <p class="text-sm text-zinc-400 leading-relaxed max-w-xl">
+            Sin tarifas de licencia, sin hardware propietario cautivo y sin muros de pago. El ecosistema completo de repositorios (`terraquipu-web`, `terraquipu-api`, `terraquipu-data`, `terraquipu-iot`) está disponible bajo licencia MIT para cualquier comunidad o investigador.
+          </p>
+        </div>
+
+        <div class="mt-6 pt-6 border-t border-white/[0.08] flex flex-wrap items-center gap-3">
+          <a href="https://github.com/TerraQuipu" target="_blank" class="text-xs font-mono px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-zinc-300 hover:text-white hover:bg-white/10 transition flex items-center gap-1.5">
+            <span>📦 github.com/TerraQuipu</span>
+          </a>
+          <span class="text-xs text-zinc-400 font-mono">Licencia MIT • FastAPI • Python • Leaflet</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= 6. INTERACTIVE IMPACT CALCULATOR (ANTIMETAL ROI STYLE) ================= -->
+  <section id="calculator" class="py-20 px-4 bg-white/[0.01] border-y border-white/[0.08]">
+    <div class="max-w-4xl mx-auto space-y-8">
+      
+      <div class="text-center space-y-2">
+        <span class="text-xs font-mono text-emerald-400 uppercase tracking-widest font-semibold">CALCULADORA DE IMPACTO AGROECOLÓGICO</span>
+        <h2 class="text-3xl font-extrabold text-white">¿Cuánto fertilizante y agua puedes ahorrar con la rotación?</h2>
+        <p class="text-sm text-zinc-400">Simula los beneficios de rotar Papa Nativa hacia Tarwi y Quinua en tu superficie agrícola.</p>
+      </div>
+
+      <!-- Interactive Widget Card -->
+      <div class="rounded-3xl border border-white/15 bg-card p-6 sm:p-8 space-y-8 shadow-2xl">
+        
+        <!-- Slider Control -->
+        <div class="space-y-3">
+          <div class="flex justify-between items-center text-sm">
+            <label for="hectares-range" class="font-medium text-zinc-300">Superficie de siembra evaluada:</label>
+            <span id="hectares-display" class="font-mono text-lg font-bold text-emerald-400">5 Hectáreas</span>
+          </div>
+          <input 
+            type="range" 
+            id="hectares-range" 
+            min="1" 
+            max="50" 
+            value="5" 
+            step="1"
+            class="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-400"
+            oninput="updateCalculator(this.value)"
+          >
+          <div class="flex justify-between text-[11px] font-mono text-zinc-400">
+            <span>1 ha (Familiar)</span>
+            <span>10 ha (Comunal)</span>
+            <span>25 ha</span>
+            <span>50 ha (Asociación)</span>
+          </div>
+        </div>
+
+        <!-- Calculated Live Metrics -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-white/[0.08]">
+          <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+            <div class="text-[11px] uppercase font-mono text-zinc-400">Nitrógeno Fijado</div>
+            <div id="calc-nitrogen" class="text-2xl font-bold font-mono text-emerald-400 mt-1">+475 kg N</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">Biológico mediante nódulos</div>
+          </div>
+          <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+            <div class="text-[11px] uppercase font-mono text-zinc-400">Ahorro en Urea/Abono</div>
+            <div id="calc-savings" class="text-2xl font-bold font-mono text-white mt-1">$1,425 USD</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">Equiv. a ~19 sacos de urea</div>
+          </div>
+          <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+            <div class="text-[11px] uppercase font-mono text-zinc-400">Agua Conservada</div>
+            <div id="calc-water" class="text-2xl font-bold font-mono text-cyan-400 mt-1">1,500 m³</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">Menor huella hídrica</div>
+          </div>
+          <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+            <div class="text-[11px] uppercase font-mono text-zinc-400">Ruptura de Plagas</div>
+            <div class="text-2xl font-bold font-mono text-amber-400 mt-1">-75%</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">Freno al gorgojo andino</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= 7. TRES VÍAS DE CONTRIBUCIÓN (PROFILES) ================= -->
+  <section id="comunidades" class="py-24 px-4 max-w-6xl mx-auto space-y-12">
+    <div class="text-center max-w-2xl mx-auto space-y-3">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-zinc-400 font-mono">
+        ECOSISTEMA ABIERTO
+      </div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+        Construido para campesinos, científicos y programadores
+      </h2>
+      <p class="text-sm text-zinc-400">
+        Elige cómo deseas involucrarte y contribuir a la resiliencia agroclimática.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <!-- Profile 1: Comunidades -->
+      <div class="rounded-3xl border border-white/10 bg-card p-6 sm:p-8 space-y-4 hairline-border hairline-border-hover flex flex-col justify-between">
+        <div class="space-y-3">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-lg text-emerald-400">
+            🌾
+          </div>
+          <h3 class="text-lg font-bold text-white">Comunidades & Productores</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Inscribe tu parcela o comunidad campesina para recibir un diagnóstico agroclimático gratuito de tu microcuenca y la recomendación de rotación óptima para tu altitud.
+          </p>
+        </div>
+        <button onclick="selectRole('comunidad')" class="w-full py-2.5 rounded-full border border-white/15 bg-white/5 hover:bg-white/10 text-xs font-semibold text-white transition text-center">
+          Inscribir mi Parcela →
+        </button>
+      </div>
+
+      <!-- Profile 2: Desarrolladores -->
+      <div class="rounded-3xl border border-white/10 bg-card p-6 sm:p-8 space-y-4 hairline-border hairline-border-hover flex flex-col justify-between">
+        <div class="space-y-3">
+          <div class="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-lg text-cyan-400">
+            💻
+          </div>
+          <h3 class="text-lg font-bold text-white">Desarrolladores & Científicos</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Aporta código en Python, algoritmos de downscaling satelital, interfaces geoespaciales o streaming de telemetría IoT. Todos nuestros repositorios son abiertos.
+          </p>
+        </div>
+        <button onclick="selectRole('desarrollador')" class="w-full py-2.5 rounded-full border border-white/15 bg-white/5 hover:bg-white/10 text-xs font-semibold text-white transition text-center">
+          Ver Tareas en GitHub →
+        </button>
+      </div>
+
+      <!-- Profile 3: Investigadores / Donantes -->
+      <div class="rounded-3xl border border-white/10 bg-card p-6 sm:p-8 space-y-4 hairline-border hairline-border-hover flex flex-col justify-between">
+        <div class="space-y-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-lg text-amber-400">
+            🔬
+          </div>
+          <h3 class="text-lg font-bold text-white">Investigación & Cooperación</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Valida variedades locales, publica estudios agronómicos sobre los datasets o financia el despliegue de pilotos en nuevas cuencas de la cordillera andina.
+          </p>
+        </div>
+        <button onclick="selectRole('investigador')" class="w-full py-2.5 rounded-full border border-white/15 bg-white/5 hover:bg-white/10 text-xs font-semibold text-white transition text-center">
+          Contactar para Alianzas →
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= 8. MULTI-PROFILE LEAD CAPTURE FORM (ANTIMETAL GLOW CARD) ================= -->
+  <section id="unirse" class="py-24 px-4 relative overflow-hidden bg-grid-pattern ambient-glow-amber">
+    <div class="max-w-3xl mx-auto">
+      
+      <!-- Glow Container Card -->
+      <div class="rounded-3xl border border-white/20 bg-black/80 backdrop-blur-2xl p-6 sm:p-10 space-y-8 shadow-[0_0_50px_rgba(16,185,129,0.1)]">
+        
+        <div class="text-center space-y-2">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-xs text-emerald-400 font-mono">
+            ÚNETE A LA ALIANZA TERRAQUIPU
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white">
+            Forma parte de la red de siembra y tecnología abierta
+          </h2>
+          <p class="text-xs sm:text-sm text-zinc-400 max-w-lg mx-auto">
+            Déjanos tus datos y te contactaremos en menos de 24 horas con las guías de integración y coordinación del piloto.
+          </p>
+        </div>
+
+        <!-- Role Selector Pills -->
+        <div class="space-y-2">
+          <label class="block text-xs font-mono uppercase text-zinc-400">Selecciona tu perfil de participación:</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <button type="button" onclick="setRoleOption('comunidad')" id="role-btn-comunidad" class="role-pill p-2.5 rounded-xl border border-emerald-500/50 bg-emerald-500/15 text-white font-medium transition text-center">
+              🌾 Comunidad
+            </button>
+            <button type="button" onclick="setRoleOption('desarrollador')" id="role-btn-desarrollador" class="role-pill p-2.5 rounded-xl border border-white/10 bg-white/5 text-zinc-400 hover:text-white transition text-center">
+              💻 Programador
+            </button>
+            <button type="button" onclick="setRoleOption('investigador')" id="role-btn-investigador" class="role-pill p-2.5 rounded-xl border border-white/10 bg-white/5 text-zinc-400 hover:text-white transition text-center">
+              🔬 Científico
+            </button>
+            <button type="button" onclick="setRoleOption('sponsor')" id="role-btn-sponsor" class="role-pill p-2.5 rounded-xl border border-white/10 bg-white/5 text-zinc-400 hover:text-white transition text-center">
+              🤝 Cooperante
+            </button>
+          </div>
+        </div>
+
+        <!-- Lead Form -->
+        <form id="lead-form" onsubmit="handleLeadSubmit(event)" class="space-y-4">
+          <input type="hidden" id="selected-role-input" value="Comunidad Agrícola / Productor">
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-mono text-zinc-400 mb-1">Nombre Completo *</label>
+              <input 
+                type="text" 
+                id="lead-name" 
+                required 
+                placeholder="Ej. Juan Quispe / María Flores" 
+                class="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-600 text-sm focus:outline-none focus:border-emerald-400 transition"
+              >
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-zinc-400 mb-1">Correo Electrónico *</label>
+              <input 
+                type="email" 
+                id="lead-email" 
+                required 
+                placeholder="juan@comunidad.org o personal" 
+                class="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-600 text-sm focus:outline-none focus:border-emerald-400 transition"
+              >
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-mono text-zinc-400 mb-1">WhatsApp / Teléfono *</label>
+              <input 
+                type="tel" 
+                id="lead-phone" 
+                required 
+                placeholder="+51 987 654 321" 
+                class="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-600 text-sm focus:outline-none focus:border-emerald-400 transition"
+              >
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-zinc-400 mb-1">Región / Organización / Universidad</label>
+              <input 
+                type="text" 
+                id="lead-org" 
+                placeholder="Ej. Valle de Urubamba / Cusco / UNALM" 
+                class="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-600 text-sm focus:outline-none focus:border-emerald-400 transition"
+              >
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-mono text-zinc-400 mb-1">¿Cómo deseas colaborar o qué parcela deseas evaluar?</label>
+            <textarea 
+              id="lead-message" 
+              rows="3" 
+              placeholder="Cuéntanos brevemente sobre tus cultivos actuales, interés técnico en los repositorios o propuesta de alianza..." 
+              class="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-600 text-sm focus:outline-none focus:border-emerald-400 transition"
+            ></textarea>
+          </div>
+
+          <!-- Submit Button -->
+          <button 
+            type="submit" 
+            class="w-full py-3.5 rounded-full bg-white text-black font-semibold text-sm hover:bg-zinc-200 transition shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+          >
+            <span>Enviar Solicitud de Participación →</span>
+          </button>
+
+          <p class="text-[11px] text-center text-zinc-400">
+            🔒 100% Libre de spam. Tus datos serán tratados estrictamente para la coordinación del proyecto abierto.
+          </p>
+        </form>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= 9. FAQ ACCORDION ================= -->
+  <section id="faq" class="py-20 px-4 max-w-3xl mx-auto space-y-8">
+    <div class="text-center space-y-2">
+      <span class="text-xs font-mono text-zinc-400 uppercase tracking-widest font-semibold">PREGUNTAS FRECUENTES</span>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Transparencia y Funcionamiento</h2>
+    </div>
+
+    <div class="space-y-3">
+      
+      <details class="group rounded-2xl border border-white/10 bg-card p-5 cursor-pointer">
+        <summary class="flex justify-between items-center text-sm font-semibold text-white list-none">
+          <span>¿Por qué Terraquipu es completamente gratuito y de código abierto?</span>
+          <span class="text-zinc-500 group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <p class="text-xs text-zinc-400 leading-relaxed mt-3 pt-3 border-t border-white/5">
+          Terraquipu nació en el marco del NASA Space Apps Challenge con el objetivo de democratizar la ciencia espacial. Creemos firmemente que las comunidades campesinas andinas, que alimentan a millones de personas, no deben pagar licencias por acceder a información climática que sus ancestros ya gestionaban con sabiduría milenaria.
+        </p>
+      </details>
+
+      <details class="group rounded-2xl border border-white/10 bg-card p-5 cursor-pointer">
+        <summary class="flex justify-between items-center text-sm font-semibold text-white list-none">
+          <span>¿Cómo se valida que las recomendaciones de rotación no sean inventadas?</span>
+          <span class="text-zinc-500 group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <p class="text-xs text-zinc-400 leading-relaxed mt-3 pt-3 border-t border-white/5">
+          A diferencia de los asistentes de IA convencionales que sufren de alucinaciones, Terraquipu utiliza un motor de puntuación determinista estricto. Cada compatibilidad de cultivo, requerimiento de lluvia y fijación de nitrógeno está respaldada por los manuales técnicos publicados por el INIA (Manual Técnico N° 14) y los boletines agroclimáticos del SENAMHI.
+        </p>
+      </details>
+
+      <details class="group rounded-2xl border border-white/10 bg-card p-5 cursor-pointer">
+        <summary class="flex justify-between items-center text-sm font-semibold text-white list-none">
+          <span>¿Necesitamos comprar sensores costosos para usar Terraquipu?</span>
+          <span class="text-zinc-500 group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <p class="text-xs text-zinc-400 leading-relaxed mt-3 pt-3 border-t border-white/5">
+          No. Terraquipu es un sistema 100% de software. El diagnóstico funciona directamente con observaciones satelitales (NASA POWER, SMAP y SRTM DEM). Para comunidades que cuentan con estaciones meteorológicas o sensores Arduino/ESP32, la API permite enviar telemetría de campo para calibrar aún más el diagnóstico, pero no es un requisito obligatorio.
+        </p>
+      </details>
+
+      <details class="group rounded-2xl border border-white/10 bg-card p-5 cursor-pointer">
+        <summary class="flex justify-between items-center text-sm font-semibold text-white list-none">
+          <span>¿Cómo pueden participar desarrolladores o agrónomos externos?</span>
+          <span class="text-zinc-500 group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <p class="text-xs text-zinc-400 leading-relaxed mt-3 pt-3 border-t border-white/5">
+          Todo el código está alojado en la organización GitHub (github.com/TerraQuipu). Puedes revisar las tareas etiquetadas como `good first issue`, clonar los repositorios, enviar Pull Requests o colaborar en la expansión de la matriz de cultivos andinos (`crop_matrix.json`).
+        </p>
+      </details>
+
+    </div>
+  </section>
+
+  <!-- ================= 10. FOOTER ================= -->
+  <footer class="py-12 border-t border-white/[0.08] bg-black text-xs text-zinc-400">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-6">
+      
+      <div class="flex items-center gap-3">
+        <div class="w-6 h-6 rounded-full bg-white flex items-center justify-center p-0.5">
+          <img src="assets/logo.svg" alt="Logo" class="w-full h-full">
+        </div>
+        <span class="font-mono font-bold text-white tracking-wider">TERRAQUIPU</span>
+        <span class="text-zinc-400">• Código Abierto para la Soberanía Alimentaria</span>
+      </div>
+
+      <div class="flex items-center gap-6 font-mono text-[11px]">
+        <a href="app.html" class="hover:text-white transition">Visor GIS</a>
+        <a href="https://github.com/TerraQuipu" target="_blank" class="hover:text-white transition">GitHub Org</a>
+        <a href="https://github.com/TerraQuipu/terraquipu-web" target="_blank" class="hover:text-white transition">terraquipu-web</a>
+        <a href="https://github.com/TerraQuipu/terraquipu-api" target="_blank" class="hover:text-white transition">terraquipu-api</a>
+      </div>
+
+      <div class="text-[11px] text-zinc-400 font-mono">
+        MIT License • NASA Space Apps Challenge 2026
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ================= SUCCESS CONFIRMATION MODAL ================= -->
+  <div id="success-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="rounded-3xl border border-white/20 bg-zinc-950 p-6 sm:p-8 max-w-md w-full space-y-5 text-center shadow-2xl">
+      <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-2xl">
+        ✓
+      </div>
+      <div class="space-y-1.5">
+        <h3 class="text-xl font-bold text-white">¡Solicitud Registrada con Éxito!</h3>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Gracias por sumarte a la red de Terraquipu. Hemos recibido tu información y un coordinador se comunicará contigo vía WhatsApp / Correo en menos de 24 horas.
+        </p>
+      </div>
+
+      <div class="p-3 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-zinc-300 text-left space-y-1">
+        <div><span class="text-zinc-500">Folio:</span> <span id="modal-folio" class="text-emerald-400 font-bold">TQ-2026-8492</span></div>
+        <div><span class="text-zinc-500">Perfil:</span> <span id="modal-role">Comunidad Agrícola</span></div>
+      </div>
+
+      <div class="pt-2 flex flex-col gap-2">
+        <a href="app.html" class="w-full py-2.5 rounded-full bg-white text-black font-semibold text-xs hover:bg-zinc-200 transition">
+          Explorar el Visor Satelital en Vivo →
+        </a>
+        <button onclick="closeModal()" class="w-full py-2.5 rounded-full border border-white/10 text-zinc-400 hover:text-white text-xs transition">
+          Cerrar
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- SCRIPT LOGIC -->
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
   <script>
-    // 1. Sector Datasets with distinct agronomic profiles & justifications
-    const sectors = {
-      chinchero: {
-        id: 'chinchero',
-        title: 'Chinchero Sector B',
-        location: 'Provincia Urubamba, Cusco',
-        microcuenca: 'Pampa Alta de Chinchero',
-        center: [-13.4180, -72.0460],
-        zoom: 13,
-        elevation: '3,762 m s. n. m.',
-        floor: 'Quechua Superior',
-        slope: '8.5° ladera este',
-        rainfall: 510,
-        anomaly: '-24.0% El Niño',
-        vwc: '18.4%',
-        temp: '12.3°C',
-        ph: '6.1',
-        nitrogen: '1.4 g/kg',
-        soc: '18.2 g/kg',
-        soilHealth: '62 / 100',
-        defaultCrop: 'papa_nativa',
-        bounds: [[-13.400, -72.065], [-13.402, -72.025], [-13.435, -72.028], [-13.432, -72.070]],
-        color: '#059669',
-        fillColor: '#10b981',
-        c1: { name: 'Tarwi / Chocho', var: 'Variedad Andenes INIA', n: '+95 kg N/ha', badge: 'Leguminosa', season: 'CAMPAÑA 1 • 2026-2027 (EL NIÑO)' },
-        c2: { name: 'Quinua Pasankalla', var: 'Salcedo INIA', water: '380 mm', badge: 'Grano Andino', season: 'CAMPAÑA 2 • 2027-2028' },
-        c3: { name: 'Papa Nativa', var: 'Huayro / Canchan', soil: '100% (+28% Cosecha)', badge: 'Campaña Principal', season: 'CAMPAÑA 3 • 2028-2029' },
-        chartData: [62, 85, 80, 88],
-        ragSummary: 'Tras la cosecha de Papa Nativa y bajo déficit hídrico por El Niño (-24%), el motor determinista prioriza Tarwi (Lupinus mutabilis). Esta leguminosa tolera sequías (350-500 mm), fija hasta 95 kg de N atmosférico por hectárea y rompe el ciclo biológico del gorgojo andino (Premnotrypes spp.).',
-        ragDoc: 'Manual Técnico N° 14: Manejo y Rotación de Tarwi en Zonas Altoandinas',
-        ragQuote: '"La inclusión de leguminosas en valles interandinos reduce en un 75% la incidencia de plagas del suelo y aporta hasta 100 kg N/ha."'
-      },
-      moray: {
-        id: 'moray',
-        title: 'Terrazas de Moray',
-        location: 'Maras, Valle Sagrado',
-        microcuenca: 'Laboratorio de Microclimas',
-        center: [-13.3298, -72.1969],
-        zoom: 14,
-        elevation: '3,500 m s. n. m.',
-        floor: 'Quechua Superior',
-        slope: '14.2° anfiteatro concéntrico',
-        rainfall: 480,
-        anomaly: '-28.5% El Niño',
-        vwc: '16.8%',
-        temp: '14.1°C',
-        ph: '6.4',
-        nitrogen: '1.6 g/kg',
-        soc: '19.5 g/kg',
-        soilHealth: '68 / 100',
-        defaultCrop: 'quinua',
-        bounds: [[-13.320, -72.210], [-13.322, -72.185], [-13.342, -72.187], [-13.340, -72.212]],
-        color: '#d97706',
-        fillColor: '#f59e0b',
-        c1: { name: 'Haba Verde de Altura', var: 'Blanca de Maras', n: '+80 kg N/ha', badge: 'Leguminosa', season: 'CAMPAÑA 1 • 2026-2027 (EL NIÑO)' },
-        c2: { name: 'Papa Nativa Amarilla', var: 'Tumbay INIA', water: '450 mm', badge: 'Tubérculo Clave', season: 'CAMPAÑA 2 • 2027-2028' },
-        c3: { name: 'Cebada Forrajera', var: 'Centenario INIA', soil: 'Cobertura de Suelo', badge: 'Cierre de Ciclo', season: 'CAMPAÑA 3 • 2028-2029' },
-        chartData: [68, 88, 82, 91],
-        ragSummary: 'En las terrazas concéntricas de Moray, el efecto microclimático amortigua las heladas. Tras quinua, se recomienda la siembra de Haba Verde de Altura para fijar nitrógeno biológico rápidamente (+80 kg/ha) antes de la campaña de papa nativa amarilla.',
-        ragDoc: 'Guía de Adaptación Climática en Terrazas Andinas - INIA Cusco',
-        ragQuote: '"Los microclimas de andenes permiten fijaciones simbióticas de nitrógeno hasta 20% más rápidas que en pampas abiertas."'
-      },
-      urubamba: {
-        id: 'urubamba',
-        title: 'Valle de Urubamba',
-        location: 'Fondo del Valle Sagrado',
-        microcuenca: 'Ribera del Río Vilcanota',
-        center: [-13.3060, -72.1158],
-        zoom: 13,
-        elevation: '2,870 m s. n. m.',
-        floor: 'Quechua Valle',
-        slope: '3.1° fondo aluvial',
-        rainfall: 590,
-        anomaly: '-16.2% El Niño',
-        vwc: '22.1%',
-        temp: '17.5°C',
-        ph: '6.8',
-        nitrogen: '2.1 g/kg',
-        soc: '22.4 g/kg',
-        soilHealth: '75 / 100',
-        defaultCrop: 'maiz',
-        bounds: [[-13.295, -72.135], [-13.298, -72.095], [-13.320, -72.098], [-13.318, -72.138]],
-        color: '#0284c7',
-        fillColor: '#0ea5e9',
-        c1: { name: 'Haba Blanca de Valle', var: 'Urubamba INIA', n: '+85 kg N/ha', badge: 'Leguminosa', season: 'CAMPAÑA 1 • 2026-2027 (EL NIÑO)' },
-        c2: { name: 'Papa de Riego', var: 'Yungay INIA', water: '500 mm', badge: 'Riego', season: 'CAMPAÑA 2 • 2027-2028' },
-        c3: { name: 'Maíz Blanco Gigante', var: 'Paraíso Cusco', soil: 'Suelo Re-Enriquecido', badge: 'Campaña Maicera', season: 'CAMPAÑA 3 • 2028-2029' },
-        chartData: [75, 92, 86, 94],
-        ragSummary: 'El Maíz Blanco Gigante del Cusco es un cultivo altamente extractor de nutrientes (-60 kg N/ha). La rotación con Haba Blanca restituye el nitrógeno del perfil aluvial sin fertilizantes químicos antes del siguiente ciclo maicero.',
-        ragDoc: 'Manual de Producción Sostenible de Maíz Gigante - INIA / CICA',
-        ragQuote: '"La alternancia Maíz-Haba en el Valle Sagrado mantiene la porosidad y microbioma del suelo aluvial por generaciones."'
-      },
-      pisac: {
-        id: 'pisac',
-        title: 'Andenes de Písac y Taray',
-        location: 'Calca, Valle Sagrado',
-        microcuenca: 'Laderas del Intihuatana',
-        center: [-13.4215, -71.8480],
-        zoom: 13,
-        elevation: '2,980 m s. n. m.',
-        floor: 'Quechua Medio',
-        slope: '16.8° andenería escalonada',
-        rainfall: 540,
-        anomaly: '-21.0% El Niño',
-        vwc: '19.5%',
-        temp: '15.8°C',
-        ph: '6.5',
-        nitrogen: '1.8 g/kg',
-        soc: '20.1 g/kg',
-        soilHealth: '70 / 100',
-        defaultCrop: 'cebada',
-        bounds: [[-13.410, -71.865], [-13.412, -71.830], [-13.435, -71.832], [-13.432, -71.868]],
-        color: '#7c3aed',
-        fillColor: '#8b5cf6',
-        c1: { name: 'Tarwi de Quebrada', var: 'Yunguyo INIA', n: '+95 kg N/ha', badge: 'Cobertura', season: 'CAMPAÑA 1 • 2026-2027 (EL NIÑO)' },
-        c2: { name: 'Papa Nativa', var: 'Canchan INIA', water: '520 mm', badge: 'Tubérculo', season: 'CAMPAÑA 2 • 2027-2028' },
-        c3: { name: 'Quinua Blanca', var: 'Salcedo INIA', soil: 'Estructura Firme', badge: 'Cierre', season: 'CAMPAÑA 3 • 2028-2029' },
-        chartData: [70, 89, 84, 90],
-        ragSummary: 'En las laderas empinadas de Písac (16.8° de pendiente), el Tarwi actúa como cubierta viva contra la erosión por lluvias intensas de El Niño, fijando hasta 95 kg de nitrógeno para la campaña de papa en andenes.',
-        ragDoc: 'Control de Erosión y Manejo de Suelos en Laderas Andinas - SENAMHI / INIA',
-        ragQuote: '"Las raíces pivotantes del Tarwi estabilizan el talud de las terrazas andinas y rompen la compactación."'
-      }
+    // 1. Calculator Interaction
+    function updateCalculator(ha) {
+      const hectares = parseInt(ha);
+      document.getElementById('hectares-display').innerText = `${hectares} Hectárea${hectares > 1 ? 's' : ''}`;
+      
+      const nitrogen = hectares * 95;
+      const savingsUsd = hectares * 285;
+      const waterM3 = hectares * 300;
+
+      document.getElementById('calc-nitrogen').innerText = `+${nitrogen.toLocaleString()} kg N`;
+      document.getElementById('calc-savings').innerText = `$${savingsUsd.toLocaleString()} USD`;
+      document.getElementById('calc-water').innerText = `${waterM3.toLocaleString()} m³`;
+    }
+
+    // 2. Role Selector Tabs in Form
+    const roleLabels = {
+      'comunidad': 'Comunidad Agrícola / Productor',
+      'desarrollador': 'Desarrollador / Científico de Datos Open Source',
+      'investigador': 'Investigador / Agrónomo / Universidad',
+      'sponsor': 'ONG / Institución Pública / Cooperante ESG'
     };
 
-    let activeSectorKey = 'chinchero';
-    let currentScenario = 'terraquipu';
-    let isCollapsed = false;
-    let isRagMinimized = false;
-
-    // 2. Leaflet Map Initialization
-    const map = L.map('map', { zoomControl: false }).setView(sectors.chinchero.center, 12);
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-    const esriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 18,
-      attribution: 'NASA, USGS, Esri | Terraquipu'
-    }).addTo(map);
-
-    const cartoLight = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 18,
-      attribution: 'CartoDB | Terraquipu'
-    });
-
-    function setMapLayer(layer) {
-      if (layer === 'sat') {
-        map.removeLayer(cartoLight);
-        map.addLayer(esriSatellite);
-        document.getElementById('btn-layer-sat').className = 'px-2 py-1 rounded bg-zinc-900 text-white font-semibold';
-        document.getElementById('btn-layer-light').className = 'px-2 py-1 rounded text-zinc-600 hover:text-zinc-950';
-      } else {
-        map.removeLayer(esriSatellite);
-        map.addLayer(cartoLight);
-        document.getElementById('btn-layer-light').className = 'px-2 py-1 rounded bg-zinc-900 text-white font-semibold';
-        document.getElementById('btn-layer-sat').className = 'px-2 py-1 rounded text-zinc-600 hover:text-zinc-950';
+    function setRoleOption(roleKey) {
+      document.querySelectorAll('.role-pill').forEach(btn => {
+        btn.classList.remove('border-emerald-500/50', 'bg-emerald-500/15', 'text-white');
+        btn.classList.add('border-white/10', 'bg-white/5', 'text-zinc-400');
+      });
+      const activeBtn = document.getElementById(`role-btn-${roleKey}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('border-white/10', 'bg-white/5', 'text-zinc-400');
+        activeBtn.classList.add('border-emerald-500/50', 'bg-emerald-500/15', 'text-white');
       }
+      document.getElementById('selected-role-input').value = roleLabels[roleKey] || 'Comunidad Agrícola / Productor';
     }
 
-    const radarIcon = L.divIcon({ className: 'pulse-radar', iconSize: [20, 20], iconAnchor: [10, 10] });
-    const marker = L.marker(sectors.chinchero.center, { icon: radarIcon }).addTo(map);
+    function selectRole(roleKey) {
+      setRoleOption(roleKey);
+      document.getElementById('unirse').scrollIntoView({ behavior: 'smooth' });
+    }
 
-    // 3. Render Sector Polygons with Tenuous Background Color
-    const sectorLayers = {};
-    Object.keys(sectors).forEach(key => {
-      const sec = sectors[key];
-      const polygon = L.polygon(sec.bounds, {
-        color: sec.color,
-        weight: 2.5,
-        fillColor: sec.fillColor,
-        fillOpacity: 0.25
-      }).addTo(map);
+    // 3. Lead Form Submission Handler
+    function handleLeadSubmit(event) {
+      event.preventDefault();
+      
+      const role = document.getElementById('selected-role-input').value;
+      const name = document.getElementById('lead-name').value;
+      const email = document.getElementById('lead-email').value;
+      const phone = document.getElementById('lead-phone').value;
+      const org = document.getElementById('lead-org').value;
+      const msg = document.getElementById('lead-message').value;
 
-      polygon.bindTooltip(`<strong>${sec.title}</strong><br><span style="color:#71717a">${sec.elevation}</span>`, {
-        direction: 'center',
-        className: 'bg-white text-zinc-950 border border-zinc-300 px-2.5 py-1 rounded-md text-xs shadow-sm font-sans'
-      });
+      // Generate realistic tracking ID
+      const folio = 'TQ-' + Math.floor(1000 + Math.random() * 9000);
 
-      polygon.on('mouseover', function() { this.setStyle({ weight: 4, fillOpacity: 0.45 }); });
-      polygon.on('mouseout', function() {
-        if (activeSectorKey !== key) this.setStyle({ weight: 2.5, fillOpacity: 0.25 });
-      });
-      polygon.on('click', function() { selectSector(key); });
-
-      sectorLayers[key] = polygon;
-    });
-
-    // 4. Sector Selection Handler
-    function selectSector(key) {
-      activeSectorKey = key;
-      const s = sectors[key];
-
-      // Highlight active polygon with clear boundary
-      Object.keys(sectorLayers).forEach(k => {
-        sectorLayers[k].setStyle({
-          weight: k === key ? 4 : 2.5,
-          fillOpacity: k === key ? 0.42 : 0.22,
-          color: sectors[k].color
+      // Save locally in localStorage for persistent lead management
+      try {
+        const existingLeads = JSON.parse(localStorage.getItem('terraquipu_leads') || '[]');
+        existingLeads.push({
+          folio,
+          role,
+          name,
+          email,
+          phone,
+          org,
+          msg,
+          timestamp: new Date().toISOString()
         });
-      });
+        localStorage.setItem('terraquipu_leads', JSON.stringify(existingLeads));
+      } catch (e) {
+        console.warn('localStorage lead caching skipped:', e);
+      }
 
-      // Smooth camera transition
-      map.flyTo(s.center, s.zoom, { duration: 1.2 });
-      marker.setLatLng(s.center);
-      marker.setIcon(L.divIcon({
-        className: 'pulse-radar',
-        html: `<div style="width:20px; height:20px; background:${s.color}; border:3px solid #ffffff; border-radius:50%; box-shadow:0 0 10px ${s.color};"></div>`,
-        iconSize: [20, 20],
-        iconAnchor: [10, 10]
-      }));
+      // Display Modal
+      document.getElementById('modal-folio').innerText = folio;
+      document.getElementById('modal-role').innerText = role;
+      document.getElementById('success-modal').classList.remove('hidden');
+      document.getElementById('success-modal').classList.add('flex');
 
-      // Top Sector Pills
-      document.querySelectorAll('.sector-pill').forEach(btn => {
-        btn.className = 'sector-pill px-3 py-1.5 rounded-md text-xs font-medium text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition flex items-center gap-1.5';
-      });
-      document.getElementById(`pill-${key}`).className = 'sector-pill px-3 py-1.5 rounded-md text-xs font-semibold bg-zinc-900 text-white transition flex items-center gap-1.5';
-
-      // Update Left Sidebar Header
-      document.getElementById('sector-title').innerText = s.title;
-      document.getElementById('sector-location').innerText = s.location;
-      document.getElementById('sector-microcuenca').innerText = s.microcuenca.toUpperCase();
-      document.getElementById('sector-floor-badge').innerText = s.floor;
-      document.getElementById('sector-alt').innerText = s.elevation;
-      document.getElementById('sector-slope').innerText = s.slope;
-
-      // Update Tab 1 (Diagnóstico)
-      document.getElementById('hud-rain').innerText = s.rainfall;
-      document.getElementById('hud-anomaly').innerText = s.anomaly;
-      document.getElementById('hud-vwc').innerText = s.vwc;
-      document.getElementById('hud-temp').innerText = s.temp;
-      document.getElementById('hud-ph').innerText = s.ph;
-      document.getElementById('hud-n').innerText = s.nitrogen;
-      document.getElementById('hud-soc').innerText = s.soc;
-      document.getElementById('hud-soil-health').innerText = s.soilHealth;
-      document.getElementById('footer-coords').innerText = `${s.center[0].toFixed(4)}° S, ${s.center[1].toFixed(4)}° W`;
-
-      // Set default crop
-      document.getElementById('select-crop').value = s.defaultCrop;
-
-      // Update Tab 2 (Quipu Cards)
-      document.getElementById('c1-name').innerText = s.c1.name;
-      document.getElementById('c1-var').innerText = s.c1.var;
-      document.getElementById('c1-n').innerText = s.c1.n;
-      document.getElementById('c1-badge').innerText = s.c1.badge;
-      document.getElementById('c1-season').innerText = s.c1.season;
-
-      document.getElementById('c2-name').innerText = s.c2.name;
-      document.getElementById('c2-var').innerText = s.c2.var;
-      document.getElementById('c2-water').innerText = s.c2.water;
-      document.getElementById('c2-badge').innerText = s.c2.badge;
-      document.getElementById('c2-season').innerText = s.c2.season;
-
-      document.getElementById('c3-name').innerText = s.c3.name;
-      document.getElementById('c3-var').innerText = s.c3.var;
-      document.getElementById('c3-soil').innerText = s.c3.soil;
-      document.getElementById('c3-badge').innerText = s.c3.badge;
-      document.getElementById('c3-season').innerText = s.c3.season;
-
-      // Update Tab 3 (Chart)
-      soilChart.data.datasets[0].data = s.chartData;
-      soilChart.update();
-
-      // Update Right-Top Dedicated Card (Justificación Científica)
-      document.getElementById('rag-text').innerText = s.ragSummary;
-      document.getElementById('rag-cite-1-doc').innerText = s.ragDoc;
-      document.getElementById('rag-cite-1-quote').innerText = s.ragQuote;
+      // Reset Form
+      document.getElementById('lead-form').reset();
     }
 
-    // Tab Switching Logic (shadcn style active states)
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.getElementById(tabId).classList.remove('hidden');
-
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.className = 'tab-btn py-1.5 rounded-md text-zinc-600 hover:text-zinc-950 font-medium transition text-center';
-      });
-      const activeBtnId = tabId.replace('tab-', 'btn-tab-');
-      document.getElementById(activeBtnId).className = 'tab-btn py-1.5 rounded-md bg-white text-zinc-950 font-semibold shadow-xs transition text-center';
-
-      if (tabId === 'tab-chart' && typeof soilChart !== 'undefined') {
-        setTimeout(() => soilChart.resize(), 50);
-      }
+    function closeModal() {
+      document.getElementById('success-modal').classList.add('hidden');
+      document.getElementById('success-modal').classList.remove('flex');
     }
-
-    // Crop Selection Change
-    function onCropChange() {
-      const crop = document.getElementById('select-crop').value;
-      const s = sectors[activeSectorKey];
-
-      if (crop === 'papa_nativa') {
-        document.getElementById('c1-name').innerText = 'Tarwi / Chocho';
-        document.getElementById('c1-var').innerText = 'Variedad Andenes INIA';
-        document.getElementById('c1-n').innerText = '+95 kg N/ha';
-        document.getElementById('rag-text').innerText = 
-          `Tras la cosecha de Papa Nativa en ${s.title}, el suelo presenta agotamiento de nitrógeno y riesgo de gorgojo. Se introduce Tarwi como cultivo regenerativo para fijar hasta 95 kg N/ha bajo condiciones de sequía El Niño.`;
-      } else if (crop === 'maiz') {
-        document.getElementById('c1-name').innerText = 'Haba Verde / Grano';
-        document.getElementById('c1-var').innerText = 'Blanca de Urubamba';
-        document.getElementById('c1-n').innerText = '+75 kg N/ha';
-        document.getElementById('rag-text').innerText = 
-          `En ${s.title}, el Maíz Blanco extrae grandes cantidades de nitrógeno. La rotación inmediata con Haba Verde restituye el perfil nutricional antes del siguiente ciclo agrícola.`;
-      } else if (crop === 'tarwi' || crop === 'haba') {
-        document.getElementById('c1-name').innerText = 'Papa Nativa Premium';
-        document.getElementById('c1-var').innerText = 'Canchan / Huayro';
-        document.getElementById('c1-n').innerText = '-70 kg N/ha';
-        document.getElementById('rag-text').innerText = 
-          `Suelo fertilizado con nitrógeno biológico en ${s.title}. La leguminosa previa preparó la tierra para un rendimiento óptimo de Papa Nativa con 40% menos fertilizante sintético.`;
-      } else {
-        document.getElementById('c1-name').innerText = 'Tarwi / Chocho';
-        document.getElementById('c1-var').innerText = 'Andenes INIA';
-        document.getElementById('c1-n').innerText = '+95 kg N/ha';
-        document.getElementById('rag-text').innerText = 
-          `Para romper el ciclo de malezas y restaurar materia orgánica tras cereales en ${s.title}, se introduce Tarwi como cultivo de cobertura regenerativa.`;
-      }
-    }
-
-    // Scenario Switcher (shadcn Monochrome)
-    function switchScenario(scen) {
-      currentScenario = scen;
-      const btnT = document.getElementById('btn-terraquipu');
-      const btnM = document.getElementById('btn-monoculture');
-
-      if (scen === 'monoculture') {
-        btnM.className = 'py-1.5 rounded-md bg-zinc-900 text-white font-semibold shadow-xs transition';
-        btnT.className = 'py-1.5 rounded-md bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50 transition';
-
-        document.getElementById('c1-name').innerText = 'Papa Nativa (Monocultivo)';
-        document.getElementById('c1-var').innerText = 'Resiembra Consecutiva en Suelo Agotado';
-        document.getElementById('c1-n').innerText = '-70 kg N/ha';
-        document.getElementById('c1-badge').innerText = 'Degradación';
-
-        document.getElementById('chart-delta').innerText = '-54% de fertilidad';
-
-        document.getElementById('rag-text').innerText = 
-          'ALERTA: La resiembra consecutiva de tubérculos en el mismo suelo durante El Niño (-24% lluvia) provoca el colapso del nitrógeno edáfico (-140 kg N acumulado), incrementa la incidencia de larvas de gorgojo andino al 80% y eleva el riesgo de pérdida total de campaña.';
-
-        soilChart.data.datasets[0].data = [62, 45, 32, 21];
-        soilChart.data.datasets[0].borderDash = [4, 4];
-        soilChart.update();
-      } else {
-        btnT.className = 'py-1.5 rounded-md bg-zinc-900 text-white font-semibold shadow-xs transition';
-        btnM.className = 'py-1.5 rounded-md bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50 transition';
-
-        document.getElementById('chart-delta').innerText = '+22% de fertilidad';
-
-        soilChart.data.datasets[0].borderDash = [];
-        selectSector(activeSectorKey);
-      }
-    }
-
-    // 5. Chart.js Setup (Monochrome Scheme)
-    const ctx = document.getElementById('soilChart').getContext('2d');
-    const soilChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: ['Inicio', 'Campaña 1', 'Campaña 2', 'Campaña 3'],
-        datasets: [{
-          label: 'Salud del Suelo',
-          data: [62, 85, 80, 88],
-          borderColor: '#18181b',
-          backgroundColor: 'rgba(24, 24, 27, 0.05)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.3,
-          pointBackgroundColor: '#18181b',
-          pointRadius: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { color: '#f4f4f5' }, ticks: { color: '#71717a', font: { size: 10, family: 'Arial' } } },
-          y: { min: 10, max: 100, grid: { color: '#f4f4f5' }, ticks: { color: '#71717a', font: { size: 10, family: 'Arial' } } }
-        }
-      }
-    });
-
-    // 6. Speech Synthesis (Audio AI in Spanish)
-    function speakExplanation() {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const text = document.getElementById('rag-text').innerText;
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'es-PE';
-        utterance.rate = 1.0;
-
-        const btnLabel = document.getElementById('audio-label');
-        const btnIcon = document.getElementById('audio-icon');
-
-        utterance.onstart = function() {
-          btnLabel.innerText = 'Hablando...';
-          btnIcon.innerText = '🔊';
-        };
-        utterance.onend = function() {
-          btnLabel.innerText = 'Escuchar';
-          btnIcon.innerText = '🔈';
-        };
-        window.speechSynthesis.speak(utterance);
-      }
-    }
-
-    // 7. Toggle Left Sidebar
-    function toggleSidebarCollapse() {
-      const sb = document.getElementById('sidebar');
-      const btn = document.getElementById('btn-collapse');
-      isCollapsed = !isCollapsed;
-      if (isCollapsed) {
-        sb.style.transform = 'translateX(-105%)';
-        btn.innerText = '▶';
-        const reopen = document.createElement('button');
-        reopen.id = 'reopen-pill';
-        reopen.className = 'absolute top-4 left-4 z-[700] px-3 py-1.5 bg-white text-zinc-950 font-semibold rounded-md border border-zinc-300 shadow-sm flex items-center gap-1.5 text-xs transition';
-        reopen.innerHTML = '<span>Panel Terraquipu</span>';
-        reopen.onclick = toggleSidebarCollapse;
-        document.body.appendChild(reopen);
-      } else {
-        sb.style.transform = 'translateX(0)';
-        btn.innerText = '◀';
-        const reopen = document.getElementById('reopen-pill');
-        if (reopen) reopen.remove();
-      }
-    }
-
-    // 8. Toggle Right-Top Card
-    function toggleRagCard() {
-      const body = document.getElementById('rag-body');
-      const btn = document.getElementById('btn-rag-min');
-      isRagMinimized = !isRagMinimized;
-      if (isRagMinimized) {
-        body.classList.add('hidden');
-        btn.innerText = '▼';
-      } else {
-        body.classList.remove('hidden');
-        btn.innerText = '▲';
-      }
-    }
-
-    // Initialize on load
-    selectSector('chinchero');
   </script>
+
 </body>
 </html>

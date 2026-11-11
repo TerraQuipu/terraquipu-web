@@ -6,9 +6,26 @@
 [![Live Demo](https://img.shields.io/badge/Demo%20en%20Vivo-GitHub%20Pages-22c55e?style=for-the-badge&logo=github)](https://terraquipu.github.io/terraquipu-web/)
 [![Status](https://img.shields.io/badge/Producci%C3%B3n-Online%20(200%20OK)-0284c7?style=for-the-badge)](https://terraquipu.github.io/terraquipu-web/)
 
-👉 **Acceso directo a producción:** [https://terraquipu.github.io/terraquipu-web/](https://terraquipu.github.io/terraquipu-web/)
+👉 **Acceso directo a producción:**
+* **Landing Page de Captación:** [https://terraquipu.github.io/terraquipu-web/](https://terraquipu.github.io/terraquipu-web/)
+* **Visor GIS Satelital en Vivo:** [https://terraquipu.github.io/terraquipu-web/app.html](https://terraquipu.github.io/terraquipu-web/app.html)
 
 ---
+
+## 📌 Arquitectura del Frontend y Componentes
+
+El frontend de `terraquipu-web` se compone de dos experiencias complementarias conectadas de forma bidireccional:
+
+1. **Landing Page de Captación de Leads (`index.html` / `landing.html`):**
+   * Inspirada en la estética B2B/DevTech de **Antimetal** (fondo dark profundo `#050507`, bordes hairline translúcidos, resplandores radiales esmeralda/ámbar).
+   * **Hero Visual Artifact:** Consola interactiva estilo macOS con simulación en tiempo real de telemetría de Chinchero y línea temporal del Quipu.
+   * **Bento Grid:** Cuatro tarjetas con downscaling satelital, motor determinista INIA, resiliencia hídrica y código abierto.
+   * **Calculadora Agroecológica Interactiva:** Slider dinámico para calcular ahorro en urea/dólares, nitrógeno biológico fijado y agua conservada.
+   * **Formulario de Captura Multi-Perfil:** Segmentación inmediata para Comunidades Campesinas, Desarrolladores Open Source, Científicos de Datos y Donantes ESG.
+2. **Visor GIS Satelital y Rotación Multianual (`app.html`):**
+   * Mapa interactivo fullscreen (Esri World Imagery + CartoDB Light) con polígonos de sectores andinos (Chinchero, Moray, Urubamba, Písac).
+   * Sidebar modular con pestañas de *Diagnóstico*, *Quipu Rotación* y *Curvas de Fertilidad*.
+   * Tarjeta flotante de Justificación Científica (INIA/SENAMHI) con locución por voz (Web Speech API).
 
 ## 📌 Propósito del Repositorio
 
