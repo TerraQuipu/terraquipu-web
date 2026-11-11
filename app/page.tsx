@@ -23,6 +23,7 @@ export default function SuperpowerTerraquipuLanding() {
   const [selectedRole, setSelectedRole] = useState("comunidad");
   const [leadSuccess, setLeadSuccess] = useState(false);
   const [folio, setFolio] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,48 +35,84 @@ export default function SuperpowerTerraquipuLanding() {
   return (
     <div className="min-h-screen bg-white text-zinc-900 font-sans selection:bg-amber-500 selection:text-white">
       
-      {/* ================= 1. TOP HEADER (SUPERPOWER MINIMALIST) ================= */}
-      <header className="sticky top-0 z-50 w-full bg-[#090A0D]/95 backdrop-blur-md border-b border-white/10 text-white">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      {/* ================= 1. FLOATING SUPERPOWER PILL NAVBAR ================= */}
+      <header className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl z-50">
+        <div className="rounded-full bg-[#242426]/90 backdrop-blur-xl border border-white/15 px-6 py-2.5 flex items-center justify-between shadow-[0_12px_40px_rgba(0,0,0,0.65)]">
           
-          <a href="#" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-amber-300 p-0.5 flex items-center justify-center">
-              <div className="w-full h-full rounded-full bg-[#090A0D] flex items-center justify-center text-amber-400 font-bold text-xs font-mono">
-                TQ
-              </div>
-            </div>
-            <span className="font-bold tracking-widest text-sm font-mono text-white">TERRAQUIPU</span>
-          </a>
-
-          <nav className="hidden md:flex items-center gap-8 text-xs font-medium text-zinc-400">
-            <a href="#como-funciona" className="hover:text-white transition">Cómo Funciona</a>
+          {/* Left Navigation Links (Superpower: What we test, Reviews, FAQs, For Employers) */}
+          <nav className="hidden lg:flex items-center gap-7 text-[13px] font-semibold text-white/90">
+            <a href="#como-funciona" className="hover:text-white transition">Cómo funciona</a>
             <a href="#diagnostico" className="hover:text-white transition">Diagnóstico 30m</a>
             <a href="#quipu" className="hover:text-white transition">El Quipu</a>
-            <a href="#comunidad" className="hover:text-white transition">Comunidad</a>
-            <a href="https://github.com/TerraQuipu" target="_blank" rel="noreferrer" className="hover:text-white transition flex items-center gap-1">
-              <span>GitHub</span>
-              <span className="text-[10px]">↗</span>
-            </a>
+            <a href="#unirse" className="hover:text-white transition">Comunidad</a>
           </nav>
 
+          {/* Center Brand Name (Exact Superpower Style: lowercase bold centered wordmark) */}
+          <a href="#" className="flex items-center gap-2 group mx-auto lg:mx-0">
+            <span className="text-xl font-bold tracking-tight text-white lowercase">
+              terraquipu
+            </span>
+          </a>
+
+          {/* Right Action Cluster (Log in, Become a member, 3x3 Grid Dots) */}
           <div className="flex items-center gap-3">
-            <a href="#unirse" className="hidden sm:inline-block text-xs font-medium text-zinc-300 hover:text-white px-3 py-1.5 transition">
-              Sumarme
+            <a 
+              href="https://github.com/TerraQuipu" 
+              target="_blank" 
+              rel="noreferrer" 
+              className="hidden sm:inline-block text-[13px] font-semibold text-white/90 hover:text-white px-2 py-1 transition"
+            >
+              GitHub
             </a>
+
+            {/* White Pill Button: Become a member */}
             <a 
               href="./app.html" 
-              className="px-5 py-2 rounded-full bg-white text-black text-xs font-semibold hover:bg-zinc-200 transition shadow-[0_0_20px_rgba(255,255,255,0.25)] flex items-center gap-1.5"
+              className="px-5 py-2 rounded-full bg-white text-black text-[13px] font-semibold hover:bg-zinc-100 transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98]"
             >
-              <span>Visor GIS</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>Visor Satelital</span>
             </a>
+
+            {/* Circular 3x3 Grid Dots Icon Button */}
+            <button 
+              type="button" 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              title="Menú"
+              className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center text-white transition cursor-pointer"
+            >
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <circle cx="5" cy="5" r="2"/>
+                <circle cx="12" cy="5" r="2"/>
+                <circle cx="19" cy="5" r="2"/>
+                <circle cx="5" cy="12" r="2"/>
+                <circle cx="12" cy="12" r="2"/>
+                <circle cx="19" cy="12" r="2"/>
+                <circle cx="5" cy="19" r="2"/>
+                <circle cx="12" cy="19" r="2"/>
+                <circle cx="19" cy="19" r="2"/>
+              </svg>
+            </button>
           </div>
 
         </div>
+
+        {/* Mobile Dropdown Drawer */}
+        {mobileMenuOpen && (
+          <div className="mt-2 p-5 rounded-3xl bg-[#1c1c1f]/95 backdrop-blur-2xl border border-white/15 text-white shadow-2xl flex flex-col gap-3 text-sm font-medium animate-in fade-in slide-in-from-top-2 duration-200">
+            <a href="#como-funciona" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Cómo funciona</a>
+            <a href="#diagnostico" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Diagnóstico 30m</a>
+            <a href="#quipu" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">El Quipu de Rotación</a>
+            <a href="#unirse" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Comunidad & Postulación</a>
+            <a href="https://github.com/TerraQuipu" target="_blank" rel="noreferrer" className="hover:text-amber-400 py-1.5 flex items-center justify-between">
+              <span>Repositorio en GitHub</span>
+              <span>↗</span>
+            </a>
+          </div>
+        )}
       </header>
 
       {/* ================= 2. HERO SECTION (ICONIC SUPERPOWER GOLDEN SUN HALO) ================= */}
-      <section className="relative bg-[#090A0D] text-white pt-16 pb-24 md:pt-24 md:pb-36 overflow-hidden">
+      <section className="relative bg-[#090A0D] text-white pt-28 pb-24 md:pt-36 md:pb-36 overflow-hidden">
         
         {/* The Superpower Signature: Golden Solar Halo Glow */}
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] sm:w-[650px] md:w-[750px] aspect-square pointer-events-none opacity-90">
