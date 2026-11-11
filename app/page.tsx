@@ -284,14 +284,9 @@ export default function SuperpowerTerraquipuLanding() {
                 {/* Gradient vignette for seamless telemetry contrast */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent pointer-events-none" />
 
-                {/* Top Phase Header */}
-                <div className="relative z-10 flex items-center justify-between">
-                  <div className="w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
-                    1
-                  </div>
-                  <span className="text-[10px] font-mono tracking-widest text-white/70 uppercase font-semibold">
-                    ORBITAL / 01
-                  </span>
+                {/* Top Number Badge (Superpower Style) */}
+                <div className="relative z-10 w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
+                  1
                 </div>
 
                 {/* Futuristic HUD Telemetry Overlay (No Inner Card Container) */}
@@ -343,14 +338,9 @@ export default function SuperpowerTerraquipuLanding() {
                 {/* Gradient vignette */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent pointer-events-none" />
 
-                {/* Top Phase Header */}
-                <div className="relative z-10 flex items-center justify-between">
-                  <div className="w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
-                    2
-                  </div>
-                  <span className="text-[10px] font-mono tracking-widest text-white/70 uppercase font-semibold">
-                    EDÁFICO / 02
-                  </span>
+                {/* Top Number Badge */}
+                <div className="relative z-10 w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
+                  2
                 </div>
 
                 {/* Futuristic HUD Telemetry Overlay (No Inner Card Container) */}
@@ -405,14 +395,9 @@ export default function SuperpowerTerraquipuLanding() {
                 {/* Gradient vignette */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent pointer-events-none" />
 
-                {/* Top Phase Header */}
-                <div className="relative z-10 flex items-center justify-between">
-                  <div className="w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
-                    3
-                  </div>
-                  <span className="text-[10px] font-mono tracking-widest text-white/70 uppercase font-semibold">
-                    ROTACIÓN / 03
-                  </span>
+                {/* Top Number Badge */}
+                <div className="relative z-10 w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
+                  3
                 </div>
 
                 {/* Futuristic HUD Telemetry Overlay (No Inner Card Container) */}
@@ -467,14 +452,9 @@ export default function SuperpowerTerraquipuLanding() {
                 {/* Gradient vignette */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent pointer-events-none" />
 
-                {/* Top Phase Header */}
-                <div className="relative z-10 flex items-center justify-between">
-                  <div className="w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
-                    4
-                  </div>
-                  <span className="text-[10px] font-mono tracking-widest text-white/70 uppercase font-semibold">
-                    COSECHA / 04
-                  </span>
+                {/* Top Number Badge */}
+                <div className="relative z-10 w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
+                  4
                 </div>
 
                 {/* Futuristic HUD Telemetry Overlay (No Inner Card Container) */}
