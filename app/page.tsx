@@ -195,10 +195,10 @@ export default function SuperpowerTerraquipuLanding() {
           {/* Hero Copy Left */}
           <div className="max-w-3xl space-y-7">
             
-            {/* Superpower Pre-title Badge (Checkmark style: ✓ HSA/ FSA eligible) */}
+            {/* Trust Badge: Open Science Attribution */}
             <div className="flex items-center gap-2 text-xs font-semibold text-white/90">
               <span className="text-amber-400 font-bold">✓</span>
-              <span>Validación Oficial INIA & SENAMHI • NASA Space Apps Challenge</span>
+              <span>Protocolos basados en datos de INIA & SENAMHI • NASA Space Apps Challenge</span>
             </div>
 
             <h1 className="hero-headline text-4xl sm:text-6xl md:text-7xl font-bold text-white leading-[1.08] tracking-tight">
@@ -239,15 +239,15 @@ export default function SuperpowerTerraquipuLanding() {
       <section className="py-12 bg-white border-b border-zinc-200">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <p className="text-[11px] font-mono uppercase tracking-widest text-zinc-400 mb-6 font-semibold">
-            DESARROLLADO CON PROTOCOLOS Y DATOS DE CIENCIA PÚBLICA ABIERTA
+            FUENTES DE DATOS PÚBLICOS Y PROTOCOLOS CIENTÍFICOS ABIERTOS
           </p>
           <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14 opacity-75 grayscale hover:grayscale-0 transition-all duration-300">
             <div className="font-mono text-xs font-bold text-zinc-800">✦ NASA POWER API</div>
             <div className="font-mono text-xs font-bold text-zinc-800">✦ NASA SMAP RADAR</div>
-            <div className="font-mono text-xs font-bold text-zinc-800">✦ INIA PERÚ</div>
-            <div className="font-mono text-xs font-bold text-zinc-800">✦ SENAMHI CLIMA</div>
+            <div className="font-mono text-xs font-bold text-zinc-800">✦ GUÍAS TÉCNICAS INIA</div>
+            <div className="font-mono text-xs font-bold text-zinc-800">✦ DATOS SENAMHI CLIMA</div>
             <div className="font-mono text-xs font-bold text-zinc-800">✦ ISRIC SOILGRIDS</div>
-            <div className="font-mono text-xs font-bold text-zinc-800">✦ OPEN-METEO DEM</div>
+            <div className="font-mono text-xs font-bold text-zinc-800">✦ OPEN-METEO API</div>
           </div>
         </div>
       </section>
