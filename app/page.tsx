@@ -549,8 +549,8 @@ export default function SuperpowerTerraquipuLanding() {
         <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-end overflow-hidden">
           <img 
             src={`${BASE_PATH}/images/agronomist_white_bg.jpg`} 
-            alt="Agrónomo analizando el suelo con tablet en los Andes" 
-            className="h-[105%] lg:h-[118%] w-auto max-h-[940px] object-contain object-right transform translate-x-24 lg:translate-x-40 xl:translate-x-48 select-none"
+            alt="Diagnóstico en Parcela con Tablet" 
+            className="h-[100%] lg:h-[110%] w-auto max-h-[880px] object-contain object-right transform -translate-x-6 lg:translate-x-0 select-none"
           />
         </div>
 
@@ -603,7 +603,7 @@ export default function SuperpowerTerraquipuLanding() {
             <div className="hidden lg:block lg:flex-1 pointer-events-none" />
 
             {/* Right Block: Vertical Tab Navigation (Exact Superpower Pattern: | Item 01) */}
-            <div className="w-full lg:w-auto flex flex-row lg:flex-col gap-3 lg:gap-6 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 shrink-0 self-center z-20">
+            <div className="w-full lg:w-auto flex flex-row lg:flex-col gap-3 lg:gap-5 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 shrink-0 self-center z-20 -translate-y-4 lg:-translate-y-8">
               {DIAGNOSTICO_TABS.map((tab, idx) => (
                 <button
                   key={idx}
@@ -612,11 +612,11 @@ export default function SuperpowerTerraquipuLanding() {
                   className={`flex items-center justify-between gap-4 text-left transition-all py-1.5 cursor-pointer group ${
                     activeDiagnosticoTab === idx
                       ? "text-zinc-950 font-bold border-l-2 border-zinc-950 pl-3.5 -ml-[2px]"
-                      : "text-zinc-500 hover:text-zinc-950 font-medium pl-3.5 border-l-2 border-transparent"
+                      : "text-zinc-600 hover:text-zinc-950 font-semibold pl-3.5 border-l-2 border-transparent"
                   }`}
                 >
                   <span className="tracking-tight leading-snug whitespace-nowrap">{tab.label}</span>
-                  <span className="font-mono text-[11px] text-zinc-400 group-hover:text-zinc-700 shrink-0">
+                  <span className="font-mono text-[11px] text-zinc-500 group-hover:text-zinc-900 shrink-0 font-bold">
                     0{idx + 1}
                   </span>
                 </button>
