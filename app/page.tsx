@@ -254,87 +254,221 @@ export default function SuperpowerTerraquipuLanding() {
 
       {/* ================= 4. FEATURE CAROUSEL CARDS ("CÓMO FUNCIONA" - SUPERPOWER 4 CARDS) ================= */}
       <section id="como-funciona" className="py-24 bg-[#FAF9F5] border-b border-zinc-200">
-        <div className="max-w-7xl mx-auto px-6 space-y-16">
+        <div className="max-w-7xl mx-auto px-6 space-y-14">
           
-          <div className="text-center max-w-2xl mx-auto space-y-3">
+          <div className="text-center max-w-3xl mx-auto space-y-4">
             <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold">
               METODOLOGÍA TERRAQUIPU
             </span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-light text-zinc-950">
+            <h2 className="hero-headline text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-950 tracking-tight leading-tight">
               La salud del suelo es el escudo más poderoso frente a El Niño.
             </h2>
-            <p className="text-sm text-zinc-600 leading-relaxed">
+            <p className="text-sm sm:text-base text-zinc-600 leading-relaxed max-w-2xl mx-auto font-sans">
               Un sistema integral de cuatro fases que convierte mediciones espaciales en decisiones agrícolas que salvan cosechas.
             </p>
           </div>
 
+          {/* Superpower 4-Card Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             
-            {/* Card 1 */}
-            <div className="bg-white rounded-2xl border border-zinc-200 p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition group">
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
-                  <Satellite className="w-6 h-6" />
+            {/* ================= Card 1: Escaneo Orbital Continuo ================= */}
+            <div className="flex flex-col group">
+              {/* Visual Container */}
+              <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-900 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-4">
+                {/* Background Image: NASA Space Orbit */}
+                <img
+                  src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop"
+                  alt="Escaneo Orbital y Satelital"
+                  className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+                />
+                {/* Gradient vignette */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/35 pointer-events-none" />
+
+                {/* Top Number Pill (Superpower Style) */}
+                <div className="relative z-10 w-7 h-7 rounded-lg bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                  1
                 </div>
-                <div className="text-[11px] font-mono text-zinc-400 uppercase font-semibold">Paso 01</div>
-                <h3 className="text-lg font-bold text-zinc-900">Escaneo Orbital Continuo</h3>
+
+                {/* Floating Frosted Glass UI Widget (Exact Superpower Card 1 Pattern) */}
+                <div className="relative z-10 w-full rounded-2xl bg-zinc-950/80 backdrop-blur-xl border border-white/15 p-3.5 shadow-2xl text-white">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 shrink-0">
+                      <Satellite className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[12px] font-bold text-white tracking-tight truncate">NASA SMAP Radar</div>
+                      <div className="text-[10px] text-zinc-300 font-mono flex items-center gap-1.5 mt-0.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        <span>Humedad: 18.4% VWC</span>
+                      </div>
+                    </div>
+                    <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300 text-[10px] shrink-0 font-bold">
+                      ✓
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Text Information Below Card (Arial Font) */}
+              <div className="pt-4 space-y-1.5 font-sans">
+                <h3 className="text-lg font-bold text-zinc-950 tracking-tight">
+                  Escaneo Orbital Continuo
+                </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
                   Monitoreo de precipitación histórica (NASA POWER) y humedad del suelo (NASA SMAP) para detectar anomalías de sequía con meses de anticipación.
                 </p>
               </div>
-              <div className="pt-4 mt-6 border-t border-zinc-100 text-[11px] font-mono text-amber-800 font-medium">
-                NASA POWER AG API
-              </div>
             </div>
 
-            {/* Card 2 */}
-            <div className="bg-white rounded-2xl border border-zinc-200 p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition group">
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
-                  <Layers className="w-6 h-6" />
+            {/* ================= Card 2: Perfil Edáfico a 30m ================= */}
+            <div className="flex flex-col group">
+              {/* Visual Container */}
+              <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-100 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-4">
+                {/* Background Image: Andean agricultural terraces */}
+                <img
+                  src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=800&auto=format&fit=crop"
+                  alt="Perfil Edáfico Andenes"
+                  className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+                />
+                {/* Gradient vignette */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30 pointer-events-none" />
+
+                {/* Top Number Pill */}
+                <div className="relative z-10 w-7 h-7 rounded-lg bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                  2
                 </div>
-                <div className="text-[11px] font-mono text-zinc-400 uppercase font-semibold">Paso 02</div>
-                <h3 className="text-lg font-bold text-zinc-900">Perfil Edáfico a 30m</h3>
+
+                {/* Floating Light UI Card / Mobile Screen Mockup (Exact Superpower Card 2 Pattern) */}
+                <div className="relative z-10 w-full rounded-2xl bg-white/95 backdrop-blur-xl border border-white/60 p-3.5 shadow-2xl text-zinc-900">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-wider">Muestra Edáfica</span>
+                    <span className="text-[10px] font-mono text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">30m SRTM</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between items-center text-[11px] font-medium text-zinc-800">
+                      <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500"></span>pH Suelo</span>
+                      <span className="font-bold font-mono">6.4 (Óptimo)</span>
+                    </div>
+                    <div className="flex justify-between items-center text-[11px] font-medium text-zinc-800">
+                      <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500"></span>Materia Orgánica</span>
+                      <span className="font-bold font-mono">3.8%</span>
+                    </div>
+                    <div className="flex justify-between items-center text-[11px] font-medium text-zinc-800">
+                      <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-500"></span>Pendiente Valle</span>
+                      <span className="font-bold font-mono">18° Grados</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Text Information Below Card (Arial Font) */}
+              <div className="pt-4 space-y-1.5 font-sans">
+                <h3 className="text-lg font-bold text-zinc-950 tracking-tight">
+                  Perfil Edáfico a 30m
+                </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
                   Corrección topográfica con elevaciones SRTM a 90m y SoilGrids para calcular pendiente, pH, materia orgánica y piso ecológico exacto.
                 </p>
               </div>
-              <div className="pt-4 mt-6 border-t border-zinc-100 text-[11px] font-mono text-emerald-800 font-medium">
-                Downscaling Topográfico
-              </div>
             </div>
 
-            {/* Card 3 */}
-            <div className="bg-white rounded-2xl border border-zinc-200 p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition group">
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700">
-                  <Cpu className="w-6 h-6" />
+            {/* ================= Card 3: El Quipu de Rotación ================= */}
+            <div className="flex flex-col group">
+              {/* Visual Container */}
+              <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-900 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-4">
+                {/* Background Image: Soil and seeds in farmer hands */}
+                <img
+                  src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?q=80&w=800&auto=format&fit=crop"
+                  alt="Quipu de Rotación Semillas"
+                  className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+                />
+                {/* Gradient vignette */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/35 pointer-events-none" />
+
+                {/* Top Number Pill */}
+                <div className="relative z-10 w-7 h-7 rounded-lg bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                  3
                 </div>
-                <div className="text-[11px] font-mono text-zinc-400 uppercase font-semibold">Paso 03</div>
-                <h3 className="text-lg font-bold text-zinc-900">El Quipu de Rotación</h3>
+
+                {/* Floating Frosted Glass Action List (Exact Superpower Card 3 "Top 5 actions" Pattern) */}
+                <div className="relative z-10 w-full rounded-2xl bg-zinc-950/85 backdrop-blur-xl border border-white/15 p-3.5 shadow-2xl text-white">
+                  <div className="text-[10px] font-mono text-amber-400 font-bold uppercase tracking-wider mb-2 flex items-center justify-between">
+                    <span>⚡ Secuencia Quipu</span>
+                    <span className="text-[9px] text-zinc-400">INIA 2026</span>
+                  </div>
+                  <div className="space-y-1.5 text-[11px]">
+                    <div className="flex items-center justify-between py-0.5 border-b border-white/10">
+                      <span className="font-semibold text-zinc-200">1. Tarwi (Leguminosa)</span>
+                      <span className="text-emerald-400 font-mono text-[10px] font-bold">+95 kg N/ha</span>
+                    </div>
+                    <div className="flex items-center justify-between py-0.5 border-b border-white/10">
+                      <span className="font-semibold text-zinc-200">2. Quinua Real</span>
+                      <span className="text-amber-300 font-mono text-[10px] font-bold">Corte ciclo</span>
+                    </div>
+                    <div className="flex items-center justify-between py-0.5">
+                      <span className="font-semibold text-zinc-200">3. Papa Nativa</span>
+                      <span className="text-blue-300 font-mono text-[10px] font-bold">Alta resiliencia</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Text Information Below Card (Arial Font) */}
+              <div className="pt-4 space-y-1.5 font-sans">
+                <h3 className="text-lg font-bold text-zinc-950 tracking-tight">
+                  El Quipu de Rotación
+                </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
-                  Algoritmo determinista que diseña la secuencia multianual óptima: Leguminosa (Tarwi) $\rightarrow$ Grano resiliente (Quinua) $\rightarrow$ Papa Nativa.
+                  Algoritmo determinista que diseña la secuencia multianual óptima: Leguminosa (Tarwi) → Grano resiliente (Quinua) → Papa Nativa.
                 </p>
               </div>
-              <div className="pt-4 mt-6 border-t border-zinc-100 text-[11px] font-mono text-blue-800 font-medium">
-                Motor INIA Auditable
-              </div>
             </div>
 
-            {/* Card 4 */}
-            <div className="bg-white rounded-2xl border border-zinc-200 p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition group">
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center text-orange-700">
-                  <Sprout className="w-6 h-6" />
+            {/* ================= Card 4: Regeneración y Cosecha ================= */}
+            <div className="flex flex-col group">
+              {/* Visual Container */}
+              <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-gradient-to-br from-amber-600/30 via-orange-500/20 to-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-4">
+                {/* Background Image: Golden Harvest Fields */}
+                <img
+                  src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=800&auto=format&fit=crop"
+                  alt="Cosecha y Regeneración de Suelo"
+                  className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+                />
+                {/* Gradient vignette */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/35 pointer-events-none" />
+
+                {/* Top Number Pill */}
+                <div className="relative z-10 w-7 h-7 rounded-lg bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                  4
                 </div>
-                <div className="text-[11px] font-mono text-zinc-400 uppercase font-semibold">Paso 04</div>
-                <h3 className="text-lg font-bold text-zinc-900">Regeneración y Cosecha</h3>
+
+                {/* Floating Results Glass Card (Exact Superpower Card 4 Pattern) */}
+                <div className="relative z-10 w-full rounded-2xl bg-zinc-950/85 backdrop-blur-xl border border-white/15 p-3.5 shadow-2xl text-white">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">Campaña Cosechada</span>
+                    <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-400/30">✓ Éxito</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-center">
+                    <div className="bg-white/5 rounded-xl p-1.5 border border-white/10">
+                      <div className="text-emerald-400 font-mono font-bold text-sm">+34%</div>
+                      <div className="text-[9px] text-zinc-400">Rendimiento</div>
+                    </div>
+                    <div className="bg-white/5 rounded-xl p-1.5 border border-white/10">
+                      <div className="text-amber-400 font-mono font-bold text-sm">-75%</div>
+                      <div className="text-[9px] text-zinc-400">Gorgojo Plaga</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Text Information Below Card (Arial Font) */}
+              <div className="pt-4 space-y-1.5 font-sans">
+                <h3 className="text-lg font-bold text-zinc-950 tracking-tight">
+                  Regeneración y Cosecha
+                </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
                   Aporte biológico de +95 kg N/ha, reducción del 75% en la incidencia del gorgojo andino y suelo 100% fértil sin comprar fertilizantes químicos.
                 </p>
-              </div>
-              <div className="pt-4 mt-6 border-t border-zinc-100 text-[11px] font-mono text-orange-800 font-medium">
-                Suelo 100% Regenerado
               </div>
             </div>
 
