@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 20, 20, 19;
+  --background-start-rgb: 247, 246, 242;
+  --background-end-rgb: 255, 255, 255;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: #FFFFFF;
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-serif {
+  font-family: 'Newsreader', Georgia, serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Superpower Solar Glow Utilities */
+.solar-ring {
+  background: radial-gradient(circle, #F59E0B 0%, #D97706 40%, rgba(180, 83, 9, 0.4) 65%, transparent 75%);
+}
+
+.subtle-solar-glow {
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.08) 50%, transparent 70%);
+}
