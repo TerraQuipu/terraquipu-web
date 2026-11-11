@@ -276,7 +276,7 @@ export default function SuperpowerTerraquipuLanding() {
       </section>
 
       {/* ================= 3. SCIENTIFIC TRUST STRIP ================= */}
-      <section className="py-12 bg-white border-b border-zinc-200">
+      <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <p className="text-[11px] font-mono uppercase tracking-widest text-zinc-400 mb-6 font-semibold">
             FUENTES DE DATOS PÚBLICOS Y PROTOCOLOS CIENTÍFICOS ABIERTOS
@@ -293,7 +293,7 @@ export default function SuperpowerTerraquipuLanding() {
       </section>
 
       {/* ================= 4. FEATURE CAROUSEL CARDS ("CÓMO FUNCIONA" - SUPERPOWER 4 CARDS) ================= */}
-      <section id="como-funciona" className="py-24 bg-[#FAF9F5] border-b border-zinc-200">
+      <section id="como-funciona" className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 space-y-14">
           
           <div className="text-center max-w-3xl mx-auto space-y-4">
@@ -537,18 +537,31 @@ export default function SuperpowerTerraquipuLanding() {
         </div>
       </section>
 
-      {/* ================= 5. LIFESTYLE TABLET SHOWCASE ("DIAGNÓSTICO INTEGRAL" - EXACT SUPERPOWER PATTERN) ================= */}
-      <section id="diagnostico" className="py-24 lg:py-32 bg-[#FAF9F5] border-b border-zinc-200 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      {/* ================= 5. LIFESTYLE TABLET SHOWCASE ("DIAGNÓSTICO INTEGRAL" - EXACT SUPERPOWER FULL-WIDTH PATTERN) ================= */}
+      <section id="diagnostico" className="relative py-20 lg:py-28 bg-white overflow-hidden min-h-[640px] lg:min-h-[720px] flex items-center">
+        
+        {/* Full Section Background Image (Agronomist with Tablet seamlessly blending into pure white canvas) */}
+        <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-end overflow-hidden">
+          <div className="relative w-full lg:w-[65%] h-full flex items-center justify-center lg:justify-end">
+            <img 
+              src={`${BASE_PATH}/images/agronomist_white_bg.jpg`} 
+              alt="Agrónomo analizando el suelo con tablet en los Andes" 
+              className="w-full max-w-[850px] lg:max-w-[950px] h-auto object-contain object-right transform translate-x-4 lg:translate-x-6"
+            />
+          </div>
+        </div>
+
+        {/* Content Container (Floats directly over the white canvas and tablet scene) */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-8">
             
-            {/* Left Column: Heading, Subtitle & Floating Glass FAQs (Superpower Style) */}
-            <div className="lg:col-span-4 flex flex-col justify-between space-y-8">
+            {/* Left Block: Heading, Subtitle & Floating Glass FAQs (Superpower Pattern) */}
+            <div className="w-full lg:max-w-md xl:max-w-lg space-y-8">
               <div className="space-y-4">
                 <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold">
                   DIAGNÓSTICO EN PARCELA
                 </span>
-                <h2 className="hero-headline text-3xl sm:text-4xl lg:text-[40px] font-bold text-zinc-950 leading-[1.12] tracking-tight transition-all duration-300">
+                <h2 className="hero-headline text-3xl sm:text-4xl lg:text-[42px] font-bold text-zinc-950 leading-[1.12] tracking-tight transition-all duration-300">
                   {DIAGNOSTICO_TABS[activeDiagnosticoTab].title}
                 </h2>
                 <p className="text-sm text-zinc-600 font-sans leading-relaxed transition-all duration-300">
@@ -557,7 +570,7 @@ export default function SuperpowerTerraquipuLanding() {
               </div>
 
               {/* Floating Frosted Glass FAQ Accordions (Exact Superpower Pattern) */}
-              <div className="space-y-2.5 pt-2">
+              <div className="space-y-2.5 pt-2 max-w-md">
                 {DIAGNOSTICO_FAQS.map((faq, idx) => (
                   <div 
                     key={idx} 
@@ -583,38 +596,28 @@ export default function SuperpowerTerraquipuLanding() {
               </div>
             </div>
 
-            {/* Center Column: The Agronomist with Tablet in Field (Hero Showcase Image) */}
-            <div className="lg:col-span-6 flex items-center justify-center">
-              <div className="relative rounded-[28px] sm:rounded-[36px] overflow-hidden border border-zinc-200/90 shadow-2xl bg-zinc-950 group">
-                <img 
-                  src={`${BASE_PATH}/images/tablet_showcase.jpg`} 
-                  alt="Agrónomo analizando el suelo con tablet en los Andes" 
-                  className="w-full h-auto object-cover object-center group-hover:scale-[1.01] transition-transform duration-500"
-                />
-              </div>
-            </div>
+            {/* Spacer for Center Space (where the tablet is displayed in the background) */}
+            <div className="hidden lg:block lg:flex-1 pointer-events-none" />
 
-            {/* Right Column: Vertical Tab Navigation (Exact Superpower Pattern: | Item 01) */}
-            <div className="lg:col-span-2 flex flex-col justify-center space-y-6 lg:pl-2">
-              <div className="flex flex-row lg:flex-col gap-3 lg:gap-5 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
-                {DIAGNOSTICO_TABS.map((tab, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setActiveDiagnosticoTab(idx)}
-                    className={`flex items-center justify-between gap-3 text-left transition-all py-1.5 cursor-pointer group ${
-                      activeDiagnosticoTab === idx
-                        ? "text-zinc-950 font-bold border-l-2 border-zinc-950 pl-3.5 -ml-[2px]"
-                        : "text-zinc-400 hover:text-zinc-800 font-medium pl-3.5 border-l-2 border-transparent"
-                    }`}
-                  >
-                    <span className="tracking-tight leading-snug">{tab.label}</span>
-                    <span className="font-mono text-[11px] text-zinc-400 group-hover:text-zinc-600 shrink-0">
-                      0{idx + 1}
-                    </span>
-                  </button>
-                ))}
-              </div>
+            {/* Right Block: Vertical Tab Navigation (Exact Superpower Pattern: | Item 01) */}
+            <div className="w-full lg:w-auto flex flex-row lg:flex-col gap-3 lg:gap-6 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 shrink-0 self-center">
+              {DIAGNOSTICO_TABS.map((tab, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setActiveDiagnosticoTab(idx)}
+                  className={`flex items-center justify-between gap-4 text-left transition-all py-1.5 cursor-pointer group ${
+                    activeDiagnosticoTab === idx
+                      ? "text-zinc-950 font-bold border-l-2 border-zinc-950 pl-3.5 -ml-[2px]"
+                      : "text-zinc-400 hover:text-zinc-800 font-medium pl-3.5 border-l-2 border-transparent"
+                  }`}
+                >
+                  <span className="tracking-tight leading-snug whitespace-nowrap">{tab.label}</span>
+                  <span className="font-mono text-[11px] text-zinc-400 group-hover:text-zinc-600 shrink-0">
+                    0{idx + 1}
+                  </span>
+                </button>
+              ))}
             </div>
 
           </div>
