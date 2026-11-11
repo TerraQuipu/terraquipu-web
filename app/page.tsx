@@ -279,15 +279,15 @@ export default function SuperpowerTerraquipuLanding() {
       <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <p className="text-[11px] font-mono uppercase tracking-widest text-zinc-400 mb-6 font-semibold">
-            FUENTES DE DATOS PÚBLICOS Y PROTOCOLOS CIENTÍFICOS ABIERTOS
+            DESARROLLADO CON PROTOCOLOS Y DATOS DE CIENCIA PÚBLICA ABIERTA
           </p>
           <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14 opacity-75 grayscale hover:grayscale-0 transition-all duration-300">
             <div className="font-mono text-xs font-bold text-zinc-800">✦ NASA POWER API</div>
             <div className="font-mono text-xs font-bold text-zinc-800">✦ NASA SMAP RADAR</div>
-            <div className="font-mono text-xs font-bold text-zinc-800">✦ GUÍAS TÉCNICAS INIA</div>
-            <div className="font-mono text-xs font-bold text-zinc-800">✦ DATOS SENAMHI CLIMA</div>
+            <div className="font-mono text-xs font-bold text-zinc-800">✦ INIA PERÚ</div>
+            <div className="font-mono text-xs font-bold text-zinc-800">✦ SENAMHI CLIMA</div>
             <div className="font-mono text-xs font-bold text-zinc-800">✦ ISRIC SOILGRIDS</div>
-            <div className="font-mono text-xs font-bold text-zinc-800">✦ OPEN-METEO API</div>
+            <div className="font-mono text-xs font-bold text-zinc-800">✦ OPEN-METEO DEM</div>
           </div>
         </div>
       </section>
@@ -314,7 +314,7 @@ export default function SuperpowerTerraquipuLanding() {
             {/* ================= Card 1: Escaneo Orbital Continuo ================= */}
             <div className="flex flex-col group">
               {/* Visual Container */}
-              <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-5">
+              <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-3.5">
                 {/* Background Image: NASA Space Orbit */}
                 <img
                   src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop"
@@ -322,32 +322,31 @@ export default function SuperpowerTerraquipuLanding() {
                   className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
                 />
                 {/* Gradient vignette for seamless telemetry contrast */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/25 pointer-events-none" />
 
                 {/* Top Number Badge (Superpower Style) */}
                 <div className="relative z-10 w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
                   1
                 </div>
 
-                {/* Futuristic HUD Telemetry Overlay (No Inner Card Container) */}
-                <div className="relative z-10 w-full space-y-2 backdrop-blur-[1px]">
+                {/* Floating Frosted Glass Pill (Exact Match to Image 4) */}
+                <div className="relative z-10 w-full rounded-2xl bg-zinc-950/85 backdrop-blur-xl border border-white/15 p-3.5 shadow-xl text-white">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold tracking-wider text-amber-400 uppercase">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <span>NASA SMAP RADAR</span>
-                    </div>
-                    <span className="text-[10px] font-mono text-zinc-400 tracking-wider">L-BAND 1.4 GHz</span>
-                  </div>
-
-                  <div className="pt-2 border-t border-white/15 flex items-baseline justify-between">
-                    <div>
-                      <div className="text-2xl font-mono font-bold text-white tracking-tight">
-                        18.4%
-                        <span className="text-[11px] font-mono text-emerald-400 ml-1.5 font-normal">VWC Óptimo</span>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 text-sm shrink-0">
+                        🛰️
                       </div>
-                      <div className="text-[10px] font-mono text-zinc-400 mt-0.5">Humedad edáfica continua</div>
+                      <div>
+                        <div className="text-xs font-mono font-bold text-white tracking-wide">
+                          NASA SMAP Radar
+                        </div>
+                        <div className="text-[11px] font-mono text-zinc-300 flex items-center gap-1.5 mt-0.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          Humedad: 18.4% VWC
+                        </div>
+                      </div>
                     </div>
-                    <div className="w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-emerald-400 text-xs font-bold">
+                    <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-xs font-bold shrink-0">
                       ✓
                     </div>
                   </div>
@@ -356,7 +355,7 @@ export default function SuperpowerTerraquipuLanding() {
 
               {/* Text Information Below Card (Arial Font) */}
               <div className="pt-4 space-y-1.5 font-sans">
-                <h3 className="text-lg font-bold text-zinc-950 tracking-tight">
+                <h3 className="hero-headline text-lg font-bold text-zinc-950 tracking-tight">
                   Escaneo Orbital Continuo
                 </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
@@ -368,7 +367,7 @@ export default function SuperpowerTerraquipuLanding() {
             {/* ================= Card 2: Perfil Edáfico a 30m ================= */}
             <div className="flex flex-col group">
               {/* Visual Container */}
-              <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-5">
+              <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-3.5">
                 {/* Background Image: Andean agricultural terraces */}
                 <img
                   src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=800&auto=format&fit=crop"
@@ -376,36 +375,42 @@ export default function SuperpowerTerraquipuLanding() {
                   className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
                 />
                 {/* Gradient vignette */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/25 pointer-events-none" />
 
                 {/* Top Number Badge */}
                 <div className="relative z-10 w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
                   2
                 </div>
 
-                {/* Futuristic HUD Telemetry Overlay (No Inner Card Container) */}
-                <div className="relative z-10 w-full space-y-2 backdrop-blur-[1px]">
+                {/* Floating White Pill (Exact Match to Image 4) */}
+                <div className="relative z-10 w-full rounded-2xl bg-white/95 backdrop-blur-xl border border-zinc-200/90 p-3.5 shadow-xl text-zinc-900 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold tracking-wider text-amber-400 uppercase">
-                      DIAGNÓSTICO 30M
+                    <span className="text-[10px] font-mono font-bold tracking-wider text-zinc-500 uppercase">
+                      MUESTRA EDÁFICA
                     </span>
-                    <span className="text-[10px] font-mono text-emerald-400 font-semibold tracking-wider">
-                      SRTM / SOILGRIDS
+                    <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-full font-bold">
+                      30m SRTM
                     </span>
                   </div>
 
-                  <div className="pt-2 border-t border-white/15 space-y-1.5 font-mono text-[11px]">
-                    <div className="flex justify-between items-center text-zinc-200">
-                      <span className="text-zinc-400 text-[10px] uppercase tracking-wider">pH Suelo</span>
-                      <span className="font-bold text-white">6.4 <span className="text-[10px] text-emerald-400 font-normal">(Óptimo)</span></span>
+                  <div className="pt-1.5 border-t border-zinc-100 space-y-1 font-mono text-[11px]">
+                    <div className="flex justify-between items-center text-zinc-700">
+                      <span className="text-zinc-500 text-[10px] uppercase tracking-wider flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-amber-500" /> pH Suelo
+                      </span>
+                      <span className="font-bold text-zinc-900">6.4 <span className="text-[10px] text-emerald-600 font-normal">(Óptimo)</span></span>
                     </div>
-                    <div className="flex justify-between items-center text-zinc-200">
-                      <span className="text-zinc-400 text-[10px] uppercase tracking-wider">Materia Orgánica</span>
-                      <span className="font-bold text-white">3.8%</span>
+                    <div className="flex justify-between items-center text-zinc-700">
+                      <span className="text-zinc-500 text-[10px] uppercase tracking-wider flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500" /> Materia Orgánica
+                      </span>
+                      <span className="font-bold text-zinc-900">3.8%</span>
                     </div>
-                    <div className="flex justify-between items-center text-zinc-200">
-                      <span className="text-zinc-400 text-[10px] uppercase tracking-wider">Pendiente Valle</span>
-                      <span className="font-bold text-white">18° Grados</span>
+                    <div className="flex justify-between items-center text-zinc-700">
+                      <span className="text-zinc-500 text-[10px] uppercase tracking-wider flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-blue-500" /> Pendiente Valle
+                      </span>
+                      <span className="font-bold text-zinc-900">18° Grados</span>
                     </div>
                   </div>
                 </div>
@@ -413,7 +418,7 @@ export default function SuperpowerTerraquipuLanding() {
 
               {/* Text Information Below Card (Arial Font) */}
               <div className="pt-4 space-y-1.5 font-sans">
-                <h3 className="text-lg font-bold text-zinc-950 tracking-tight">
+                <h3 className="hero-headline text-lg font-bold text-zinc-950 tracking-tight">
                   Perfil Edáfico a 30m
                 </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
@@ -425,7 +430,7 @@ export default function SuperpowerTerraquipuLanding() {
             {/* ================= Card 3: El Quipu de Rotación ================= */}
             <div className="flex flex-col group">
               {/* Visual Container */}
-              <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-5">
+              <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-3.5">
                 {/* Background Image: Soil and seeds in farmer hands */}
                 <img
                   src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?q=80&w=800&auto=format&fit=crop"
@@ -433,15 +438,15 @@ export default function SuperpowerTerraquipuLanding() {
                   className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
                 />
                 {/* Gradient vignette */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/25 pointer-events-none" />
 
                 {/* Top Number Badge */}
                 <div className="relative z-10 w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
                   3
                 </div>
 
-                {/* Futuristic HUD Telemetry Overlay (No Inner Card Container) */}
-                <div className="relative z-10 w-full space-y-2 backdrop-blur-[1px]">
+                {/* Floating Frosted Glass Pill (Exact Match to Image 4) */}
+                <div className="relative z-10 w-full rounded-2xl bg-zinc-950/85 backdrop-blur-xl border border-white/15 p-3.5 shadow-xl text-white space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-mono font-bold tracking-wider text-amber-400 uppercase flex items-center gap-1">
                       <span>⚡</span> SECUENCIA QUIPU
@@ -451,7 +456,7 @@ export default function SuperpowerTerraquipuLanding() {
                     </span>
                   </div>
 
-                  <div className="pt-2 border-t border-white/15 space-y-1.5 font-mono text-[11px]">
+                  <div className="pt-1.5 border-t border-white/15 space-y-1 font-mono text-[11px]">
                     <div className="flex justify-between items-center text-zinc-200">
                       <span className="text-zinc-300">1. Tarwi (Leguminosa)</span>
                       <span className="text-emerald-400 font-bold text-[10px]">+95 kg N/ha</span>
@@ -462,7 +467,7 @@ export default function SuperpowerTerraquipuLanding() {
                     </div>
                     <div className="flex justify-between items-center text-zinc-200">
                       <span className="text-zinc-300">3. Papa Nativa</span>
-                      <span className="text-blue-300 font-bold text-[10px]">Resiliencia</span>
+                      <span className="text-blue-300 font-bold text-[10px]">Alta resiliencia</span>
                     </div>
                   </div>
                 </div>
@@ -470,7 +475,7 @@ export default function SuperpowerTerraquipuLanding() {
 
               {/* Text Information Below Card (Arial Font) */}
               <div className="pt-4 space-y-1.5 font-sans">
-                <h3 className="text-lg font-bold text-zinc-950 tracking-tight">
+                <h3 className="hero-headline text-lg font-bold text-zinc-950 tracking-tight">
                   El Quipu de Rotación
                 </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
@@ -482,7 +487,7 @@ export default function SuperpowerTerraquipuLanding() {
             {/* ================= Card 4: Regeneración y Cosecha ================= */}
             <div className="flex flex-col group">
               {/* Visual Container */}
-              <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-5">
+              <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-3.5">
                 {/* Background Image: Golden Harvest Fields */}
                 <img
                   src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=800&auto=format&fit=crop"
@@ -490,32 +495,32 @@ export default function SuperpowerTerraquipuLanding() {
                   className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
                 />
                 {/* Gradient vignette */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/25 pointer-events-none" />
 
                 {/* Top Number Badge */}
                 <div className="relative z-10 w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
                   4
                 </div>
 
-                {/* Futuristic HUD Telemetry Overlay (No Inner Card Container) */}
-                <div className="relative z-10 w-full space-y-2 backdrop-blur-[1px]">
+                {/* Floating Frosted Glass Pill (Exact Match to Image 4) */}
+                <div className="relative z-10 w-full rounded-2xl bg-zinc-950/85 backdrop-blur-xl border border-white/15 p-3.5 shadow-xl text-white space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold tracking-wider text-amber-400 uppercase">
-                      BALANCE DE COSECHA
+                    <span className="text-[10px] font-mono font-bold tracking-wider text-zinc-300 uppercase">
+                      CAMPAÑA COSECHADA
                     </span>
-                    <span className="text-[10px] font-mono text-emerald-400 font-semibold tracking-wider flex items-center gap-1">
-                      <span>●</span> CERTIFICADO
+                    <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                      ✓ Éxito
                     </span>
                   </div>
 
-                  <div className="pt-2 border-t border-white/15 grid grid-cols-2 gap-3 font-mono">
-                    <div>
-                      <div className="text-2xl font-bold text-emerald-400 tracking-tight">+34%</div>
-                      <div className="text-[10px] text-zinc-400 uppercase tracking-wider mt-0.5">Rendimiento</div>
+                  <div className="pt-1.5 border-t border-white/15 grid grid-cols-2 gap-2 text-center font-mono">
+                    <div className="bg-white/5 rounded-xl p-1.5">
+                      <div className="text-xl font-bold text-emerald-400 tracking-tight">+34%</div>
+                      <div className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">Rendimiento</div>
                     </div>
-                    <div>
-                      <div className="text-2xl font-bold text-amber-300 tracking-tight">-75%</div>
-                      <div className="text-[10px] text-zinc-400 uppercase tracking-wider mt-0.5">Gorgojo Plaga</div>
+                    <div className="bg-white/5 rounded-xl p-1.5">
+                      <div className="text-xl font-bold text-amber-300 tracking-tight">-75%</div>
+                      <div className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">Gorgojo Plaga</div>
                     </div>
                   </div>
                 </div>
@@ -523,7 +528,7 @@ export default function SuperpowerTerraquipuLanding() {
 
               {/* Text Information Below Card (Arial Font) */}
               <div className="pt-4 space-y-1.5 font-sans">
-                <h3 className="text-lg font-bold text-zinc-950 tracking-tight">
+                <h3 className="hero-headline text-lg font-bold text-zinc-950 tracking-tight">
                   Regeneración y Cosecha
                 </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
@@ -539,29 +544,16 @@ export default function SuperpowerTerraquipuLanding() {
 
       {/* ================= 5. LIFESTYLE TABLET SHOWCASE ("DIAGNÓSTICO INTEGRAL" - EXACT SUPERPOWER FULL-WIDTH PATTERN) ================= */}
       <section id="diagnostico" className="relative py-20 lg:py-28 bg-white overflow-hidden min-h-[640px] lg:min-h-[720px] flex items-center">
-        
-        {/* Full Section Background Image (Agronomist with Tablet seamlessly blending into pure white canvas) */}
-        <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-end overflow-hidden">
-          <div className="relative w-full lg:w-[65%] h-full flex items-center justify-center lg:justify-end">
-            <img 
-              src={`${BASE_PATH}/images/agronomist_white_bg.jpg`} 
-              alt="Agrónomo analizando el suelo con tablet en los Andes" 
-              className="w-full max-w-[850px] lg:max-w-[950px] h-auto object-contain object-right transform translate-x-4 lg:translate-x-6"
-            />
-          </div>
-        </div>
-
-        {/* Content Container (Floats directly over the white canvas and tablet scene) */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-8">
+        <div className="max-w-7xl mx-auto px-6 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-4 items-center">
             
-            {/* Left Block: Heading, Subtitle & Floating Glass FAQs (Superpower Pattern) */}
-            <div className="w-full lg:max-w-md xl:max-w-lg space-y-8">
+            {/* Left Block: Heading, Subtitle & Floating Glass FAQs (lg:col-span-4) */}
+            <div className="lg:col-span-4 space-y-8 z-10">
               <div className="space-y-4">
                 <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold">
                   DIAGNÓSTICO EN PARCELA
                 </span>
-                <h2 className="hero-headline text-3xl sm:text-4xl lg:text-[42px] font-bold text-zinc-950 leading-[1.12] tracking-tight transition-all duration-300">
+                <h2 className="hero-headline text-3xl sm:text-4xl lg:text-[40px] font-bold text-zinc-950 leading-[1.15] tracking-tight transition-all duration-300">
                   {DIAGNOSTICO_TABS[activeDiagnosticoTab].title}
                 </h2>
                 <p className="text-sm text-zinc-600 font-sans leading-relaxed transition-all duration-300">
@@ -574,7 +566,7 @@ export default function SuperpowerTerraquipuLanding() {
                 {DIAGNOSTICO_FAQS.map((faq, idx) => (
                   <div 
                     key={idx} 
-                    className="rounded-2xl bg-zinc-900/85 hover:bg-zinc-900/95 backdrop-blur-xl border border-white/10 p-3.5 text-white transition-all duration-200 shadow-md"
+                    className="rounded-2xl bg-zinc-900/90 hover:bg-zinc-900/95 backdrop-blur-xl border border-white/10 p-3.5 text-white transition-all duration-200 shadow-md"
                   >
                     <button
                       type="button"
@@ -596,11 +588,17 @@ export default function SuperpowerTerraquipuLanding() {
               </div>
             </div>
 
-            {/* Spacer for Center Space (where the tablet is displayed in the background) */}
-            <div className="hidden lg:block lg:flex-1 pointer-events-none" />
+            {/* Center Block: Agronomist with Tablet (lg:col-span-5) */}
+            <div className="lg:col-span-5 flex items-center justify-center relative select-none pointer-events-none">
+              <img 
+                src={`${BASE_PATH}/images/agronomist_white_bg.jpg`} 
+                alt="Agrónomo analizando el suelo con tablet en los Andes" 
+                className="w-full max-w-[580px] lg:max-w-[650px] h-auto object-contain transform lg:scale-105"
+              />
+            </div>
 
-            {/* Right Block: Vertical Tab Navigation (Exact Superpower Pattern: | Item 01) */}
-            <div className="w-full lg:w-auto flex flex-row lg:flex-col gap-3 lg:gap-6 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 shrink-0 self-center">
+            {/* Right Block: Vertical Tab Navigation (lg:col-span-3) */}
+            <div className="lg:col-span-3 flex flex-row lg:flex-col gap-3 lg:gap-6 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 shrink-0 justify-center z-10 lg:pl-6">
               {DIAGNOSTICO_TABS.map((tab, idx) => (
                 <button
                   key={idx}
@@ -708,7 +706,7 @@ export default function SuperpowerTerraquipuLanding() {
       </section>
 
       {/* ================= 7. SCIENTIFIC ADVISORY COUNCIL ================= */}
-      <section className="py-24 bg-white border-b border-zinc-200">
+      <section className="py-24 bg-white">
         <div className="max-w-6xl mx-auto px-6 space-y-12">
           
           <div className="text-center max-w-xl mx-auto space-y-2">
@@ -755,7 +753,7 @@ export default function SuperpowerTerraquipuLanding() {
       </section>
 
       {/* ================= 8. MULTI-PROFILE LEAD CAPTURE FORM (SUPERPOWER JOIN) ================= */}
-      <section id="unirse" className="py-24 bg-[#FAF9F5] border-b border-zinc-200">
+      <section id="unirse" className="py-24 bg-white">
         <div className="max-w-3xl mx-auto px-6 space-y-8">
           
           <div className="text-center space-y-2">
@@ -929,7 +927,7 @@ export default function SuperpowerTerraquipuLanding() {
       </section>
 
       {/* ================= 10. CLEAN MULTI-COLUMN FOOTER ================= */}
-      <footer className="bg-white py-16 border-t border-zinc-200 text-xs text-zinc-500 font-sans">
+      <footer className="bg-white py-16 text-xs text-zinc-500 font-sans">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-5 gap-10">
           
           <div className="md:col-span-2 space-y-3">
@@ -977,7 +975,7 @@ export default function SuperpowerTerraquipuLanding() {
 
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 pt-10 mt-10 border-t border-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-zinc-400">
+        <div className="max-w-7xl mx-auto px-6 pt-10 mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-zinc-400">
           <div>© 2026 Terraquipu Project. Diseñado con sabiduría ancestral y telemetría espacial.</div>
           <div>Cusco • Valle Sagrado • Perú</div>
         </div>
