@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Satellite, 
   Sprout, 
@@ -16,12 +16,7 @@ import {
   Users, 
   QrCode,
   Github,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Play,
-  Pause,
-  Video
+  ChevronDown
 } from "lucide-react";
 
 // Royalty-free background video playlist (Mixkit free commercial license - Andes aerials & Andean agriculture)
@@ -70,28 +65,19 @@ export default function SuperpowerTerraquipuLanding() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentVideoIdx, setCurrentVideoIdx] = useState(0);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [fade, setFade] = useState(true);
 
-  const handleNextVideo = () => {
-    setCurrentVideoIdx((prev) => (prev + 1) % HERO_PLAYLIST.length);
-  };
-
-  const handlePrevVideo = () => {
-    setCurrentVideoIdx((prev) => (prev - 1 + HERO_PLAYLIST.length) % HERO_PLAYLIST.length);
-  };
-
-  const togglePlayPause = () => {
-    if (videoRef.current) {
-      if (videoRef.current.paused) {
-        videoRef.current.play();
-        setIsVideoPlaying(true);
-      } else {
-        videoRef.current.pause();
-        setIsVideoPlaying(false);
-      }
-    }
-  };
+  // Automatic seamless transition across videos every 9 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setCurrentVideoIdx((prev) => (prev + 1) % HERO_PLAYLIST.length);
+        setFade(true);
+      }, 600);
+    }, 9000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -203,14 +189,21 @@ export default function SuperpowerTerraquipuLanding() {
         {/* Dynamic Royalty-Free Background Video Carousel (Mixkit Commercial Free - Andes & Agriculture) */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <video
-            ref={videoRef}
             key={HERO_PLAYLIST[currentVideoIdx].url}
             autoPlay
             muted
             playsInline
             poster={HERO_PLAYLIST[currentVideoIdx].poster}
-            onEnded={handleNextVideo}
-            className="absolute inset-0 w-full h-full object-cover opacity-35 scale-105 transition-opacity duration-1000 ease-out"
+            onEnded={() => {
+              setFade(false);
+              setTimeout(() => {
+                setCurrentVideoIdx((prev) => (prev + 1) % HERO_PLAYLIST.length);
+                setFade(true);
+              }, 600);
+            }}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
+              fade ? "opacity-35" : "opacity-0"
+            } scale-105`}
           >
             <source src={HERO_PLAYLIST[currentVideoIdx].url} type="video/mp4" />
           </video>
@@ -232,10 +225,10 @@ export default function SuperpowerTerraquipuLanding() {
           <div className="w-full h-full rounded-full bg-gradient-to-tr from-amber-600 via-amber-500 to-amber-300 blur-[95px] opacity-45"></div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
+        <div className="max-w-7xl mx-auto px-6 relative z-10 w-full py-12 md:py-20">
           
           {/* Hero Copy Left */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="max-w-3xl space-y-7">
             
             {/* Superpower Pre-title Badge (Checkmark style: ✓ HSA/ FSA eligible) */}
             <div className="flex items-center gap-2 text-xs font-semibold text-white/90">
@@ -272,111 +265,25 @@ export default function SuperpowerTerraquipuLanding() {
             </div>
 
             {/* Bottom Hero Value Proposition Points */}
-            <div className="pt-8 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
+            <div className="pt-10 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-6 text-left max-w-2xl">
               <div>
-                <div className="text-xl font-bold text-white">100+</div>
+                <div className="text-xl sm:text-2xl font-bold text-white">100+</div>
                 <div className="text-xs text-zinc-400 mt-0.5">Indicadores satelitales</div>
               </div>
               <div>
-                <div className="text-xl font-bold text-amber-400">+95 kg/ha</div>
+                <div className="text-xl sm:text-2xl font-bold text-amber-400">+95 kg/ha</div>
                 <div className="text-xs text-zinc-400 mt-0.5">Nitrógeno biológico</div>
               </div>
               <div>
-                <div className="text-xl font-bold text-white">3 Años</div>
+                <div className="text-xl sm:text-2xl font-bold text-white">3 Años</div>
                 <div className="text-xs text-zinc-400 mt-0.5">Rotación Quipu</div>
               </div>
               <div>
-                <div className="text-xl font-bold text-emerald-400">0 Soles</div>
+                <div className="text-xl sm:text-2xl font-bold text-emerald-400">0 Soles</div>
                 <div className="text-xs text-zinc-400 mt-0.5">100% Código Abierto</div>
               </div>
             </div>
 
-          </div>
-
-          {/* Hero Visual Right (Superpower Dramatic Solar Glow + Farmer Portrait) */}
-          <div className="lg:col-span-5 relative flex justify-center items-center">
-            
-            {/* Golden Sun Ring Circle */}
-            <div className="relative w-[340px] sm:w-[420px] aspect-square rounded-full border-[6px] border-amber-500/40 p-4 shadow-[0_0_100px_rgba(245,158,11,0.5)] flex items-center justify-center">
-              <div className="w-full h-full rounded-full bg-gradient-to-b from-amber-500 via-amber-600 to-amber-900 overflow-hidden relative flex items-end justify-center">
-                
-                {/* Farmer / Soil Guardian silhouette photo representation */}
-                <img 
-                  src="https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=800&auto=format&fit=crop" 
-                  alt="Agricultor Andino" 
-                  className="w-full h-full object-cover object-top opacity-90 mix-blend-luminosity filter contrast-125"
-                />
-
-                {/* Floating Badge in Portrait */}
-                <div className="absolute bottom-6 left-6 right-6 bg-[#090A0D]/85 backdrop-blur-md border border-white/20 p-3 rounded-xl text-center shadow-lg">
-                  <div className="text-[10px] text-amber-300 uppercase tracking-widest font-semibold">Cusco, Perú • 3,762 m</div>
-                  <div className="text-xs font-bold text-white mt-0.5">Parcela Piloto Chinchero Sector B</div>
-                  <div className="text-[10px] text-emerald-400 mt-0.5">● Telemetría Satelital Activa</div>
-                </div>
-
-              </div>
-            </div>
-
-          </div>
-
-          {/* Subtle Live Scene Telemetry & Video Playlist Switcher Capsule */}
-          <div className="lg:col-span-12 pt-6 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 text-xs text-zinc-400">
-            <div className="flex items-center gap-3">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-              </span>
-              <div className="flex items-center gap-2">
-                <span className="text-white font-medium">Transmisión:</span>
-                <span className="text-amber-400 font-semibold">{HERO_PLAYLIST[currentVideoIdx].label}</span>
-                <span className="text-zinc-500 hidden sm:inline">•</span>
-                <span className="text-zinc-400 hidden sm:inline">{HERO_PLAYLIST[currentVideoIdx].tagline}</span>
-              </div>
-            </div>
-
-            {/* Video Controls (Prev, Pause/Play, Next, Scene dots) */}
-            <div className="flex items-center gap-2">
-              <button 
-                type="button"
-                onClick={handlePrevVideo}
-                title="Escena anterior"
-                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center text-white transition cursor-pointer"
-              >
-                <ChevronLeft className="w-3.5 h-3.5" />
-              </button>
-              <button 
-                type="button"
-                onClick={togglePlayPause}
-                title={isVideoPlaying ? "Pausar video" : "Reproducir video"}
-                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center text-white transition cursor-pointer"
-              >
-                {isVideoPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
-              </button>
-              <button 
-                type="button"
-                onClick={handleNextVideo}
-                title="Siguiente escena"
-                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center text-white transition cursor-pointer"
-              >
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-
-              <div className="hidden sm:flex items-center gap-1.5 ml-2 pl-3 border-l border-white/15">
-                {HERO_PLAYLIST.map((item, idx) => (
-                  <button
-                    key={item.id}
-                    onClick={() => setCurrentVideoIdx(idx)}
-                    className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition ${
-                      currentVideoIdx === idx 
-                        ? "bg-amber-400 text-black font-bold shadow-sm" 
-                        : "bg-white/5 hover:bg-white/15 text-zinc-300"
-                    }`}
-                  >
-                    0{idx + 1}
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
 
         </div>
