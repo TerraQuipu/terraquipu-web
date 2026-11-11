@@ -201,7 +201,7 @@ export default function SuperpowerTerraquipuLanding() {
               <span>Validación Oficial INIA & SENAMHI • NASA Space Apps Challenge</span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold text-white leading-[1.08] tracking-tight">
+            <h1 className="hero-headline text-4xl sm:text-6xl md:text-7xl font-bold text-white leading-[1.08] tracking-tight">
               Inteligencia satelital para regenerar la salud del suelo, <br className="hidden sm:inline" />
               <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500">
                 cada campaña.
@@ -227,26 +227,6 @@ export default function SuperpowerTerraquipuLanding() {
               >
                 Cómo funciona ↓
               </a>
-            </div>
-
-            {/* Bottom Hero Value Proposition Points */}
-            <div className="pt-10 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-6 text-left max-w-2xl">
-              <div>
-                <div className="text-xl sm:text-2xl font-bold text-white">100+</div>
-                <div className="text-xs text-zinc-400 mt-0.5">Indicadores satelitales</div>
-              </div>
-              <div>
-                <div className="text-xl sm:text-2xl font-bold text-amber-400">+95 kg/ha</div>
-                <div className="text-xs text-zinc-400 mt-0.5">Nitrógeno biológico</div>
-              </div>
-              <div>
-                <div className="text-xl sm:text-2xl font-bold text-white">3 Años</div>
-                <div className="text-xs text-zinc-400 mt-0.5">Rotación Quipu</div>
-              </div>
-              <div>
-                <div className="text-xl sm:text-2xl font-bold text-emerald-400">0 Soles</div>
-                <div className="text-xs text-zinc-400 mt-0.5">100% Código Abierto</div>
-              </div>
             </div>
 
           </div>
