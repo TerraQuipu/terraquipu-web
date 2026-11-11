@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Satellite, 
   Sprout, 
@@ -24,6 +24,19 @@ export default function SuperpowerTerraquipuLanding() {
   const [leadSuccess, setLeadSuccess] = useState(false);
   const [folio, setFolio] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 25) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,11 +48,17 @@ export default function SuperpowerTerraquipuLanding() {
   return (
     <div className="min-h-screen bg-white text-zinc-900 font-sans selection:bg-amber-500 selection:text-white">
       
-      {/* ================= 1. FLOATING SUPERPOWER PILL NAVBAR ================= */}
-      <header className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl z-50">
-        <div className="rounded-full bg-[#242426]/90 backdrop-blur-xl border border-white/15 px-6 py-2.5 flex items-center justify-between shadow-[0_12px_40px_rgba(0,0,0,0.65)]">
+      {/* ================= 1. DYNAMIC NAVBAR (SUPERPOWER DEFAULT -> SCROLL PILL) ================= */}
+      <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ease-in-out ${
+        isScrolled ? "pt-3 px-4 sm:px-0" : "pt-2"
+      }`}>
+        <div className={`transition-all duration-300 ease-in-out flex items-center justify-between ${
+          isScrolled 
+            ? "max-w-6xl mx-auto rounded-full bg-[#242426]/90 backdrop-blur-xl border border-white/15 px-6 py-2.5 shadow-[0_12px_40px_rgba(0,0,0,0.65)]" 
+            : "max-w-7xl mx-auto px-6 sm:px-10 py-4 bg-transparent border-b border-transparent"
+        }`}>
           
-          {/* Left Navigation Links (Superpower: What we test, Reviews, FAQs, For Employers) */}
+          {/* Left Navigation Links */}
           <nav className="hidden lg:flex items-center gap-7 text-[13px] font-semibold text-white/90">
             <a href="#como-funciona" className="hover:text-white transition">Cómo funciona</a>
             <a href="#diagnostico" className="hover:text-white transition">Diagnóstico 30m</a>
@@ -49,7 +68,7 @@ export default function SuperpowerTerraquipuLanding() {
 
           {/* Center Brand Name (Exact Superpower Style: lowercase bold centered wordmark) */}
           <a href="#" className="flex items-center gap-2 group mx-auto lg:mx-0">
-            <span className="brand-logo text-xl font-extrabold tracking-tight text-white lowercase">
+            <span className="brand-logo text-xl sm:text-2xl font-extrabold tracking-tight text-white lowercase">
               terraquipu
             </span>
           </a>
@@ -65,7 +84,7 @@ export default function SuperpowerTerraquipuLanding() {
               GitHub
             </a>
 
-            {/* White Pill Button: Become a member */}
+            {/* White Pill Button */}
             <a 
               href="./app.html" 
               className="px-5 py-2 rounded-full bg-white text-black text-[13px] font-semibold hover:bg-zinc-100 transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98]"
@@ -98,7 +117,7 @@ export default function SuperpowerTerraquipuLanding() {
 
         {/* Mobile Dropdown Drawer */}
         {mobileMenuOpen && (
-          <div className="mt-2 p-5 rounded-3xl bg-[#1c1c1f]/95 backdrop-blur-2xl border border-white/15 text-white shadow-2xl flex flex-col gap-3 text-sm font-medium animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="max-w-6xl mx-auto mt-2 p-5 rounded-3xl bg-[#1c1c1f]/95 backdrop-blur-2xl border border-white/15 text-white shadow-2xl flex flex-col gap-3 text-sm font-medium animate-in fade-in slide-in-from-top-2 duration-200">
             <a href="#como-funciona" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Cómo funciona</a>
             <a href="#diagnostico" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Diagnóstico 30m</a>
             <a href="#quipu" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">El Quipu de Rotación</a>
@@ -111,46 +130,51 @@ export default function SuperpowerTerraquipuLanding() {
         )}
       </header>
 
-      {/* ================= 2. HERO SECTION (ICONIC SUPERPOWER GOLDEN SUN HALO) ================= */}
-      <section className="relative bg-[#090A0D] text-white pt-28 pb-24 md:pt-36 md:pb-36 overflow-hidden">
+      {/* ================= 2. HERO SECTION (SUPERPOWER LIGHTING & BUTTON STYLES) ================= */}
+      <section id="hero-section" className="relative bg-[#090A0D] text-white pt-32 pb-24 md:pt-40 md:pb-36 overflow-hidden min-h-[92vh] flex items-center">
         
+        {/* Layer ready for custom background image provided by user */}
+        <div id="hero-bg-layer" className="absolute inset-0 bg-cover bg-center pointer-events-none opacity-40"></div>
+
         {/* The Superpower Signature: Golden Solar Halo Glow */}
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] sm:w-[650px] md:w-[750px] aspect-square pointer-events-none opacity-90">
-          <div className="w-full h-full rounded-full bg-gradient-to-tr from-amber-600 via-amber-500 to-amber-300 blur-[90px] opacity-40"></div>
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[520px] sm:w-[680px] md:w-[780px] aspect-square pointer-events-none opacity-90">
+          <div className="w-full h-full rounded-full bg-gradient-to-tr from-amber-600 via-amber-500 to-amber-300 blur-[95px] opacity-45"></div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="max-w-7xl mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
           
           {/* Hero Copy Left */}
           <div className="lg:col-span-7 space-y-6">
             
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs font-mono">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-              <span>NASA SPACE APPS • VALIDACIÓN OFICIAL INIA PERÚ</span>
+            {/* Superpower Pre-title Badge (Checkmark style: ✓ HSA/ FSA eligible) */}
+            <div className="flex items-center gap-2 text-xs font-semibold text-white/90">
+              <span className="text-amber-400 font-bold">✓</span>
+              <span>Validación Oficial INIA & SENAMHI • NASA Space Apps Challenge</span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-serif font-light text-white leading-[1.08] tracking-tight">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold text-white leading-[1.08] tracking-tight">
               Inteligencia satelital para regenerar la salud del suelo, <br className="hidden sm:inline" />
-              <span className="italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500">
+              <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500">
                 cada campaña.
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg text-zinc-400 max-w-xl font-normal leading-relaxed">
-              Terraquipu fusiona observaciones orbitales de la NASA con la sabiduría agronómica del Quipu milenario. Predecimos sequías por El Niño y diseñamos rotaciones multianuales que devuelven nitrógeno al suelo sin fertilizantes químicos.
+            <p className="text-base sm:text-lg text-zinc-300 max-w-xl font-normal leading-relaxed">
+              100+ indicadores agroclimáticos. Un plan diseñado para tu cuenca. Todo lo que necesitas para proteger tus cultivos frente a El Niño.
             </p>
 
+            {/* Exact Superpower Button Styles: Solid White Pill + Translucent Dark Glass Pill */}
             <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
               <a 
                 href="./app.html" 
-                className="px-7 py-3.5 rounded-full bg-white text-black font-semibold text-sm hover:bg-zinc-200 transition shadow-[0_0_30px_rgba(255,255,255,0.3)] flex items-center justify-center gap-2"
+                className="px-7 py-3.5 rounded-full bg-white text-black font-semibold text-sm hover:bg-zinc-100 transition shadow-[0_0_25px_rgba(255,255,255,0.25)] flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99]"
               >
                 <span>🛰️ Explorar Visor Satelital</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a 
                 href="#como-funciona" 
-                className="px-6 py-3.5 rounded-full border border-white/20 bg-white/5 text-white font-medium text-sm hover:bg-white/10 transition text-center"
+                className="px-7 py-3.5 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-md text-white border border-white/15 font-semibold text-sm transition text-center hover:scale-[1.01] active:scale-[0.99]"
               >
                 Cómo funciona ↓
               </a>
@@ -159,19 +183,19 @@ export default function SuperpowerTerraquipuLanding() {
             {/* Bottom Hero Value Proposition Points */}
             <div className="pt-8 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
               <div>
-                <div className="text-xl font-bold font-mono text-white">100+</div>
+                <div className="text-xl font-bold text-white">100+</div>
                 <div className="text-xs text-zinc-400 mt-0.5">Indicadores satelitales</div>
               </div>
               <div>
-                <div className="text-xl font-bold font-mono text-amber-400">+95 kg/ha</div>
+                <div className="text-xl font-bold text-amber-400">+95 kg/ha</div>
                 <div className="text-xs text-zinc-400 mt-0.5">Nitrógeno biológico</div>
               </div>
               <div>
-                <div className="text-xl font-bold font-mono text-white">3 Años</div>
+                <div className="text-xl font-bold text-white">3 Años</div>
                 <div className="text-xs text-zinc-400 mt-0.5">Rotación Quipu</div>
               </div>
               <div>
-                <div className="text-xl font-bold font-mono text-emerald-400">0 Soles</div>
+                <div className="text-xl font-bold text-emerald-400">0 Soles</div>
                 <div className="text-xs text-zinc-400 mt-0.5">100% Código Abierto</div>
               </div>
             </div>
@@ -194,7 +218,7 @@ export default function SuperpowerTerraquipuLanding() {
 
                 {/* Floating Badge in Portrait */}
                 <div className="absolute bottom-6 left-6 right-6 bg-[#090A0D]/85 backdrop-blur-md border border-white/20 p-3 rounded-xl text-center shadow-lg">
-                  <div className="text-[10px] font-mono text-amber-300 uppercase tracking-widest font-semibold">Cusco, Perú • 3,762 m</div>
+                  <div className="text-[10px] text-amber-300 uppercase tracking-widest font-semibold">Cusco, Perú • 3,762 m</div>
                   <div className="text-xs font-bold text-white mt-0.5">Parcela Piloto Chinchero Sector B</div>
                   <div className="text-[10px] text-emerald-400 mt-0.5">● Telemetría Satelital Activa</div>
                 </div>
