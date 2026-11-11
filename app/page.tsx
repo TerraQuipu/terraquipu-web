@@ -19,42 +19,30 @@ import {
   ChevronDown
 } from "lucide-react";
 
-// Royalty-free background video playlist (Mixkit free commercial license - Andes aerials & Andean agriculture)
+// Royalty-free background video playlist (Optimized local MP4 with CDN fallback - Andes aerials & Andean agriculture)
+const BASE_PATH = process.env.NODE_ENV === 'production' ? '/terraquipu-web' : '';
+
 const HERO_PLAYLIST = [
   {
-    id: "cordillera",
+    id: "andes",
     label: "Cordillera de los Andes",
-    tagline: "Vuelo sobre picos y valles andinos",
-    url: "https://assets.mixkit.co/videos/4132/4132-720.mp4",
-    poster: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1600&auto=format&fit=crop"
+    url: `${BASE_PATH}/videos/andes.mp4`,
+    fallback: "https://assets.mixkit.co/videos/4132/4132-720.mp4",
+    poster: `${BASE_PATH}/videos/andes_poster.jpg`
   },
   {
     id: "cultivos",
     label: "Valles y Maizales",
-    tagline: "Telemetría sobre cuenca agrícola",
-    url: "https://assets.mixkit.co/videos/35854/35854-720.mp4",
-    poster: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1600&auto=format&fit=crop"
+    url: `${BASE_PATH}/videos/cultivos.mp4`,
+    fallback: "https://assets.mixkit.co/videos/35854/35854-720.mp4",
+    poster: `${BASE_PATH}/videos/cultivos_poster.jpg`
   },
   {
     id: "cosecha",
     label: "Cosecha & Semilla",
-    tagline: "Inspección de grano dorado andino",
-    url: "https://assets.mixkit.co/videos/48769/48769-720.mp4",
-    poster: "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?q=80&w=1600&auto=format&fit=crop"
-  },
-  {
-    id: "cumbre",
-    label: "Amanecer en la Cumbre",
-    tagline: "Radiación solar y monitoreo térmico",
-    url: "https://assets.mixkit.co/videos/34952/34952-720.mp4",
-    poster: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1600&auto=format&fit=crop"
-  },
-  {
-    id: "nubes",
-    label: "Mar de Nubes Andino",
-    tagline: "Microclimas de altura y humedad",
-    url: "https://assets.mixkit.co/videos/48483/48483-720.mp4",
-    poster: "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop"
+    url: `${BASE_PATH}/videos/cosecha.mp4`,
+    fallback: "https://assets.mixkit.co/videos/48769/48769-720.mp4",
+    poster: `${BASE_PATH}/videos/cosecha_poster.jpg`
   }
 ];
 
@@ -65,16 +53,11 @@ export default function SuperpowerTerraquipuLanding() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentVideoIdx, setCurrentVideoIdx] = useState(0);
-  const [fade, setFade] = useState(true);
 
   // Automatic seamless transition across videos every 9 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setFade(false);
-      setTimeout(() => {
-        setCurrentVideoIdx((prev) => (prev + 1) % HERO_PLAYLIST.length);
-        setFade(true);
-      }, 600);
+      setCurrentVideoIdx((prev) => (prev + 1) % HERO_PLAYLIST.length);
     }, 9000);
     return () => clearInterval(interval);
   }, []);
@@ -183,46 +166,28 @@ export default function SuperpowerTerraquipuLanding() {
         )}
       </header>
 
-      {/* ================= 2. HERO SECTION (SUPERPOWER LIGHTING & BUTTON STYLES) ================= */}
+      {/* ================= 2. HERO SECTION ================= */}
       <section id="hero-section" className="relative bg-[#090A0D] text-white pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden min-h-[92vh] flex items-center">
         
-        {/* Dynamic Royalty-Free Background Video Carousel (Mixkit Commercial Free - Andes & Agriculture) */}
+        {/* Dynamic Background Video (Andes & Agriculture) - Bright, Vibrant and Fully Visible */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <video
             key={HERO_PLAYLIST[currentVideoIdx].url}
             autoPlay
             muted
+            loop={false}
             playsInline
             poster={HERO_PLAYLIST[currentVideoIdx].poster}
-            onEnded={() => {
-              setFade(false);
-              setTimeout(() => {
-                setCurrentVideoIdx((prev) => (prev + 1) % HERO_PLAYLIST.length);
-                setFade(true);
-              }, 600);
-            }}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
-              fade ? "opacity-35" : "opacity-0"
-            } scale-105`}
+            onEnded={() => setCurrentVideoIdx((prev) => (prev + 1) % HERO_PLAYLIST.length)}
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out"
           >
             <source src={HERO_PLAYLIST[currentVideoIdx].url} type="video/mp4" />
+            <source src={HERO_PLAYLIST[currentVideoIdx].fallback} type="video/mp4" />
           </video>
 
-          {/* Moody Dark Overlays for Ultra-High Text Contrast */}
-          {/* Base darkening layer */}
-          <div className="absolute inset-0 bg-[#090A0D]/75"></div>
-
-          {/* Left-side horizontal dark ramp (keeps typography 100% crisp and readable) */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#090A0D] via-[#090A0D]/85 to-transparent"></div>
-
-          {/* Vertical vignettes top and bottom */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#090A0D] via-transparent to-[#090A0D]/90"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#090A0D]/30 to-[#090A0D]"></div>
-        </div>
-
-        {/* The Superpower Signature: Golden Solar Halo Glow */}
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[520px] sm:w-[680px] md:w-[780px] aspect-square pointer-events-none opacity-90">
-          <div className="w-full h-full rounded-full bg-gradient-to-tr from-amber-600 via-amber-500 to-amber-300 blur-[95px] opacity-45"></div>
+          {/* Minimal, subtle scrim so white text is readable without hiding the video */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/35 to-black/20"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#090A0D]/80 via-transparent to-black/30"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10 w-full py-12 md:py-20">
