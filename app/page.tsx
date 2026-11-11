@@ -543,30 +543,41 @@ export default function SuperpowerTerraquipuLanding() {
       </section>
 
       {/* ================= 5. LIFESTYLE TABLET SHOWCASE ("DIAGNÓSTICO INTEGRAL" - EXACT SUPERPOWER FULL-WIDTH PATTERN) ================= */}
-      <section id="diagnostico" className="relative py-20 lg:py-28 bg-white overflow-hidden min-h-[640px] lg:min-h-[720px] flex items-center">
-        <div className="max-w-7xl mx-auto px-6 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-4 items-center">
+      <section id="diagnostico" className="relative min-h-[720px] lg:min-h-[820px] bg-white overflow-hidden flex items-center">
+        
+        {/* Full Section Background Image (HUGE, exactly like Superpower) */}
+        <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-end overflow-hidden">
+          <img 
+            src={`${BASE_PATH}/images/agronomist_white_bg.jpg`} 
+            alt="Agrónomo analizando el suelo con tablet en los Andes" 
+            className="h-[105%] lg:h-[118%] w-auto max-h-[940px] object-contain object-right transform translate-x-24 lg:translate-x-40 xl:translate-x-48 select-none"
+          />
+        </div>
+
+        {/* Content Container (Floats directly over the white canvas and tablet scene) */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 w-full py-12 lg:py-20">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-8">
             
-            {/* Left Block: Heading, Subtitle & Floating Glass FAQs (lg:col-span-4) */}
-            <div className="lg:col-span-4 space-y-8 z-10">
+            {/* Left Block: Heading, Subtitle & Floating Glass FAQs (Superpower Pattern) */}
+            <div className="w-full lg:max-w-[360px] xl:max-w-[380px] space-y-8 shrink-0">
               <div className="space-y-4">
                 <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold">
                   DIAGNÓSTICO EN PARCELA
                 </span>
-                <h2 className="hero-headline text-3xl sm:text-4xl lg:text-[40px] font-bold text-zinc-950 leading-[1.15] tracking-tight transition-all duration-300">
+                <h2 className="hero-headline text-3xl sm:text-4xl lg:text-[40px] font-bold text-zinc-950 leading-[1.12] tracking-tight transition-all duration-300">
                   {DIAGNOSTICO_TABS[activeDiagnosticoTab].title}
                 </h2>
-                <p className="text-sm text-zinc-600 font-sans leading-relaxed transition-all duration-300">
+                <p className="text-sm text-zinc-600 font-sans leading-relaxed transition-all duration-300 max-w-[340px]">
                   {DIAGNOSTICO_TABS[activeDiagnosticoTab].subtitle}
                 </p>
               </div>
 
               {/* Floating Frosted Glass FAQ Accordions (Exact Superpower Pattern) */}
-              <div className="space-y-2.5 pt-2 max-w-md">
+              <div className="space-y-2.5 pt-2 w-full max-w-[360px]">
                 {DIAGNOSTICO_FAQS.map((faq, idx) => (
                   <div 
                     key={idx} 
-                    className="rounded-2xl bg-zinc-900/90 hover:bg-zinc-900/95 backdrop-blur-xl border border-white/10 p-3.5 text-white transition-all duration-200 shadow-md"
+                    className="rounded-2xl bg-zinc-900/90 hover:bg-zinc-900 backdrop-blur-xl border border-white/10 p-3.5 text-white transition-all duration-200 shadow-md"
                   >
                     <button
                       type="button"
@@ -588,17 +599,11 @@ export default function SuperpowerTerraquipuLanding() {
               </div>
             </div>
 
-            {/* Center Block: Agronomist with Tablet (lg:col-span-5) */}
-            <div className="lg:col-span-5 flex items-center justify-center relative select-none pointer-events-none">
-              <img 
-                src={`${BASE_PATH}/images/agronomist_white_bg.jpg`} 
-                alt="Agrónomo analizando el suelo con tablet en los Andes" 
-                className="w-full max-w-[580px] lg:max-w-[650px] h-auto object-contain transform lg:scale-105"
-              />
-            </div>
+            {/* Spacer for Center Space (where the huge tablet in the background is displayed) */}
+            <div className="hidden lg:block lg:flex-1 pointer-events-none" />
 
-            {/* Right Block: Vertical Tab Navigation (lg:col-span-3) */}
-            <div className="lg:col-span-3 flex flex-row lg:flex-col gap-3 lg:gap-6 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 shrink-0 justify-center z-10 lg:pl-6">
+            {/* Right Block: Vertical Tab Navigation (Exact Superpower Pattern: | Item 01) */}
+            <div className="w-full lg:w-auto flex flex-row lg:flex-col gap-3 lg:gap-6 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 shrink-0 self-center z-20">
               {DIAGNOSTICO_TABS.map((tab, idx) => (
                 <button
                   key={idx}
@@ -607,11 +612,11 @@ export default function SuperpowerTerraquipuLanding() {
                   className={`flex items-center justify-between gap-4 text-left transition-all py-1.5 cursor-pointer group ${
                     activeDiagnosticoTab === idx
                       ? "text-zinc-950 font-bold border-l-2 border-zinc-950 pl-3.5 -ml-[2px]"
-                      : "text-zinc-400 hover:text-zinc-800 font-medium pl-3.5 border-l-2 border-transparent"
+                      : "text-zinc-500 hover:text-zinc-950 font-medium pl-3.5 border-l-2 border-transparent"
                   }`}
                 >
                   <span className="tracking-tight leading-snug whitespace-nowrap">{tab.label}</span>
-                  <span className="font-mono text-[11px] text-zinc-400 group-hover:text-zinc-600 shrink-0">
+                  <span className="font-mono text-[11px] text-zinc-400 group-hover:text-zinc-700 shrink-0">
                     0{idx + 1}
                   </span>
                 </button>
