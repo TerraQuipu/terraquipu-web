@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { 
   Satellite, 
   Sprout, 
@@ -16,8 +16,52 @@ import {
   Users, 
   QrCode,
   Github,
-  ChevronDown
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Play,
+  Pause,
+  Video
 } from "lucide-react";
+
+// Royalty-free background video playlist (Mixkit free commercial license - Andes aerials & Andean agriculture)
+const HERO_PLAYLIST = [
+  {
+    id: "cordillera",
+    label: "Cordillera de los Andes",
+    tagline: "Vuelo sobre picos y valles andinos",
+    url: "https://assets.mixkit.co/videos/4132/4132-720.mp4",
+    poster: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1600&auto=format&fit=crop"
+  },
+  {
+    id: "cultivos",
+    label: "Valles y Maizales",
+    tagline: "Telemetría sobre cuenca agrícola",
+    url: "https://assets.mixkit.co/videos/35854/35854-720.mp4",
+    poster: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1600&auto=format&fit=crop"
+  },
+  {
+    id: "cosecha",
+    label: "Cosecha & Semilla",
+    tagline: "Inspección de grano dorado andino",
+    url: "https://assets.mixkit.co/videos/48769/48769-720.mp4",
+    poster: "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?q=80&w=1600&auto=format&fit=crop"
+  },
+  {
+    id: "cumbre",
+    label: "Amanecer en la Cumbre",
+    tagline: "Radiación solar y monitoreo térmico",
+    url: "https://assets.mixkit.co/videos/34952/34952-720.mp4",
+    poster: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1600&auto=format&fit=crop"
+  },
+  {
+    id: "nubes",
+    label: "Mar de Nubes Andino",
+    tagline: "Microclimas de altura y humedad",
+    url: "https://assets.mixkit.co/videos/48483/48483-720.mp4",
+    poster: "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop"
+  }
+];
 
 export default function SuperpowerTerraquipuLanding() {
   const [selectedRole, setSelectedRole] = useState("comunidad");
@@ -25,6 +69,29 @@ export default function SuperpowerTerraquipuLanding() {
   const [folio, setFolio] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [currentVideoIdx, setCurrentVideoIdx] = useState(0);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handleNextVideo = () => {
+    setCurrentVideoIdx((prev) => (prev + 1) % HERO_PLAYLIST.length);
+  };
+
+  const handlePrevVideo = () => {
+    setCurrentVideoIdx((prev) => (prev - 1 + HERO_PLAYLIST.length) % HERO_PLAYLIST.length);
+  };
+
+  const togglePlayPause = () => {
+    if (videoRef.current) {
+      if (videoRef.current.paused) {
+        videoRef.current.play();
+        setIsVideoPlaying(true);
+      } else {
+        videoRef.current.pause();
+        setIsVideoPlaying(false);
+      }
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -131,10 +198,34 @@ export default function SuperpowerTerraquipuLanding() {
       </header>
 
       {/* ================= 2. HERO SECTION (SUPERPOWER LIGHTING & BUTTON STYLES) ================= */}
-      <section id="hero-section" className="relative bg-[#090A0D] text-white pt-32 pb-24 md:pt-40 md:pb-36 overflow-hidden min-h-[92vh] flex items-center">
+      <section id="hero-section" className="relative bg-[#090A0D] text-white pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden min-h-[92vh] flex items-center">
         
-        {/* Layer ready for custom background image provided by user */}
-        <div id="hero-bg-layer" className="absolute inset-0 bg-cover bg-center pointer-events-none opacity-40"></div>
+        {/* Dynamic Royalty-Free Background Video Carousel (Mixkit Commercial Free - Andes & Agriculture) */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <video
+            ref={videoRef}
+            key={HERO_PLAYLIST[currentVideoIdx].url}
+            autoPlay
+            muted
+            playsInline
+            poster={HERO_PLAYLIST[currentVideoIdx].poster}
+            onEnded={handleNextVideo}
+            className="absolute inset-0 w-full h-full object-cover opacity-35 scale-105 transition-opacity duration-1000 ease-out"
+          >
+            <source src={HERO_PLAYLIST[currentVideoIdx].url} type="video/mp4" />
+          </video>
+
+          {/* Moody Dark Overlays for Ultra-High Text Contrast */}
+          {/* Base darkening layer */}
+          <div className="absolute inset-0 bg-[#090A0D]/75"></div>
+
+          {/* Left-side horizontal dark ramp (keeps typography 100% crisp and readable) */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#090A0D] via-[#090A0D]/85 to-transparent"></div>
+
+          {/* Vertical vignettes top and bottom */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#090A0D] via-transparent to-[#090A0D]/90"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#090A0D]/30 to-[#090A0D]"></div>
+        </div>
 
         {/* The Superpower Signature: Golden Solar Halo Glow */}
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[520px] sm:w-[680px] md:w-[780px] aspect-square pointer-events-none opacity-90">
@@ -226,6 +317,66 @@ export default function SuperpowerTerraquipuLanding() {
               </div>
             </div>
 
+          </div>
+
+          {/* Subtle Live Scene Telemetry & Video Playlist Switcher Capsule */}
+          <div className="lg:col-span-12 pt-6 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 text-xs text-zinc-400">
+            <div className="flex items-center gap-3">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-white font-medium">Transmisión:</span>
+                <span className="text-amber-400 font-semibold">{HERO_PLAYLIST[currentVideoIdx].label}</span>
+                <span className="text-zinc-500 hidden sm:inline">•</span>
+                <span className="text-zinc-400 hidden sm:inline">{HERO_PLAYLIST[currentVideoIdx].tagline}</span>
+              </div>
+            </div>
+
+            {/* Video Controls (Prev, Pause/Play, Next, Scene dots) */}
+            <div className="flex items-center gap-2">
+              <button 
+                type="button"
+                onClick={handlePrevVideo}
+                title="Escena anterior"
+                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center text-white transition cursor-pointer"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+              <button 
+                type="button"
+                onClick={togglePlayPause}
+                title={isVideoPlaying ? "Pausar video" : "Reproducir video"}
+                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center text-white transition cursor-pointer"
+              >
+                {isVideoPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+              </button>
+              <button 
+                type="button"
+                onClick={handleNextVideo}
+                title="Siguiente escena"
+                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center text-white transition cursor-pointer"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+
+              <div className="hidden sm:flex items-center gap-1.5 ml-2 pl-3 border-l border-white/15">
+                {HERO_PLAYLIST.map((item, idx) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setCurrentVideoIdx(idx)}
+                    className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition ${
+                      currentVideoIdx === idx 
+                        ? "bg-amber-400 text-black font-bold shadow-sm" 
+                        : "bg-white/5 hover:bg-white/15 text-zinc-300"
+                    }`}
+                  >
+                    0{idx + 1}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
         </div>
