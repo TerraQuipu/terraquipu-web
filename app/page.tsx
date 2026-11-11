@@ -46,6 +46,44 @@ const HERO_PLAYLIST = [
   }
 ];
 
+const DIAGNOSTICO_TABS = [
+  {
+    label: "Diagnóstico en Parcela",
+    title: "Cada parcela comienza con 100+ indicadores agroclimáticos.",
+    subtitle: "Diagnóstico edáfico a 30m de resolución con telemetría satelital en tiempo real para anticipar sequías, optimizar nitrógeno y proteger tus cultivos frente a El Niño."
+  },
+  {
+    label: "Historial Agroclimático",
+    title: "Dos décadas de memoria satelital para tu cuenca.",
+    subtitle: "Modelado agroclimático de 20 años con NASA POWER para anticipar anomalías pluviométricas y calcular curvas de evapotranspiración con rigor científico."
+  },
+  {
+    label: "Rotación Quipu",
+    title: "Un plan multianual regenerativo para tu suelo.",
+    subtitle: "Secuencia determinista auditada por INIA: Tarwi para inyección biológica de nitrógeno (+95 kg N/ha), Quinua tolerante y Papa Nativa resistente."
+  },
+  {
+    label: "Alertas El Niño",
+    title: "Alertas predictivas antes de que la sequía golpee.",
+    subtitle: "Telemetría radar NASA SMAP para calibrar la humedad radicular y activar planes de contingencia hídrica meses antes de la siembra."
+  }
+];
+
+const DIAGNOSTICO_FAQS = [
+  {
+    q: "¿Cómo mide Terraquipu la humedad a 30m?",
+    a: "Combinando radar L-Band NASA SMAP con downscaling topográfico SRTM a 90m y modelos edáficos SoilGrids a 30m calibrados para laderas andinas."
+  },
+  {
+    q: "¿Qué datos satelitales y públicos se integran?",
+    a: "Datos abiertos de NASA POWER (clima y radiación solar), NASA SMAP (humedad de suelo), ISRIC SoilGrids v2 (perfil de suelo) y registros meteorológicos de SENAMHI."
+  },
+  {
+    q: "¿Cómo se valida la rotación con normas INIA?",
+    a: "El motor algorítmico sigue las guías técnicas del INIA (Instituto Nacional de Innovación Agraria) para fijación biológica de nitrógeno (+95 kg N/ha) y control del gorgojo andino."
+  }
+];
+
 export default function SuperpowerTerraquipuLanding() {
   const [selectedRole, setSelectedRole] = useState("comunidad");
   const [leadSuccess, setLeadSuccess] = useState(false);
@@ -53,6 +91,8 @@ export default function SuperpowerTerraquipuLanding() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentVideoIdx, setCurrentVideoIdx] = useState(0);
+  const [activeDiagnosticoTab, setActiveDiagnosticoTab] = useState(0);
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   // Automatic seamless transition across videos every 9 seconds
   useEffect(() => {
@@ -497,86 +537,87 @@ export default function SuperpowerTerraquipuLanding() {
         </div>
       </section>
 
-      {/* ================= 5. LIFESTYLE TABLET SHOWCASE ("DIAGNÓSTICO INTEGRAL") ================= */}
-      <section id="diagnostico" className="py-24 bg-white border-b border-zinc-200">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
-          {/* Tablet Mockup Screen */}
-          <div className="lg:col-span-7">
-            <div className="rounded-2xl border-[8px] border-zinc-900 bg-zinc-950 p-2 shadow-2xl overflow-hidden">
-              <div className="rounded-xl overflow-hidden bg-zinc-900 aspect-[16/10] relative flex flex-col justify-between p-6 text-white">
-                <div className="flex justify-between items-center text-xs font-mono">
-                  <span className="text-amber-400 font-bold">// VISOR GEOESPACIAL DE PARCELA</span>
-                  <span className="text-zinc-400">CHINCHERO • 3,762 M</span>
-                </div>
+      {/* ================= 5. LIFESTYLE TABLET SHOWCASE ("DIAGNÓSTICO INTEGRAL" - EXACT SUPERPOWER PATTERN) ================= */}
+      <section id="diagnostico" className="py-24 lg:py-32 bg-[#FAF9F5] border-b border-zinc-200 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            {/* Left Column: Heading, Subtitle & Floating Glass FAQs (Superpower Style) */}
+            <div className="lg:col-span-4 flex flex-col justify-between space-y-8">
+              <div className="space-y-4">
+                <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold">
+                  DIAGNÓSTICO EN PARCELA
+                </span>
+                <h2 className="hero-headline text-3xl sm:text-4xl lg:text-[40px] font-bold text-zinc-950 leading-[1.12] tracking-tight transition-all duration-300">
+                  {DIAGNOSTICO_TABS[activeDiagnosticoTab].title}
+                </h2>
+                <p className="text-sm text-zinc-600 font-sans leading-relaxed transition-all duration-300">
+                  {DIAGNOSTICO_TABS[activeDiagnosticoTab].subtitle}
+                </p>
+              </div>
 
-                <div className="grid grid-cols-3 gap-3 my-auto">
-                  <div className="bg-white/10 p-3 rounded-lg backdrop-blur-md">
-                    <div className="text-[10px] text-zinc-400">Lluvia Campaña</div>
-                    <div className="text-xl font-bold font-mono">510 mm</div>
-                    <div className="text-[9px] text-amber-400">-24% Déficit</div>
+              {/* Floating Frosted Glass FAQ Accordions (Exact Superpower Pattern) */}
+              <div className="space-y-2.5 pt-2">
+                {DIAGNOSTICO_FAQS.map((faq, idx) => (
+                  <div 
+                    key={idx} 
+                    className="rounded-2xl bg-zinc-900/85 hover:bg-zinc-900/95 backdrop-blur-xl border border-white/10 p-3.5 text-white transition-all duration-200 shadow-md"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setExpandedFaq(expandedFaq === idx ? null : idx)}
+                      className="w-full flex items-center justify-between text-left gap-3 text-xs font-medium cursor-pointer"
+                    >
+                      <span className="font-sans text-zinc-100">{faq.q}</span>
+                      <span className="w-5 h-5 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-xs text-zinc-300 shrink-0 font-mono font-bold">
+                        {expandedFaq === idx ? "−" : "+"}
+                      </span>
+                    </button>
+                    {expandedFaq === idx && (
+                      <p className="mt-2.5 pt-2.5 border-t border-white/10 text-[11px] text-zinc-300 font-sans leading-relaxed animate-in fade-in duration-200">
+                        {faq.a}
+                      </p>
+                    )}
                   </div>
-                  <div className="bg-white/10 p-3 rounded-lg backdrop-blur-md">
-                    <div className="text-[10px] text-zinc-400">Humedad Suelo</div>
-                    <div className="text-xl font-bold font-mono text-emerald-400">18.4%</div>
-                    <div className="text-[9px] text-zinc-300">VWC Calibrado</div>
-                  </div>
-                  <div className="bg-white/10 p-3 rounded-lg backdrop-blur-md">
-                    <div className="text-[10px] text-zinc-400">Nitrógeno Ganado</div>
-                    <div className="text-xl font-bold font-mono text-emerald-400">+95 kg</div>
-                    <div className="text-[9px] text-emerald-300">Por hectárea</div>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center pt-3 border-t border-white/10 text-xs font-mono">
-                  <span>Recomendación: Tarwi (Leguminosa)</span>
-                  <a href="./app.html" className="text-amber-300 hover:text-white flex items-center gap-1 font-bold">
-                    <span>Lanzar Mapa</span>
-                    <span>→</span>
-                  </a>
-                </div>
+                ))}
               </div>
             </div>
-          </div>
 
-          {/* Description Right */}
-          <div className="lg:col-span-5 space-y-6">
-            <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold">
-              DIAGNÓSTICO EN PARCELA
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-serif font-light text-zinc-950 leading-tight">
-              Un mapa integral de la salud de tu suelo en tus manos.
-            </h2>
-            <p className="text-sm text-zinc-600 leading-relaxed">
-              Los técnicos y agricultores ya no tienen que adivinar cuándo lloverá o si el suelo tiene los nutrientes suficientes. Con un solo clic sobre la parcela, Terraquipu despliega los indicadores críticos de la cuenca.
-            </p>
-
-            <ul className="space-y-3 text-xs text-zinc-700">
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                <span><strong>Resolución efectiva de 30m:</strong> Downscaling adaptado a laderas andinas.</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                <span><strong>Historial agroclimático de 20 años:</strong> Modelado estacional de sequías.</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                <span><strong>Cálculo de pH y textura edáfica:</strong> Datos de ISRIC SoilGrids v2.0.</span>
-              </li>
-            </ul>
-
-            <div className="pt-2">
-              <a 
-                href="./app.html" 
-                className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-black font-bold hover:gap-3 transition-all"
-              >
-                <span>Explorar sectores en vivo (Chinchero, Moray, Urubamba)</span>
-                <span>→</span>
-              </a>
+            {/* Center Column: The Agronomist with Tablet in Field (Hero Showcase Image) */}
+            <div className="lg:col-span-6 flex items-center justify-center">
+              <div className="relative rounded-[28px] sm:rounded-[36px] overflow-hidden border border-zinc-200/90 shadow-2xl bg-zinc-950 group">
+                <img 
+                  src={`${BASE_PATH}/images/tablet_showcase.jpg`} 
+                  alt="Agrónomo analizando el suelo con tablet en los Andes" 
+                  className="w-full h-auto object-cover object-center group-hover:scale-[1.01] transition-transform duration-500"
+                />
+              </div>
             </div>
-          </div>
 
+            {/* Right Column: Vertical Tab Navigation (Exact Superpower Pattern: | Item 01) */}
+            <div className="lg:col-span-2 flex flex-col justify-center space-y-6 lg:pl-2">
+              <div className="flex flex-row lg:flex-col gap-3 lg:gap-5 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
+                {DIAGNOSTICO_TABS.map((tab, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveDiagnosticoTab(idx)}
+                    className={`flex items-center justify-between gap-3 text-left transition-all py-1.5 cursor-pointer group ${
+                      activeDiagnosticoTab === idx
+                        ? "text-zinc-950 font-bold border-l-2 border-zinc-950 pl-3.5 -ml-[2px]"
+                        : "text-zinc-400 hover:text-zinc-800 font-medium pl-3.5 border-l-2 border-transparent"
+                    }`}
+                  >
+                    <span className="tracking-tight leading-snug">{tab.label}</span>
+                    <span className="font-mono text-[11px] text-zinc-400 group-hover:text-zinc-600 shrink-0">
+                      0{idx + 1}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+          </div>
         </div>
       </section>
 
