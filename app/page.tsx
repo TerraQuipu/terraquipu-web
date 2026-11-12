@@ -352,33 +352,26 @@ export default function SuperpowerTerraquipuLanding() {
                   className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
                 />
                 {/* Gradient vignette for seamless telemetry contrast */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/25 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 pointer-events-none" />
 
                 {/* Top Number Badge (Superpower Style) */}
                 <div className="relative z-10 w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
                   1
                 </div>
 
-                {/* Floating Frosted Glass Pill (Exact Match to Image 4) */}
-                <div className="relative z-10 w-full rounded-2xl bg-zinc-950/85 backdrop-blur-xl border border-white/15 p-3.5 shadow-xl text-white">
+                {/* Floating Telemetry (Pure Text - No Background Card) */}
+                <div className="relative z-10 w-full text-white space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 text-sm shrink-0">
-                        🛰️
-                      </div>
-                      <div>
-                        <div className="text-xs font-mono font-bold text-white tracking-wide">
-                          NASA SMAP Radar
-                        </div>
-                        <div className="text-[11px] font-mono text-zinc-300 flex items-center gap-1.5 mt-0.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          Humedad: 18.4% VWC
-                        </div>
-                      </div>
-                    </div>
-                    <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-xs font-bold shrink-0">
-                      ✓
-                    </div>
+                    <span className="text-[11px] font-mono font-bold tracking-wider text-zinc-200 uppercase">
+                      NASA SMAP Radar
+                    </span>
+                    <span className="text-[11px] font-mono text-emerald-400 font-bold">
+                      18.4% VWC
+                    </span>
+                  </div>
+                  <div className="pt-1.5 border-t border-white/20 flex justify-between items-baseline font-mono text-[11px] text-zinc-300">
+                    <span>Humedad Radicular</span>
+                    <span className="text-emerald-400 font-medium">Óptimo</span>
                   </div>
                 </div>
               </div>
@@ -405,42 +398,36 @@ export default function SuperpowerTerraquipuLanding() {
                   className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
                 />
                 {/* Gradient vignette */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/25 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 pointer-events-none" />
 
                 {/* Top Number Badge */}
                 <div className="relative z-10 w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
                   2
                 </div>
 
-                {/* Floating White Pill (Exact Match to Image 4) */}
-                <div className="relative z-10 w-full rounded-2xl bg-white/95 backdrop-blur-xl border border-zinc-200/90 p-3.5 shadow-xl text-zinc-900 space-y-2">
+                {/* Floating Telemetry (Pure Text - No Background Card) */}
+                <div className="relative z-10 w-full text-white space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold tracking-wider text-zinc-500 uppercase">
+                    <span className="text-[11px] font-mono font-bold tracking-wider text-zinc-200 uppercase">
                       MUESTRA EDÁFICA
                     </span>
-                    <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-full font-bold">
+                    <span className="text-[10px] font-mono text-emerald-400 font-bold">
                       30m SRTM
                     </span>
                   </div>
 
-                  <div className="pt-1.5 border-t border-zinc-100 space-y-1 font-mono text-[11px]">
-                    <div className="flex justify-between items-center text-zinc-700">
-                      <span className="text-zinc-500 text-[10px] uppercase tracking-wider flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-amber-500" /> pH Suelo
-                      </span>
-                      <span className="font-bold text-zinc-900">6.4 <span className="text-[10px] text-emerald-600 font-normal">(Óptimo)</span></span>
+                  <div className="pt-1.5 border-t border-white/20 space-y-1 font-mono text-[11px]">
+                    <div className="flex justify-between items-center text-zinc-300">
+                      <span>pH Suelo</span>
+                      <span className="font-bold text-white">6.4 <span className="text-[10px] text-emerald-400 font-normal">(Óptimo)</span></span>
                     </div>
-                    <div className="flex justify-between items-center text-zinc-700">
-                      <span className="text-zinc-500 text-[10px] uppercase tracking-wider flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500" /> Materia Orgánica
-                      </span>
-                      <span className="font-bold text-zinc-900">3.8%</span>
+                    <div className="flex justify-between items-center text-zinc-300">
+                      <span>Materia Orgánica</span>
+                      <span className="font-bold text-emerald-400">3.8%</span>
                     </div>
-                    <div className="flex justify-between items-center text-zinc-700">
-                      <span className="text-zinc-500 text-[10px] uppercase tracking-wider flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-blue-500" /> Pendiente Valle
-                      </span>
-                      <span className="font-bold text-zinc-900">18° Grados</span>
+                    <div className="flex justify-between items-center text-zinc-300">
+                      <span>Pendiente Valle</span>
+                      <span className="font-bold text-white">18° Grados</span>
                     </div>
                   </div>
                 </div>
@@ -468,36 +455,36 @@ export default function SuperpowerTerraquipuLanding() {
                   className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
                 />
                 {/* Gradient vignette */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/25 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 pointer-events-none" />
 
                 {/* Top Number Badge */}
                 <div className="relative z-10 w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
                   3
                 </div>
 
-                {/* Floating Frosted Glass Pill (Exact Match to Image 4) */}
-                <div className="relative z-10 w-full rounded-2xl bg-zinc-950/85 backdrop-blur-xl border border-white/15 p-3.5 shadow-xl text-white space-y-2">
+                {/* Floating Telemetry (Pure Text - No Background Card) */}
+                <div className="relative z-10 w-full text-white space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold tracking-wider text-amber-400 uppercase flex items-center gap-1">
-                      <span>⚡</span> SECUENCIA QUIPU
+                    <span className="text-[11px] font-mono font-bold tracking-wider text-amber-400 uppercase">
+                      SECUENCIA QUIPU
                     </span>
-                    <span className="text-[10px] font-mono text-zinc-400 tracking-wider">
+                    <span className="text-[10px] font-mono text-zinc-400">
                       INIA 2026
                     </span>
                   </div>
 
-                  <div className="pt-1.5 border-t border-white/15 space-y-1 font-mono text-[11px]">
-                    <div className="flex justify-between items-center text-zinc-200">
-                      <span className="text-zinc-300">1. Tarwi (Leguminosa)</span>
-                      <span className="text-emerald-400 font-bold text-[10px]">+95 kg N/ha</span>
+                  <div className="pt-1.5 border-t border-white/20 space-y-1 font-mono text-[11px]">
+                    <div className="flex justify-between items-center text-zinc-300">
+                      <span>1. Tarwi (Leguminosa)</span>
+                      <span className="text-emerald-400 font-bold">+95 kg N/ha</span>
                     </div>
-                    <div className="flex justify-between items-center text-zinc-200">
-                      <span className="text-zinc-300">2. Quinua Real</span>
-                      <span className="text-amber-300 font-bold text-[10px]">Corte ciclo</span>
+                    <div className="flex justify-between items-center text-zinc-300">
+                      <span>2. Quinua Real</span>
+                      <span className="text-amber-300 font-bold">Corte ciclo</span>
                     </div>
-                    <div className="flex justify-between items-center text-zinc-200">
-                      <span className="text-zinc-300">3. Papa Nativa</span>
-                      <span className="text-blue-300 font-bold text-[10px]">Alta resiliencia</span>
+                    <div className="flex justify-between items-center text-zinc-300">
+                      <span>3. Papa Nativa</span>
+                      <span className="text-blue-300 font-bold">Alta resiliencia</span>
                     </div>
                   </div>
                 </div>
@@ -525,32 +512,32 @@ export default function SuperpowerTerraquipuLanding() {
                   className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
                 />
                 {/* Gradient vignette */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/25 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 pointer-events-none" />
 
                 {/* Top Number Badge */}
                 <div className="relative z-10 w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
                   4
                 </div>
 
-                {/* Floating Frosted Glass Pill (Exact Match to Image 4) */}
-                <div className="relative z-10 w-full rounded-2xl bg-zinc-950/85 backdrop-blur-xl border border-white/15 p-3.5 shadow-xl text-white space-y-2">
+                {/* Floating Telemetry (Pure Text - No Background Card) */}
+                <div className="relative z-10 w-full text-white space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold tracking-wider text-zinc-300 uppercase">
+                    <span className="text-[11px] font-mono font-bold tracking-wider text-zinc-200 uppercase">
                       CAMPAÑA COSECHADA
                     </span>
-                    <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
-                      ✓ Éxito
+                    <span className="text-[10px] font-mono text-emerald-400 font-bold">
+                      Éxito
                     </span>
                   </div>
 
-                  <div className="pt-1.5 border-t border-white/15 grid grid-cols-2 gap-2 text-center font-mono">
-                    <div className="bg-white/5 rounded-xl p-1.5">
-                      <div className="text-xl font-bold text-emerald-400 tracking-tight">+34%</div>
-                      <div className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">Rendimiento</div>
+                  <div className="pt-1.5 border-t border-white/20 grid grid-cols-2 gap-2 text-center font-mono">
+                    <div>
+                      <div className="text-2xl font-bold text-emerald-400 tracking-tight">+34%</div>
+                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">Rendimiento</div>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-1.5">
-                      <div className="text-xl font-bold text-amber-300 tracking-tight">-75%</div>
-                      <div className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">Gorgojo Plaga</div>
+                    <div>
+                      <div className="text-2xl font-bold text-amber-300 tracking-tight">-75%</div>
+                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">Gorgojo Plaga</div>
                     </div>
                   </div>
                 </div>
@@ -685,15 +672,15 @@ export default function SuperpowerTerraquipuLanding() {
             </p>
           </div>
 
-          {/* Superpower Membership Card Style */}
-          <div className="rounded-3xl border border-white/15 bg-[#12141A] p-8 sm:p-12 space-y-8 shadow-2xl relative overflow-hidden">
+          {/* Community Membership Content */}
+          <div className="space-y-8">
             
-            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-white/10 pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
               <div>
                 <h3 className="text-2xl font-serif text-white">Membresía Abierta de Microcuenca</h3>
                 <p className="text-xs text-zinc-400 mt-1">Para comunidades agrícolas, investigadores y desarrolladores</p>
               </div>
-              <div className="text-right">
+              <div className="text-left sm:text-right">
                 <div className="text-4xl font-extrabold font-mono text-white">0 Soles</div>
                 <div className="text-xs text-emerald-400 font-mono">100% Open Source (Licencia MIT)</div>
               </div>
@@ -735,7 +722,7 @@ export default function SuperpowerTerraquipuLanding() {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-xs text-zinc-400 font-mono">
                 Desplegado para Cusco, Valle Sagrado y nuevas cuencas 2026-2027.
               </div>
@@ -898,7 +885,7 @@ export default function SuperpowerTerraquipuLanding() {
                 >
                   <source src={`${BASE_PATH}/videos/cultivos.mp4`} type="video/mp4" />
                 </video>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/35 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 pointer-events-none" />
 
                 {/* Top Institution Label (Pure Elegant Font - No Card, No Icon) */}
                 <div className="relative z-10 pt-1 px-1">
@@ -907,10 +894,10 @@ export default function SuperpowerTerraquipuLanding() {
                   </span>
                 </div>
 
-                {/* Floating Frosted Glass Pill */}
-                <div className="relative z-10 w-full rounded-2xl bg-zinc-950/85 backdrop-blur-xl border border-white/15 p-3.5 shadow-xl text-white space-y-2">
+                {/* Floating Telemetry (Pure Text - No Background Card) */}
+                <div className="relative z-10 w-full text-white space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold tracking-wider text-zinc-300 uppercase">
+                    <span className="text-[11px] font-mono font-bold tracking-wider text-zinc-200 uppercase">
                       MANUAL TÉCNICO N° 14
                     </span>
                     <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider font-semibold">
@@ -918,14 +905,14 @@ export default function SuperpowerTerraquipuLanding() {
                     </span>
                   </div>
 
-                  <div className="pt-1.5 border-t border-white/15 grid grid-cols-2 gap-2 text-center font-mono">
-                    <div className="bg-white/5 rounded-xl p-1.5">
-                      <div className="text-lg font-bold text-emerald-400 tracking-tight">+100 kg</div>
-                      <div className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">N / ha fijado</div>
+                  <div className="pt-1.5 border-t border-white/20 grid grid-cols-2 gap-2 text-center font-mono">
+                    <div>
+                      <div className="text-2xl font-bold text-emerald-400 tracking-tight">+100 kg</div>
+                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">N / ha fijado</div>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-1.5">
-                      <div className="text-lg font-bold text-amber-300 tracking-tight">Tarwi</div>
-                      <div className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">Lupinus m.</div>
+                    <div>
+                      <div className="text-2xl font-bold text-amber-300 tracking-tight">Tarwi</div>
+                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">Lupinus m.</div>
                     </div>
                   </div>
                 </div>
@@ -957,7 +944,7 @@ export default function SuperpowerTerraquipuLanding() {
                 >
                   <source src={`${BASE_PATH}/videos/andes.mp4`} type="video/mp4" />
                 </video>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/35 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 pointer-events-none" />
 
                 {/* Top Institution Label (Pure Elegant Font - No Card, No Icon) */}
                 <div className="relative z-10 pt-1 px-1">
@@ -966,10 +953,10 @@ export default function SuperpowerTerraquipuLanding() {
                   </span>
                 </div>
 
-                {/* Floating Frosted Glass Pill */}
-                <div className="relative z-10 w-full rounded-2xl bg-zinc-950/85 backdrop-blur-xl border border-white/15 p-3.5 shadow-xl text-white space-y-2">
+                {/* Floating Telemetry (Pure Text - No Background Card) */}
+                <div className="relative z-10 w-full text-white space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold tracking-wider text-zinc-300 uppercase">
+                    <span className="text-[11px] font-mono font-bold tracking-wider text-zinc-200 uppercase">
                       BOLETINES AGROCLIMÁTICOS
                     </span>
                     <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider font-semibold">
@@ -977,14 +964,14 @@ export default function SuperpowerTerraquipuLanding() {
                     </span>
                   </div>
 
-                  <div className="pt-1.5 border-t border-white/15 grid grid-cols-2 gap-2 text-center font-mono">
-                    <div className="bg-white/5 rounded-xl p-1.5">
-                      <div className="text-lg font-bold text-cyan-400 tracking-tight">-4°C</div>
-                      <div className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">Umbral Helada</div>
+                  <div className="pt-1.5 border-t border-white/20 grid grid-cols-2 gap-2 text-center font-mono">
+                    <div>
+                      <div className="text-2xl font-bold text-cyan-400 tracking-tight">-4°C</div>
+                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">Umbral Helada</div>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-1.5">
-                      <div className="text-lg font-bold text-emerald-400 tracking-tight">Sierra Sur</div>
-                      <div className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">Cusco & Puno</div>
+                    <div>
+                      <div className="text-2xl font-bold text-emerald-400 tracking-tight">Sierra Sur</div>
+                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">Cusco & Puno</div>
                     </div>
                   </div>
                 </div>
@@ -1016,7 +1003,7 @@ export default function SuperpowerTerraquipuLanding() {
                 >
                   <source src={`${BASE_PATH}/videos/nasa_orbit.mp4`} type="video/mp4" />
                 </video>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/35 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 pointer-events-none" />
 
                 {/* Top Institution Label (Pure Elegant Font - No Card, No Icon) */}
                 <div className="relative z-10 pt-1 px-1">
@@ -1025,10 +1012,10 @@ export default function SuperpowerTerraquipuLanding() {
                   </span>
                 </div>
 
-                {/* Floating Frosted Glass Pill */}
-                <div className="relative z-10 w-full rounded-2xl bg-zinc-950/85 backdrop-blur-xl border border-white/15 p-3.5 shadow-xl text-white space-y-2">
+                {/* Floating Telemetry (Pure Text - No Background Card) */}
+                <div className="relative z-10 w-full text-white space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold tracking-wider text-zinc-300 uppercase">
+                    <span className="text-[11px] font-mono font-bold tracking-wider text-zinc-200 uppercase">
                       GLOBAL CHALLENGE 2026
                     </span>
                     <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider font-semibold">
@@ -1036,14 +1023,14 @@ export default function SuperpowerTerraquipuLanding() {
                     </span>
                   </div>
 
-                  <div className="pt-1.5 border-t border-white/15 grid grid-cols-2 gap-2 text-center font-mono">
-                    <div className="bg-white/5 rounded-xl p-1.5">
-                      <div className="text-lg font-bold text-amber-400 tracking-tight">SMAP</div>
-                      <div className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">Radar L-Band</div>
+                  <div className="pt-1.5 border-t border-white/20 grid grid-cols-2 gap-2 text-center font-mono">
+                    <div>
+                      <div className="text-2xl font-bold text-amber-400 tracking-tight">SMAP</div>
+                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">Radar L-Band</div>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-1.5">
-                      <div className="text-lg font-bold text-emerald-400 tracking-tight">POWER</div>
-                      <div className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">Solar & Lluvia</div>
+                    <div>
+                      <div className="text-2xl font-bold text-emerald-400 tracking-tight">POWER</div>
+                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">Solar & Lluvia</div>
                     </div>
                   </div>
                 </div>
