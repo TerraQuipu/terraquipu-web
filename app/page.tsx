@@ -865,46 +865,196 @@ export default function SuperpowerTerraquipuLanding() {
         </div>
       </section>
 
-      {/* ================= 8. SCIENTIFIC ADVISORY COUNCIL ================= */}
-      <section className="py-24 bg-white">
+      {/* ================= 8. SCIENTIFIC ADVISORY & VALIDATION (METODOLOGÍA STYLE WITH VIDEOS) ================= */}
+      <section id="respaldo" className="py-24 bg-white">
         <div className="max-w-6xl mx-auto px-6 space-y-12">
           
-          <div className="text-center max-w-xl mx-auto space-y-2">
-            <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-semibold">
-              RESPALDO CIENTÍFICO
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold">
+              RESPALDO CIENTÍFICO OFICIAL
             </span>
-            <h2 className="text-3xl sm:text-4xl font-serif font-light text-zinc-950">
+            <h2 className="hero-headline text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-950 tracking-tight leading-tight">
               Guiado por agrónomos y científicos del clima.
             </h2>
-            <p className="text-xs text-zinc-600">
-              Validamos cada parámetro agronómico con literatura técnica oficial peruana.
+            <p className="text-sm text-zinc-600 font-sans leading-relaxed max-w-xl mx-auto">
+              Validamos cada parámetro agronómico con literatura técnica oficial peruana y modelos de telemetría de observación espacial.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             
-            <div className="p-6 rounded-2xl bg-zinc-50 border border-zinc-200 space-y-3">
-              <div className="text-xs font-mono uppercase text-amber-700 font-bold">INIA Perú</div>
-              <h3 className="text-base font-bold text-zinc-900">Manual Técnico N° 14</h3>
-              <p className="text-xs text-zinc-600 leading-relaxed">
-                Manejo integrado del cultivo de Tarwi (<em>Lupinus mutabilis</em>) y fijación de hasta 100 kg N/ha en suelos de altura.
-              </p>
+            {/* ================= Card 1: INIA Perú ================= */}
+            <div className="flex flex-col group">
+              {/* Visual Container */}
+              <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-3.5">
+                {/* Background Video: Terrazas y Cultivos Agrícolas */}
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  poster={`${BASE_PATH}/videos/cultivos_poster.jpg`}
+                  className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+                >
+                  <source src={`${BASE_PATH}/videos/cultivos.mp4`} type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/35 pointer-events-none" />
+
+                {/* Top Badge */}
+                <div className="relative z-10 w-fit px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center gap-1.5 text-white text-[10px] font-bold font-mono shadow-sm uppercase tracking-wider">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                  INIA PERÚ
+                </div>
+
+                {/* Floating Frosted Glass Pill */}
+                <div className="relative z-10 w-full rounded-2xl bg-zinc-950/85 backdrop-blur-xl border border-white/15 p-3.5 shadow-xl text-white space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold tracking-wider text-zinc-300 uppercase">
+                      MANUAL TÉCNICO N° 14
+                    </span>
+                    <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                      ✓ Oficial
+                    </span>
+                  </div>
+
+                  <div className="pt-1.5 border-t border-white/15 grid grid-cols-2 gap-2 text-center font-mono">
+                    <div className="bg-white/5 rounded-xl p-1.5">
+                      <div className="text-lg font-bold text-emerald-400 tracking-tight">+100 kg</div>
+                      <div className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">N / ha fijado</div>
+                    </div>
+                    <div className="bg-white/5 rounded-xl p-1.5">
+                      <div className="text-lg font-bold text-amber-300 tracking-tight">Tarwi</div>
+                      <div className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">Lupinus m.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Text Information Below Card */}
+              <div className="pt-4 space-y-1.5 font-sans">
+                <h3 className="hero-headline text-lg font-bold text-zinc-950 tracking-tight">
+                  Manual Técnico N° 14
+                </h3>
+                <p className="text-xs text-zinc-600 leading-relaxed">
+                  Manejo agronómico oficial del cultivo de Tarwi (<em>Lupinus mutabilis</em>) y fijación biológica de hasta 100 kg N/ha en suelos andinos de altura.
+                </p>
+              </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-zinc-50 border border-zinc-200 space-y-3">
-              <div className="text-xs font-mono uppercase text-blue-700 font-bold">SENAMHI</div>
-              <h3 className="text-base font-bold text-zinc-900">Boletines Agroclimáticos</h3>
-              <p className="text-xs text-zinc-600 leading-relaxed">
-                Calibración de umbrales térmicos, heladas agronómicas y déficit estacional de lluvias en la Sierra Sur.
-              </p>
+            {/* ================= Card 2: SENAMHI ================= */}
+            <div className="flex flex-col group">
+              {/* Visual Container */}
+              <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-3.5">
+                {/* Background Video: Atmósfera y Nubes en la Cordillera */}
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  poster={`${BASE_PATH}/videos/andes_poster.jpg`}
+                  className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+                >
+                  <source src={`${BASE_PATH}/videos/andes.mp4`} type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/35 pointer-events-none" />
+
+                {/* Top Badge */}
+                <div className="relative z-10 w-fit px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center gap-1.5 text-white text-[10px] font-bold font-mono shadow-sm uppercase tracking-wider">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                  SENAMHI
+                </div>
+
+                {/* Floating Frosted Glass Pill */}
+                <div className="relative z-10 w-full rounded-2xl bg-zinc-950/85 backdrop-blur-xl border border-white/15 p-3.5 shadow-xl text-white space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold tracking-wider text-zinc-300 uppercase">
+                      BOLETINES AGROCLIMÁTICOS
+                    </span>
+                    <span className="text-[10px] font-mono text-cyan-400 bg-cyan-500/20 border border-cyan-500/30 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                      ✓ Validado
+                    </span>
+                  </div>
+
+                  <div className="pt-1.5 border-t border-white/15 grid grid-cols-2 gap-2 text-center font-mono">
+                    <div className="bg-white/5 rounded-xl p-1.5">
+                      <div className="text-lg font-bold text-cyan-400 tracking-tight">-4°C</div>
+                      <div className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">Umbral Helada</div>
+                    </div>
+                    <div className="bg-white/5 rounded-xl p-1.5">
+                      <div className="text-lg font-bold text-emerald-400 tracking-tight">Sierra Sur</div>
+                      <div className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">Cusco & Puno</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Text Information Below Card */}
+              <div className="pt-4 space-y-1.5 font-sans">
+                <h3 className="hero-headline text-lg font-bold text-zinc-950 tracking-tight">
+                  Boletines Agroclimáticos
+                </h3>
+                <p className="text-xs text-zinc-600 leading-relaxed">
+                  Calibración de umbrales térmicos, heladas agronómicas y déficit estacional de lluvias en valles y microcuencas de la Sierra Sur.
+                </p>
+              </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-zinc-50 border border-zinc-200 space-y-3">
-              <div className="text-xs font-mono uppercase text-emerald-700 font-bold">NASA Space Apps</div>
-              <h3 className="text-base font-bold text-zinc-900">Global Challenge 2026</h3>
-              <p className="text-xs text-zinc-600 leading-relaxed">
-                Solución de software galardonada para democratizar la inteligencia de observación terrestre a comunidades campesinas.
-              </p>
+            {/* ================= Card 3: NASA Space Apps ================= */}
+            <div className="flex flex-col group">
+              {/* Visual Container */}
+              <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-3.5">
+                {/* Background Video: Órbita Planetaria y Satélite */}
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  poster={`${BASE_PATH}/videos/nasa_orbit_poster.jpg`}
+                  className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+                >
+                  <source src={`${BASE_PATH}/videos/nasa_orbit.mp4`} type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/35 pointer-events-none" />
+
+                {/* Top Badge */}
+                <div className="relative z-10 w-fit px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center gap-1.5 text-white text-[10px] font-bold font-mono shadow-sm uppercase tracking-wider">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  NASA SPACE APPS
+                </div>
+
+                {/* Floating Frosted Glass Pill */}
+                <div className="relative z-10 w-full rounded-2xl bg-zinc-950/85 backdrop-blur-xl border border-white/15 p-3.5 shadow-xl text-white space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold tracking-wider text-zinc-300 uppercase">
+                      GLOBAL CHALLENGE 2026
+                    </span>
+                    <span className="text-[10px] font-mono text-amber-400 bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                      ★ Galardón
+                    </span>
+                  </div>
+
+                  <div className="pt-1.5 border-t border-white/15 grid grid-cols-2 gap-2 text-center font-mono">
+                    <div className="bg-white/5 rounded-xl p-1.5">
+                      <div className="text-lg font-bold text-amber-400 tracking-tight">SMAP</div>
+                      <div className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">Radar L-Band</div>
+                    </div>
+                    <div className="bg-white/5 rounded-xl p-1.5">
+                      <div className="text-lg font-bold text-emerald-400 tracking-tight">POWER</div>
+                      <div className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">Solar & Lluvia</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Text Information Below Card */}
+              <div className="pt-4 space-y-1.5 font-sans">
+                <h3 className="hero-headline text-lg font-bold text-zinc-950 tracking-tight">
+                  Global Challenge 2026
+                </h3>
+                <p className="text-xs text-zinc-600 leading-relaxed">
+                  Solución de software desarrollada para democratizar la inteligencia de observación terrestre y telemetría espacial a comunidades agrícolas.
+                </p>
+              </div>
             </div>
 
           </div>
