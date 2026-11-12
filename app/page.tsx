@@ -542,85 +542,103 @@ export default function SuperpowerTerraquipuLanding() {
         </div>
       </section>
 
-      {/* ================= 5. LIFESTYLE TABLET SHOWCASE ("DIAGNÓSTICO INTEGRAL" - EXACT SUPERPOWER FULL-WIDTH PATTERN) ================= */}
-      <section id="diagnostico" className="relative min-h-[720px] lg:min-h-[820px] bg-white overflow-hidden flex items-center">
-        
-        {/* Full Section Background Image (HUGE, exactly like Superpower) */}
-        <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-end overflow-hidden">
-          <img 
-            src={`${BASE_PATH}/images/agronomist_white_bg.jpg`} 
-            alt="Diagnóstico en Parcela con Tablet" 
-            className="h-[100%] lg:h-[110%] w-auto max-h-[880px] object-contain object-right transform -translate-x-6 lg:translate-x-0 select-none"
-          />
-        </div>
-
-        {/* Content Container (Floats directly over the white canvas and tablet scene) */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 w-full py-12 lg:py-20">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-8">
+      {/* ================= 5. LIFESTYLE TABLET SHOWCASE ("DIAGNÓSTICO INTEGRAL" - SUPERPOWER FRAMED PATTERN) ================= */}
+      <section id="diagnostico" className="py-8 sm:py-12 bg-white">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+          {/* Framed Master Showcase Container with elegant rounded corners and subtle border */}
+          <div className="relative min-h-[720px] lg:min-h-[820px] bg-white rounded-[32px] sm:rounded-[40px] lg:rounded-[48px] border border-zinc-200/90 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] overflow-hidden flex items-center">
             
-            {/* Left Block: Heading, Subtitle & Floating Glass FAQs (Superpower Pattern) */}
-            <div className="w-full lg:max-w-[360px] xl:max-w-[380px] space-y-8 shrink-0">
-              <div className="space-y-4">
-                <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold">
-                  DIAGNÓSTICO EN PARCELA
-                </span>
-                <h2 className="hero-headline text-3xl sm:text-4xl lg:text-[40px] font-bold text-zinc-950 leading-[1.12] tracking-tight transition-all duration-300">
-                  {DIAGNOSTICO_TABS[activeDiagnosticoTab].title}
-                </h2>
-                <p className="text-sm text-zinc-600 font-sans leading-relaxed transition-all duration-300 max-w-[340px]">
-                  {DIAGNOSTICO_TABS[activeDiagnosticoTab].subtitle}
-                </p>
-              </div>
-
-              {/* Floating Frosted Glass FAQ Accordions (Exact Superpower Pattern) */}
-              <div className="space-y-2.5 pt-2 w-full max-w-[360px]">
-                {DIAGNOSTICO_FAQS.map((faq, idx) => (
-                  <div 
-                    key={idx} 
-                    className="rounded-2xl bg-zinc-900/90 hover:bg-zinc-900 backdrop-blur-xl border border-white/10 p-3.5 text-white transition-all duration-200 shadow-md"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setExpandedFaq(expandedFaq === idx ? null : idx)}
-                      className="w-full flex items-center justify-between text-left gap-3 text-xs font-medium cursor-pointer"
-                    >
-                      <span className="font-sans text-zinc-100">{faq.q}</span>
-                      <span className="w-5 h-5 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-xs text-zinc-300 shrink-0 font-mono font-bold">
-                        {expandedFaq === idx ? "−" : "+"}
-                      </span>
-                    </button>
-                    {expandedFaq === idx && (
-                      <p className="mt-2.5 pt-2.5 border-t border-white/10 text-[11px] text-zinc-300 font-sans leading-relaxed animate-in fade-in duration-200">
-                        {faq.a}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
+            {/* Background Image: Tablet Showcase cleanly centered with iPad shifted left to provide 170px+ white corridor */}
+            <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
+              <img 
+                src={`${BASE_PATH}/images/agronomist_white_bg.jpg`} 
+                alt="Diagnóstico en Parcela con Tablet" 
+                className="h-[105%] lg:h-[114%] w-auto max-h-[880px] object-contain object-center transform -translate-x-8 sm:-translate-x-12 lg:-translate-x-20 xl:-translate-x-24 select-none"
+              />
             </div>
 
-            {/* Spacer for Center Space (where the huge tablet in the background is displayed) */}
-            <div className="hidden lg:block lg:flex-1 pointer-events-none" />
+            {/* Content Container (Floats directly over the white framed canvas) */}
+            <div className="relative z-10 w-full px-6 sm:px-10 lg:px-14 py-12 lg:py-16">
+              <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-8">
+                
+                {/* Left Block: Heading, Subtitle & Floating Glass FAQs (Superpower Pattern) */}
+                <div className="w-full lg:max-w-[360px] xl:max-w-[380px] space-y-7 shrink-0">
+                  <div className="space-y-4">
+                    <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold">
+                      DIAGNÓSTICO EN PARCELA
+                    </span>
+                    <h2 className="hero-headline text-3xl sm:text-4xl lg:text-[40px] font-bold text-zinc-950 leading-[1.12] tracking-tight transition-all duration-300">
+                      {DIAGNOSTICO_TABS[activeDiagnosticoTab].title}
+                    </h2>
+                    <p className="text-sm text-zinc-600 font-sans leading-relaxed transition-all duration-300 max-w-[340px]">
+                      {DIAGNOSTICO_TABS[activeDiagnosticoTab].subtitle}
+                    </p>
+                  </div>
 
-            {/* Right Block: Vertical Tab Navigation (Exact Superpower Pattern: | Item 01) */}
-            <div className="w-full lg:w-auto flex flex-row lg:flex-col gap-3 lg:gap-5 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 shrink-0 self-center z-20 -translate-y-4 lg:-translate-y-8">
-              {DIAGNOSTICO_TABS.map((tab, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setActiveDiagnosticoTab(idx)}
-                  className={`flex items-center justify-between gap-4 text-left transition-all py-1.5 cursor-pointer group ${
-                    activeDiagnosticoTab === idx
-                      ? "text-zinc-950 font-bold border-l-2 border-zinc-950 pl-3.5 -ml-[2px]"
-                      : "text-zinc-600 hover:text-zinc-950 font-semibold pl-3.5 border-l-2 border-transparent"
-                  }`}
-                >
-                  <span className="tracking-tight leading-snug whitespace-nowrap">{tab.label}</span>
-                  <span className="font-mono text-[11px] text-zinc-500 group-hover:text-zinc-900 shrink-0 font-bold">
-                    0{idx + 1}
-                  </span>
-                </button>
-              ))}
+                  {/* Floating Frosted Glass FAQ Accordions with Smooth Expand/Collapse Animation */}
+                  <div className="space-y-2.5 pt-2 w-full max-w-[360px]">
+                    {DIAGNOSTICO_FAQS.map((faq, idx) => (
+                      <div 
+                        key={idx} 
+                        className="rounded-2xl bg-zinc-900/95 hover:bg-zinc-900 backdrop-blur-xl border border-white/10 p-3.5 text-white transition-all duration-300 shadow-md"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => setExpandedFaq(expandedFaq === idx ? null : idx)}
+                          className="w-full flex items-center justify-between text-left gap-3 text-xs font-medium cursor-pointer"
+                        >
+                          <span className="font-sans text-zinc-100">{faq.q}</span>
+                          <span className={`w-5 h-5 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-xs text-zinc-300 shrink-0 font-mono font-bold transition-transform duration-300 ease-in-out ${
+                            expandedFaq === idx ? 'rotate-45 bg-amber-500/20 text-amber-300 border-amber-500/30' : 'rotate-0'
+                          }`}>
+                            +
+                          </span>
+                        </button>
+                        
+                        {/* Animated Expand / Collapse grid container */}
+                        <div 
+                          className={`grid transition-all duration-300 ease-in-out ${
+                            expandedFaq === idx 
+                              ? 'grid-rows-[1fr] opacity-100 mt-2.5 pt-2.5 border-t border-white/10' 
+                              : 'grid-rows-[0fr] opacity-0'
+                          }`}
+                        >
+                          <div className="overflow-hidden">
+                            <p className="text-[11px] text-zinc-300 font-sans leading-relaxed">
+                              {faq.a}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Spacer for Center Space (where the huge tablet in the background is displayed) */}
+                <div className="hidden lg:block lg:flex-1 pointer-events-none" />
+
+                {/* Right Block: Vertical Tab Navigation (Sitting in pure white corridor between iPad and person) */}
+                <div className="w-full lg:w-auto flex flex-row lg:flex-col gap-3 lg:gap-5 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 shrink-0 self-center z-20 mr-0 lg:mr-24 xl:mr-28 -translate-y-16 lg:-translate-y-28">
+                  {DIAGNOSTICO_TABS.map((tab, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setActiveDiagnosticoTab(idx)}
+                      className={`flex items-center justify-between gap-5 text-left transition-all py-1.5 cursor-pointer group ${
+                        activeDiagnosticoTab === idx
+                          ? "text-zinc-950 font-bold border-l-2 border-zinc-950 pl-3.5 -ml-[2px]"
+                          : "text-zinc-600 hover:text-zinc-950 font-semibold pl-3.5 border-l-2 border-transparent"
+                      }`}
+                    >
+                      <span className="tracking-tight leading-snug whitespace-nowrap">{tab.label}</span>
+                      <span className="font-mono text-[11px] text-zinc-500 group-hover:text-zinc-900 shrink-0 font-bold ml-4">
+                        0{idx + 1}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+              </div>
             </div>
 
           </div>
