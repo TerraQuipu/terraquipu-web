@@ -752,32 +752,48 @@ export default function SuperpowerTerraquipuLanding() {
         </div>
       </section>
 
-      {/* ================= 7. QUIPU ROTATION & ACTION PLAN SHOWCASE (SUPERPOWER STYLE REPEATED) ================= */}
-      <section id="quipu" className="relative w-full min-h-[720px] lg:min-h-[840px] bg-white overflow-hidden flex items-center rounded-[48px] sm:rounded-[64px] lg:rounded-[80px]">
+      {/* ================= 7. QUIPU ROTATION & ACTION PLAN SHOWCASE (FULL-BLEED WHEAT IN WIND VIDEO LOOP) ================= */}
+      <section id="quipu" className="relative w-full min-h-[720px] lg:min-h-[840px] bg-[#f8f7f4] overflow-hidden flex items-center rounded-[48px] sm:rounded-[64px] lg:rounded-[80px]">
         
-        {/* Full Section Background Image with rounded corners on image only (sin línea de borde) */}
+        {/* Full Section Background Video Loop: Golden Wheat Field Whipped by Wind */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-[48px] sm:rounded-[64px] lg:rounded-[80px]">
-          <img 
-            src={`${BASE_PATH}/images/quipu_showcase_white_bg.jpg`} 
-            alt="Plan de Rotación Quipu y Fertilidad del Suelo" 
-            className="w-full h-full object-cover object-[center_35%] lg:object-[center_40%] select-none rounded-[48px] sm:rounded-[64px] lg:rounded-[80px]"
-          />
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster={`${BASE_PATH}/videos/trigo_viento_poster.jpg`}
+            className="w-full h-full object-cover object-center select-none rounded-[48px] sm:rounded-[64px] lg:rounded-[80px]"
+          >
+            <source src={`${BASE_PATH}/videos/trigo_viento.mp4`} type="video/mp4" />
+            <source src="https://assets.mixkit.co/videos/8582/8582-720.mp4" type="video/mp4" />
+          </video>
+          
+          {/* Editorial Scrim: Smooth white-to-transparent gradient on the left so black typography and FAQs are 100% sharp */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/85 to-transparent w-full lg:w-[58%] pointer-events-none" />
+          
+          {/* Subtle right-side soft scrim for tabs contrast while keeping wheat movement fully visible */}
+          <div className="absolute inset-y-0 right-0 w-full lg:w-[35%] bg-gradient-to-l from-white/70 via-white/30 to-transparent pointer-events-none" />
+          
+          {/* Top and bottom subtle atmospheric blending */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/30 pointer-events-none" />
         </div>
 
-        {/* Content Container (Floats directly over full-screen white canvas) */}
+        {/* Content Container (Floats directly over full-screen canvas) */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 w-full py-12 lg:py-20">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-8">
             
             {/* Left Block: Heading, Subtitle & Floating Glass FAQs (Superpower Pattern) */}
-            <div className="w-full lg:max-w-[360px] xl:max-w-[380px] space-y-7 shrink-0">
+            <div className="w-full lg:max-w-[380px] xl:max-w-[400px] space-y-7 shrink-0">
               <div className="space-y-4">
-                <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold">
+                <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                   PLAN DE ACCIÓN AGROECOLÓGICO
                 </span>
                 <h2 className="hero-headline text-3xl sm:text-4xl lg:text-[40px] font-bold text-zinc-950 leading-[1.12] tracking-tight transition-all duration-300">
                   {ROTACION_TABS[activeRotacionTab].title}
                 </h2>
-                <p className="text-sm text-zinc-600 font-sans leading-relaxed transition-all duration-300 max-w-[340px]">
+                <p className="text-sm text-zinc-700 font-sans leading-relaxed transition-all duration-300 max-w-[360px]">
                   {ROTACION_TABS[activeRotacionTab].subtitle}
                 </p>
               </div>
@@ -821,11 +837,11 @@ export default function SuperpowerTerraquipuLanding() {
               </div>
             </div>
 
-            {/* Spacer for Center Space (where the device and visual subject sit) */}
+            {/* Spacer for Center Space (where the wheat field whipped by wind is fully appreciated) */}
             <div className="hidden lg:block lg:flex-1 pointer-events-none" />
 
-            {/* Right Block: Vertical Tab Navigation (Sitting in pure white corridor between iPad and person) */}
-            <div className="w-full lg:w-auto flex flex-row lg:flex-col gap-3 lg:gap-5 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 shrink-0 self-center z-20 mr-0 lg:mr-24 xl:mr-32 -translate-y-12 lg:-translate-y-24">
+            {/* Right Block: Vertical Tab Navigation (Floating in frosted pill over living wind backdrop) */}
+            <div className="w-full lg:w-auto flex flex-row lg:flex-col gap-3 lg:gap-4 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 shrink-0 self-center z-20 bg-white/80 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-black/5 shadow-md">
               {ROTACION_TABS.map((tab, idx) => (
                 <button
                   key={idx}
