@@ -677,9 +677,8 @@ export default function SuperpowerTerraquipuLanding() {
                 <h3 className="text-2xl font-serif text-white">Membresía Abierta de Microcuenca</h3>
                 <p className="text-xs text-zinc-400 mt-1">Para comunidades agrícolas, investigadores y desarrolladores</p>
               </div>
-              <div>
-                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-xs sm:text-sm text-emerald-400 font-mono font-semibold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="text-left sm:text-right">
+                <span className="text-xs sm:text-sm text-emerald-400 font-mono font-medium">
                   100% Open Source (Licencia MIT)
                 </span>
               </div>
