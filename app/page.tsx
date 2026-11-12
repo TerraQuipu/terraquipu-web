@@ -543,14 +543,14 @@ export default function SuperpowerTerraquipuLanding() {
       </section>
 
       {/* ================= 5. LIFESTYLE TABLET SHOWCASE ("DIAGNÓSTICO INTEGRAL" - FULL SCREEN, BORDE A LA IMAGEN SIN LÍNEA) ================= */}
-      <section id="diagnostico" className="relative w-full min-h-[720px] lg:min-h-[840px] bg-white overflow-hidden flex items-center">
+      <section id="diagnostico" className="relative w-full min-h-[720px] lg:min-h-[840px] bg-white overflow-hidden flex items-center rounded-[48px] sm:rounded-[64px] lg:rounded-[80px]">
         
         {/* Full Section Background Image with rounded corners on image only (sin línea de borde) */}
-        <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-[48px] sm:rounded-[64px] lg:rounded-[80px]">
           <img 
             src={`${BASE_PATH}/images/agronomist_white_bg.jpg`} 
             alt="Diagnóstico en Parcela con Tablet" 
-            className="h-[105%] lg:h-[114%] w-auto max-h-[880px] object-contain object-center transform -translate-x-8 sm:-translate-x-12 lg:-translate-x-20 xl:-translate-x-24 rounded-[32px] sm:rounded-[40px] lg:rounded-[48px] select-none"
+            className="w-full h-full object-cover object-[center_35%] lg:object-[center_40%] select-none rounded-[48px] sm:rounded-[64px] lg:rounded-[80px]"
           />
         </div>
 
