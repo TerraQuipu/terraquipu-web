@@ -900,10 +900,11 @@ export default function SuperpowerTerraquipuLanding() {
                 </video>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/35 pointer-events-none" />
 
-                {/* Top Badge */}
-                <div className="relative z-10 w-fit px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center gap-1.5 text-white text-[10px] font-bold font-mono shadow-sm uppercase tracking-wider">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                  INIA PERÚ
+                {/* Top Institution Label (Pure Elegant Font - No Card, No Icon) */}
+                <div className="relative z-10 pt-1 px-1">
+                  <span className="hero-headline text-lg sm:text-xl font-bold text-white tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
+                    INIA Perú
+                  </span>
                 </div>
 
                 {/* Floating Frosted Glass Pill */}
@@ -912,8 +913,8 @@ export default function SuperpowerTerraquipuLanding() {
                     <span className="text-[10px] font-mono font-bold tracking-wider text-zinc-300 uppercase">
                       MANUAL TÉCNICO N° 14
                     </span>
-                    <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
-                      ✓ Oficial
+                    <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider font-semibold">
+                      Oficial INIA
                     </span>
                   </div>
 
@@ -958,10 +959,11 @@ export default function SuperpowerTerraquipuLanding() {
                 </video>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/35 pointer-events-none" />
 
-                {/* Top Badge */}
-                <div className="relative z-10 w-fit px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center gap-1.5 text-white text-[10px] font-bold font-mono shadow-sm uppercase tracking-wider">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                  SENAMHI
+                {/* Top Institution Label (Pure Elegant Font - No Card, No Icon) */}
+                <div className="relative z-10 pt-1 px-1">
+                  <span className="hero-headline text-lg sm:text-xl font-bold text-white tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
+                    SENAMHI
+                  </span>
                 </div>
 
                 {/* Floating Frosted Glass Pill */}
@@ -970,8 +972,8 @@ export default function SuperpowerTerraquipuLanding() {
                     <span className="text-[10px] font-mono font-bold tracking-wider text-zinc-300 uppercase">
                       BOLETINES AGROCLIMÁTICOS
                     </span>
-                    <span className="text-[10px] font-mono text-cyan-400 bg-cyan-500/20 border border-cyan-500/30 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
-                      ✓ Validado
+                    <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider font-semibold">
+                      Validado SENAMHI
                     </span>
                   </div>
 
@@ -1016,10 +1018,11 @@ export default function SuperpowerTerraquipuLanding() {
                 </video>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/35 pointer-events-none" />
 
-                {/* Top Badge */}
-                <div className="relative z-10 w-fit px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center gap-1.5 text-white text-[10px] font-bold font-mono shadow-sm uppercase tracking-wider">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  NASA SPACE APPS
+                {/* Top Institution Label (Pure Elegant Font - No Card, No Icon) */}
+                <div className="relative z-10 pt-1 px-1">
+                  <span className="hero-headline text-lg sm:text-xl font-bold text-white tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
+                    NASA Space Apps
+                  </span>
                 </div>
 
                 {/* Floating Frosted Glass Pill */}
@@ -1028,8 +1031,8 @@ export default function SuperpowerTerraquipuLanding() {
                     <span className="text-[10px] font-mono font-bold tracking-wider text-zinc-300 uppercase">
                       GLOBAL CHALLENGE 2026
                     </span>
-                    <span className="text-[10px] font-mono text-amber-400 bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
-                      ★ Galardón
+                    <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider font-semibold">
+                      NASA Galardón
                     </span>
                   </div>
 
