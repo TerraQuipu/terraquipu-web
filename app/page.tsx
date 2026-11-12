@@ -825,7 +825,7 @@ export default function SuperpowerTerraquipuLanding() {
             <div className="hidden lg:block lg:flex-1 pointer-events-none" />
 
             {/* Right Block: Vertical Tab Navigation (Sitting in pure white corridor between iPad and person) */}
-            <div className="w-full lg:w-auto flex flex-row lg:flex-col gap-3 lg:gap-5 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 shrink-0 self-center z-20 mr-0 lg:mr-4 xl:mr-8 -translate-y-16 lg:-translate-y-28">
+            <div className="w-full lg:w-auto flex flex-row lg:flex-col gap-3 lg:gap-5 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 shrink-0 self-center z-20 mr-0 lg:mr-24 xl:mr-32 -translate-y-12 lg:-translate-y-24">
               {ROTACION_TABS.map((tab, idx) => (
                 <button
                   key={idx}
