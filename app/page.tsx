@@ -141,12 +141,9 @@ export default function SuperpowerTerraquipuLanding() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 25) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 25);
     };
+    handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -675,14 +672,16 @@ export default function SuperpowerTerraquipuLanding() {
           {/* Community Membership Content */}
           <div className="space-y-8">
             
-            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="text-2xl font-serif text-white">Membresía Abierta de Microcuenca</h3>
                 <p className="text-xs text-zinc-400 mt-1">Para comunidades agrícolas, investigadores y desarrolladores</p>
               </div>
-              <div className="text-left sm:text-right">
-                <div className="text-4xl font-extrabold font-mono text-white">0 Soles</div>
-                <div className="text-xs text-emerald-400 font-mono">100% Open Source (Licencia MIT)</div>
+              <div>
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-xs sm:text-sm text-emerald-400 font-mono font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  100% Open Source (Licencia MIT)
+                </span>
               </div>
             </div>
 
