@@ -84,15 +84,52 @@ const DIAGNOSTICO_FAQS = [
   }
 ];
 
+const ROTACION_TABS = [
+  {
+    label: "Secuencia Quipu Multianual",
+    title: "El Quipu agronómico que regenera la fertilidad del suelo.",
+    subtitle: "Algoritmos biológicos que alternan leguminosas fijadoras de nitrógeno, granos andinos y tubérculos de alta resiliencia para proteger cosechas frente a El Niño."
+  },
+  {
+    label: "Fijación Biológica de Nitrógeno",
+    title: "+95 kg de nitrógeno orgánico por hectárea sin agroquímicos.",
+    subtitle: "Inoculación y aporte natural de biomasa mediante Tarwi (Lupinus mutabilis) que ahorra cientos de dólares en fertilizantes sintéticos y recupera la estructura edáfica."
+  },
+  {
+    label: "Corte de Ciclos de Plagas",
+    title: "-75% de incidencia del gorgojo andino y nematodos.",
+    subtitle: "Ruptura del nicho biológico de plagas mediante alternancia botánica estricta (Leguminosa → Chenopodiácea → Solanácea) validada con normas INIA."
+  },
+  {
+    label: "Monitoreo Satelital de Clorofila",
+    title: "Seguimiento multiespectral de biomasa y rendimiento.",
+    subtitle: "Telemetría NDVI cada 5 días para detectar estrés hídrico o nutricional semanas antes de que sea perceptible en la superficie del cultivo."
+  }
+];
+
+const ROTACION_FAQS = [
+  {
+    q: "¿Cómo calcula Terraquipu la rotación óptima de parcelas?",
+    a: "Analizando la elevación SRTM, el pH de SoilGrids y el déficit hídrico de NASA POWER para diseñar la alternancia de 3 años que maximiza nutrientes sin fertilizantes sintéticos."
+  },
+  {
+    q: "¿Cuánto ahorra un agricultor al usar fijación con Tarwi?",
+    a: "Hasta 95 kg de N/ha equivalen a 4 sacos de urea comercial (aprox. $450 USD por hectárea), además de mejorar la retención de humedad en un 22%."
+  },
+  {
+    q: "¿Cómo se accede a las fichas técnicas sin conexión a internet?",
+    a: "Terraquipu genera cartillas agronómicas comunitarias descargables en PDF y cuenta con modo offline PWA para consultar en la parcela sin cobertura celular."
+  }
+];
+
 export default function SuperpowerTerraquipuLanding() {
-  const [selectedRole, setSelectedRole] = useState("comunidad");
-  const [leadSuccess, setLeadSuccess] = useState(false);
-  const [folio, setFolio] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentVideoIdx, setCurrentVideoIdx] = useState(0);
   const [activeDiagnosticoTab, setActiveDiagnosticoTab] = useState(0);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [activeRotacionTab, setActiveRotacionTab] = useState(0);
+  const [expandedRotacionFaq, setExpandedRotacionFaq] = useState<number | null>(null);
 
   // Automatic seamless transition across videos every 9 seconds
   useEffect(() => {
@@ -114,13 +151,6 @@ export default function SuperpowerTerraquipuLanding() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const generatedFolio = "TQ-" + Math.floor(1000 + Math.random() * 9000);
-    setFolio(generatedFolio);
-    setLeadSuccess(true);
-  };
-
   return (
     <div className="min-h-screen bg-white text-zinc-900 font-sans selection:bg-amber-500 selection:text-white">
       
@@ -138,8 +168,8 @@ export default function SuperpowerTerraquipuLanding() {
           <nav className="hidden lg:flex items-center gap-7 text-[13px] font-semibold text-white/90">
             <a href="#como-funciona" className="hover:text-white transition">Cómo funciona</a>
             <a href="#diagnostico" className="hover:text-white transition">Diagnóstico 30m</a>
-            <a href="#quipu" className="hover:text-white transition">El Quipu</a>
-            <a href="#unirse" className="hover:text-white transition">Comunidad</a>
+            <a href="#quipu" className="hover:text-white transition">Plan Quipu</a>
+            <a href="#comunidad" className="hover:text-white transition">Comunidad</a>
           </nav>
 
           {/* Center Brand Name (Exact Superpower Style: lowercase bold centered wordmark) */}
@@ -197,7 +227,7 @@ export default function SuperpowerTerraquipuLanding() {
             <a href="#como-funciona" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Cómo funciona</a>
             <a href="#diagnostico" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Diagnóstico 30m</a>
             <a href="#quipu" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">El Quipu de Rotación</a>
-            <a href="#unirse" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Comunidad & Postulación</a>
+            <a href="#comunidad" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Acceso Comunitario</a>
             <a href="https://github.com/TerraQuipu" target="_blank" rel="noreferrer" className="hover:text-amber-400 py-1.5 flex items-center justify-between">
               <span>Repositorio en GitHub</span>
               <span>↗</span>
@@ -640,7 +670,7 @@ export default function SuperpowerTerraquipuLanding() {
       </section>
 
       {/* ================= 6. COMMUNITY PLAN TRANSPARENT COMPARISON CARD (SUPERPOWER STYLE) ================= */}
-      <section className="py-24 bg-[#090A0D] text-white">
+      <section id="comunidad" className="py-24 bg-[#090A0D] text-white">
         <div className="max-w-4xl mx-auto px-6 space-y-12">
           
           <div className="text-center space-y-3">
@@ -710,10 +740,10 @@ export default function SuperpowerTerraquipuLanding() {
                 Desplegado para Cusco, Valle Sagrado y nuevas cuencas 2026-2027.
               </div>
               <a 
-                href="#unirse" 
+                href="#quipu" 
                 className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-wider hover:bg-zinc-200 transition shadow-lg text-center"
               >
-                Inscribir mi Parcela o Comunidad
+                Explorar Plan de Rotación Quipu ↓
               </a>
             </div>
 
@@ -722,7 +752,104 @@ export default function SuperpowerTerraquipuLanding() {
         </div>
       </section>
 
-      {/* ================= 7. SCIENTIFIC ADVISORY COUNCIL ================= */}
+      {/* ================= 7. QUIPU ROTATION & ACTION PLAN SHOWCASE (SUPERPOWER STYLE REPEATED) ================= */}
+      <section id="quipu" className="relative w-full min-h-[720px] lg:min-h-[840px] bg-white overflow-hidden flex items-center rounded-[48px] sm:rounded-[64px] lg:rounded-[80px]">
+        
+        {/* Full Section Background Image with rounded corners on image only (sin línea de borde) */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-[48px] sm:rounded-[64px] lg:rounded-[80px]">
+          <img 
+            src={`${BASE_PATH}/images/quipu_showcase_white_bg.jpg`} 
+            alt="Plan de Rotación Quipu y Fertilidad del Suelo" 
+            className="w-full h-full object-cover object-[center_35%] lg:object-[center_40%] select-none rounded-[48px] sm:rounded-[64px] lg:rounded-[80px]"
+          />
+        </div>
+
+        {/* Content Container (Floats directly over full-screen white canvas) */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 w-full py-12 lg:py-20">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-8">
+            
+            {/* Left Block: Heading, Subtitle & Floating Glass FAQs (Superpower Pattern) */}
+            <div className="w-full lg:max-w-[360px] xl:max-w-[380px] space-y-7 shrink-0">
+              <div className="space-y-4">
+                <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold">
+                  PLAN DE ACCIÓN AGROECOLÓGICO
+                </span>
+                <h2 className="hero-headline text-3xl sm:text-4xl lg:text-[40px] font-bold text-zinc-950 leading-[1.12] tracking-tight transition-all duration-300">
+                  {ROTACION_TABS[activeRotacionTab].title}
+                </h2>
+                <p className="text-sm text-zinc-600 font-sans leading-relaxed transition-all duration-300 max-w-[340px]">
+                  {ROTACION_TABS[activeRotacionTab].subtitle}
+                </p>
+              </div>
+
+              {/* Floating Frosted Glass FAQ Accordions with Smooth Expand/Collapse Animation */}
+              <div className="space-y-2.5 pt-2 w-full max-w-[360px]">
+                {ROTACION_FAQS.map((faq, idx) => (
+                  <div 
+                    key={idx} 
+                    className="rounded-2xl bg-zinc-900/95 hover:bg-zinc-900 backdrop-blur-xl border border-white/10 p-3.5 text-white transition-all duration-300 shadow-md"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setExpandedRotacionFaq(expandedRotacionFaq === idx ? null : idx)}
+                      className="w-full flex items-center justify-between text-left gap-3 text-xs font-medium cursor-pointer"
+                    >
+                      <span className="font-sans text-zinc-100">{faq.q}</span>
+                      <span className={`w-5 h-5 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-xs text-zinc-300 shrink-0 font-mono font-bold transition-transform duration-300 ease-in-out ${
+                        expandedRotacionFaq === idx ? 'rotate-45 bg-amber-500/20 text-amber-300 border-amber-500/30' : 'rotate-0'
+                      }`}>
+                        +
+                      </span>
+                    </button>
+                    
+                    {/* Animated Expand / Collapse grid container */}
+                    <div 
+                      className={`grid transition-all duration-300 ease-in-out ${
+                        expandedRotacionFaq === idx 
+                          ? 'grid-rows-[1fr] opacity-100 mt-2.5 pt-2.5 border-t border-white/10' 
+                          : 'grid-rows-[0fr] opacity-0'
+                      }`}
+                    >
+                      <div className="overflow-hidden">
+                        <p className="text-[11px] text-zinc-300 font-sans leading-relaxed">
+                          {faq.a}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Spacer for Center Space (where the device and visual subject sit) */}
+            <div className="hidden lg:block lg:flex-1 pointer-events-none" />
+
+            {/* Right Block: Vertical Tab Navigation (Sitting in pure white corridor between iPad and person) */}
+            <div className="w-full lg:w-auto flex flex-row lg:flex-col gap-3 lg:gap-5 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 shrink-0 self-center z-20 mr-0 lg:mr-4 xl:mr-8 -translate-y-16 lg:-translate-y-28">
+              {ROTACION_TABS.map((tab, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setActiveRotacionTab(idx)}
+                  className={`flex items-center justify-between gap-5 text-left transition-all py-1.5 cursor-pointer group ${
+                    activeRotacionTab === idx
+                      ? "text-zinc-950 font-bold border-l-2 border-zinc-950 pl-3.5 -ml-[2px]"
+                      : "text-zinc-600 hover:text-zinc-950 font-semibold pl-3.5 border-l-2 border-transparent"
+                  }`}
+                >
+                  <span className="tracking-tight leading-snug whitespace-nowrap">{tab.label}</span>
+                  <span className="font-mono text-[11px] text-zinc-500 group-hover:text-zinc-900 shrink-0 font-bold ml-4">
+                    0{idx + 1}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ================= 8. SCIENTIFIC ADVISORY COUNCIL ================= */}
       <section className="py-24 bg-white">
         <div className="max-w-6xl mx-auto px-6 space-y-12">
           
@@ -769,141 +896,6 @@ export default function SuperpowerTerraquipuLanding() {
         </div>
       </section>
 
-      {/* ================= 8. MULTI-PROFILE LEAD CAPTURE FORM (SUPERPOWER JOIN) ================= */}
-      <section id="unirse" className="py-24 bg-white">
-        <div className="max-w-3xl mx-auto px-6 space-y-8">
-          
-          <div className="text-center space-y-2">
-            <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold">
-              POSTULACIÓN ABIERTA 2026-2027
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-serif font-light text-zinc-950">
-              Forma parte de la Alianza Terraquipu.
-            </h2>
-            <p className="text-xs sm:text-sm text-zinc-600">
-              Completa tus datos y nos pondremos en contacto contigo en menos de 24 horas para coordinar el diagnóstico de tu zona o tu aporte al código.
-            </p>
-          </div>
-
-          <div className="bg-white p-8 rounded-3xl border border-zinc-200 shadow-xl space-y-6">
-            
-            {/* Persona Switcher */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
-              <button 
-                type="button" 
-                onClick={() => setSelectedRole("comunidad")}
-                className={`py-2 px-3 rounded-xl border transition ${selectedRole === 'comunidad' ? 'bg-black text-white border-black font-bold' : 'bg-zinc-50 text-zinc-600 border-zinc-200'}`}
-              >
-                🌾 Comunidad
-              </button>
-              <button 
-                type="button" 
-                onClick={() => setSelectedRole("desarrollador")}
-                className={`py-2 px-3 rounded-xl border transition ${selectedRole === 'desarrollador' ? 'bg-black text-white border-black font-bold' : 'bg-zinc-50 text-zinc-600 border-zinc-200'}`}
-              >
-                💻 Programador
-              </button>
-              <button 
-                type="button" 
-                onClick={() => setSelectedRole("investigador")}
-                className={`py-2 px-3 rounded-xl border transition ${selectedRole === 'investigador' ? 'bg-black text-white border-black font-bold' : 'bg-zinc-50 text-zinc-600 border-zinc-200'}`}
-              >
-                🔬 Científico
-              </button>
-              <button 
-                type="button" 
-                onClick={() => setSelectedRole("sponsor")}
-                className={`py-2 px-3 rounded-xl border transition ${selectedRole === 'sponsor' ? 'bg-black text-white border-black font-bold' : 'bg-zinc-50 text-zinc-600 border-zinc-200'}`}
-              >
-                🤝 Donante
-              </button>
-            </div>
-
-            {leadSuccess ? (
-              <div className="p-6 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-3">
-                <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto font-bold">
-                  ✓
-                </div>
-                <h4 className="text-lg font-serif text-emerald-950 font-bold">¡Solicitud Registrada con Éxito!</h4>
-                <p className="text-xs text-emerald-800">
-                  Hemos generado tu folio de seguimiento <strong className="font-mono">{folio}</strong>. Te escribiremos vía WhatsApp o correo en menos de 24 horas.
-                </p>
-                <div className="pt-2">
-                  <a href="./app.html" className="inline-block px-5 py-2 rounded-full bg-emerald-700 text-white text-xs font-semibold hover:bg-emerald-800 transition">
-                    Ir al Visor Satelital →
-                  </a>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handleFormSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[11px] font-mono text-zinc-600 mb-1">Nombre Completo *</label>
-                    <input 
-                      type="text" 
-                      required 
-                      placeholder="Ej. Juan Quispe" 
-                      className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 text-xs focus:outline-none focus:border-black transition"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-mono text-zinc-600 mb-1">Correo Electrónico *</label>
-                    <input 
-                      type="email" 
-                      required 
-                      placeholder="juan@comunidad.org" 
-                      className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 text-xs focus:outline-none focus:border-black transition"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[11px] font-mono text-zinc-600 mb-1">WhatsApp / Teléfono *</label>
-                    <input 
-                      type="tel" 
-                      required 
-                      placeholder="+51 987 654 321" 
-                      className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 text-xs focus:outline-none focus:border-black transition"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-mono text-zinc-600 mb-1">Comunidad / Universidad / Zona</label>
-                    <input 
-                      type="text" 
-                      placeholder="Ej. Valle Sagrado, Cusco" 
-                      className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 text-xs focus:outline-none focus:border-black transition"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-mono text-zinc-600 mb-1">Mensaje o Detalle de tus Parcelas</label>
-                  <textarea 
-                    rows={2} 
-                    placeholder="Cuéntanos brevemente sobre tus cultivos actuales o propuesta de contribución..." 
-                    className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 text-xs focus:outline-none focus:border-black transition"
-                  ></textarea>
-                </div>
-
-                <button 
-                  type="submit" 
-                  className="w-full py-3.5 rounded-full bg-black text-white text-xs font-mono uppercase tracking-wider font-semibold hover:bg-zinc-800 transition shadow-md"
-                >
-                  Enviar Postulación Comunitaria →
-                </button>
-
-                <p className="text-[10px] text-center text-zinc-400 font-mono">
-                  🔒 Cero spam. Datos tratados estrictamente para la coordinación técnica del piloto abierto.
-                </p>
-              </form>
-            )}
-
-          </div>
-
-        </div>
-      </section>
-
       {/* ================= 9. DRAMATIC BOTTOM GOLDEN HALO BANNER (SUPERPOWER SIGNATURE) ================= */}
       <section className="relative bg-[#090A0D] text-white py-28 px-6 overflow-hidden text-center">
         
@@ -933,10 +925,12 @@ export default function SuperpowerTerraquipuLanding() {
               Lanzar Visor Satelital
             </a>
             <a 
-              href="#unirse" 
+              href="https://github.com/TerraQuipu" 
+              target="_blank"
+              rel="noreferrer"
               className="w-full sm:w-auto px-8 py-3.5 rounded-full border border-white/20 bg-white/10 text-white font-medium text-xs uppercase tracking-wider hover:bg-white/20 transition"
             >
-              Registrar Parcela
+              Repositorio en GitHub ↗
             </a>
           </div>
         </div>
@@ -966,7 +960,7 @@ export default function SuperpowerTerraquipuLanding() {
               <li><a href="./app.html" className="hover:text-black transition">Visor GIS Satelital</a></li>
               <li><a href="#como-funciona" className="hover:text-black transition">Cómo Funciona</a></li>
               <li><a href="#diagnostico" className="hover:text-black transition">Diagnóstico 30m</a></li>
-              <li><a href="#unirse" className="hover:text-black transition">Inscribir Parcela</a></li>
+              <li><a href="#quipu" className="hover:text-black transition">Plan Quipu de Rotación</a></li>
             </ul>
           </div>
 
