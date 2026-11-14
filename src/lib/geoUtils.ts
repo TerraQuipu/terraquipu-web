@@ -14,6 +14,18 @@ export interface ActiveParcel {
   center: [number, number]; // [lat, lng]
   bounds: [number, number][]; // [[lat, lng], ...]
   isCustom?: boolean;
+  groundTruthCalibrated?: boolean;
+  groundTruthData?: {
+    soilTexture: 'arena' | 'franca' | 'arcilla';
+    soilStoniness: 'pedregoso' | 'profundo';
+    cropCoverNdvi: 'sembrado' | 'barbecho' | 'pasto' | 'suelo_desnudo';
+    waterSource: 'secano' | 'auxilio' | 'permanente';
+    sowingWindow: 'esta_semana' | '2_4_semanas' | '1_2_meses' | 'proxima_campana';
+    hasWeevil: boolean;
+    hasFrostAlert: boolean;
+    soilHealthIndex: number; // 0-100
+    calibratedAt: string;
+  };
 }
 
 const EARTH_RADIUS_M = 6378137;

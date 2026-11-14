@@ -228,11 +228,23 @@ export async function submitFarmerReport(report: {
   humedad_suelo_estimada: 'SECO' | 'HUMEDAD_MEDIA' | 'SATURADO' | 'CHARCO';
   presencia_gorgojo: boolean;
   alerta_helada_observada: boolean;
-}): Promise<{ success: boolean; error: string | null }> {
+  cuenca_id?: string;
+  cultivo_actual_id?: string;
+  notas_voz_url?: string;
+  sincronizado_desde_outbox?: boolean;
+}): Promise<{ success: boolean; data?: ReporteAgricultor; error: string | null }> {
   try {
-    const { error } = await supabase.from('reportes_agricultores').insert([report]);
+    const payload = {
+      ...report,
+      sincronizado_desde_outbox: report.sincronizado_desde_outbox ?? false,
+    };
+    const { data, error } = await supabase
+      .from('reportes_agricultores')
+      .insert([payload])
+      .select();
+
     if (error) throw error;
-    return { success: true, error: null };
+    return { success: true, data: data?.[0] as ReporteAgricultor, error: null };
   } catch (err: any) {
     return { success: false, error: err.message };
   }

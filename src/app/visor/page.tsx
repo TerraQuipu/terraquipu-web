@@ -114,6 +114,16 @@ export default function TerraQuipuSuitePage() {
     activeParcel
   );
 
+  const handleCalibrationComplete = (
+    calibratedParcel: ActiveParcel,
+    newReport?: ReporteAgricultor
+  ) => {
+    setActiveParcel(calibratedParcel);
+    if (newReport) {
+      setFarmerReports((prev) => [newReport, ...prev]);
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col bg-zinc-100 overflow-hidden">
       {/* Top Header - Production Technician / Farmer View */}
@@ -149,6 +159,7 @@ export default function TerraQuipuSuitePage() {
           onSetPriority={setPriority}
           rotationResult={rotationResult}
           onShowToast={showToast}
+          onCalibrationComplete={handleCalibrationComplete}
         />
       </main>
 

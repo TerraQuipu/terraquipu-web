@@ -389,14 +389,18 @@ export default function MapViewer({
     if (activePolygonRef.current) {
       activePolygonRef.current.setLatLngs(activeParcel.bounds);
       activePolygonRef.current.setStyle({
-        color: activeParcel.isCustom ? '#2563eb' : '#059669',
-        fillColor: activeParcel.isCustom ? '#3b82f6' : '#10b981',
-        weight: 3.5,
-        fillOpacity: 0.38,
+        color: activeParcel.groundTruthCalibrated ? '#15803d' : activeParcel.isCustom ? '#2563eb' : '#059669',
+        fillColor: activeParcel.groundTruthCalibrated ? '#22c55e' : activeParcel.isCustom ? '#3b82f6' : '#10b981',
+        weight: activeParcel.groundTruthCalibrated ? 4.5 : 3.5,
+        fillOpacity: activeParcel.groundTruthCalibrated ? 0.45 : 0.38,
       });
 
+      const calibratedBadge = activeParcel.groundTruthCalibrated
+        ? `<br><span style="color:#15803d; font-weight:bold;">🌱 Calibrada en Campo • Salud Edáfica: ${activeParcel.groundTruthData?.soilHealthIndex || 85}/100</span>`
+        : '';
+
       activePolygonRef.current.setTooltipContent(
-        `<strong>${activeParcel.name}</strong><br><span style="color:#52525b">Área: ${activeParcel.areaHa.toFixed(2)} ha • Pendiente: ${activeParcel.slopePct}%</span>`
+        `<strong>${activeParcel.name}</strong><br><span style="color:#52525b">Área: ${activeParcel.areaHa.toFixed(2)} ha • Pendiente: ${activeParcel.slopePct}%</span>${calibratedBadge}`
       );
     }
   }, [activeParcel]);

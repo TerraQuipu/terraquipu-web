@@ -22,9 +22,10 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { ActiveParcel, generateQgisGeoJson, downloadGeoJsonFile } from '@/lib/geoUtils';
-import { RotationEngineResult } from '@/types';
+import { RotationEngineResult, ReporteAgricultor } from '@/types';
 import { downloadWordReportFile, downloadJsonPlanFile } from '@/lib/planExport';
 import { generateHardwareProfile } from '@/lib/deviceProfile';
+import GroundTruthCalibratorModal from './GroundTruthCalibratorModal';
 
 interface DecisionPanelProps {
   activeParcel: ActiveParcel;
@@ -37,6 +38,7 @@ interface DecisionPanelProps {
   onSetPriority: (priority: string) => void;
   rotationResult: RotationEngineResult;
   onShowToast: (msg: string) => void;
+  onCalibrationComplete?: (calibratedParcel: ActiveParcel, newReport?: ReporteAgricultor) => void;
 }
 
 const CROP_THUMBNAILS: Record<string, { label: string; img: string }> = {
@@ -57,6 +59,7 @@ export default function DecisionPanel({
   onSetPriority,
   rotationResult,
   onShowToast,
+  onCalibrationComplete,
 }: DecisionPanelProps) {
   // Linear 3-Step Navigation: 'parcel' (1) | 'satellite' (2) | 'rotation' (3)
   const [activeStep, setActiveStep] = useState<'parcel' | 'satellite' | 'rotation'>('parcel');
@@ -65,6 +68,7 @@ export default function DecisionPanel({
   const [customName, setCustomName] = useState(activeParcel.name);
   const [showAllCampaigns, setShowAllCampaigns] = useState(true);
   const [isSavedModalOpen, setIsSavedModalOpen] = useState(false);
+  const [isGroundTruthModalOpen, setIsGroundTruthModalOpen] = useState(false);
   const [hardwareId, setHardwareId] = useState<string>('TQ-TECH-PRO');
 
   React.useEffect(() => {
@@ -303,6 +307,53 @@ export default function DecisionPanel({
                 </p>
               </div>
 
+              {/* Ground-Truth 5+1 Field Calibration Card */}
+              <div className="p-3 bg-gradient-to-br from-emerald-50 via-teal-50/40 to-white border border-emerald-200 rounded-xl space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-xs font-bold text-emerald-950">
+                      Verdad Terrestre (Ground-Truth 5+1)
+                    </span>
+                  </div>
+                  {activeParcel.groundTruthCalibrated ? (
+                    <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-emerald-600 text-white shadow-xs">
+                      ✓ Calibrada ({activeParcel.groundTruthData?.soilHealthIndex}/100)
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                      Pendiente
+                    </span>
+                  )}
+                </div>
+
+                {activeParcel.groundTruthCalibrated && activeParcel.groundTruthData ? (
+                  <div className="bg-white/90 p-2.5 rounded-lg border border-emerald-200 text-xs space-y-1">
+                    <div className="flex justify-between font-semibold text-emerald-900">
+                      <span>Índice Edáfico y Resiliencia:</span>
+                      <span className="font-mono font-bold">{activeParcel.groundTruthData.soilHealthIndex}/100</span>
+                    </div>
+                    <div className="text-[10px] text-zinc-600 flex justify-between">
+                      <span>Textura: <strong>{activeParcel.groundTruthData.soilTexture}</strong></span>
+                      <span>Cobertura: <strong>{activeParcel.groundTruthData.cropCoverNdvi}</strong></span>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-emerald-900/80 leading-snug">
+                    Responde las 5 preguntas agronómicas de campo con el agricultor para corregir los sensores satelitales SMAP y Sentinel-2.
+                  </p>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => setIsGroundTruthModalOpen(true)}
+                  className="w-full py-2 px-3 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+                  <span>{activeParcel.groundTruthCalibrated ? 'Re-calibrar Preguntas de Campo' : 'Calibrar con Preguntas de Campo (5+1)'}</span>
+                </button>
+              </div>
+
               {/* QGIS Export Button */}
               <button
                 onClick={handleExportQgis}
@@ -478,6 +529,28 @@ export default function DecisionPanel({
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900">
                   Riesgo Leve
                 </span>
+              </div>
+
+              {/* Ground-Truth Calibration Status */}
+              <div className="p-2.5 bg-emerald-50/70 border border-emerald-200 rounded-lg flex items-center justify-between text-xs">
+                <div>
+                  <span className="font-bold text-emerald-950 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                    Validación Ground-Truth
+                  </span>
+                  <span className="text-[10px] text-zinc-600 block mt-0.5">
+                    {activeParcel.groundTruthCalibrated
+                      ? `Calibrado con agricultor • Índice edáfico ${activeParcel.groundTruthData?.soilHealthIndex}/100`
+                      : 'Telemetría orbital en bruto (pendiente validación con agricultor)'}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsGroundTruthModalOpen(true)}
+                  className="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-[11px] font-bold transition flex items-center gap-1 shadow-xs cursor-pointer"
+                >
+                  <span>{activeParcel.groundTruthCalibrated ? 'Re-calibrar' : 'Calibrar'}</span>
+                </button>
               </div>
             </div>
 
@@ -906,6 +979,20 @@ export default function DecisionPanel({
           </div>
         </div>
       )}
+
+      {/* Ground-Truth 5+1 Field Calibrator Modal */}
+      <GroundTruthCalibratorModal
+        isOpen={isGroundTruthModalOpen}
+        onClose={() => setIsGroundTruthModalOpen(false)}
+        activeParcel={activeParcel}
+        previousCrop={previousCrop}
+        onCalibrationComplete={(calibratedParcel, newReport) => {
+          if (onCalibrationComplete) {
+            onCalibrationComplete(calibratedParcel, newReport);
+          }
+        }}
+        onShowToast={onShowToast}
+      />
     </div>
   );
 }
