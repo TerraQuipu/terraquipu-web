@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { 
   Satellite, 
   Sprout, 
@@ -20,7 +21,7 @@ import {
 } from "lucide-react";
 
 // Royalty-free background video playlist (Optimized local MP4 with CDN fallback - Andes aerials & Andean agriculture)
-const BASE_PATH = process.env.NODE_ENV === 'production' ? '/terraquipu-web' : '';
+const BASE_PATH = '';
 
 const HERO_PLAYLIST = [
   {
@@ -187,13 +188,13 @@ export default function SuperpowerTerraquipuLanding() {
               GitHub
             </a>
 
-            {/* White Pill Button */}
-            <a 
-              href="./app.html" 
+            {/* White Pill Button to /visor */}
+            <Link 
+              href="/visor" 
               className="px-5 py-2 rounded-full bg-white text-black text-[13px] font-semibold hover:bg-zinc-100 transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98]"
             >
               <span>Visor Satelital</span>
-            </a>
+            </Link>
 
             {/* Circular 3x3 Grid Dots Icon Button */}
             <button 
@@ -221,6 +222,9 @@ export default function SuperpowerTerraquipuLanding() {
         {/* Mobile Dropdown Drawer */}
         {mobileMenuOpen && (
           <div className="max-w-6xl mx-auto mt-2 p-5 rounded-3xl bg-[#1c1c1f]/95 backdrop-blur-2xl border border-white/15 text-white shadow-2xl flex flex-col gap-3 text-sm font-medium animate-in fade-in slide-in-from-top-2 duration-200">
+            <Link href="/visor" onClick={() => setMobileMenuOpen(false)} className="bg-white text-black font-semibold text-center py-2.5 rounded-full shadow-sm hover:bg-zinc-200 transition">
+              Lanzar Visor Satelital (/visor) →
+            </Link>
             <a href="#como-funciona" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Cómo funciona</a>
             <a href="#diagnostico" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Diagnóstico 30m</a>
             <a href="#quipu" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">El Quipu de Rotación</a>
@@ -281,13 +285,13 @@ export default function SuperpowerTerraquipuLanding() {
 
             {/* Exact Superpower Button Styles: Solid White Pill + Translucent Dark Glass Pill */}
             <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-              <a 
-                href="./app.html" 
+              <Link 
+                href="/visor" 
                 className="px-7 py-3.5 rounded-full bg-white text-black font-semibold text-sm hover:bg-zinc-100 transition shadow-[0_0_25px_rgba(255,255,255,0.25)] flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99]"
               >
                 <span>🛰️ Explorar Visor Satelital</span>
                 <ArrowRight className="w-4 h-4" />
-              </a>
+              </Link>
               <a 
                 href="#como-funciona" 
                 className="px-7 py-3.5 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-md text-white border border-white/15 font-semibold text-sm transition text-center hover:scale-[1.01] active:scale-[0.99]"
@@ -1072,12 +1076,12 @@ export default function SuperpowerTerraquipuLanding() {
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a 
-              href="./app.html" 
+            <Link 
+              href="/visor" 
               className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-wider hover:bg-zinc-200 transition shadow-2xl"
             >
               Lanzar Visor Satelital
-            </a>
+            </Link>
             <a 
               href="https://github.com/TerraQuipu" 
               target="_blank"
@@ -1111,7 +1115,7 @@ export default function SuperpowerTerraquipuLanding() {
           <div className="space-y-2">
             <div className="font-mono text-[11px] uppercase tracking-wider font-bold text-zinc-900">Plataforma</div>
             <ul className="space-y-1.5 text-xs">
-              <li><a href="./app.html" className="hover:text-black transition">Visor GIS Satelital</a></li>
+              <li><Link href="/visor" className="hover:text-black transition">Visor GIS Satelital</Link></li>
               <li><a href="#como-funciona" className="hover:text-black transition">Cómo Funciona</a></li>
               <li><a href="#diagnostico" className="hover:text-black transition">Diagnóstico 30m</a></li>
               <li><a href="#quipu" className="hover:text-black transition">Plan Quipu de Rotación</a></li>
@@ -1149,3 +1153,4 @@ export default function SuperpowerTerraquipuLanding() {
     </div>
   );
 }
+

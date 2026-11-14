@@ -1,0 +1,90 @@
+@import 'leaflet/dist/leaflet.css';
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 9, 9, 11;
+  --background-start-rgb: 250, 250, 250;
+  --background-end-rgb: 255, 255, 255;
+}
+
+/* Global Font: clean, high-precision typography */
+*, html, body, button, input, textarea, select, h2, h3, h4, h5, h6, p, span, a, label {
+  font-family: Arial, Helvetica, "Plus Jakarta Sans", sans-serif;
+}
+
+/* Hero Headline: Playfair Display (Editorial Serif) */
+.hero-headline, .hero-headline * {
+  font-family: 'Playfair Display', Georgia, Cambria, 'Times New Roman', serif !important;
+  letter-spacing: -0.02em !important;
+}
+
+.brand-logo, .brand-logo * {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  letter-spacing: -0.03em !important;
+}
+
+/* Superpower Solar Glow Utilities */
+.solar-ring {
+  background: radial-gradient(circle, #F59E0B 0%, #D97706 40%, rgba(180, 83, 9, 0.4) 65%, transparent 75%);
+}
+
+.subtle-solar-glow {
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.08) 50%, transparent 70%);
+}
+
+/* Minimalist scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f4f4f5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa;
+}
+
+/* Radar pulse animation for Leaflet markers */
+.pulse-radar {
+  width: 20px;
+  height: 20px;
+  background: #09090b;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+  animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.6);
+  }
+  70% {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 12px rgba(0, 0, 0, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+
+/* Leaflet container full fit */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background-color: #f4f4f5;
+}
