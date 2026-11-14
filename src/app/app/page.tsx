@@ -7,6 +7,8 @@ import {
   AlertTriangle,
   ChevronDown,
   WifiOff,
+  Droplets,
+  Thermometer,
 } from 'lucide-react';
 import {
   Microcuenca,
@@ -37,6 +39,7 @@ import SoilValidator from '@/components/SoilValidator';
 import SaberesCard from '@/components/SaberesCard';
 import SettingsTab from '@/components/SettingsTab';
 import KipuFullScreenWizard from '@/components/KipuFullScreenWizard';
+import AgroClimaNewsFeed from '@/components/AgroClimaNewsFeed';
 
 export default function MobileApp() {
   const [activeTab, setActiveTab] = useState<'inicio' | 'elnino' | 'chacra' | 'tierra' | 'saberes' | 'ajustes'>('inicio');
@@ -44,6 +47,7 @@ export default function MobileApp() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [hardwareId, setHardwareId] = useState('TQ-HW-INIT');
+  const [isNewsOpen, setIsNewsOpen] = useState(false);
 
   // Full-screen first-time setup / onboarding state
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -132,7 +136,7 @@ export default function MobileApp() {
       setCultivos(cultivosData);
 
       // Match microcuenca by profile
-      const activeCuenca = cuencasData.find((c: Microcuenca) => c.id === profile.cuencaId) || cuencasData[0];
+      const activeCuenca = cuencasData.find((c) => c.id === profile.cuencaId) || cuencasData[0];
       if (activeCuenca) {
         const climaData = await getClimaNasa(activeCuenca.id);
         setClimaNasa(climaData);
@@ -161,7 +165,7 @@ export default function MobileApp() {
       if (cuencasData.length > 0) setMicrocuencas(cuencasData);
       if (cultivosData.length > 0) setCultivos(cultivosData);
 
-      const activeCuenca = cuencasData.find((c: Microcuenca) => c.id === profile.cuencaId) || cuencasData[0];
+      const activeCuenca = cuencasData.find((c) => c.id === profile.cuencaId) || cuencasData[0];
       if (activeCuenca) {
         const climaData = await getClimaNasa(activeCuenca.id);
         if (climaData) setClimaNasa(climaData);
@@ -204,8 +208,8 @@ export default function MobileApp() {
       alerta_helada_observada: false,
       sincronizado_desde_outbox: false,
       created_at: new Date().toISOString(),
-    }).then((res: any) => {
-      if (res && res.success) {
+    }).then((res) => {
+      if (res.success) {
         triggerToast('🛰️ Calibración triangulada enviada a Supabase (Ground-Truth Comunal)');
       }
     }).catch(() => {});
@@ -251,17 +255,17 @@ export default function MobileApp() {
       )}
 
       {/* Top Mobile App Header */}
-      <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 sticky top-0 z-40 flex items-center justify-between shadow-xs">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-emerald-800 flex items-center justify-center text-white font-bold text-sm shadow-xs">
+      <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 px-2.5 py-1.5 sticky top-0 z-40 flex items-center justify-between shadow-xs gap-1.5">
+        <div className="flex items-center gap-1.5 min-w-0 shrink">
+          <div className="w-7 h-7 rounded-xl bg-emerald-800 flex items-center justify-center text-white font-bold text-xs shadow-xs shrink-0">
             🌱
           </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-sm text-slate-950 tracking-tight">
+          <div className="min-w-0">
+            <div className="flex items-center gap-1">
+              <span className="font-extrabold text-xs text-slate-950 tracking-tight truncate">
                 TerraQuipu
               </span>
-              <span className="text-[10px] font-bold uppercase px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+              <span className="text-[8px] font-black uppercase px-1 py-0.2 rounded bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
                 Móvil
               </span>
             </div>
@@ -269,79 +273,57 @@ export default function MobileApp() {
             <button
               type="button"
               onClick={() => setActiveTab('ajustes')}
-              className="flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:text-slate-950 transition cursor-pointer"
+              className="flex items-center gap-0.5 text-[10px] font-semibold text-slate-600 hover:text-slate-950 transition cursor-pointer truncate max-w-[105px] sm:max-w-[140px]"
               title="Ir a ajustes de la parcela"
             >
-              <span>{profile.parcelName} ({profile.areaHa || 1.0} ha) • {profile.altitude}m</span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
+              <span className="truncate">{profile.parcelName}</span>
+              <ChevronDown className="w-2.5 h-2.5 text-slate-400 shrink-0" />
             </button>
           </div>
         </div>
 
-        {/* Status Pills */}
-        <div className="flex items-center gap-1.5">
-          {/* Online status indicator */}
-          <div
-            className={`px-2 py-1 rounded-xl text-[10px] font-bold flex items-center gap-1 border ${
-              isOnline
-                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                : 'bg-amber-50 text-amber-800 border-amber-200'
-            }`}
-          >
-            {isOnline ? (
-              <>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span className="hidden sm:inline">En Línea</span>
-              </>
-            ) : (
-              <>
-                <WifiOff className="w-3 h-3 text-amber-600" />
-                <span>Sin Señal</span>
-              </>
-            )}
-          </div>
-
-          {/* El Niño mode indicator */}
-          <button
-            type="button"
-            onClick={() => {
-              const next = !isElNino;
-              setIsElNino(next);
-              triggerToast(next ? '⚠️ Modo Sequía El Niño activo' : '☀️ Modo Año Normal');
-            }}
-            className={`px-2.5 py-1 rounded-xl text-[10px] font-bold flex items-center gap-1 border transition cursor-pointer ${
-              isElNino
-                ? 'bg-amber-600 text-white border-amber-700 shadow-xs'
-                : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
-            }`}
-          >
-            {isElNino ? (
-              <>
-                <AlertTriangle className="w-3 h-3 text-amber-200" />
-                <span className="contrast-bold-white">Sequía</span>
-              </>
-            ) : (
-              <>
-                <Sun className="w-3 h-3 text-amber-600" />
-                <span>Normal</span>
-              </>
-            )}
-          </button>
-
-          {/* Refresh button for fresh cloud data */}
+        {/* Right: Refresh button + Compact Telemetry (Humedad & Temperatura) */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* Refresh button with green border */}
           <button
             type="button"
             onClick={handleRefreshData}
             disabled={isRefreshing}
-            className={`p-1.5 rounded-xl border transition flex items-center justify-center active:scale-95 cursor-pointer ${
-              isRefreshing
-                ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                : 'bg-slate-100 hover:bg-slate-200 text-emerald-800 border-slate-200'
+            className={`w-7 h-7 rounded-full border-2 border-emerald-400 bg-emerald-50 text-emerald-800 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-2xs hover:bg-emerald-100 shrink-0 ${
+              isRefreshing ? 'border-emerald-600 bg-emerald-100' : ''
             }`}
             title="Recibir datos frescos de la nube (Hora Perú)"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-600' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-600' : 'text-emerald-700'}`} />
           </button>
+
+          {/* Compact Humedad SMAP Pill */}
+          <div className="px-2 py-0.5 rounded-xl bg-sky-50/80 border border-sky-200 text-left leading-tight shadow-2xs">
+            <div className="flex items-center gap-0.5 text-[8.5px] font-bold text-sky-800">
+              <Droplets className="w-2.5 h-2.5 text-sky-600 shrink-0" />
+              <span className="truncate">Humedad SMAP</span>
+            </div>
+            <div className="text-[11px] font-black text-slate-900 leading-none my-0.5">
+              {smapPercent}% <span className="text-[8px] font-normal text-slate-500">vol</span>
+            </div>
+            <div className="text-[7.5px] font-extrabold text-emerald-700 truncate leading-none">
+              {smapPercent < 20 ? '⚠️ Déficit' : '✓ Adecuada'}
+            </div>
+          </div>
+
+          {/* Compact Temperatura Pill */}
+          <div className="px-2 py-0.5 rounded-xl bg-amber-50/80 border border-amber-200 text-left leading-tight shadow-2xs">
+            <div className="flex items-center gap-0.5 text-[8.5px] font-bold text-amber-800">
+              <Thermometer className="w-2.5 h-2.5 text-amber-600 shrink-0" />
+              <span className="truncate">Temperatura</span>
+            </div>
+            <div className="text-[11px] font-black text-slate-900 leading-none my-0.5">
+              {climaNasa?.temp_media_c ? `${climaNasa.temp_media_c} °C` : '11.1 °C'}
+            </div>
+            <div className="text-[7.5px] font-medium text-slate-500 truncate leading-none">
+              NASA POWER
+            </div>
+          </div>
         </div>
       </header>
 
@@ -358,6 +340,7 @@ export default function MobileApp() {
             onOpenWizard={() => setShowOnboarding(true)}
             onNavigateToClima={() => setActiveTab('elnino')}
             onNavigateToChacra={() => setActiveTab('chacra')}
+            onOpenNews={() => setIsNewsOpen(true)}
           />
         )}
 
@@ -510,6 +493,28 @@ export default function MobileApp() {
           </div>
         )}
       </main>
+
+      {/* Floating News Button (Bottom-Left above navbar) */}
+      <div className="fixed bottom-20 left-3 sm:left-4 z-40">
+        <button
+          type="button"
+          onClick={() => {
+            playBubblePop();
+            setIsNewsOpen(true);
+          }}
+          className="relative w-12 h-12 rounded-2xl bg-emerald-900 hover:bg-emerald-800 border-2 border-emerald-700 text-white flex items-center justify-center shadow-lg transition transform active:scale-95 cursor-pointer group"
+          title="Abrir Boletines Científicos y Alertas ENOS"
+        >
+          <span className="text-xl">📰</span>
+          {/* Notification Badge with '3' */}
+          <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-500 text-white font-black text-[10px] flex items-center justify-center border-2 border-white shadow-md">
+            3
+          </span>
+        </button>
+      </div>
+
+      {/* Slide-Up Bottom Sheet for News & ENOS Bulletins */}
+      <AgroClimaNewsFeed isOpen={isNewsOpen} onClose={() => setIsNewsOpen(false)} />
 
       {/* Bottom Mobile Navigation Bar */}
       <BottomNav activeTab={activeTab} onSelectTab={setActiveTab} />

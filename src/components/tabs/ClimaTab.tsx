@@ -27,6 +27,7 @@ export default function ClimaTab({
 }: ClimaTabProps) {
   const [climaView, setClimaView] = useState<'index' | 'forecast' | 'elnino'>('index');
   const [isSanidadOpen, setIsSanidadOpen] = useState<boolean>(false);
+  const [isNewsOpen, setIsNewsOpen] = useState<boolean>(false);
 
   const temp = climaNasa?.temp_media_c || 14.2;
   const rain = climaNasa?.precipitacion_mm || 0;
@@ -58,7 +59,22 @@ export default function ClimaTab({
           />
 
           {/* Boletines Científicos Oficiales & Alertas ENOS */}
-          <AgroClimaNewsFeed />
+          <div className="flex justify-center pt-0.5 pb-0.5">
+            <button
+              type="button"
+              onClick={() => {
+                playBubblePop();
+                setIsNewsOpen(true);
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-2xs hover:shadow-xs hover:border-amber-300 text-xs font-bold text-slate-700 active:scale-95 transition cursor-pointer"
+            >
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+              <span>3 Boletines ENOS &amp; INIA disponibles</span>
+              <span className="text-slate-400 font-normal">↗</span>
+            </button>
+          </div>
+
+          <AgroClimaNewsFeed isOpen={isNewsOpen} onClose={() => setIsNewsOpen(false)} />
 
           {/* Grid de Módulos Temáticos con Imagen Superior y Enlaces Limpios */}
           <div className="space-y-3.5 pt-1">
