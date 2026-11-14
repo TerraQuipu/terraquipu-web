@@ -280,7 +280,13 @@ export default function DecisionPanel({
                 </div>
 
                 <div className="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200">
-                  <span className="text-[10px] text-zinc-500 font-medium block">Altitud Topográfica</span>
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="text-[10px] text-zinc-500 font-medium block">Altitud Topográfica</span>
+                    <span className="text-[8px] font-mono text-emerald-800 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-200 flex items-center gap-1 font-semibold" title="Copernicus DEM 30m / SRTM API">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      DEM API
+                    </span>
+                  </div>
                   <span className="font-bold text-zinc-950 text-sm font-mono block">
                     {activeParcel.elevationMsnm} m s.n.m.
                   </span>

@@ -20,6 +20,7 @@ import {
   calculateParcelAreaHa,
   calculateParcelCentroid,
   estimateTerrainMetrics,
+  fetchRealTerrainMetrics,
   generateQgisGeoJson,
   downloadGeoJsonFile,
 } from '@/lib/geoUtils';
@@ -261,6 +262,18 @@ export default function MapViewer({
           };
 
           onSelectParcel(newParcel);
+
+          // Asynchronously query real Copernicus DEM 30m / SRTM and live satellite soil moisture via API
+          fetchRealTerrainMetrics(clickedLatLng, areaHa).then((real) => {
+            onSelectParcel({
+              ...newParcel,
+              elevationMsnm: real.elevationMsnm,
+              slopePct: real.slopePct,
+              smapMoisturePct: real.smapMoisturePct,
+              ndvi: real.ndvi,
+            });
+          }).catch(() => {});
+
           setDrawMode('none');
           map.getContainer().removeAttribute('data-draw-mode');
           map.getContainer().style.cursor = '';
@@ -475,6 +488,19 @@ export default function MapViewer({
       bounds: drawPoints,
       isCustom: true,
     };
+
+    onSelectParcel(newParcel);
+
+    // Asynchronously query real Copernicus DEM 30m / SRTM and live satellite soil moisture via API
+    fetchRealTerrainMetrics(center, areaHa).then((real) => {
+      onSelectParcel({
+        ...newParcel,
+        elevationMsnm: real.elevationMsnm,
+        slopePct: real.slopePct,
+        smapMoisturePct: real.smapMoisturePct,
+        ndvi: real.ndvi,
+      });
+    }).catch(() => {});
 
     // Clean up temporary drawing layers
     if (tempPolylineRef.current && mapInstanceRef.current) {

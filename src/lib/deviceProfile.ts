@@ -1,18 +1,8 @@
-export interface FarmerHardwareProfile {
-  deviceId: string;
-  hardwareHash: string;
-  farmerName: string;
-  community: string;
-  sector: string;
-  lastHarvestCrop: string;
-  priority: string;
-  registeredAt: string;
-  isConfigured: boolean;
-}
+import { FarmerProfile } from './types';
 
 /**
- * Deterministic hardware hash function based on non-volatile browser/hardware telemetry.
- * Produces the same signature across reloads and sessions on the same physical device.
+ * Deterministic hardware hash function based on non-volatile hardware telemetry.
+ * Produces the exact same signature across reloads and sessions on the same physical device.
  */
 function createDeterministicHash(str: string): string {
   let hash = 0x811c9dc5;
@@ -52,44 +42,43 @@ export function generateHardwareProfile(): { deviceId: string; hardwareHash: str
 
 const STORAGE_KEY = 'terraquipu_hardware_farmer_profile';
 
-export function getStoredFarmerProfile(): FarmerHardwareProfile | null {
+export function getStoredDeviceProfile(): (FarmerProfile & { deviceId: string; isConfigured: boolean }) | null {
   if (typeof window === 'undefined') return null;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const profile = JSON.parse(raw) as FarmerHardwareProfile;
+    const profile = JSON.parse(raw);
     return profile && profile.isConfigured ? profile : null;
   } catch (e) {
     return null;
   }
 }
 
-export function saveFarmerProfile(
-  data: Omit<FarmerHardwareProfile, 'deviceId' | 'hardwareHash' | 'registeredAt' | 'isConfigured'>
-): FarmerHardwareProfile {
+export function saveDeviceProfile(
+  profile: FarmerProfile
+): FarmerProfile & { deviceId: string; isConfigured: boolean } {
   const { deviceId, hardwareHash } = generateHardwareProfile();
 
-  const profile: FarmerHardwareProfile = {
+  const fullProfile = {
+    ...profile,
     deviceId,
     hardwareHash,
-    farmerName: data.farmerName || 'Agricultor Titular',
-    community: data.community || 'Ayllu Chinchero',
-    sector: data.sector || 'yanacona',
-    lastHarvestCrop: data.lastHarvestCrop || 'papa',
-    priority: data.priority || 'alimento',
-    registeredAt: new Date().toISOString(),
     isConfigured: true,
+    updatedAt: new Date().toISOString(),
   };
 
   if (typeof window !== 'undefined') {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(fullProfile));
+    // also sync legacy key for backward compatibility
+    localStorage.setItem('terraquipu_farmer_profile', JSON.stringify(fullProfile));
   }
 
-  return profile;
+  return fullProfile;
 }
 
-export function resetFarmerProfile(): void {
+export function resetDeviceProfile(): void {
   if (typeof window !== 'undefined') {
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem('terraquipu_farmer_profile');
   }
 }

@@ -188,12 +188,20 @@ export default function SuperpowerTerraquipuLanding() {
               GitHub
             </a>
 
+            {/* Emerald Pill Button to /app (TerraQuipu Móvil PWA) */}
+            <Link 
+              href="/app" 
+              className="px-4 py-2 rounded-full bg-emerald-500 text-white text-[13px] font-bold hover:bg-emerald-400 transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <span>🌱 App Móvil</span>
+            </Link>
+
             {/* White Pill Button to /visor */}
             <Link 
               href="/visor" 
-              className="px-5 py-2 rounded-full bg-white text-black text-[13px] font-semibold hover:bg-zinc-100 transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98]"
+              className="px-4 py-2 rounded-full bg-white text-black text-[13px] font-semibold hover:bg-zinc-100 transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98]"
             >
-              <span>Visor Satelital</span>
+              <span>🛰️ Visor Satelital</span>
             </Link>
 
             {/* Circular 3x3 Grid Dots Icon Button */}
@@ -222,8 +230,11 @@ export default function SuperpowerTerraquipuLanding() {
         {/* Mobile Dropdown Drawer */}
         {mobileMenuOpen && (
           <div className="max-w-6xl mx-auto mt-2 p-5 rounded-3xl bg-[#1c1c1f]/95 backdrop-blur-2xl border border-white/15 text-white shadow-2xl flex flex-col gap-3 text-sm font-medium animate-in fade-in slide-in-from-top-2 duration-200">
+            <Link href="/app" onClick={() => setMobileMenuOpen(false)} className="bg-emerald-500 text-white font-bold text-center py-2.5 rounded-full shadow-sm hover:bg-emerald-400 transition">
+              🌱 Abrir App Móvil (/app)
+            </Link>
             <Link href="/visor" onClick={() => setMobileMenuOpen(false)} className="bg-white text-black font-semibold text-center py-2.5 rounded-full shadow-sm hover:bg-zinc-200 transition">
-              Lanzar Visor Satelital (/visor) →
+              🛰️ Lanzar Visor Satelital (/visor)
             </Link>
             <a href="#como-funciona" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Cómo funciona</a>
             <a href="#diagnostico" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Diagnóstico 30m</a>
@@ -283,18 +294,24 @@ export default function SuperpowerTerraquipuLanding() {
               100+ indicadores agroclimáticos. Un plan diseñado para tu cuenca. Todo lo que necesitas para proteger tus cultivos frente a El Niño.
             </p>
 
-            {/* Exact Superpower Button Styles: Solid White Pill + Translucent Dark Glass Pill */}
-            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            {/* Exact Superpower Button Styles: Emerald App Pill + Solid White Visor Pill */}
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <Link 
+                href="/app" 
+                className="px-7 py-3.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm transition shadow-[0_0_25px_rgba(16,185,129,0.35)] flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99]"
+              >
+                <span>🌱 Abrir App Móvil PWA</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
               <Link 
                 href="/visor" 
                 className="px-7 py-3.5 rounded-full bg-white text-black font-semibold text-sm hover:bg-zinc-100 transition shadow-[0_0_25px_rgba(255,255,255,0.25)] flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99]"
               >
-                <span>🛰️ Explorar Visor Satelital</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>🛰️ Visor Técnico GIS</span>
               </Link>
               <a 
                 href="#como-funciona" 
-                className="px-7 py-3.5 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-md text-white border border-white/15 font-semibold text-sm transition text-center hover:scale-[1.01] active:scale-[0.99]"
+                className="px-6 py-3.5 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-md text-white border border-white/15 font-semibold text-sm transition text-center hover:scale-[1.01] active:scale-[0.99]"
               >
                 Cómo funciona ↓
               </a>
@@ -1115,7 +1132,8 @@ export default function SuperpowerTerraquipuLanding() {
           <div className="space-y-2">
             <div className="font-mono text-[11px] uppercase tracking-wider font-bold text-zinc-900">Plataforma</div>
             <ul className="space-y-1.5 text-xs">
-              <li><Link href="/visor" className="hover:text-black transition">Visor GIS Satelital</Link></li>
+              <li><Link href="/app" className="hover:text-black transition font-semibold text-emerald-800">🌱 App Móvil PWA (/app)</Link></li>
+              <li><Link href="/visor" className="hover:text-black transition">🛰️ Visor GIS Satelital (/visor)</Link></li>
               <li><a href="#como-funciona" className="hover:text-black transition">Cómo Funciona</a></li>
               <li><a href="#diagnostico" className="hover:text-black transition">Diagnóstico 30m</a></li>
               <li><a href="#quipu" className="hover:text-black transition">Plan Quipu de Rotación</a></li>

@@ -8,21 +8,21 @@
 
 👉 **Acceso directo a producción:**
 * **Landing Page de Captación:** [https://terraquipu.github.io/terraquipu-web/](https://terraquipu.github.io/terraquipu-web/)
-* **Visor GIS Satelital en Vivo:** [https://terraquipu.github.io/terraquipu-web/app.html](https://terraquipu.github.io/terraquipu-web/app.html)
+* **Visor GIS Satelital en Vivo:** [https://terraquipu.github.io/terraquipu-web/visor/](https://terraquipu.github.io/terraquipu-web/visor/)
 
 ---
 
 ## 📌 Arquitectura del Frontend y Componentes
 
-El frontend de `terraquipu-web` se compone de dos experiencias complementarias conectadas de forma bidireccional:
+El frontend de `terraquipu-web` se compone de dos experiencias complementarias conectadas de forma bidireccional (desarrolladas en Next.js 14 App Router):
 
-1. **Landing Page de Captación de Leads (`index.html` / `landing.html`):**
+1. **Landing Page de Captación de Leads (`/`):**
    * Inspirada en la estética B2B/DevTech de **Antimetal** (fondo dark profundo `#050507`, bordes hairline translúcidos, resplandores radiales esmeralda/ámbar).
    * **Hero Visual Artifact:** Consola interactiva estilo macOS con simulación en tiempo real de telemetría de Chinchero y línea temporal del Quipu.
    * **Bento Grid:** Cuatro tarjetas con downscaling satelital, motor determinista INIA, resiliencia hídrica y código abierto.
    * **Calculadora Agroecológica Interactiva:** Slider dinámico para calcular ahorro en urea/dólares, nitrógeno biológico fijado y agua conservada.
    * **Formulario de Captura Multi-Perfil:** Segmentación inmediata para Comunidades Campesinas, Desarrolladores Open Source, Científicos de Datos y Donantes ESG.
-2. **Visor GIS Satelital y Rotación Multianual (`app.html`):**
+2. **Visor GIS Satelital y Rotación Multianual (`/visor` o `/app`):**
    * Mapa interactivo fullscreen (Esri World Imagery + CartoDB Light) con polígonos de sectores andinos (Chinchero, Moray, Urubamba, Písac).
    * Sidebar modular con pestañas de *Diagnóstico*, *Quipu Rotación* y *Curvas de Fertilidad*.
    * Tarjeta flotante de Justificación Científica (INIA/SENAMHI) con locución por voz (Web Speech API).

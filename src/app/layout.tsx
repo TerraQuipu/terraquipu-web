@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import ModuleGuidePill from '@/components/layout/ModuleGuidePill';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://terraquipu.com'),
@@ -109,7 +108,6 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen flex flex-col antialiased text-zinc-900 bg-white selection:bg-amber-500 selection:text-white">
         {children}
-        <ModuleGuidePill />
       </body>
     </html>
   );
