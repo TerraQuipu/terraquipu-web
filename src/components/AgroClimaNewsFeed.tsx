@@ -181,7 +181,7 @@ export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeed
 
   return (
     <div
-      className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex flex-col justify-end transition-opacity duration-300 ease-in-out ${
+      className={`fixed inset-0 z-[60] bg-black/60 backdrop-blur-xs flex flex-col justify-end transition-opacity duration-300 ease-in-out ${
         isAnimating ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
       }`}
     >

@@ -494,23 +494,25 @@ export default function MobileApp() {
         )}
       </main>
 
-      {/* Floating News Button (Bottom-Right above navbar for ergonomic thumb access) */}
-      <div className="fixed bottom-20 right-3 sm:right-4 z-40">
-        <button
-          type="button"
-          onClick={() => {
-            playBubblePop();
-            setIsNewsOpen(true);
-          }}
-          className="relative w-12 h-12 rounded-2xl bg-emerald-900 hover:bg-emerald-800 border-2 border-emerald-700 text-white flex items-center justify-center shadow-xl transition transform active:scale-95 cursor-pointer group hover:shadow-emerald-900/40"
-          title="Abrir Boletines Científicos y Alertas ENOS"
-        >
-          <span className="text-xl">📰</span>
-          {/* Notification Badge with '3' */}
-          <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-500 text-white font-black text-[10px] flex items-center justify-center border-2 border-white shadow-md">
-            3
-          </span>
-        </button>
+      {/* Floating News Button Container (Elevated cleanly above navbar, aligned to max-w-md, z-50 so NEVER behind BottomNav) */}
+      <div className="fixed bottom-24 inset-x-0 max-w-md mx-auto pointer-events-none z-50 px-4">
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => {
+              playBubblePop();
+              setIsNewsOpen(true);
+            }}
+            className="pointer-events-auto relative w-13 h-13 rounded-2xl bg-emerald-900 hover:bg-emerald-800 border-2 border-emerald-600 text-white flex items-center justify-center shadow-2xl transition transform active:scale-95 cursor-pointer group hover:shadow-emerald-900/50"
+            title="Abrir Boletines Científicos y Alertas ENOS"
+          >
+            <span className="text-2xl">📰</span>
+            {/* Notification Badge with '3' */}
+            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-500 text-white font-black text-[10px] flex items-center justify-center border-2 border-white shadow-md animate-pulse">
+              3
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* Slide-Up Bottom Sheet for News & ENOS Bulletins */}
