@@ -21,7 +21,7 @@ import {
   Layers,
   Sparkles,
 } from 'lucide-react';
-import { ActiveParcel, generateQgisGeoJson, downloadGeoJsonFile } from '@/lib/geoUtils';
+import { ActiveParcel, generateQgisGeoJson, downloadGeoJsonFile, getAltitudinalFloor } from '@/lib/geoUtils';
 import { RotationEngineResult, ReporteAgricultor } from '@/types';
 import { downloadWordReportFile, downloadJsonPlanFile } from '@/lib/planExport';
 import { generateHardwareProfile } from '@/lib/deviceProfile';
@@ -284,7 +284,11 @@ export default function DecisionPanel({
                   <span className="font-bold text-zinc-950 text-sm font-mono block">
                     {activeParcel.elevationMsnm} m s.n.m.
                   </span>
-                  <span className="text-[10px] text-zinc-500">Piso Quechua / Suni</span>
+                  <span className={`text-[10px] font-semibold block truncate ${
+                    activeParcel.elevationMsnm <= 0 ? 'text-sky-700' : 'text-zinc-600'
+                  }`}>
+                    {getAltitudinalFloor(activeParcel.elevationMsnm).shortName}
+                  </span>
                 </div>
 
                 <div className="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200">
@@ -295,6 +299,21 @@ export default function DecisionPanel({
                   <span className="text-[10px] text-zinc-500">Radar Satelital</span>
                 </div>
               </div>
+
+              {/* Maritime Ocean Warning if outside continental land */}
+              {activeParcel.elevationMsnm <= 0 && (
+                <div className="p-3 bg-sky-50 border border-sky-300 rounded-xl text-xs text-sky-950 flex items-start gap-2.5 shadow-xs animate-in fade-in">
+                  <span className="text-xl flex-shrink-0">🌊</span>
+                  <div>
+                    <strong className="block text-xs font-bold text-sky-950">
+                      Coordenada en Océano Pacífico (Mar de Grau)
+                    </strong>
+                    <p className="text-[11px] text-sky-900 leading-tight mt-0.5">
+                      Altitud: 0 m s.n.m. Esta coordenada se ubica en el mar. Para calibrar cultivos agrícolas o validar andenería, ubica la parcela sobre suelo continental.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Instructions Box */}
               <div className="p-3 bg-blue-50/70 border border-blue-200 rounded-lg text-xs text-blue-900 space-y-1">
@@ -307,51 +326,62 @@ export default function DecisionPanel({
                 </p>
               </div>
 
-              {/* Ground-Truth 5+1 Field Calibration Card */}
-              <div className="p-3 bg-gradient-to-br from-emerald-50 via-teal-50/40 to-white border border-emerald-200 rounded-xl space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                    <span className="text-xs font-bold text-emerald-950">
-                      Verdad Terrestre (Ground-Truth 5+1)
-                    </span>
+              {/* Ground-Truth 5+1 Field Calibration Card with Photographic Banner */}
+              <div className="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-xs space-y-0">
+                <div className="relative h-20 overflow-hidden group">
+                  <img
+                    src="/images/cosecha_poster.jpg"
+                    alt="Ground-Truth en campo"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/90 via-emerald-950/50 to-transparent flex items-end p-2.5 justify-between">
+                    <div>
+                      <span className="text-[9px] font-bold text-emerald-300 uppercase tracking-wider block font-mono">
+                        Validación Terrestre NASA
+                      </span>
+                      <h4 className="text-xs font-bold text-white leading-tight">
+                        Ground-Truth 5+1 en Campo
+                      </h4>
+                    </div>
+                    {activeParcel.groundTruthCalibrated ? (
+                      <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-emerald-500 text-white shadow-xs">
+                        ✓ Calibrada ({activeParcel.groundTruthData?.soilHealthIndex}/100)
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-amber-400 text-amber-950 shadow-xs">
+                        Pendiente
+                      </span>
+                    )}
                   </div>
-                  {activeParcel.groundTruthCalibrated ? (
-                    <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-emerald-600 text-white shadow-xs">
-                      ✓ Calibrada ({activeParcel.groundTruthData?.soilHealthIndex}/100)
-                    </span>
-                  ) : (
-                    <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
-                      Pendiente
-                    </span>
-                  )}
                 </div>
 
-                {activeParcel.groundTruthCalibrated && activeParcel.groundTruthData ? (
-                  <div className="bg-white/90 p-2.5 rounded-lg border border-emerald-200 text-xs space-y-1">
-                    <div className="flex justify-between font-semibold text-emerald-900">
-                      <span>Índice Edáfico y Resiliencia:</span>
-                      <span className="font-mono font-bold">{activeParcel.groundTruthData.soilHealthIndex}/100</span>
+                <div className="p-3 space-y-2 bg-gradient-to-b from-white to-emerald-50/30">
+                  {activeParcel.groundTruthCalibrated && activeParcel.groundTruthData ? (
+                    <div className="bg-white p-2.5 rounded-lg border border-emerald-200 text-xs space-y-1 shadow-2xs">
+                      <div className="flex justify-between font-semibold text-emerald-900">
+                        <span>Salud Edáfica y Resiliencia:</span>
+                        <span className="font-mono font-bold">{activeParcel.groundTruthData.soilHealthIndex}/100</span>
+                      </div>
+                      <div className="text-[10px] text-zinc-600 flex justify-between">
+                        <span>Textura: <strong className="capitalize">{activeParcel.groundTruthData.soilTexture}</strong></span>
+                        <span>Cobertura: <strong className="capitalize">{activeParcel.groundTruthData.cropCoverNdvi.replace('_', ' ')}</strong></span>
+                      </div>
                     </div>
-                    <div className="text-[10px] text-zinc-600 flex justify-between">
-                      <span>Textura: <strong>{activeParcel.groundTruthData.soilTexture}</strong></span>
-                      <span>Cobertura: <strong>{activeParcel.groundTruthData.cropCoverNdvi}</strong></span>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-[11px] text-emerald-900/80 leading-snug">
-                    Responde las 5 preguntas agronómicas de campo con el agricultor para corregir los sensores satelitales SMAP y Sentinel-2.
-                  </p>
-                )}
+                  ) : (
+                    <p className="text-[11px] text-zinc-600 leading-snug">
+                      Responde las 5 preguntas agronómicas guiadas por <strong>Kipu y Astro</strong> para calibrar los sensores satelitales SMAP y Sentinel-2.
+                    </p>
+                  )}
 
-                <button
-                  type="button"
-                  onClick={() => setIsGroundTruthModalOpen(true)}
-                  className="w-full py-2 px-3 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs cursor-pointer"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
-                  <span>{activeParcel.groundTruthCalibrated ? 'Re-calibrar Preguntas de Campo' : 'Calibrar con Preguntas de Campo (5+1)'}</span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsGroundTruthModalOpen(true)}
+                    className="w-full py-2 px-3 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+                    <span>{activeParcel.groundTruthCalibrated ? 'Re-calibrar Preguntas de Campo' : 'Calibrar con Preguntas de Campo (5+1)'}</span>
+                  </button>
+                </div>
               </div>
 
               {/* QGIS Export Button */}

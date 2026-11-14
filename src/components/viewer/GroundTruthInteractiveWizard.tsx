@@ -314,32 +314,44 @@ export default function GroundTruthInteractiveWizard({
           />
         </div>
 
-        {/* Character Dialogue Header */}
-        <div className="p-4 bg-white border-b border-zinc-200 flex items-start gap-3 flex-shrink-0 shadow-xs">
-          <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-zinc-200 flex-shrink-0 flex items-center justify-center p-1 shadow-xs">
+        {/* Character Dialogue Header (Hero Mascot & Comic Bubble) */}
+        <div className="px-4 py-3 bg-white border-b border-zinc-200 flex items-center gap-3.5 flex-shrink-0 shadow-xs">
+          <div className="w-20 sm:w-24 h-24 sm:h-28 flex-shrink-0 relative flex items-center justify-center">
             <img
               src={currentDialog.avatar}
               alt={currentDialog.name}
-              className="w-full h-full object-contain filter drop-shadow-xs transition-transform duration-200 hover:scale-105"
+              className={`w-full h-full object-contain filter drop-shadow-md transition-all duration-300 ${
+                isHappy ? 'scale-105' : 'scale-100'
+              }`}
             />
           </div>
 
-          <div className="flex-1 min-w-0">
+          <div
+            className={`flex-1 relative bg-white border-2 border-b-4 rounded-2xl sm:rounded-3xl p-3 sm:p-3.5 shadow-xs transition-colors duration-300 ${
+              currentDialog.speaker === 'astro'
+                ? 'border-sky-500 border-b-sky-700'
+                : 'border-emerald-600 border-b-emerald-700'
+            }`}
+          >
+            <div
+              className={`absolute top-5 -left-2.5 w-3.5 h-3.5 bg-white border-b-2 border-l-2 transform rotate-45 ${
+                currentDialog.speaker === 'astro' ? 'border-sky-500' : 'border-emerald-600'
+              }`}
+            />
+
             <div className="flex items-center justify-between gap-1 mb-1">
-              <span className="text-[11px] font-bold text-zinc-950 uppercase tracking-tight">
+              <span className="font-extrabold text-[11px] text-zinc-950 uppercase tracking-wide">
                 {currentDialog.name}
               </span>
-              <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${currentDialog.tagColor}`}>
+              <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${currentDialog.tagColor}`}>
                 {currentDialog.tag}
               </span>
             </div>
-            <div className="relative bg-zinc-50 border border-zinc-200 rounded-2xl p-2.5 shadow-2xs">
-              <p className="text-xs text-zinc-800 leading-snug font-medium">
-                {isHappy && currentDialog.reactionSpeech
-                  ? currentDialog.reactionSpeech
-                  : currentDialog.speech}
-              </p>
-            </div>
+            <p className="text-xs text-zinc-800 leading-snug font-medium">
+              {isHappy && currentDialog.reactionSpeech
+                ? currentDialog.reactionSpeech
+                : currentDialog.speech}
+            </p>
           </div>
         </div>
 
@@ -641,95 +653,93 @@ export default function GroundTruthInteractiveWizard({
             </div>
           )}
 
-          {/* STEP 6: Final Phytosanitary Verification & Summary */}
+          {/* STEP 6: Final Phytosanitary Verification & Unified Summary (Sin exceso de cartas) */}
           {step === 6 && (
-            <div className="space-y-3.5 animate-in fade-in">
-              {/* Score Bar */}
-              <div className="p-3 bg-white border border-emerald-300 rounded-2xl shadow-xs flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-bold text-zinc-900 block">
-                    Índice de Salud Edáfica y Resiliencia:
-                  </span>
-                  <span className="text-[10px] text-zinc-500">
-                    Triangulado con NASA SMAP + Campo
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="text-lg font-bold font-mono text-emerald-800">
-                    {healthScore} / 100
-                  </span>
-                  <span className="text-[10px] font-bold text-emerald-700 block">
-                    {healthScore >= 75 ? 'Resiliencia Alta' : 'Resiliencia Media'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Switches */}
-              <div className="space-y-2">
-                <div className={`p-3 rounded-2xl border transition flex items-center justify-between ${
-                  hasWeevil ? 'bg-rose-50 border-rose-300' : 'bg-white border-zinc-200'
-                }`}>
+            <div className="space-y-3 animate-in fade-in">
+              <div className="p-3.5 bg-white border-2 border-emerald-600/40 rounded-2xl shadow-xs space-y-3">
+                {/* Score Header */}
+                <div className="flex items-center justify-between pb-2.5 border-b border-zinc-200">
                   <div>
-                    <span className="text-xs font-bold text-zinc-900 block">
-                      ¿Hay presencia de Gorgojo de los Andes?
+                    <span className="text-xs font-bold text-zinc-950 block">
+                      Índice de Salud Edáfica y Resiliencia
                     </span>
-                    <span className="text-[10px] text-zinc-500">Premnotrypes spp. en tubérculos</span>
+                    <span className="text-[10px] text-zinc-500">
+                      Triangulado: NASA SMAP + Sentinel-2 + Prueba de Campo
+                    </span>
                   </div>
+                  <div className="text-right">
+                    <span className="text-xl font-mono font-black text-emerald-800">
+                      {healthScore} / 100
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-700 block">
+                      {healthScore >= 75 ? '✓ Resiliencia Alta' : '⚠️ Resiliencia Media'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 2 Tactile Interactive Toggle Buttons */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => {
                       playBubblePop();
                       setHasWeevil(!hasWeevil);
                     }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                      hasWeevil ? 'bg-rose-600 text-white shadow-xs' : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'
+                    className={`p-2.5 rounded-xl border-2 text-left transition flex items-center justify-between cursor-pointer active:scale-98 ${
+                      hasWeevil
+                        ? 'bg-rose-50 border-rose-500 text-rose-950 font-bold ring-2 ring-rose-300/30'
+                        : 'bg-zinc-50 hover:bg-zinc-100 border-zinc-200 text-zinc-800'
                     }`}
                   >
-                    {hasWeevil ? '⚠️ SÍ DETECTADO' : 'NO OBSERVADO'}
+                    <div>
+                      <span className="text-xs font-bold block leading-tight">
+                        {hasWeevil ? '⚠️ Gorgojo Detectado' : '✓ Sin Gorgojo'}
+                      </span>
+                      <span className="text-[10px] opacity-75">Premnotrypes spp.</span>
+                    </div>
+                    <span className="text-base">{hasWeevil ? '🦗' : '🛡️'}</span>
                   </button>
-                </div>
 
-                <div className={`p-3 rounded-2xl border transition flex items-center justify-between ${
-                  hasFrostAlert ? 'bg-amber-50 border-amber-300' : 'bg-white border-zinc-200'
-                }`}>
-                  <div>
-                    <span className="text-xs font-bold text-zinc-900 block">
-                      ¿Se observó escarcha o helada reciente?
-                    </span>
-                    <span className="text-[10px] text-zinc-500">En las últimas 48 horas</span>
-                  </div>
                   <button
                     type="button"
                     onClick={() => {
                       playBubblePop();
                       setHasFrostAlert(!hasFrostAlert);
                     }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                      hasFrostAlert ? 'bg-amber-600 text-white shadow-xs' : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'
+                    className={`p-2.5 rounded-xl border-2 text-left transition flex items-center justify-between cursor-pointer active:scale-98 ${
+                      hasFrostAlert
+                        ? 'bg-amber-50 border-amber-500 text-amber-950 font-bold ring-2 ring-amber-300/30'
+                        : 'bg-zinc-50 hover:bg-zinc-100 border-zinc-200 text-zinc-800'
                     }`}
                   >
-                    {hasFrostAlert ? '❄️ SÍ OBSERVADA' : 'SIN HELADA'}
+                    <div>
+                      <span className="text-xs font-bold block leading-tight">
+                        {hasFrostAlert ? '❄️ Helada Observada' : '☀️ Sin Heladas'}
+                      </span>
+                      <span className="text-[10px] opacity-75">Últimas 48 horas</span>
+                    </div>
+                    <span className="text-base">{hasFrostAlert ? '🥶' : '🌱'}</span>
                   </button>
                 </div>
-              </div>
 
-              {/* Summary Breakdown */}
-              <div className="p-3 bg-zinc-100/80 rounded-2xl text-[11px] text-zinc-700 space-y-1">
-                <div className="flex justify-between font-semibold">
-                  <span>Textura de Suelo:</span>
-                  <span className="capitalize">{soilTexture}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Profundidad:</span>
-                  <span className="capitalize">{soilStoniness}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Cobertura Real:</span>
-                  <span className="capitalize">{cropCoverNdvi.replace('_', ' ')}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Riego:</span>
-                  <span className="capitalize">{waterSource}</span>
+                {/* Direct 4-attribute chip row (No redundant nested cards) */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1 text-[11px]">
+                  <div className="bg-zinc-50 p-2 rounded-lg border border-zinc-200/80">
+                    <span className="text-[10px] text-zinc-400 block font-medium">Textura</span>
+                    <span className="font-bold text-zinc-900 capitalize">{soilTexture}</span>
+                  </div>
+                  <div className="bg-zinc-50 p-2 rounded-lg border border-zinc-200/80">
+                    <span className="text-[10px] text-zinc-400 block font-medium">Profundidad</span>
+                    <span className="font-bold text-zinc-900 capitalize">{soilStoniness}</span>
+                  </div>
+                  <div className="bg-zinc-50 p-2 rounded-lg border border-zinc-200/80">
+                    <span className="text-[10px] text-zinc-400 block font-medium">Cobertura</span>
+                    <span className="font-bold text-zinc-900 capitalize">{cropCoverNdvi.replace('_', ' ')}</span>
+                  </div>
+                  <div className="bg-zinc-50 p-2 rounded-lg border border-zinc-200/80">
+                    <span className="text-[10px] text-zinc-400 block font-medium">Riego</span>
+                    <span className="font-bold text-zinc-900 capitalize">{waterSource}</span>
+                  </div>
                 </div>
               </div>
             </div>

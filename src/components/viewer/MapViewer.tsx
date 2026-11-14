@@ -139,6 +139,21 @@ export default function MapViewer({
 
       if (!isMounted || !mapContainerRef.current) return;
 
+      // Safe getPosition monkey-patch to prevent _leaflet_pos runtime errors
+      if (L && L.DomUtil) {
+        const origGetPosition = L.DomUtil.getPosition;
+        L.DomUtil.getPosition = function (el: any) {
+          if (!el) {
+            return (L.Point ? new L.Point(0, 0) : { x: 0, y: 0 }) as any;
+          }
+          try {
+            return origGetPosition ? origGetPosition.call(L.DomUtil, el) : (el._leaflet_pos || { x: 0, y: 0 });
+          } catch {
+            return (el._leaflet_pos || { x: 0, y: 0 }) as any;
+          }
+        };
+      }
+
       // 1. Initialize Map centered at Chinchero
       const map = L.map(mapContainerRef.current, {
         zoomControl: false,
@@ -427,8 +442,12 @@ export default function MapViewer({
         ? `<br><span style="color:#15803d; font-weight:bold;">🌱 Calibrada en Campo • Salud Edáfica: ${activeParcel.groundTruthData?.soilHealthIndex || 85}/100</span>`
         : '';
 
+      const elevationText = activeParcel.elevationMsnm <= 0
+        ? `<br><span style="color:#0284c7; font-weight:bold;">🌊 Zona Marítima • Mar de Grau (0 m s.n.m.)</span>`
+        : `<br><span style="color:#52525b">Altitud: ${activeParcel.elevationMsnm} m s.n.m.</span>`;
+
       activePolygonRef.current.setTooltipContent(
-        `<strong>${activeParcel.name}</strong><br><span style="color:#52525b">Área: ${activeParcel.areaHa.toFixed(2)} ha • Pendiente: ${activeParcel.slopePct}%</span>${calibratedBadge}`
+        `<strong>${activeParcel.name}</strong><br><span style="color:#52525b">Área: ${activeParcel.areaHa.toFixed(2)} ha • Pendiente: ${activeParcel.slopePct}%</span>${elevationText}${calibratedBadge}`
       );
     }
   }, [activeParcel]);

@@ -18,7 +18,7 @@ import {
   Thermometer,
 } from 'lucide-react';
 import { ReporteAgricultor } from '@/types';
-import { ActiveParcel } from '@/lib/geoUtils';
+import { ActiveParcel, getAltitudinalFloor, estimateTerrainMetrics } from '@/lib/geoUtils';
 
 interface FarmerReportDetailModalProps {
   report: ReporteAgricultor | null;
@@ -26,6 +26,15 @@ interface FarmerReportDetailModalProps {
   onLoadAsActiveParcel?: (parcel: ActiveParcel) => void;
   onShowToast: (msg: string) => void;
 }
+
+const CROP_IMAGES: Record<string, { label: string; img: string }> = {
+  papa_nativa: { label: 'Papa Nativa Andina', img: '/images/papa_nativa.jpg' },
+  papa: { label: 'Papa Nativa Andina', img: '/images/papa_nativa.jpg' },
+  quinua: { label: 'Quinua Real / Pasankalla', img: '/images/quinua_real.jpg' },
+  tarwi: { label: 'Tarwi / Chocho', img: '/images/tarwi_chocho.jpg' },
+  haba: { label: 'Haba Verde Criollo', img: '/images/haba_verde.jpg' },
+  maiz: { label: 'Maíz Blanco Gigante Cusco', img: '/images/maiz_blanco.jpg' },
+};
 
 export default function FarmerReportDetailModal({
   report,
@@ -37,37 +46,47 @@ export default function FarmerReportDetailModal({
 
   const dateFormatted = new Date(report.created_at).toLocaleString('es-PE', {
     day: '2-digit',
-    month: 'long',
+    month: 'short',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
     timeZone: 'America/Lima',
   });
 
-  const cropName = report.cultivo_actual_id
-    ? report.cultivo_actual_id.replace('_', ' ').toUpperCase()
-    : 'PAPA NATIVA ANDINA';
+  const cropKey = (report.cultivo_actual_id || 'papa_nativa').toLowerCase();
+  const cropData = CROP_IMAGES[cropKey] || {
+    label: report.cultivo_actual_id ? report.cultivo_actual_id.replace('_', ' ').toUpperCase() : 'PAPA NATIVA',
+    img: '/images/papa_nativa.jpg',
+  };
 
-  const moistureDescriptions: Record<string, { label: string; desc: string; badge: string }> = {
+  // Accurate elevation & terrain calculation for report coordinate
+  const terrain = estimateTerrainMetrics([report.latitud, report.longitud], 1.25);
+  const floor = getAltitudinalFloor(terrain.elevationMsnm);
+
+  const moistureDescriptions: Record<string, { label: string; desc: string; badge: string; icon: string }> = {
     SECO: {
       label: 'Seco / Infiltración Rápida',
-      desc: 'Poca retención hídrica en perfil radicular (0-20 cm). Alerta de déficit.',
+      desc: 'Poca retención hídrica en perfil radicular. Alerta de estrés hídrico.',
       badge: 'bg-amber-100 text-amber-900 border-amber-300',
+      icon: '🏜️',
     },
     HUMEDAD_MEDIA: {
       label: 'Húmedo y Mullido (Óptimo)',
       desc: 'Forma bola suave con prueba del puño. Estructura esponjosa ideal.',
       badge: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+      icon: '🌱',
     },
     SATURADO: {
       label: 'Muy Húmedo / Barro',
-      desc: 'Alta retención en arcilla. Riesgo de encharcamiento si llueve.',
+      desc: 'Alta retención en arcilla. Precaución con drenaje y aporque.',
       badge: 'bg-blue-100 text-blue-900 border-blue-300',
+      icon: '🧱',
     },
     CHARCO: {
       label: 'Encharcado / Saturado',
       desc: 'Agua estancada en superficie. Drenaje deficiente o canal desbordado.',
       badge: 'bg-cyan-100 text-cyan-900 border-cyan-300',
+      icon: '🌊',
     },
   };
 
@@ -79,12 +98,12 @@ export default function FarmerReportDetailModal({
   if (!report.presencia_gorgojo) estimatedHealth += 10;
   else estimatedHealth -= 20;
   if (report.alerta_helada_observada) estimatedHealth -= 10;
-  estimatedHealth = Math.max(25, Math.min(100, estimatedHealth));
+  if (terrain.elevationMsnm <= 0) estimatedHealth = 20;
+  estimatedHealth = Math.max(10, Math.min(100, estimatedHealth));
 
   const handleLoadInPlanner = () => {
     if (!onLoadAsActiveParcel) return;
 
-    // Build parcel geometry around report centroid (~1.2 ha)
     const lat = report.latitud;
     const lng = report.longitud;
     const delta = 0.0016;
@@ -93,10 +112,10 @@ export default function FarmerReportDetailModal({
       id: `PARCEL-${report.dispositivo_id}`,
       name: `Chacra Validada • ${report.dispositivo_id}`,
       areaHa: 1.25,
-      slopePct: 12.5,
-      elevationMsnm: 3740,
+      slopePct: terrain.slopePct,
+      elevationMsnm: terrain.elevationMsnm,
       smapMoisturePct: report.humedad_suelo_estimada === 'SECO' ? 18.4 : 42.1,
-      ndvi: 0.64,
+      ndvi: terrain.ndvi,
       center: [lat, lng],
       bounds: [
         [lat - delta, lng - delta],
@@ -120,159 +139,179 @@ export default function FarmerReportDetailModal({
     };
 
     onLoadAsActiveParcel(newParcel);
-    onShowToast(`🎯 Parcela ${report.dispositivo_id} cargada en el Planificador`);
+    onShowToast(`🎯 Parcela ${report.dispositivo_id} cargada en el Planificador Territorial`);
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-zinc-200 overflow-hidden flex flex-col max-h-[90vh]">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-emerald-900 via-zinc-900 to-slate-900 p-4 text-white flex items-center justify-between border-b border-emerald-800 flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-lg shadow-xs">
-              🌱
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/65 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-zinc-200 overflow-hidden flex flex-col max-h-[92vh]">
+        {/* Photographic Banner Header (Identical style to Visor Side Lateral) */}
+        <div className="relative h-32 sm:h-36 overflow-hidden flex-shrink-0 group">
+          <img
+            src={cropData.img}
+            alt={cropData.label}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex flex-col justify-end p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                ✓ Ground-Truth Comunal • Supabase PostGIS
+              </span>
+              <span className="text-[10px] font-mono text-zinc-300 bg-black/40 px-2 py-0.5 rounded backdrop-blur-xs">
+                {dateFormatted}
+              </span>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider font-mono">
-                  Ground-Truth Comunal
-                </span>
-                <span className="text-[10px] bg-emerald-500/30 text-emerald-200 px-2 py-0.2 rounded-full font-semibold border border-emerald-400/40">
-                  Supabase PostGIS
-                </span>
-              </div>
-              <h2 className="text-sm sm:text-base font-bold text-white leading-tight">
-                Parcela Validada • {report.dispositivo_id}
-              </h2>
-            </div>
+
+            <h3 className="text-white font-bold text-base sm:text-lg leading-tight mt-1 drop-shadow-sm">
+              Parcela Validada • {report.dispositivo_id}
+            </h3>
+
+            <p className="text-[11px] text-zinc-300 font-mono mt-0.5 flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+              <span>{report.latitud.toFixed(4)}° S, {report.longitud.toFixed(4)}° W</span>
+              <span>•</span>
+              <span className="text-emerald-300 font-bold">{terrain.elevationMsnm} m s.n.m.</span>
+              <span>•</span>
+              <span className="truncate max-w-[150px]">{floor.shortName}</span>
+            </p>
           </div>
 
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition"
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition backdrop-blur-xs shadow-md"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Content Body */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 text-xs">
-          {/* Spatial Coords Banner */}
-          <div className="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-              <div>
-                <span className="font-bold text-zinc-900 block">Coordenadas en Terreno</span>
-                <span className="font-mono text-zinc-600 text-[11px]">
-                  {report.latitud.toFixed(5)}° S, {report.longitud.toFixed(5)}° W
-                </span>
-              </div>
+        {/* Ocean Warning if in Pacific */}
+        {terrain.elevationMsnm <= 0 && (
+          <div className="p-3 bg-sky-50 border-b border-sky-200 text-xs text-sky-950 flex items-center gap-2">
+            <span className="text-xl">🌊</span>
+            <span className="text-[11px]">
+              <strong>Zona Marina:</strong> Coordenadas ubicadas en aguas del Pacífico (0 m s.n.m.).
+            </span>
+          </div>
+        )}
+
+        {/* Unified Inspection Content (No redundant nested cards) */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 text-xs">
+          {/* 1. Spatial & Agronomic 4-Metric Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="bg-zinc-50 p-2.5 rounded-xl border border-zinc-200">
+              <span className="text-[10px] text-zinc-500 font-medium block">Superficie Lote</span>
+              <span className="font-mono font-bold text-zinc-950 text-sm block">1.25 ha</span>
+              <span className="text-[10px] text-zinc-500 font-mono">≈ 3.8 topos</span>
             </div>
-            <div className="text-right">
-              <span className="text-[10px] text-zinc-500 font-medium block">Fecha de Registro</span>
-              <span className="font-mono text-zinc-700 text-[11px]">{dateFormatted}</span>
+
+            <div className="bg-zinc-50 p-2.5 rounded-xl border border-zinc-200">
+              <span className="text-[10px] text-zinc-500 font-medium block">Pendiente</span>
+              <span className="font-mono font-bold text-zinc-950 text-sm block">{terrain.slopePct}%</span>
+              <span className="text-[10px] text-zinc-500">
+                {terrain.slopePct > 15 ? 'Ladera Media' : 'Ladera Suave'}
+              </span>
+            </div>
+
+            <div className="bg-zinc-50 p-2.5 rounded-xl border border-zinc-200">
+              <span className="text-[10px] text-zinc-500 font-medium block">Humedad SMAP</span>
+              <span className="font-mono font-bold text-blue-700 text-sm block">{terrain.smapMoisturePct}%</span>
+              <span className="text-[10px] text-zinc-500">Radar Orbital</span>
+            </div>
+
+            <div className="bg-zinc-50 p-2.5 rounded-xl border border-zinc-200">
+              <span className="text-[10px] text-zinc-500 font-medium block">Salud Edáfica</span>
+              <span className="font-mono font-bold text-emerald-800 text-sm block">{estimatedHealth} / 100</span>
+              <span className="text-[10px] text-emerald-700 font-semibold">Resiliencia</span>
             </div>
           </div>
 
-          {/* Triangulation Metrics Grid */}
-          <div className="grid grid-cols-2 gap-2.5">
-            {/* Crop Card */}
-            <div className="p-3 bg-white border border-zinc-200 rounded-xl space-y-1 shadow-xs">
-              <div className="flex items-center gap-1.5 text-zinc-500 text-[10px] font-semibold uppercase">
-                <Sprout className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Cultivo Cosechado</span>
+          {/* 2. Crop & Texture Profile Row with Thumbnail */}
+          <div className="p-3 bg-zinc-50/80 rounded-xl border border-zinc-200 space-y-2">
+            <div className="flex items-center justify-between pb-2 border-b border-zinc-200/80">
+              <div className="flex items-center gap-2.5">
+                <img
+                  src={cropData.img}
+                  alt={cropData.label}
+                  className="w-10 h-10 rounded-lg object-cover border border-zinc-300 shadow-2xs"
+                />
+                <div>
+                  <span className="text-[10px] text-zinc-500 font-medium block">Cultivo en Parcela</span>
+                  <span className="font-bold text-zinc-950 text-xs block">{cropData.label}</span>
+                </div>
               </div>
-              <span className="font-bold text-zinc-950 text-sm block">
-                {cropName}
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 font-semibold">
+                Campaña Validada
               </span>
-              <span className="text-[10px] text-zinc-500">Campaña agrícola reportada</span>
             </div>
 
-            {/* Health Score */}
-            <div className="p-3 bg-white border border-zinc-200 rounded-xl space-y-1 shadow-xs">
-              <div className="flex items-center gap-1.5 text-zinc-500 text-[10px] font-semibold uppercase">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Salud Edáfica Calculada</span>
+            {/* Ground Soil Moisture Diagnostic */}
+            <div className="flex items-center justify-between pt-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">{moistureInfo.icon}</span>
+                <div>
+                  <span className="font-bold text-zinc-900 block leading-tight">
+                    {moistureInfo.label}
+                  </span>
+                  <span className="text-[10px] text-zinc-500">{moistureInfo.desc}</span>
+                </div>
               </div>
-              <span className="font-mono font-bold text-emerald-800 text-sm block">
-                {estimatedHealth} / 100
-              </span>
-              <span className="text-[10px] text-emerald-700 font-semibold">
-                {estimatedHealth >= 75 ? 'Resiliencia Alta' : 'Resiliencia Moderada'}
+              <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${moistureInfo.badge}`}>
+                Prueba Puño
               </span>
             </div>
           </div>
 
-          {/* Soil Moisture Detail */}
-          <div className="p-3.5 bg-white border border-zinc-200 rounded-xl space-y-1.5 shadow-xs">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-zinc-900 flex items-center gap-1.5">
-                <CloudRain className="w-3.5 h-3.5 text-blue-600" />
-                Humedad de Campo (Prueba del Puño)
-              </span>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${moistureInfo.badge}`}>
-                {moistureInfo.label}
-              </span>
-            </div>
-            <p className="text-[11px] text-zinc-600 leading-snug">
-              {moistureInfo.desc}
-            </p>
-          </div>
-
-          {/* Phytosanitary and Weather Alerts */}
-          <div className="grid grid-cols-2 gap-2.5">
-            <div className={`p-3 rounded-xl border flex items-center gap-2.5 ${
+          {/* 3. Phytosanitary & Microclimate Direct Chips */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className={`p-2.5 rounded-xl border flex items-center gap-2 ${
               report.presencia_gorgojo
-                ? 'bg-rose-50 border-rose-300 text-rose-950'
-                : 'bg-emerald-50 border-emerald-200 text-emerald-950'
+                ? 'bg-rose-50/90 border-rose-300 text-rose-950'
+                : 'bg-emerald-50/90 border-emerald-200 text-emerald-950'
             }`}>
-              <div className="text-xl">
-                {report.presencia_gorgojo ? '⚠️' : '✓'}
-              </div>
+              <span className="text-lg">{report.presencia_gorgojo ? '⚠️' : '✓'}</span>
               <div>
-                <span className="font-bold block text-xs">
+                <span className="font-bold block text-xs leading-tight">
                   {report.presencia_gorgojo ? 'Gorgojo Detectado' : 'Sin Gorgojo'}
                 </span>
                 <span className="text-[10px] opacity-75">
-                  {report.presencia_gorgojo ? 'Requiere rotación con leguminosa' : 'Suelo sano para rotación'}
+                  {report.presencia_gorgojo ? 'Corte de ciclo biológico' : 'Sanidad óptima'}
                 </span>
               </div>
             </div>
 
-            <div className={`p-3 rounded-xl border flex items-center gap-2.5 ${
+            <div className={`p-2.5 rounded-xl border flex items-center gap-2 ${
               report.alerta_helada_observada
-                ? 'bg-amber-50 border-amber-300 text-amber-950'
+                ? 'bg-amber-50/90 border-amber-300 text-amber-950'
                 : 'bg-zinc-50 border-zinc-200 text-zinc-900'
             }`}>
-              <div className="text-xl">
-                {report.alerta_helada_observada ? '❄️' : '☀️'}
-              </div>
+              <span className="text-lg">{report.alerta_helada_observada ? '❄️' : '☀️'}</span>
               <div>
-                <span className="font-bold block text-xs">
+                <span className="font-bold block text-xs leading-tight">
                   {report.alerta_helada_observada ? 'Helada Observada' : 'Sin Helada'}
                 </span>
                 <span className="text-[10px] text-zinc-500">
-                  {report.alerta_helada_observada ? 'Escarcha en campo reportada' : 'Condición térmica estable'}
+                  {report.alerta_helada_observada ? 'Escarcha en campo' : 'Térmicamente estable'}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Cloud Sync Information */}
-          <div className="p-3 bg-sky-50/70 border border-sky-200 rounded-xl flex items-center justify-between text-[11px] text-sky-900">
+          {/* 4. Supabase Realtime Provenance */}
+          <div className="p-2.5 bg-sky-50/80 border border-sky-200 rounded-xl flex items-center justify-between text-[11px] text-sky-950">
             <div className="flex items-center gap-2">
-              <Database className="w-4 h-4 text-sky-700" />
-              <span>Sincronizado desde app móvil vía Supabase Realtime</span>
+              <Database className="w-3.5 h-3.5 text-sky-700 flex-shrink-0" />
+              <span>Sincronizado desde app móvil PWA vía Supabase Realtime</span>
             </div>
-            <span className="font-mono text-[10px] text-sky-700 bg-sky-100 px-2 py-0.5 rounded border border-sky-300 font-semibold">
+            <span className="font-mono text-[10px] text-sky-800 bg-sky-100 px-2 py-0.5 rounded border border-sky-300 font-semibold">
               UUID: {report.id.slice(0, 8)}...
             </span>
           </div>
         </div>
 
-        {/* Footer with Actions */}
-        <div className="bg-zinc-50 border-t border-zinc-200 p-4 flex items-center justify-between gap-3 flex-shrink-0">
+        {/* Footer Actions */}
+        <div className="bg-zinc-50 border-t border-zinc-200 p-3.5 sm:p-4 flex items-center justify-between gap-2.5 flex-shrink-0">
           <button
             type="button"
             onClick={onClose}
