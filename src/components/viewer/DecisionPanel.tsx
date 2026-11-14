@@ -25,7 +25,7 @@ import { ActiveParcel, generateQgisGeoJson, downloadGeoJsonFile } from '@/lib/ge
 import { RotationEngineResult, ReporteAgricultor } from '@/types';
 import { downloadWordReportFile, downloadJsonPlanFile } from '@/lib/planExport';
 import { generateHardwareProfile } from '@/lib/deviceProfile';
-import GroundTruthCalibratorModal from './GroundTruthCalibratorModal';
+import GroundTruthInteractiveWizard from './GroundTruthInteractiveWizard';
 
 interface DecisionPanelProps {
   activeParcel: ActiveParcel;
@@ -980,8 +980,8 @@ export default function DecisionPanel({
         </div>
       )}
 
-      {/* Ground-Truth 5+1 Field Calibrator Modal */}
-      <GroundTruthCalibratorModal
+      {/* Ground-Truth 5+1 Field Calibrator Stepped Wizard (Formulario Móvil con Kipu & Astro) */}
+      <GroundTruthInteractiveWizard
         isOpen={isGroundTruthModalOpen}
         onClose={() => setIsGroundTruthModalOpen(false)}
         activeParcel={activeParcel}

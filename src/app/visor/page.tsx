@@ -6,6 +6,7 @@ import Toast from '@/components/layout/Toast';
 import ModuleGuidePill from '@/components/layout/ModuleGuidePill';
 import MapViewer from '@/components/viewer/MapViewer';
 import DecisionPanel from '@/components/viewer/DecisionPanel';
+import FarmerReportDetailModal from '@/components/viewer/FarmerReportDetailModal';
 import { calculateRotationSequence } from '@/lib/rotationAlgorithm';
 import {
   fetchCropMatrix,
@@ -38,6 +39,7 @@ export default function TerraQuipuSuitePage() {
   const [climateMode, setClimateMode] = useState<'normal' | 'nino'>('normal');
   const [previousCrop, setPreviousCrop] = useState<string>('papa');
   const [priority, setPriority] = useState<string>('alimento');
+  const [selectedFarmerReport, setSelectedFarmerReport] = useState<ReporteAgricultor | null>(null);
 
   // Supabase states
   const [crops, setCrops] = useState<CropRecord[]>(DEFAULT_CROPS);
@@ -145,6 +147,7 @@ export default function TerraQuipuSuitePage() {
           previousCrop={previousCrop}
           recommendedCrop={rotationResult.campaigns[0].title}
           farmerReports={farmerReports}
+          onSelectFarmerReport={setSelectedFarmerReport}
         />
         <DecisionPanel
           activeParcel={activeParcel}
@@ -168,6 +171,16 @@ export default function TerraQuipuSuitePage() {
 
       {/* Floating System Architecture Guide - Only in Visor */}
       <ModuleGuidePill />
+
+      {/* Ground-Truth Farmer Report Detail Inspection Modal */}
+      <FarmerReportDetailModal
+        report={selectedFarmerReport}
+        onClose={() => setSelectedFarmerReport(null)}
+        onLoadAsActiveParcel={(parcel) => {
+          setActiveParcel(parcel);
+        }}
+        onShowToast={showToast}
+      />
     </div>
   );
 }

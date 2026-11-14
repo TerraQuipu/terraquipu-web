@@ -33,6 +33,7 @@ interface MapViewerProps {
   previousCrop?: string;
   recommendedCrop?: string;
   farmerReports?: ReporteAgricultor[];
+  onSelectFarmerReport?: (report: ReporteAgricultor) => void;
 }
 
 // Preset reference andenes in Chinchero
@@ -98,6 +99,7 @@ export default function MapViewer({
   previousCrop = 'Papa Nativa',
   recommendedCrop = 'Tarwi Chocho INIA-445',
   farmerReports = [],
+  onSelectFarmerReport,
 }: MapViewerProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -331,7 +333,7 @@ export default function MapViewer({
         const dateStr = new Date(r.created_at).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' });
 
         marker.bindPopup(`
-          <div style="font-family:system-ui,-apple-system,sans-serif;padding:6px;min-width:210px;">
+          <div style="font-family:system-ui,-apple-system,sans-serif;padding:6px;min-width:220px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
               <span style="font-size:10px;font-weight:bold;color:#047857;background:#ecfdf5;padding:2px 6px;border-radius:6px;border:1px solid #a7f3d0;">
                 ✓ Ground-Truth Comunal
@@ -350,16 +352,42 @@ export default function MapViewer({
             <div style="font-size:10px;color:${r.presencia_gorgojo ? '#b91c1c' : '#047857'};font-weight:bold;margin-bottom:6px;">
               ${r.presencia_gorgojo ? '⚠️ Alerta Gorgojo Detectada' : '✓ Sin plaga de gorgojo'}
             </div>
-            <div style="font-size:10px;color:#0369a1;background:#f0f9ff;padding:4px;border-radius:4px;border:1px solid #bae6fd;text-align:center;">
+            <div style="font-size:10px;color:#0369a1;background:#f0f9ff;padding:4px;border-radius:4px;border:1px solid #bae6fd;text-align:center;margin-bottom:6px;">
               📡 Sincronizado vía Supabase desde TerraQuipu Móvil
             </div>
+            <button onclick="window.__openFarmerReportDetail && window.__openFarmerReportDetail('${r.id}')" style="width:100%;padding:6px 10px;background:#059669;color:#ffffff;border:none;border-radius:8px;font-size:11px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;box-shadow:0 1px 2px rgba(0,0,0,0.15);">
+              🔍 Ver Ficha Detallada de Parcela
+            </button>
           </div>
         `);
+
+        marker.on('click', () => {
+          if (onSelectFarmerReport) {
+            onSelectFarmerReport(r);
+          }
+        });
 
         farmerMarkersRef.current.push(marker);
       });
     }).catch(() => {});
-  }, [farmerReports, showGroundTruth]);
+  }, [farmerReports, showGroundTruth, onSelectFarmerReport]);
+
+  // Global popup callback for inspecting farmer reports
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__openFarmerReportDetail = (reportId: string) => {
+        const found = farmerReports.find((x) => x.id === reportId);
+        if (found && onSelectFarmerReport) {
+          onSelectFarmerReport(found);
+        }
+      };
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        delete (window as any).__openFarmerReportDetail;
+      }
+    };
+  }, [farmerReports, onSelectFarmerReport]);
 
   // Sync drawMode attribute on map container for click handler
   useEffect(() => {
