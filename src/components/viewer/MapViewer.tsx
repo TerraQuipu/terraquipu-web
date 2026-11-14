@@ -23,6 +23,7 @@ import {
   generateQgisGeoJson,
   downloadGeoJsonFile,
 } from '@/lib/geoUtils';
+import { ReporteAgricultor } from '@/types';
 
 interface MapViewerProps {
   activeParcel: ActiveParcel;
@@ -31,6 +32,7 @@ interface MapViewerProps {
   onShowToast: (msg: string) => void;
   previousCrop?: string;
   recommendedCrop?: string;
+  farmerReports?: ReporteAgricultor[];
 }
 
 // Preset reference andenes in Chinchero
@@ -95,6 +97,7 @@ export default function MapViewer({
   onShowToast,
   previousCrop = 'Papa Nativa',
   recommendedCrop = 'Tarwi Chocho INIA-445',
+  farmerReports = [],
 }: MapViewerProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -102,6 +105,7 @@ export default function MapViewer({
   const presetLayersRef = useRef<Record<string, any>>({});
   const markerRef = useRef<any>(null);
   const tileLayersRef = useRef<{ osm: any; sat: any; topo: any } | null>(null);
+  const farmerMarkersRef = useRef<any[]>([]);
 
   // Drawing mode refs & state
   const [drawMode, setDrawMode] = useState<'none' | 'polygon' | 'point'>('none');
@@ -113,6 +117,7 @@ export default function MapViewer({
   // Base map & sensor layer states
   const [activeBaseMap, setActiveBaseMap] = useState<'osm' | 'sat' | 'topo'>('osm');
   const [activeNasaLayer, setActiveNasaLayer] = useState<'smap' | 'ndvi' | 'srtm'>('smap');
+  const [showGroundTruth, setShowGroundTruth] = useState<boolean>(true);
   const [mouseCoords, setMouseCoords] = useState<string>('-13.3934° S, -72.0498° W');
 
   // Keep drawPointsRef in sync
@@ -287,6 +292,74 @@ export default function MapViewer({
       }
     };
   }, []);
+
+  // Render farmer ground-truth markers from Supabase (reportes_agricultores)
+  useEffect(() => {
+    if (!mapInstanceRef.current || typeof window === 'undefined') return;
+
+    // Clear previous farmer markers
+    farmerMarkersRef.current.forEach((m) => {
+      try {
+        if (mapInstanceRef.current) mapInstanceRef.current.removeLayer(m);
+      } catch (e) {}
+    });
+    farmerMarkersRef.current = [];
+
+    if (!showGroundTruth || !farmerReports || farmerReports.length === 0) return;
+
+    import('leaflet').then(({ default: L }) => {
+      if (!mapInstanceRef.current) return;
+
+      farmerReports.forEach((r) => {
+        if (!r.latitud || !r.longitud) return;
+
+        const customIcon = L.divIcon({
+          className: 'farmer-report-marker',
+          html: `
+            <div style="background-color: #059669; width: 28px; height: 28px; border-radius: 50%; border: 2.5px solid #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; transition: transform 0.2s;">
+              🌱
+            </div>
+          `,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14],
+        });
+
+        const marker = L.marker([r.latitud, r.longitud], { icon: customIcon }).addTo(mapInstanceRef.current);
+
+        const cropLabel = r.cultivo_actual_id ? r.cultivo_actual_id.replace('_', ' ').toUpperCase() : 'PAPA NATIVA';
+        const moistureLabel = r.humedad_suelo_estimada || 'HUMEDAD_MEDIA';
+        const dateStr = new Date(r.created_at).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' });
+
+        marker.bindPopup(`
+          <div style="font-family:system-ui,-apple-system,sans-serif;padding:6px;min-width:210px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:10px;font-weight:bold;color:#047857;background:#ecfdf5;padding:2px 6px;border-radius:6px;border:1px solid #a7f3d0;">
+                ✓ Ground-Truth Comunal
+              </span>
+              <span style="font-size:10px;color:#64748b;font-family:monospace;">${dateStr}</span>
+            </div>
+            <strong style="color:#0f172a;font-size:13px;display:block;margin-bottom:3px;">
+              Parcela Validada • ${r.dispositivo_id}
+            </strong>
+            <div style="font-size:11px;color:#334155;margin-bottom:2px;">
+              Cultivo / Cosecha: <strong>${cropLabel}</strong>
+            </div>
+            <div style="font-size:11px;color:#334155;margin-bottom:3px;">
+              Humedad en campo: <strong>${moistureLabel}</strong>
+            </div>
+            <div style="font-size:10px;color:${r.presencia_gorgojo ? '#b91c1c' : '#047857'};font-weight:bold;margin-bottom:6px;">
+              ${r.presencia_gorgojo ? '⚠️ Alerta Gorgojo Detectada' : '✓ Sin plaga de gorgojo'}
+            </div>
+            <div style="font-size:10px;color:#0369a1;background:#f0f9ff;padding:4px;border-radius:4px;border:1px solid #bae6fd;text-align:center;">
+              📡 Sincronizado vía Supabase desde TerraQuipu Móvil
+            </div>
+          </div>
+        `);
+
+        farmerMarkersRef.current.push(marker);
+      });
+    }).catch(() => {});
+  }, [farmerReports, showGroundTruth]);
 
   // Sync drawMode attribute on map container for click handler
   useEffect(() => {
@@ -571,6 +644,28 @@ export default function MapViewer({
           >
             <Mountain className="w-3.5 h-3.5 text-amber-500" />
             <span>SRTM</span>
+          </button>
+
+          <button
+            onClick={() => {
+              const nextState = !showGroundTruth;
+              setShowGroundTruth(nextState);
+              onShowToast(nextState ? `Capa activa: Ground-Truth Comunal (${farmerReports.length} parcelas validadas)` : 'Capa Ground-Truth desactivada');
+            }}
+            className={`px-2 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1 ${
+              showGroundTruth
+                ? 'bg-emerald-800 text-white shadow-xs'
+                : 'text-zinc-700 hover:bg-zinc-100'
+            }`}
+            title="Mostrar parcelas validadas por agricultores en campo vía Supabase"
+          >
+            <span>🌱</span>
+            <span>Ground-Truth</span>
+            {farmerReports.length > 0 && (
+              <span className="text-[10px] px-1 py-0.2 bg-emerald-600 rounded-full text-white font-mono">
+                {farmerReports.length}
+              </span>
+            )}
           </button>
         </div>
       </div>

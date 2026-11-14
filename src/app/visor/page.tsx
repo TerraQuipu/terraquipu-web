@@ -3,14 +3,16 @@
 import React, { useState, useEffect } from 'react';
 import TopHeader from '@/components/layout/TopHeader';
 import Toast from '@/components/layout/Toast';
+import ModuleGuidePill from '@/components/layout/ModuleGuidePill';
 import MapViewer from '@/components/viewer/MapViewer';
 import DecisionPanel from '@/components/viewer/DecisionPanel';
 import { calculateRotationSequence } from '@/lib/rotationAlgorithm';
 import {
   fetchCropMatrix,
+  fetchFarmerReports,
   DEFAULT_CROPS,
 } from '@/lib/supabase';
-import { CropRecord } from '@/types';
+import { CropRecord, ReporteAgricultor } from '@/types';
 import { ActiveParcel } from '@/lib/geoUtils';
 
 const DEFAULT_PARCEL: ActiveParcel = {
@@ -39,6 +41,7 @@ export default function TerraQuipuSuitePage() {
 
   // Supabase states
   const [crops, setCrops] = useState<CropRecord[]>(DEFAULT_CROPS);
+  const [farmerReports, setFarmerReports] = useState<ReporteAgricultor[]>([]);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [dbStatus, setDbStatus] = useState<'connected' | 'syncing' | 'offline'>('connected');
 
@@ -60,15 +63,21 @@ export default function TerraQuipuSuitePage() {
       setIsSyncing(true);
       setDbStatus('syncing');
 
-      const cropsRes = await fetchCropMatrix();
+      const [cropsRes, reportsRes] = await Promise.all([
+        fetchCropMatrix(),
+        fetchFarmerReports(),
+      ]);
 
       if (cropsRes.data && cropsRes.data.length > 0) {
         setCrops(cropsRes.data);
       }
+      if (reportsRes.data && reportsRes.data.length > 0) {
+        setFarmerReports(reportsRes.data);
+      }
 
       setIsSyncing(false);
       setDbStatus(cropsRes.error ? 'offline' : 'connected');
-      showToast('Telemetría PostGIS, NASA SMAP y Supabase conectada');
+      showToast('Telemetría PostGIS, NASA SMAP y Ground-Truth Supabase conectada');
     }
 
     loadInitialData();
@@ -79,15 +88,21 @@ export default function TerraQuipuSuitePage() {
     setDbStatus('syncing');
     showToast('Sincronizando con Supabase en tiempo real...');
 
-    const cropsRes = await fetchCropMatrix();
+    const [cropsRes, reportsRes] = await Promise.all([
+      fetchCropMatrix(),
+      fetchFarmerReports(),
+    ]);
 
     if (cropsRes.data && cropsRes.data.length > 0) {
       setCrops(cropsRes.data);
     }
+    if (reportsRes.data && reportsRes.data.length > 0) {
+      setFarmerReports(reportsRes.data);
+    }
 
     setIsSyncing(false);
     setDbStatus(cropsRes.error ? 'offline' : 'connected');
-    showToast('Base de datos Supabase sincronizada');
+    showToast('Base de datos y reportes de agricultores sincronizados');
   };
 
   // Calculate dynamic rotation based on state and active parcel geometry
@@ -119,6 +134,7 @@ export default function TerraQuipuSuitePage() {
           onShowToast={showToast}
           previousCrop={previousCrop}
           recommendedCrop={rotationResult.campaigns[0].title}
+          farmerReports={farmerReports}
         />
         <DecisionPanel
           activeParcel={activeParcel}
@@ -138,6 +154,9 @@ export default function TerraQuipuSuitePage() {
 
       {/* Toast Notifications */}
       <Toast message={toastMessage} isVisible={toastVisible} />
+
+      {/* Floating System Architecture Guide - Only in Visor */}
+      <ModuleGuidePill />
     </div>
   );
 }
