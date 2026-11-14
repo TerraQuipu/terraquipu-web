@@ -1,13 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ExternalLink,
   ChevronRight,
   Sparkles,
   X,
   ArrowLeft,
-  CheckCircle2,
+  BookOpen,
+  Calendar,
+  ShieldAlert,
 } from 'lucide-react';
 import { playBubblePop, playQuestionChime } from '@/lib/soundEffects';
 
@@ -23,9 +25,10 @@ export interface Article {
   tags: string[];
   fullBody: string[];
   officialDocUrl: string;
+  heroImage: string;
   overlayBadge: string;
-  overlayBadgeColor: 'amber' | 'emerald' | 'sky';
-  colorScheme: 'amber' | 'emerald' | 'sky';
+  overlayBadgeColor: 'amber' | 'emerald' | 'sky' | 'purple';
+  colorScheme: 'amber' | 'emerald' | 'sky' | 'purple';
 }
 
 export const SCIENTIFIC_ARTICLES: Article[] = [
@@ -38,6 +41,7 @@ export const SCIENTIFIC_ARTICLES: Article[] = [
     source: 'ENFEN / SENAMHI',
     date: 'Octubre 2026',
     readTime: '3 min de lectura',
+    heroImage: '/images/andes_poster.jpg',
     summary:
       'Modelos acoplados océano-atmósfera confirman condiciones de El Niño débil a moderado, con anomalía térmica de +1.4°C y reducción del 24% en precipitaciones estacionales en valles del Cusco.',
     keyTakeaway:
@@ -60,6 +64,7 @@ export const SCIENTIFIC_ARTICLES: Article[] = [
     source: 'INIA Estación Illpa',
     date: 'Agosto 2026',
     readTime: '4 min de lectura',
+    heroImage: '/images/tarwi_chocho.jpg',
     summary:
       'Ensayos multianuales en valles andinos demuestran que el Tarwi desarrolla raíces pivotantes profundas, sobreviviendo con 320 mm de lluvia mientras fija +95 kg de N₂ natural por hectárea.',
     keyTakeaway:
@@ -82,6 +87,7 @@ export const SCIENTIFIC_ARTICLES: Article[] = [
     source: 'NASA SMAP / CIP',
     date: 'Julio 2026',
     readTime: '2 min de lectura',
+    heroImage: '/images/nasa_orbit_poster.jpg',
     summary:
       'El radiómetro satelital SMAP en banda L (1.4 GHz) mide la constante dieléctrica del suelo superficial. La validación en terreno con agricultores permite estimar la ventana de aporque óptima.',
     keyTakeaway:
@@ -95,6 +101,29 @@ export const SCIENTIFIC_ARTICLES: Article[] = [
       'Esto permite emitir avisos tempranos de siembra hasta 14 días antes de que los cultivos muestren síntomas visibles de marchitez por estrés hídrico.',
     ],
   },
+  {
+    id: 'cip-gorgojo-plaga',
+    category: 'SANIDAD VEGETAL CIP / FAO',
+    overlayBadge: '🪲 Bio',
+    overlayBadgeColor: 'purple',
+    title: 'Control Agroecológico del Gorgojo Andino ante Inviernos Cálidos',
+    source: 'Centro Internacional de la Papa (CIP)',
+    date: 'Septiembre 2026',
+    readTime: '3 min de lectura',
+    heroImage: '/images/papa_nativa.jpg',
+    summary:
+      'Temperaturas medias elevadas aceleran el ciclo del gorgojo andino (Premnotrypes spp.). La rotación con leguminosas y bio-repelentes de muña reducen la infestación en un 84% sin agrotóxicos.',
+    keyTakeaway:
+      'Rompe el ciclo del gorgojo: no siembres tubérculos sobre tubérculos. La rotación con haba o tarwi deja sin alimento a las larvas y sanea la parcela.',
+    tags: ['CIP', 'Gorgojo Andino', 'Bio-Control', 'Sanidad de Suelo'],
+    colorScheme: 'purple',
+    officialDocUrl: 'https://cipotato.org',
+    fullBody: [
+      'Estudios entomológicos del CIP confirman que la falta de heladas nocturnas severas en invierno permite que las larvas del gorgojo andino sobrevivan en el suelo.',
+      'Al intercalar barreras perimetrales de muña silvestre (rica en pulegona) y sustituir la papa por leguminosas en la siguiente campaña, la tasa de supervivencia de las larvas cae al 16%.',
+      'Esta práctica ancestral recomendada por Kipu protege la economía del productor y evita el envenenamiento del suelo con pesticidas sintéticos.',
+    ],
+  },
 ];
 
 interface AgroClimaNewsFeedProps {
@@ -104,8 +133,38 @@ interface AgroClimaNewsFeedProps {
 
 export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeedProps) {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const [isRendered, setIsRendered] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      setIsRendered(true);
+      // Wait a moment for mount, then animate slide-up
+      const timer = setTimeout(() => {
+        setIsAnimating(true);
+      }, 20);
+      return () => clearTimeout(timer);
+    } else {
+      setIsAnimating(false);
+      // Wait for slide-down animation (300ms) before unmounting
+      const timer = setTimeout(() => {
+        setIsRendered(false);
+        setSelectedArticle(null);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  const handleStartClose = () => {
+    playBubblePop();
+    setIsAnimating(false);
+    setTimeout(() => {
+      setSelectedArticle(null);
+      onClose();
+    }, 280);
+  };
+
+  if (!isRendered) return null;
 
   const handleOpenArticle = (article: Article) => {
     playBubblePop();
@@ -120,19 +179,21 @@ export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeed
     setSelectedArticle(null);
   };
 
-  const handleCloseAll = () => {
-    playBubblePop();
-    setSelectedArticle(null);
-    onClose();
-  };
-
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex flex-col justify-end animate-in fade-in duration-200">
-      {/* Click outside to close */}
-      <div className="fixed inset-0 -z-10" onClick={handleCloseAll} />
+    <div
+      className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex flex-col justify-end transition-opacity duration-300 ease-in-out ${
+        isAnimating ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+      }`}
+    >
+      {/* Click outside to close with slide-down animation */}
+      <div className="absolute inset-0 -z-10" onClick={handleStartClose} />
 
-      {/* Bottom Sheet Container */}
-      <div className="w-full max-w-md mx-auto bg-white rounded-t-[32px] border-t-2 border-slate-200 shadow-2xl max-h-[85vh] flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-300">
+      {/* Bottom Sheet Container with Smooth Slide-Up / Slide-Down */}
+      <div
+        className={`w-full max-w-md mx-auto bg-white rounded-t-[32px] border-t-2 border-slate-200 shadow-2xl max-h-[88vh] flex flex-col overflow-hidden transition-all duration-300 ease-out transform ${
+          isAnimating ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-90'
+        }`}
+      >
         {/* Pull Handle Bar */}
         <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mt-3 mb-1 shrink-0" />
 
@@ -158,7 +219,7 @@ export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeed
               </span>
               <button
                 type="button"
-                onClick={handleCloseAll}
+                onClick={handleStartClose}
                 className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm transition active:scale-95 cursor-pointer"
                 title="Cerrar boletines"
               >
@@ -179,7 +240,7 @@ export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeed
             </button>
             <button
               type="button"
-              onClick={handleCloseAll}
+              onClick={handleStartClose}
               className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm transition active:scale-95 cursor-pointer"
               title="Cerrar"
             >
@@ -191,25 +252,28 @@ export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeed
         {/* Scrollable Body Content */}
         <div className="px-4 py-3 space-y-3 overflow-y-auto flex-1 pb-8">
           {!selectedArticle ? (
-            /* List of 3 Rich Scientific Cards */
+            /* List of 4 Rich Scientific Cards */
             <div className="space-y-3">
               {SCIENTIFIC_ARTICLES.map((article) => {
                 const borderStyles = {
                   amber: 'border-amber-200 hover:border-amber-400 bg-white',
                   emerald: 'border-emerald-200 hover:border-emerald-400 bg-white',
                   sky: 'border-sky-200 hover:border-sky-400 bg-white',
+                  purple: 'border-purple-200 hover:border-purple-400 bg-white',
                 };
 
                 const badgeStyles = {
                   amber: 'bg-amber-100 text-amber-900 border-amber-300',
                   emerald: 'bg-emerald-100 text-emerald-900 border-emerald-300',
                   sky: 'bg-sky-100 text-sky-900 border-sky-300',
+                  purple: 'bg-purple-100 text-purple-900 border-purple-300',
                 };
 
                 const tagOverlayStyles = {
                   amber: 'bg-amber-500 text-white',
                   emerald: 'bg-emerald-600 text-white',
                   sky: 'bg-sky-600 text-white',
+                  purple: 'bg-purple-600 text-white',
                 };
 
                 return (
@@ -218,8 +282,8 @@ export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeed
                     onClick={() => handleOpenArticle(article)}
                     className={`p-3 rounded-2xl border-2 border-b-4 transition-all cursor-pointer active:border-b-2 active:translate-y-0.5 shadow-2xs flex items-center gap-3 ${borderStyles[article.colorScheme]}`}
                   >
-                    {/* Left Thumbnail Graphic */}
-                    <div className="w-16 h-16 rounded-xl relative overflow-hidden shrink-0 border border-slate-200 shadow-2xs">
+                    {/* Left Thumbnail Graphic / Image */}
+                    <div className="w-16 h-16 rounded-xl relative overflow-hidden shrink-0 border border-slate-200 shadow-2xs bg-slate-900">
                       {article.id === 'enfen-2026' && (
                         <svg className="w-full h-full" viewBox="0 0 64 64" fill="none">
                           <rect width="64" height="64" rx="12" fill="#0F172A" />
@@ -294,6 +358,17 @@ export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeed
                         </svg>
                       )}
 
+                      {article.id === 'cip-gorgojo-plaga' && (
+                        <div className="w-full h-full relative">
+                          <img
+                            src="/images/papa_nativa.jpg"
+                            alt="Papa Nativa CIP"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-purple-950/40" />
+                        </div>
+                      )}
+
                       {/* Top-Left Tag Overlay */}
                       <span
                         className={`absolute top-1 left-1 text-[9px] font-black px-1.5 py-0.2 rounded shadow-xs ${tagOverlayStyles[article.overlayBadgeColor]}`}
@@ -334,24 +409,40 @@ export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeed
               })}
             </div>
           ) : (
-            /* Full Article Expanded Reader */
-            <div className="space-y-4 animate-in fade-in duration-150">
-              {/* Category & Source Meta */}
-              <div className="flex items-center gap-2">
-                <span
-                  className={`text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border ${
-                    selectedArticle.colorScheme === 'amber'
-                      ? 'bg-amber-100 text-amber-900 border-amber-300'
-                      : selectedArticle.colorScheme === 'emerald'
-                      ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
-                      : 'bg-sky-100 text-sky-900 border-sky-300'
-                  }`}
-                >
-                  {selectedArticle.category}
-                </span>
-                <span className="text-[11px] text-slate-500 font-medium">
-                  {selectedArticle.source} • {selectedArticle.date}
-                </span>
+            /* Full Article Expanded Reader with Real Hero Image */
+            <div className="space-y-4 animate-in fade-in duration-200">
+              {/* Hero Banner Image */}
+              <div className="w-full h-44 sm:h-52 rounded-2xl overflow-hidden relative shadow-md bg-slate-900 shrink-0 border border-slate-200">
+                <img
+                  src={selectedArticle.heroImage}
+                  alt={selectedArticle.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent" />
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white">
+                  <span
+                    className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-xs ${
+                      selectedArticle.colorScheme === 'amber'
+                        ? 'bg-amber-600'
+                        : selectedArticle.colorScheme === 'emerald'
+                        ? 'bg-emerald-600'
+                        : selectedArticle.colorScheme === 'purple'
+                        ? 'bg-purple-600'
+                        : 'bg-sky-600'
+                    }`}
+                  >
+                    {selectedArticle.category}
+                  </span>
+                  <span className="text-[11px] font-mono text-slate-200 font-medium">
+                    {selectedArticle.readTime}
+                  </span>
+                </div>
+              </div>
+
+              {/* Source & Date Meta */}
+              <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium px-1">
+                <span>Fuente: {selectedArticle.source}</span>
+                <span>{selectedArticle.date}</span>
               </div>
 
               {/* Title */}

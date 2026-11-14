@@ -5,6 +5,7 @@ import { ClimaNasa, FarmerProfile } from '@/lib/types';
 import { Tractor } from 'lucide-react';
 import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
 import KipuCarouselBanner from '@/components/KipuCarouselBanner';
+import KipuDetailedInfoCard from '@/components/KipuDetailedInfoCard';
 
 interface InicioTabProps {
   profile: FarmerProfile;
@@ -32,7 +33,7 @@ export default function InicioTab({
   const currentArea = profile.areaHa !== undefined ? profile.areaHa : 1.0;
 
   return (
-    <div className="space-y-4 animate-in fade-in pb-12">
+    <div className="space-y-4 animate-in fade-in pb-16">
       {/* Encabezado Principal */}
       <div className="flex items-center justify-between pb-0.5">
         <div>
@@ -86,7 +87,7 @@ export default function InicioTab({
       </div>
 
       {/* 3. Chip Banner: 3 Boletines ENOS & INIA disponibles */}
-      <div className="flex justify-center pt-1 pb-1">
+      <div className="flex justify-center pt-0.5 pb-0.5">
         <button
           type="button"
           onClick={() => {
@@ -100,6 +101,9 @@ export default function InicioTab({
           <span className="text-slate-400 font-normal">↗</span>
         </button>
       </div>
+
+      {/* 4. Información Detallada de Kipu (Saberes Ancestrales & Ficha Agronómica) */}
+      <KipuDetailedInfoCard />
     </div>
   );
 }

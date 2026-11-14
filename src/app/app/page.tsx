@@ -494,15 +494,15 @@ export default function MobileApp() {
         )}
       </main>
 
-      {/* Floating News Button (Bottom-Left above navbar) */}
-      <div className="fixed bottom-20 left-3 sm:left-4 z-40">
+      {/* Floating News Button (Bottom-Right above navbar for ergonomic thumb access) */}
+      <div className="fixed bottom-20 right-3 sm:right-4 z-40">
         <button
           type="button"
           onClick={() => {
             playBubblePop();
             setIsNewsOpen(true);
           }}
-          className="relative w-12 h-12 rounded-2xl bg-emerald-900 hover:bg-emerald-800 border-2 border-emerald-700 text-white flex items-center justify-center shadow-lg transition transform active:scale-95 cursor-pointer group"
+          className="relative w-12 h-12 rounded-2xl bg-emerald-900 hover:bg-emerald-800 border-2 border-emerald-700 text-white flex items-center justify-center shadow-xl transition transform active:scale-95 cursor-pointer group hover:shadow-emerald-900/40"
           title="Abrir Boletines Científicos y Alertas ENOS"
         >
           <span className="text-xl">📰</span>
