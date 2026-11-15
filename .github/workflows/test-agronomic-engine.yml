@@ -1,0 +1,31 @@
+name: Tests del Motor Agroambiental TerraQuipu
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "src/lib/agroenvironmentalEngine.ts"
+      - "tests/**"
+      - ".github/workflows/test-agronomic-engine.yml"
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  test-engine:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del Repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Instalar dependencias
+        run: npm ci || npm install
+
+      - name: Ejecutar Suite de Pruebas A13 y Calendario Preventivo
+        run: node --experimental-strip-types tests/agroenvironmentalEngine.test.ts

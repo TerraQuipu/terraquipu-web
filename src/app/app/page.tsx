@@ -215,6 +215,36 @@ export default function MobileApp() {
     }).catch(() => {});
   };
 
+  const handleUpdateProfile = (updatedFields: Partial<FarmerProfile>) => {
+    setProfile((prev) => {
+      const next = { ...prev, ...updatedFields };
+      saveDeviceProfile(next);
+      return next;
+    });
+
+    // Sincronización transparente en segundo plano con Supabase para el Visor Territorial
+    if (typeof window !== 'undefined' && navigator.onLine) {
+      submitReportToCloud({
+        id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `rep-${Date.now()}`,
+        dispositivo_id: hardwareId,
+        cuenca_id: profile.cuencaId,
+        latitud: profile.lat,
+        longitud: profile.lon,
+        cultivo_actual_id: updatedFields.previousCropId || profile.previousCropId,
+        humedad_suelo_estimada: updatedFields.moisture || profile.moisture,
+        presencia_gorgojo: (updatedFields.pest || profile.pest) === 'gorgojo',
+        alerta_helada_observada: false,
+        textura_suelo: updatedFields.soilTexture || profile.soilTexture || 'franca',
+        pedregosidad: updatedFields.soilStoniness || profile.soilStoniness || 'profundo',
+        cobertura_ndvi_real: updatedFields.cropCoverNdvi || profile.cropCoverNdvi || 'barbecho',
+        fuente_agua: updatedFields.waterSource || profile.waterSource || 'auxilio',
+        ventana_siembra: updatedFields.sowingWindow || profile.sowingWindow || '2_4_semanas',
+        sincronizado_desde_outbox: false,
+        created_at: new Date().toISOString(),
+      }).catch(() => {});
+    }
+  };
+
   // Calculate live SMAP percentage from Supabase or cuenca defaults
   const smapPercent = climaNasa?.humedad_suelo_smap_m3m3
     ? Math.round(climaNasa.humedad_suelo_smap_m3m3 * 100)
@@ -404,20 +434,9 @@ export default function MobileApp() {
         {/* ================= TAB 4: DIAGNÓSTICO DE SUELO ================= */}
         {activeTab === 'tierra' && (
           <div className="space-y-4 animate-in fade-in">
-            <div className="flex items-center justify-between pb-0.5">
-              <div>
-                <h1 className="text-lg font-black text-slate-950 tracking-tight flex items-center gap-1.5">
-                  <span>🧪 Diagnóstico de Suelo</span>
-                </h1>
-                <p className="text-xs text-slate-500">
-                  Prueba táctil de campo, humedad edáfica y balance de nutrientes
-                </p>
-              </div>
-            </div>
-
-            {/* Kipu Agrónomo Mascot */}
-            <div className="flex items-center gap-3.5 pt-1 pb-1">
-              <div className="w-28 sm:w-32 h-36 sm:h-40 flex-shrink-0 relative flex items-center justify-center">
+            {/* Kipu Agrónomo Mascot con Globo de Diálogo (Mismo branding de Inicio y Clima) */}
+            <div className="flex items-center gap-3.5 pt-1 pb-1 min-h-[155px]">
+              <div className="w-28 sm:w-32 h-36 sm:h-40 shrink-0 relative flex items-center justify-center">
                 <img
                   src="/images/kipu_llama.png"
                   alt="Kipu Suelo"
@@ -426,11 +445,17 @@ export default function MobileApp() {
               </div>
               <div className="flex-1 relative bg-white border-2 border-emerald-600 border-b-4 border-b-emerald-700 rounded-3xl p-3.5 shadow-xs">
                 <div className="absolute top-7 -left-2.5 w-4 h-4 bg-white border-b-2 border-l-2 border-emerald-600 transform rotate-45"></div>
-                <span className="font-extrabold text-xs text-emerald-950 uppercase tracking-wide block mb-1">
-                  Kipu Agrónomo
-                </span>
-                <p className="text-xs text-slate-800 leading-relaxed font-sans font-medium">
-                  Tocar la tierra con tus manos te revela la estructura y humedad al instante. Realiza la prueba del puño para calibrar el riego:
+                <div className="flex items-center justify-between gap-1 mb-1.5">
+                  <span className="font-black text-xs text-emerald-950 uppercase tracking-wide">
+                    KIPU AGRÓNOMO
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                    Laboratorio
+                  </span>
+                </div>
+                <p className="text-xs text-black font-semibold leading-relaxed font-sans">
+                  Tocar la tierra con tus manos revela su estructura y humedad al instante. Realiza la prueba del puño para calibrar los sensores NASA con tu terreno:
                 </p>
               </div>
             </div>
@@ -442,6 +467,8 @@ export default function MobileApp() {
               profile={profile}
               climaNasa={climaNasa}
               onToast={triggerToast}
+              onUpdateProfile={handleUpdateProfile}
+              onOpenWizard={() => setShowOnboarding(true)}
             />
           </div>
         )}
@@ -449,20 +476,9 @@ export default function MobileApp() {
         {/* ================= TAB 5: SABERES ANDINOS ================= */}
         {activeTab === 'saberes' && (
           <div className="space-y-4 animate-in fade-in">
-            <div className="flex items-center justify-between pb-0.5">
-              <div>
-                <h1 className="text-lg font-black text-slate-950 tracking-tight flex items-center gap-1.5">
-                  <span>📚 Saberes Andinos</span>
-                </h1>
-                <p className="text-xs text-slate-500">
-                  Prácticas agrícolas incaicas validadas por la ciencia INIA y FAO
-                </p>
-              </div>
-            </div>
-
             {/* Kipu Sabio Mascot */}
-            <div className="flex items-center gap-3.5 pt-1 pb-1">
-              <div className="w-28 sm:w-32 h-36 sm:h-40 flex-shrink-0 relative flex items-center justify-center">
+            <div className="flex items-center gap-3.5 pt-1 pb-1 min-h-[155px]">
+              <div className="w-28 sm:w-32 h-36 sm:h-40 shrink-0 relative flex items-center justify-center">
                 <img
                   src="/images/kipu_llama.png"
                   alt="Kipu Saberes"
@@ -472,9 +488,9 @@ export default function MobileApp() {
               <div className="flex-1 relative bg-white border-2 border-purple-600 border-b-4 border-b-purple-700 rounded-3xl p-3.5 shadow-xs">
                 <div className="absolute top-7 -left-2.5 w-4 h-4 bg-white border-b-2 border-l-2 border-purple-600 transform rotate-45"></div>
                 <span className="font-extrabold text-xs text-purple-950 uppercase tracking-wide block mb-1">
-                  Kipu Sabio
+                  KIPU SABIO
                 </span>
-                <p className="text-xs text-slate-800 leading-relaxed font-sans font-medium">
+                <p className="text-xs text-black font-semibold leading-relaxed font-sans">
                   Nuestros abuelos perfeccionaron los andenes y las asociaciones de cultivos. Aplica estos saberes en tu chacra para no depender de químicos:
                 </p>
               </div>
@@ -487,17 +503,6 @@ export default function MobileApp() {
         {/* ================= TAB 6: AJUSTES & HARDWARE ================= */}
         {activeTab === 'ajustes' && (
           <div className="space-y-4 animate-in fade-in">
-            <div className="flex items-center justify-between pb-0.5">
-              <div>
-                <h1 className="text-lg font-black text-slate-950 tracking-tight flex items-center gap-1.5">
-                  <span>⚙️ Ajustes &amp; Hardware</span>
-                </h1>
-                <p className="text-xs text-slate-500">
-                  Identificador de dispositivo, comprobación GPS y recalibración
-                </p>
-              </div>
-            </div>
-
             <SettingsTab
               profile={profile}
               hardwareId={hardwareId}

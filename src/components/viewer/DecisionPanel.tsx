@@ -26,6 +26,7 @@ import { RotationEngineResult, ReporteAgricultor } from '@/types';
 import { downloadWordReportFile, downloadJsonPlanFile } from '@/lib/planExport';
 import { generateHardwareProfile } from '@/lib/deviceProfile';
 import GroundTruthInteractiveWizard from './GroundTruthInteractiveWizard';
+import AgroenvironmentalAssistant from './AgroenvironmentalAssistant';
 
 interface DecisionPanelProps {
   activeParcel: ActiveParcel;
@@ -61,8 +62,8 @@ export default function DecisionPanel({
   onShowToast,
   onCalibrationComplete,
 }: DecisionPanelProps) {
-  // Linear 3-Step Navigation: 'parcel' (1) | 'satellite' (2) | 'rotation' (3)
-  const [activeStep, setActiveStep] = useState<'parcel' | 'satellite' | 'rotation'>('parcel');
+  // Linear 4-Step Navigation: 'parcel' (1) | 'satellite' (2) | 'rotation' (3) | 'assistant' (4)
+  const [activeStep, setActiveStep] = useState<'parcel' | 'satellite' | 'rotation' | 'assistant'>('parcel');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [customName, setCustomName] = useState(activeParcel.name);
@@ -130,48 +131,62 @@ export default function DecisionPanel({
           </span>
         </div>
 
-        {/* 3 Sequential Step Tabs */}
-        <div className="grid grid-cols-3 gap-1.5 p-1 bg-zinc-100 rounded-xl border border-zinc-200 text-xs">
+        {/* 4 Sequential Step Tabs */}
+        <div className="grid grid-cols-4 gap-1 p-1 bg-zinc-100 rounded-xl border border-zinc-200 text-xs">
           <button
             onClick={() => setActiveStep('parcel')}
-            className={`py-1.5 px-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 transition ${
+            className={`py-1.5 px-1 rounded-lg font-semibold flex items-center justify-center gap-1 transition ${
               activeStep === 'parcel'
                 ? 'bg-zinc-900 text-white shadow-xs'
                 : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200/60'
             }`}
           >
-            <span className="w-4 h-4 rounded-full bg-zinc-700 text-white flex items-center justify-center text-[10px]">
+            <span className="w-3.5 h-3.5 rounded-full bg-zinc-700 text-white flex items-center justify-center text-[9px]">
               1
             </span>
-            <span className="truncate">Área Parcela</span>
+            <span className="truncate text-[11px]">Parcela</span>
           </button>
 
           <button
             onClick={() => setActiveStep('satellite')}
-            className={`py-1.5 px-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 transition ${
+            className={`py-1.5 px-1 rounded-lg font-semibold flex items-center justify-center gap-1 transition ${
               activeStep === 'satellite'
                 ? 'bg-zinc-900 text-white shadow-xs'
                 : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200/60'
             }`}
           >
-            <span className="w-4 h-4 rounded-full bg-zinc-700 text-white flex items-center justify-center text-[10px]">
+            <span className="w-3.5 h-3.5 rounded-full bg-zinc-700 text-white flex items-center justify-center text-[9px]">
               2
             </span>
-            <span className="truncate">Satélite NASA</span>
+            <span className="truncate text-[11px]">Satélite</span>
           </button>
 
           <button
             onClick={() => setActiveStep('rotation')}
-            className={`py-1.5 px-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 transition ${
+            className={`py-1.5 px-1 rounded-lg font-semibold flex items-center justify-center gap-1 transition ${
               activeStep === 'rotation'
                 ? 'bg-zinc-900 text-white shadow-xs'
                 : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200/60'
             }`}
           >
-            <span className="w-4 h-4 rounded-full bg-zinc-700 text-white flex items-center justify-center text-[10px]">
+            <span className="w-3.5 h-3.5 rounded-full bg-zinc-700 text-white flex items-center justify-center text-[9px]">
               3
             </span>
-            <span className="truncate">Plan Quipu</span>
+            <span className="truncate text-[11px]">Plan Quipu</span>
+          </button>
+
+          <button
+            onClick={() => setActiveStep('assistant')}
+            className={`py-1.5 px-1 rounded-lg font-bold flex items-center justify-center gap-1 transition ${
+              activeStep === 'assistant'
+                ? 'bg-emerald-800 text-white shadow-xs'
+                : 'text-emerald-800 hover:bg-emerald-100/60'
+            }`}
+          >
+            <span className="w-3.5 h-3.5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[9px]">
+              4
+            </span>
+            <span className="truncate text-[11px]">Asistente</span>
           </button>
         </div>
       </div>
@@ -876,6 +891,16 @@ export default function DecisionPanel({
               </button>
             </div>
           </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* PASO 4: ASISTENTE AGROAMBIENTAL TERRAQUIPU (CALENDARIO EL NIÑO)           */}
+        {/* ========================================================================= */}
+        {activeStep === 'assistant' && (
+          <AgroenvironmentalAssistant
+            activeParcel={activeParcel}
+            onShowToast={onShowToast}
+          />
         )}
       </div>
 

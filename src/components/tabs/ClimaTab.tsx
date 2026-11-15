@@ -9,6 +9,7 @@ import WeatherForecastCard from '@/components/WeatherForecastCard';
 import ElNinoSimulatorCard from '@/components/ElNinoSimulatorCard';
 import ClimaCarouselBanner from '@/components/ClimaCarouselBanner';
 import SanidadVegetalModal from '@/components/SanidadVegetalModal';
+import AgroenvironmentalAssistantModal from '@/components/AgroenvironmentalAssistantModal';
 
 interface ClimaTabProps {
   profile: FarmerProfile;
@@ -28,6 +29,7 @@ export default function ClimaTab({
   const [climaView, setClimaView] = useState<'index' | 'forecast' | 'elnino'>('index');
   const [isSanidadOpen, setIsSanidadOpen] = useState<boolean>(false);
   const [isNewsOpen, setIsNewsOpen] = useState<boolean>(false);
+  const [isAssistantOpen, setIsAssistantOpen] = useState<boolean>(false);
 
   const temp = climaNasa?.temp_media_c || 14.2;
   const rain = climaNasa?.precipitacion_mm || 0;
@@ -161,7 +163,48 @@ export default function ClimaTab({
                 </div>
               </div>
             </div>
+
+            {/* Tarjeta 4: Asistente Agroambiental & Calendario Preventivo El Niño */}
+            <div
+              onClick={() => {
+                playBubblePop();
+                setIsAssistantOpen(true);
+              }}
+              className="flex items-center gap-3.5 pt-1 pb-1 animate-in fade-in duration-300 min-h-[140px] px-1 group cursor-pointer"
+            >
+              <div className="w-28 sm:w-32 h-28 sm:h-32 rounded-2xl overflow-hidden shrink-0 shadow-md border border-slate-200/90 bg-slate-900">
+                <img
+                  src="/images/quipu_plan.jpg"
+                  alt="Asistente Agroambiental El Niño"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+
+              <div className="flex-1 min-w-0 space-y-1">
+                <h3 className="font-black text-base text-slate-950 group-hover:text-emerald-900 transition leading-snug">
+                  Asistente Agroambiental &amp; Calendario
+                </h3>
+                <p className="text-xs text-black font-semibold font-sans leading-relaxed">
+                  Calendario preventivo en 4 bloques temporales y rotación A13 para proteger tu suelo ante El Niño en Piuray-Qorimarca y Cusco.
+                </p>
+                <div className="pt-1">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs active:scale-95 transition">
+                    <span>Consultar Asistente</span>
+                    <ArrowRight className="w-3 h-3 text-emerald-200" />
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
+
+          {/* Modal del Asistente Agroambiental */}
+          <AgroenvironmentalAssistantModal
+            isOpen={isAssistantOpen}
+            onClose={() => setIsAssistantOpen(false)}
+            profile={profile}
+            climaNasa={climaNasa}
+            onToast={onToast}
+          />
         </div>
       )}
 
