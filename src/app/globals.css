@@ -88,3 +88,58 @@
   z-index: 10;
   background-color: #f4f4f5;
 }
+
+/* Bottom Sheet Native Spring Slide Animations */
+@keyframes sheetSlideUp {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes sheetSlideDown {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes backdropFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes backdropFadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-sheet-up {
+  animation: sheetSlideUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  will-change: transform;
+}
+
+.animate-sheet-down {
+  animation: sheetSlideDown 0.28s cubic-bezier(0.7, 0, 0.84, 0) forwards !important;
+  will-change: transform;
+}
+
+.animate-backdrop-in {
+  animation: backdropFadeIn 0.3s ease-out forwards !important;
+}
+
+.animate-backdrop-out {
+  animation: backdropFadeOut 0.28s ease-in forwards !important;
+}

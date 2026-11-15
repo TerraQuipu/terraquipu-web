@@ -134,31 +134,29 @@ interface AgroClimaNewsFeedProps {
 export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeedProps) {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [isRendered, setIsRendered] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setIsRendered(true);
-      // Wait a moment for mount, then animate slide-up
-      const timer = setTimeout(() => {
-        setIsAnimating(true);
-      }, 20);
-      return () => clearTimeout(timer);
-    } else {
-      setIsAnimating(false);
-      // Wait for slide-down animation (300ms) before unmounting
+      setIsClosing(false);
+    } else if (isRendered && !isClosing) {
+      setIsClosing(true);
       const timer = setTimeout(() => {
         setIsRendered(false);
+        setIsClosing(false);
         setSelectedArticle(null);
-      }, 300);
+      }, 280);
       return () => clearTimeout(timer);
     }
-  }, [isOpen]);
+  }, [isOpen, isRendered, isClosing]);
 
   const handleStartClose = () => {
     playBubblePop();
-    setIsAnimating(false);
+    setIsClosing(true);
     setTimeout(() => {
+      setIsRendered(false);
+      setIsClosing(false);
       setSelectedArticle(null);
       onClose();
     }, 280);
@@ -181,17 +179,51 @@ export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeed
 
   return (
     <div
-      className={`fixed inset-0 z-[60] bg-black/60 backdrop-blur-xs flex flex-col justify-end transition-opacity duration-300 ease-in-out ${
-        isAnimating ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+      className={`fixed inset-0 z-[60] bg-black/60 backdrop-blur-xs flex flex-col justify-end ${
+        isClosing ? 'animate-backdrop-out' : 'animate-backdrop-in'
       }`}
     >
-      {/* Click outside to close with slide-down animation */}
-      <div className="absolute inset-0 -z-10" onClick={handleStartClose} />
+      {/* Inline Keyframes for 100% Reliable Cross-Browser Slide-Up & Down */}
+      <style>{`
+        @keyframes sheetSlideUp {
+          0% { transform: translateY(100%); }
+          100% { transform: translateY(0%); }
+        }
+        @keyframes sheetSlideDown {
+          0% { transform: translateY(0%); }
+          100% { transform: translateY(100%); }
+        }
+        @keyframes backdropFadeIn {
+          0% { opacity: 0; }
+          100% { opacity: 1; }
+        }
+        @keyframes backdropFadeOut {
+          0% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+        .animate-sheet-up {
+          animation: sheetSlideUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+          will-change: transform;
+        }
+        .animate-sheet-down {
+          animation: sheetSlideDown 0.28s cubic-bezier(0.7, 0, 0.84, 0) forwards !important;
+          will-change: transform;
+        }
+        .animate-backdrop-in {
+          animation: backdropFadeIn 0.3s ease-out forwards !important;
+        }
+        .animate-backdrop-out {
+          animation: backdropFadeOut 0.28s ease-in forwards !important;
+        }
+      `}</style>
 
-      {/* Bottom Sheet Container with Smooth Slide-Up / Slide-Down */}
+      {/* Click outside to close with slide-down animation */}
+      <div className="absolute inset-0 -z-10 cursor-pointer" onClick={handleStartClose} />
+
+      {/* Bottom Sheet Container with Smooth Keyframe Slide-Up / Slide-Down */}
       <div
-        className={`w-full max-w-md mx-auto bg-white rounded-t-[32px] border-t-2 border-slate-200 shadow-2xl max-h-[88vh] flex flex-col overflow-hidden transition-all duration-300 ease-out transform ${
-          isAnimating ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-90'
+        className={`w-full max-w-md mx-auto bg-white rounded-t-[32px] border-t-2 border-slate-200 shadow-2xl max-h-[88vh] flex flex-col overflow-hidden ${
+          isClosing ? 'animate-sheet-down' : 'animate-sheet-up'
         }`}
       >
         {/* Pull Handle Bar */}
