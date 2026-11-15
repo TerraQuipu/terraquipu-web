@@ -13,6 +13,7 @@ import {
 import { playBubblePop, playQuestionChime } from '@/lib/soundEffects';
 import QuickCropSelector from './campaigns/QuickCropSelector';
 import CampaignSpotlightCard from './campaigns/CampaignSpotlightCard';
+import KipuFullScreenWizard from './KipuFullScreenWizard';
 
 interface QuipuRotationCardProps {
   cultivos: Cultivo[];
@@ -39,6 +40,7 @@ export default function QuipuRotationCard({
   const [priority, setPriority] = useState<'tierra' | 'mercado' | 'comida'>(initialPriority);
   const [activeKnot, setActiveKnot] = useState<1 | 2 | 3>(1);
   const [showOverviewTable, setShowOverviewTable] = useState<boolean>(false);
+  const [isWizardOpen, setIsWizardOpen] = useState<boolean>(false);
 
   // Dynamic recalibration alert state
   const [recalibrationNotice, setRecalibrationNotice] = useState<{
@@ -158,6 +160,57 @@ export default function QuipuRotationCard({
 
   return (
     <div className="space-y-3.5 animate-in fade-in">
+      {/* Modal Duolingo para Rotación */}
+      {isWizardOpen && (
+        <KipuFullScreenWizard
+          mode="rotation"
+          microcuencas={[]}
+          cultivos={cultivos}
+          initialProfile={{
+            previousCropId,
+            priority,
+            areaHa,
+          }}
+          onComplete={(newProfile) => {
+            setIsWizardOpen(false);
+            if (newProfile.previousCropId) {
+              handleSelectCrop(newProfile.previousCropId);
+            }
+            if (newProfile.priority) {
+              handleSelectPriority(newProfile.priority);
+            }
+            onToast('✓ Rotación de 3 campañas actualizada con Kipu');
+          }}
+          onCancel={() => setIsWizardOpen(false)}
+        />
+      )}
+
+      {/* Botón Hero Duolingo para Rotación */}
+      <button
+        type="button"
+        onClick={() => {
+          playBubblePop();
+          setIsWizardOpen(true);
+        }}
+        className="w-full p-3.5 rounded-2xl bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 border-2 border-emerald-500 border-b-4 border-b-emerald-950 text-white flex items-center justify-between shadow-xs active:border-b-2 active:translate-y-0.5 transition cursor-pointer"
+      >
+        <div className="flex items-center gap-2.5 text-left">
+          <span className="p-1.5 rounded-xl bg-white/20 text-lg">🌾</span>
+          <div>
+            <div className="text-xs font-black text-white flex items-center gap-1.5">
+              <span>Planificar Rotación con Kipu</span>
+              <span className="text-[9px] bg-emerald-300/30 text-emerald-100 font-extrabold px-1.5 py-0.2 rounded-full border border-emerald-300/40">
+                Duolingo
+              </span>
+            </div>
+            <p className="text-[11px] text-emerald-100/90 leading-tight">
+              Define tu cosecha previa y meta para optimizar 3 campañas
+            </p>
+          </div>
+        </div>
+        <ArrowRight className="w-4 h-4 text-emerald-200" />
+      </button>
+
       {/* 1. Selector Rápido Táctil (Sin dropdowns ni acordeones) */}
       <QuickCropSelector
         cultivos={cultivos}

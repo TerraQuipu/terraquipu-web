@@ -64,53 +64,55 @@ export default function WizardDialogHeader({
         </div>
       </div>
 
-      {/* Hero Mascot & Speech Bubble */}
-      <div className="flex items-center gap-3.5 pt-2 pb-3">
-        {/* Mascot Avatar (Astro or Kipu with happy reaction) */}
-        <div className="w-28 sm:w-32 h-36 sm:h-40 flex-shrink-0 relative flex items-center justify-center">
-          <img
-            src={
-              currentDialog.speaker === 'astro'
-                ? '/images/astro_satelin.png'
-                : isHappy
-                ? '/images/kipu_llama_happy.png'
-                : '/images/kipu_llama.png'
-            }
-            alt={currentDialog.name}
-            className={`w-full h-full object-contain filter drop-shadow-md transition-all duration-300 ${
-              isHappy ? 'scale-105' : 'scale-100'
-            }`}
-          />
-        </div>
-
-        {/* Comic Speech Bubble with Directional Tail */}
-        <div
-          className={`flex-1 relative bg-white border-2 border-b-4 rounded-3xl p-4 shadow-xs transition-colors duration-300 ${currentDialog.bubbleBorder}`}
-        >
-          <div
-            className={`absolute top-7 -left-2.5 w-4 h-4 bg-white border-b-2 border-l-2 transform rotate-45 ${
-              currentDialog.speaker === 'astro' ? 'border-sky-500' : 'border-emerald-600'
-            }`}
-          />
-
-          <div className="flex items-center justify-between gap-1 mb-1">
-            <span className="font-extrabold text-[11px] text-slate-900 uppercase tracking-wide">
-              {currentDialog.name}
-            </span>
-            <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${currentDialog.tagColor}`}>
-              {currentDialog.tag}
-            </span>
+      {/* Hero Mascot & Speech Bubble (Solo en pasos interactivos; en el paso final de conclusión WizardStepConclusion muestra la celebración) */}
+      {step < totalSteps && (
+        <div className="flex items-center gap-3.5 pt-2 pb-3">
+          {/* Mascot Avatar (Astro or Kipu with happy reaction) */}
+          <div className="w-28 sm:w-32 h-36 sm:h-40 flex-shrink-0 relative flex items-center justify-center">
+            <img
+              src={
+                currentDialog.speaker === 'astro'
+                  ? '/images/astro_satelin.png'
+                  : isHappy
+                  ? '/images/kipu_llama_happy.png'
+                  : '/images/kipu_llama.png'
+              }
+              alt={currentDialog.name}
+              className={`w-full h-full object-contain filter drop-shadow-md transition-all duration-300 ${
+                isHappy ? 'scale-105' : 'scale-100'
+              }`}
+            />
           </div>
 
-          <p className="text-xs sm:text-sm text-slate-800 leading-relaxed font-sans font-medium">
-            <TypewriterText
-              key={`${step}-${isHappy ? 'happy' : 'normal'}`}
-              text={isHappy ? '¡Excelente elección! Opción registrada con éxito.' : currentDialog.speech}
-              speed={15}
+          {/* Comic Speech Bubble with Directional Tail */}
+          <div
+            className={`flex-1 relative bg-white border-2 border-b-4 rounded-3xl p-4 shadow-xs transition-colors duration-300 ${currentDialog.bubbleBorder}`}
+          >
+            <div
+              className={`absolute top-7 -left-2.5 w-4 h-4 bg-white border-b-2 border-l-2 transform rotate-45 ${
+                currentDialog.speaker === 'astro' ? 'border-sky-500' : 'border-emerald-600'
+              }`}
             />
-          </p>
+
+            <div className="flex items-center justify-between gap-1 mb-1">
+              <span className="font-extrabold text-[11px] text-slate-900 uppercase tracking-wide">
+                {currentDialog.name}
+              </span>
+              <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${currentDialog.tagColor}`}>
+                {currentDialog.tag}
+              </span>
+            </div>
+
+            <p className="text-xs sm:text-sm text-slate-800 leading-relaxed font-sans font-medium">
+              <TypewriterText
+                key={`${step}-${isHappy ? 'happy' : 'normal'}`}
+                text={isHappy ? '¡Excelente elección! Opción registrada con éxito.' : currentDialog.speech}
+                speed={15}
+              />
+            </p>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

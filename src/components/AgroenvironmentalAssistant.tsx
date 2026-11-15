@@ -18,7 +18,8 @@ import {
   Users,
   Clock,
   Layers,
-  HelpCircle,
+  ArrowRight,
+  RotateCcw,
 } from 'lucide-react';
 import {
   ActiveParcel,
@@ -35,7 +36,10 @@ import {
   OrigenTextura,
   DisponibilidadPersonas,
   TiempoSemanal,
+  ResultadoAsistenteAgroambiental,
 } from '@/lib/agroenvironmentalEngine';
+import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
+import KipuFullScreenWizard from '@/components/KipuFullScreenWizard';
 
 interface AgroenvironmentalAssistantProps {
   activeParcel: ActiveParcel;
@@ -46,6 +50,9 @@ export default function AgroenvironmentalAssistant({
   activeParcel,
   onShowToast,
 }: AgroenvironmentalAssistantProps) {
+  // Wizard Modal state
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
+
   // Cuestionario inicial con valores por defecto basados en Piuray-Qorimarca
   const [cobertura, setCobertura] = useState<CoberturaSuelo>('rastrojo');
   const [cultivoActual, setCultivoActual] = useState<string>('papa');
@@ -65,7 +72,7 @@ export default function AgroenvironmentalAssistant({
   const [tiempoSemanal, setTiempoSemanal] = useState<TiempoSemanal>('algo');
 
   // Estado de secciones desplegables
-  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   // Predicción institucional V2 (SENAMHI / ENFEN)
@@ -105,7 +112,7 @@ export default function AgroenvironmentalAssistant({
   );
 
   // Ejecución dinámica reactiva del Asistente
-  const resultado = useMemo(() => {
+  const resultado: ResultadoAsistenteAgroambiental = useMemo(() => {
     const cuestionario: CuestionarioAgricultor = {
       esenciales: {
         cobertura,
@@ -153,347 +160,184 @@ export default function AgroenvironmentalAssistant({
     datosVisor,
   ]);
 
-  const handleSpeech = () => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      if (isSpeaking) {
-        setIsSpeaking(false);
-        return;
-      }
-      setIsSpeaking(true);
+  // Manejo de síntesis de voz (Quechua / Español)
+  const handleToggleVoice = () => {
+    playBubblePop();
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      onShowToast('Tu navegador no soporta síntesis de audio.');
+      return;
+    }
 
-      const textoLectura = `${resultado.estadoChacra}. ${resultado.estadoClima}. Para la rotación, el algoritmo recomienda sembrar ${resultado.recomendacionA13.cultivo_sugerido}. ${resultado.condicionalFinal}`;
-      const utterance = new SpeechSynthesisUtterance(textoLectura);
-      utterance.lang = 'es-PE';
-      utterance.rate = 0.92;
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
-      window.speechSynthesis.speak(utterance);
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    const textoVoz = `Allillanchu hermano agricultor. ${resultado.estadoChacra}. ${resultado.estadoClima}. Para rotación recomendamos ${resultado.recomendacionA13.cultivo_sugerido || 'Quinua'}. ${resultado.recomendacionA13.motivo}. ${resultado.condicionalFinal}`;
+
+    const utter = new SpeechSynthesisUtterance(textoVoz);
+    utter.lang = 'es-PE';
+    utter.rate = 0.95;
+    utter.onend = () => setIsSpeaking(false);
+    utter.onerror = () => setIsSpeaking(false);
+
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utter);
+    onShowToast('🔊 Reproduciendo diagnóstico de Kipu...');
+  };
+
+  const handleShare = () => {
+    playBubblePop();
+    if (navigator.share) {
+      navigator.share({
+        title: 'Calendario Preventivo TerraQuipu',
+        text: `${resultado.estadoChacra}. Rotación A13 recomendada: ${resultado.recomendacionA13.cultivo_sugerido}.`,
+        url: window.location.href,
+      }).catch(() => {});
     } else {
-      onShowToast('Síntesis de voz no disponible en este navegador');
+      navigator.clipboard.writeText(
+        `TerraQuipu: ${resultado.estadoChacra}\n${resultado.estadoClima}\nCultivo sugerido: ${resultado.recomendacionA13.cultivo_sugerido}\n${resultado.condicionalFinal}`
+      );
+      onShowToast('✓ Diagnóstico copiado al portapapeles');
     }
   };
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-200">
-      {/* Banner Principal del Asistente Agroambiental */}
-      <div className="bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-900 text-white p-4 rounded-2xl shadow-sm space-y-2.5">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                🌱
-              </span>
-              <h3 className="font-black text-sm tracking-tight text-white">
-                Asistente Agroambiental TerraQuipu
-              </h3>
-            </div>
-            <p className="text-[11px] text-zinc-300 mt-1 leading-snug">
-              Microcuenca Piuray-Qorimarca (Cusco) • Calendario preventivo y reducción de vulnerabilidad frente a El Niño.
-            </p>
-          </div>
+    <div className="space-y-4">
+      {/* ======================================================== */}
+      {/* Modal Duolingo Interactivo para El Niño                  */}
+      {/* ======================================================== */}
+      {isWizardOpen && (
+        <KipuFullScreenWizard
+          mode="elnino"
+          microcuencas={[]}
+          cultivos={[]}
+          initialProfile={{
+            parcelName: activeParcel.name,
+            areaHa: activeParcel.areaHa,
+            distrito: 'Chinchero',
+            altitude: activeParcel.elevationMsnm,
+          }}
+          activeParcel={activeParcel}
+          onComplete={(profile, customAgroResult) => {
+            setIsWizardOpen(false);
+            if (profile.cropCoverNdvi) {
+              setCobertura(
+                profile.cropCoverNdvi === 'sembrado'
+                  ? 'cultivo'
+                  : profile.cropCoverNdvi === 'pasto'
+                  ? 'pasto'
+                  : profile.cropCoverNdvi === 'suelo_desnudo'
+                  ? 'suelo_desnudo'
+                  : 'rastrojo'
+              );
+            }
+            if (profile.waterSource) {
+              setAgua(
+                profile.waterSource === 'secano'
+                  ? 'secano'
+                  : profile.waterSource === 'permanente'
+                  ? 'riego_permanente'
+                  : 'riego_auxilio'
+              );
+            }
+            if (profile.soilStoniness) {
+              setProfundidad(
+                profile.soilStoniness === 'pedregoso' ? 'muy_pedregoso' : 'profundo'
+              );
+            }
+            onShowToast('✓ Cuestionario completado y calendario preventivo generado');
+          }}
+          onCancel={() => setIsWizardOpen(false)}
+        />
+      )}
 
+      {/* Encabezado y Contexto Espacial de la Chacra */}
+      <div className="p-4 rounded-3xl bg-zinc-900 text-white space-y-3 shadow-md border border-zinc-800">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="p-2 rounded-2xl bg-emerald-500/20 text-emerald-400 text-lg">
+              🌾
+            </span>
+            <div>
+              <h2 className="text-sm font-black tracking-tight text-white flex items-center gap-1.5">
+                <span>Asistente Agroambiental TerraQuipu</span>
+                <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded-full border border-emerald-400/30">
+                  El Niño
+                </span>
+              </h2>
+              <p className="text-[11px] text-zinc-400">
+                {datosVisor.microcuenca} • Parcela: {datosVisor.nombre} ({datosVisor.areaHa} ha)
+              </p>
+            </div>
+          </div>
           <button
             type="button"
-            onClick={handleSpeech}
-            className={`p-2 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 ${
+            onClick={handleToggleVoice}
+            className={`p-2.5 rounded-2xl border transition cursor-pointer ${
               isSpeaking
-                ? 'bg-amber-500 text-black border-amber-400 animate-pulse'
-                : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+                ? 'bg-amber-500 text-zinc-950 border-amber-400 animate-pulse'
+                : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700'
             }`}
-            title="Escuchar recomendación en voz alta"
+            title="Escuchar en Quechua / Español"
           >
             <Volume2 className="w-4 h-4" />
-            <span className="hidden sm:inline">{isSpeaking ? 'Pausar' : 'Escuchar'}</span>
           </button>
         </div>
 
-        {/* 3 Fuentes Integradas Chips */}
-        <div className="grid grid-cols-3 gap-2 pt-1 text-[10px] font-mono">
-          <div className="p-2 rounded-xl bg-white/5 border border-white/10 text-center">
-            <span className="text-zinc-400 block text-[9px]">1. Visor Espacial</span>
-            <span className="font-bold text-emerald-300 truncate block">
-              {activeParcel.id} ({activeParcel.areaHa.toFixed(1)} ha, {activeParcel.slopePct}%)
-            </span>
+        {/* Telemetría Integrada (Fuente 1 + Fuente 3) */}
+        <div className="grid grid-cols-4 gap-1.5 text-center text-[10px] pt-1 border-t border-zinc-800">
+          <div className="bg-zinc-800/80 p-2 rounded-xl">
+            <span className="text-zinc-400 block">Pendiente</span>
+            <span className="text-white font-mono font-bold">{datosVisor.pendientePct}%</span>
           </div>
-          <div className="p-2 rounded-xl bg-white/5 border border-white/10 text-center">
-            <span className="text-zinc-400 block text-[9px]">2. Cuestionario</span>
-            <span className="font-bold text-sky-300 truncate block">
-              {cobertura} • {agua}
-            </span>
+          <div className="bg-zinc-800/80 p-2 rounded-xl">
+            <span className="text-zinc-400 block">Altitud</span>
+            <span className="text-white font-mono font-bold">{datosVisor.altitudMsnm}m</span>
           </div>
-          <div className="p-2 rounded-xl bg-white/5 border border-white/10 text-center">
-            <span className="text-zinc-400 block text-[9px]">3. NASA / SENAMHI</span>
-            <span className="font-bold text-amber-300 truncate block">
-              SMAP {activeParcel.smapMoisturePct?.toFixed(0)}% • T0 {prediccionV2.T0}
-            </span>
+          <div className="bg-zinc-800/80 p-2 rounded-xl">
+            <span className="text-zinc-400 block">NASA SMAP</span>
+            <span className="text-sky-300 font-mono font-bold">{estadoClimaticoV3.humedad_suelo_pct}%</span>
+          </div>
+          <div className="bg-zinc-800/80 p-2 rounded-xl">
+            <span className="text-zinc-400 block">NDVI Veg.</span>
+            <span className="text-emerald-400 font-mono font-bold">{datosVisor.ndvi}</span>
           </div>
         </div>
       </div>
 
-      {/* Botón para Desplegar / Editar el Cuestionario del Agricultor */}
-      <div className="bg-white border border-zinc-200 rounded-2xl shadow-xs overflow-hidden">
-        <button
-          type="button"
-          onClick={() => setShowQuestionnaire(!showQuestionnaire)}
-          className="w-full p-3.5 flex items-center justify-between text-left hover:bg-zinc-50 transition cursor-pointer"
-        >
-          <div className="flex items-center gap-2.5">
-            <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs font-bold">
-              ?
-            </span>
-            <div>
-              <span className="font-bold text-xs text-zinc-900 block">
-                Cuestionario de la Chacra (Parámetros Directos)
-              </span>
-              <span className="text-[11px] text-zinc-500">
-                La voz del agricultor tiene prioridad absoluta sobre las lecturas satelitales
+      {/* ======================================================== */}
+      {/* BOTÓN HERO DUOLINGO: Cuestionario Interactivo            */}
+      {/* ======================================================== */}
+      <button
+        type="button"
+        onClick={() => {
+          playBubblePop();
+          setIsWizardOpen(true);
+        }}
+        className="w-full p-4 rounded-3xl bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 border-2 border-emerald-500 border-b-4 border-b-emerald-950 text-white flex items-center justify-between shadow-md active:border-b-2 active:translate-y-0.5 transition cursor-pointer group"
+      >
+        <div className="flex items-center gap-3.5 text-left">
+          <span className="p-2.5 rounded-2xl bg-white/20 text-2xl backdrop-blur-xs flex-shrink-0 shadow-xs">
+            🌾
+          </span>
+          <div>
+            <div className="text-sm font-black text-white flex items-center gap-2">
+              <span>Cuestionario de Parcela con Kipu</span>
+              <span className="text-[10px] bg-emerald-300/30 text-emerald-100 font-extrabold px-2 py-0.5 rounded-full border border-emerald-300/40">
+                Estilo Duolingo
               </span>
             </div>
+            <p className="text-xs text-emerald-100/90 mt-0.5 leading-snug">
+              Cobertura vegetal, agua, obras andinas, historial A13 y mano de obra
+            </p>
           </div>
-          {showQuestionnaire ? (
-            <ChevronUp className="w-4 h-4 text-zinc-500" />
-          ) : (
-            <ChevronDown className="w-4 h-4 text-zinc-500" />
-          )}
-        </button>
-
-        {showQuestionnaire && (
-          <div className="p-4 border-t border-zinc-100 space-y-4 bg-zinc-50/50 text-xs animate-in fade-in duration-150">
-            {/* A. Parámetros Esenciales */}
-            <div className="space-y-2">
-              <span className="font-extrabold text-xs text-zinc-950 uppercase tracking-wider block">
-                A. Parámetros Esenciales
-              </span>
-
-              <div>
-                <label className="text-[11px] font-semibold text-zinc-700 block mb-1">
-                  Cobertura actual del suelo:
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-                  {(['cultivo', 'rastrojo', 'pasto', 'suelo_desnudo'] as CoberturaSuelo[]).map((c) => (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() => setCobertura(c)}
-                      className={`p-2 rounded-xl border text-center font-bold text-xs transition capitalize cursor-pointer ${
-                        cobertura === c
-                          ? 'bg-emerald-800 text-white border-emerald-900 shadow-xs'
-                          : 'bg-white hover:bg-zinc-100 text-zinc-800 border-zinc-300'
-                      }`}
-                    >
-                      {c === 'suelo_desnudo' ? '⚠️ Suelo Desnudo' : c}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {cobertura === 'cultivo' ? (
-                <div>
-                  <label className="text-[11px] font-semibold text-zinc-700 block mb-1">
-                    Cultivo que actualmente está creciendo:
-                  </label>
-                  <select
-                    value={cultivoActual}
-                    onChange={(e) => setCultivoActual(e.target.value)}
-                    className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
-                  >
-                    <option value="papa">Papa Nativa</option>
-                    <option value="maiz">Maíz Blanco Urubamba</option>
-                    <option value="haba">Haba Verde</option>
-                    <option value="tarwi">Tarwi / Chocho</option>
-                    <option value="quinua">Quinua Real</option>
-                    <option value="cebada">Cebada / Avena</option>
-                  </select>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="text-[11px] font-semibold text-zinc-700 block mb-1">
-                      Ventana estimada de siembra:
-                    </label>
-                    <input
-                      type="text"
-                      value={siembraEstimada}
-                      onChange={(e) => setSiembraEstimada(e.target.value)}
-                      placeholder="Ej. En 3 semanas"
-                      className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-medium"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-semibold text-zinc-700 block mb-1">
-                      Próximo cultivo deseado (intención):
-                    </label>
-                    <select
-                      value={cultivoProximo}
-                      onChange={(e) => setCultivoProximo(e.target.value)}
-                      className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
-                    >
-                      <option value="quinua">Quinua</option>
-                      <option value="papa">Papa</option>
-                      <option value="olluco">Olluco</option>
-                      <option value="oca">Oca</option>
-                      <option value="haba">Haba</option>
-                      <option value="tarwi">Tarwi</option>
-                    </select>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* B. Parámetros Complementarios */}
-            <div className="space-y-2 pt-2 border-t border-zinc-200">
-              <span className="font-extrabold text-xs text-zinc-950 uppercase tracking-wider block">
-                B. Parámetros Complementarios
-              </span>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                <div>
-                  <label className="text-[11px] font-semibold text-zinc-700 block mb-1">Agua:</label>
-                  <select
-                    value={agua}
-                    onChange={(e) => setAgua(e.target.value as any)}
-                    className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
-                  >
-                    <option value="secano">Secano (Solo lluvias)</option>
-                    <option value="riego_auxilio">Riego de auxilio</option>
-                    <option value="riego_permanente">Riego permanente</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-semibold text-zinc-700 block mb-1">Obras de conservación:</label>
-                  <select
-                    value={obras}
-                    onChange={(e) => setObras(e.target.value as any)}
-                    className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
-                  >
-                    <option value="buen_estado">Buen estado</option>
-                    <option value="mal_estado">Mal estado (requiere reparo)</option>
-                    <option value="ninguna">Ninguna obra</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-semibold text-zinc-700 block mb-1">Profundidad y piedras:</label>
-                  <select
-                    value={profundidad}
-                    onChange={(e) => setProfundidad(e.target.value as any)}
-                    className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
-                  >
-                    <option value="profundo">Profundo y suelto</option>
-                    <option value="algo_piedras">Algo de piedras</option>
-                    <option value="muy_pedregoso">Muy pedregoso (bloquea zanjas)</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Textura y Origen */}
-              <div className="grid grid-cols-2 gap-2 pt-1">
-                <div>
-                  <label className="text-[11px] font-semibold text-zinc-700 block mb-1">Textura del suelo:</label>
-                  <select
-                    value={texturaClase}
-                    onChange={(e) => setTexturaClase(e.target.value as any)}
-                    className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
-                  >
-                    <option value="arenosa">Arenosa (suelta)</option>
-                    <option value="franca">Franca (equilibrada)</option>
-                    <option value="arcillosa">Arcillosa (pesada)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-semibold text-zinc-700 block mb-1">Origen de la textura:</label>
-                  <select
-                    value={texturaOrigen}
-                    onChange={(e) => setTexturaOrigen(e.target.value as any)}
-                    className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
-                  >
-                    <option value="declarado">Declarado por el agricultor</option>
-                    <option value="prueba_del_punado">Estimado por prueba del puñado</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Historial agrícola */}
-              <div className="grid grid-cols-2 gap-2 pt-1">
-                <div>
-                  <label className="text-[11px] font-semibold text-zinc-700 block mb-1">
-                    Campaña anterior (vez anterior):
-                  </label>
-                  <select
-                    value={cultivoAnterior}
-                    onChange={(e) => setCultivoAnterior(e.target.value)}
-                    className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
-                  >
-                    <option value="papa">Papa</option>
-                    <option value="quinua">Quinua</option>
-                    <option value="olluco">Olluco</option>
-                    <option value="oca">Oca</option>
-                    <option value="haba">Haba</option>
-                    <option value="tarwi">Tarwi</option>
-                    <option value="descanso">Descanso / Barbecho</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-semibold text-zinc-700 block mb-1">
-                    Campaña previa a esa (hace 2 campañas):
-                  </label>
-                  <select
-                    value={cultivoAntepenultimo}
-                    onChange={(e) => setCultivoAntepenultimo(e.target.value)}
-                    className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
-                  >
-                    <option value="quinua">Quinua</option>
-                    <option value="papa">Papa</option>
-                    <option value="olluco">Olluco</option>
-                    <option value="oca">Oca</option>
-                    <option value="haba">Haba</option>
-                    <option value="tarwi">Tarwi</option>
-                    <option value="descanso">Descanso / Barbecho</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* C. Factores Adicionales */}
-            <div className="space-y-2 pt-2 border-t border-zinc-200">
-              <span className="font-extrabold text-xs text-zinc-950 uppercase tracking-wider block">
-                C. Disponibilidad de Trabajo (Ajusta volumen y esfuerzo)
-              </span>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="text-[11px] font-semibold text-zinc-700 block mb-1">Personas disponibles:</label>
-                  <select
-                    value={personas}
-                    onChange={(e) => setPersonas(e.target.value as any)}
-                    className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
-                  >
-                    <option value="solo_yo">Solo yo (1 persona)</option>
-                    <option value="dos_o_tres">2 o 3 personas</option>
-                    <option value="cuatro_o_mas">4 o más personas</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-semibold text-zinc-700 block mb-1">Tiempo semanal:</label>
-                  <select
-                    value={tiempoSemanal}
-                    onChange={(e) => setTiempoSemanal(e.target.value as any)}
-                    className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
-                  >
-                    <option value="poco">Poco tiempo</option>
-                    <option value="algo">Tiempo moderado</option>
-                    <option value="bastante">Bastante tiempo</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+        <div className="w-9 h-9 rounded-2xl bg-white/15 flex items-center justify-center shrink-0 group-hover:bg-white/25 transition">
+          <ArrowRight className="w-5 h-5 text-emerald-200 group-hover:translate-x-0.5 transition-transform" />
+        </div>
+      </button>
 
       {/* ===================================================================== */}
       {/* FORMATO OBLIGATORIO DE RESPUESTA DEL ASISTENTE                        */}
@@ -550,113 +394,201 @@ export default function AgroenvironmentalAssistant({
                   : '🍠'}
               </span>
               <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 block">
-                  Acción A13 • Rotación Óptima
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900 block">
+                  Recomendación A13: Rotación de Cultivos
                 </span>
-                <h4 className="font-black text-sm text-emerald-950">
-                  Cultivo Sugerido: {resultado.recomendacionA13.cultivo_sugerido}
-                </h4>
+                <span className="text-sm font-black text-emerald-950">
+                  Sembrar {resultado.recomendacionA13.cultivo_sugerido}
+                </span>
               </div>
             </div>
-
-            <span
-              className={`text-[10px] font-black px-2.5 py-1 rounded-full border ${
-                resultado.recomendacionA13.confianza === 'alta'
-                  ? 'bg-emerald-200 text-emerald-900 border-emerald-400'
-                  : resultado.recomendacionA13.confianza === 'media'
-                  ? 'bg-amber-100 text-amber-900 border-amber-300'
-                  : 'bg-zinc-200 text-zinc-800 border-zinc-300'
-              }`}
-            >
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-900 border border-emerald-300">
               Confianza {resultado.recomendacionA13.confianza}
             </span>
           </div>
 
-          <p className="text-xs text-zinc-800 leading-relaxed font-sans">
+          <p className="text-xs text-emerald-950 font-medium leading-relaxed">
             {resultado.recomendacionA13.motivo}
           </p>
 
           {resultado.recomendacionA13.diferenciaConIntencion && (
-            <div className="p-2.5 rounded-xl bg-white/80 border border-emerald-200 text-[11px] text-zinc-700">
-              <Info className="w-3.5 h-3.5 text-emerald-700 inline-block mr-1 align-text-bottom" />
-              <span>{resultado.recomendacionA13.diferenciaConIntencion}</span>
+            <div className="pt-1 text-[11px] text-amber-900 bg-amber-50 p-2 rounded-xl border border-amber-200">
+              <span className="font-bold">Nota de discrepancia: </span>
+              {resultado.recomendacionA13.diferenciaConIntencion}
             </div>
           )}
         </div>
       )}
 
-      {/* TABLA DEL CALENDARIO PREVENTIVO EN 4 BLOQUES */}
-      <div className="bg-white rounded-2xl border border-zinc-200 shadow-xs overflow-hidden space-y-2 p-3">
-        <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
-          <div className="flex items-center gap-1.5">
+      {/* CALENDARIO PREVENTIVO EN 4 BLOQUES */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-emerald-700" />
-            <h4 className="font-black text-xs text-zinc-950">
-              Calendario Preventivo de Actividades (4 Bloques)
-            </h4>
+            <h3 className="text-xs font-black text-zinc-950 uppercase tracking-wide">
+              Calendario Preventivo (4 Bloques Temporales)
+            </h3>
           </div>
-          <span className="text-[10px] font-mono text-zinc-500">
-            T0: {prediccionV2.T0}
+          <span className="text-[10px] text-zinc-500 font-mono">
+            {resultado.calendario.length} tareas programadas
           </span>
         </div>
 
-        {/* Tabla Responsiva Estandarizada */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-zinc-200 text-[10px] font-bold uppercase tracking-wider text-zinc-500 bg-zinc-50">
-                <th className="py-2 px-2.5">Fecha o bloque</th>
-                <th className="py-2 px-2.5">Acción</th>
-                <th className="py-2 px-2.5">Motivo</th>
-                <th className="py-2 px-2 text-center">Confianza</th>
-                <th className="py-2 px-2.5">Fuente</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100">
-              {resultado.calendario.map((item, idx) => (
-                <tr key={idx} className="hover:bg-zinc-50/70 transition">
-                  <td className="py-2.5 px-2.5 align-top whitespace-nowrap">
-                    <span className="font-extrabold text-zinc-900 block text-[11px]">
-                      {item.bloque}
-                    </span>
-                    <span className="text-[10px] text-zinc-500 font-mono">
-                      {item.fechaTexto}
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-2.5 align-top">
-                    <span className="font-black text-emerald-900 block text-xs">
-                      {item.accionCodigo}. {item.accionNombre}
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-2.5 align-top text-zinc-700 leading-snug text-[11px] max-w-xs">
+        <div className="space-y-2.5">
+          {resultado.calendario.map((item, idx) => (
+            <div
+              key={idx}
+              className="p-3 rounded-2xl bg-white border border-zinc-200 shadow-xs space-y-1.5 hover:border-emerald-300 transition"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-800 border border-zinc-200">
+                  {item.bloque}
+                </span>
+                <span className="text-[10px] font-mono text-zinc-500 font-bold">
+                  {item.fechaTexto}
+                </span>
+              </div>
+
+              <div className="flex items-start gap-2 pt-0.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-xs font-black text-zinc-900 leading-snug">
+                    {item.accionNombre}
+                  </h4>
+                  <p className="text-[11px] text-zinc-600 leading-relaxed mt-0.5">
                     {item.motivo}
-                  </td>
-                  <td className="py-2.5 px-2 align-top text-center whitespace-nowrap">
-                    <span
-                      className={`text-[9px] font-black px-2 py-0.5 rounded-full border ${
-                        item.confianza === 'alta'
-                          ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
-                          : item.confianza === 'media'
-                          ? 'bg-amber-100 text-amber-900 border-amber-300'
-                          : 'bg-zinc-100 text-zinc-800 border-zinc-300'
-                      }`}
-                    >
-                      {item.confianza}
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-2.5 align-top text-zinc-500 text-[10px] font-mono whitespace-nowrap">
-                    {item.fuente}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-[10px] text-zinc-400 pt-1 border-t border-zinc-100">
+                <span>Fuente: {item.fuente}</span>
+                <span className="font-mono text-zinc-500 font-bold">Código: {item.accionCodigo}</span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* LÍNEA FINAL OBLIGATORIA */}
-      <div className="p-3.5 rounded-2xl bg-emerald-50/90 border border-emerald-300/80 text-emerald-950 text-xs italic font-sans leading-relaxed shadow-xs flex items-start gap-2">
-        <Sparkles className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
-        <span>{resultado.condicionalFinal}</span>
+      {/* LÍNEA 5: Condicional de Cierre */}
+      <div className="p-3.5 rounded-2xl bg-zinc-100 border border-zinc-300 text-zinc-800 text-xs shadow-2xs flex items-start gap-2.5">
+        <Info className="w-4 h-4 text-zinc-600 shrink-0 mt-0.5" />
+        <div>
+          <strong className="block font-black text-zinc-900 mb-0.5">Condicional de Vigencia:</strong>
+          <p className="text-zinc-700 leading-relaxed font-sans">{resultado.condicionalFinal}</p>
+        </div>
+      </div>
+
+      {/* Acciones de Exportar y Compartir */}
+      <div className="grid grid-cols-2 gap-2 pt-1">
+        <button
+          type="button"
+          onClick={handleShare}
+          className="py-3 px-3 rounded-2xl bg-white border border-zinc-300 text-zinc-800 font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-zinc-50 active:scale-98 transition cursor-pointer shadow-2xs"
+        >
+          <Share2 className="w-3.5 h-3.5 text-zinc-600" />
+          <span>Compartir Ficha</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            playBubblePop();
+            window.print();
+          }}
+          className="py-3 px-3 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs flex items-center justify-center gap-1.5 active:scale-98 transition cursor-pointer shadow-xs"
+        >
+          <Download className="w-3.5 h-3.5 text-emerald-200" />
+          <span>Descargar Ficha PDF</span>
+        </button>
+      </div>
+
+      {/* Acordeón Opcional: Ajustes Manuales Rápidos */}
+      <div className="bg-white rounded-3xl border border-zinc-200 overflow-hidden shadow-xs">
+        <button
+          type="button"
+          onClick={() => {
+            playBubblePop();
+            setShowAdvancedSettings(!showAdvancedSettings);
+          }}
+          className="w-full p-3.5 flex items-center justify-between text-left hover:bg-zinc-50 transition cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-xs">⚙️</span>
+            <div>
+              <span className="font-bold text-xs text-zinc-900 block">
+                {showAdvancedSettings ? 'Ocultar Parámetros Directos' : 'Ver Parámetros Directos Calibrados'}
+              </span>
+              <span className="text-[10px] text-zinc-500">
+                Ajustar manualmente cobertura, agua u obras
+              </span>
+            </div>
+          </div>
+          {showAdvancedSettings ? (
+            <ChevronUp className="w-4 h-4 text-zinc-500" />
+          ) : (
+            <ChevronDown className="w-4 h-4 text-zinc-500" />
+          )}
+        </button>
+
+        {showAdvancedSettings && (
+          <div className="p-4 border-t border-zinc-100 space-y-3 bg-zinc-50/50 text-xs animate-in fade-in duration-150">
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-[10px] font-bold text-zinc-700 block mb-1">Cobertura:</label>
+                <select
+                  value={cobertura}
+                  onChange={(e) => setCobertura(e.target.value as any)}
+                  className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
+                >
+                  <option value="cultivo">Cultivo Creciendo</option>
+                  <option value="rastrojo">Rastrojo Protector</option>
+                  <option value="pasto">Pasto Natural</option>
+                  <option value="suelo_desnudo">Suelo Desnudo</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-zinc-700 block mb-1">Agua:</label>
+                <select
+                  value={agua}
+                  onChange={(e) => setAgua(e.target.value as any)}
+                  className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
+                >
+                  <option value="secano">Secano (Solo Lluvia)</option>
+                  <option value="riego_auxilio">Riego de Auxilio</option>
+                  <option value="riego_permanente">Riego Permanente</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-zinc-700 block mb-1">Obras de Conservación:</label>
+                <select
+                  value={obras}
+                  onChange={(e) => setObras(e.target.value as any)}
+                  className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
+                >
+                  <option value="buen_estado">Buen Estado</option>
+                  <option value="mal_estado">Mal Estado / Deterioradas</option>
+                  <option value="ninguna">Ninguna Obra</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-zinc-700 block mb-1">Personas / Trabajo:</label>
+                <select
+                  value={personas}
+                  onChange={(e) => setPersonas(e.target.value as any)}
+                  className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
+                >
+                  <option value="solo_yo">Solo yo (1 persona)</option>
+                  <option value="dos_o_tres">2 o 3 personas</option>
+                  <option value="cuatro_o_mas">4 o más personas</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

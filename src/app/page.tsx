@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   Satellite, 
+  Smartphone,
   Sprout, 
   ShieldCheck, 
   ArrowRight, 
@@ -188,20 +189,22 @@ export default function SuperpowerTerraquipuLanding() {
               GitHub
             </a>
 
-            {/* Emerald Pill Button to /app (TerraQuipu Móvil PWA) */}
+            {/* Outline Button to /app (TerraQuipu Móvil PWA) */}
             <Link 
               href="/app" 
-              className="px-4 py-2 rounded-full bg-emerald-500 text-white text-[13px] font-bold hover:bg-emerald-400 transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98]"
+              className="px-4 py-1.5 rounded-full border-2 border-emerald-500 bg-transparent text-emerald-400 hover:bg-emerald-900 hover:border-emerald-600 hover:text-white font-semibold text-xs transition-all shadow-sm flex items-center gap-1.5 active:scale-95 cursor-pointer group"
             >
-              <span>🌱 App Móvil</span>
+              <Smartphone className="w-3.5 h-3.5 text-emerald-400 group-hover:text-white transition-colors" />
+              <span>App Móvil</span>
             </Link>
 
             {/* White Pill Button to /visor */}
             <Link 
               href="/visor" 
-              className="px-4 py-2 rounded-full bg-white text-black text-[13px] font-semibold hover:bg-zinc-100 transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98]"
+              className="px-4 py-1.5 rounded-full bg-white text-black text-xs font-semibold hover:bg-zinc-100 transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98]"
             >
-              <span>🛰️ Visor Satelital</span>
+              <Satellite className="w-3.5 h-3.5 text-zinc-900" />
+              <span>Visor Satelital</span>
             </Link>
 
             {/* Circular 3x3 Grid Dots Icon Button */}
@@ -230,11 +233,21 @@ export default function SuperpowerTerraquipuLanding() {
         {/* Mobile Dropdown Drawer */}
         {mobileMenuOpen && (
           <div className="max-w-6xl mx-auto mt-2 p-5 rounded-3xl bg-[#1c1c1f]/95 backdrop-blur-2xl border border-white/15 text-white shadow-2xl flex flex-col gap-3 text-sm font-medium animate-in fade-in slide-in-from-top-2 duration-200">
-            <Link href="/app" onClick={() => setMobileMenuOpen(false)} className="bg-emerald-500 text-white font-bold text-center py-2.5 rounded-full shadow-sm hover:bg-emerald-400 transition">
-              🌱 Abrir App Móvil (/app)
+            <Link 
+              href="/app" 
+              onClick={() => setMobileMenuOpen(false)} 
+              className="border-2 border-emerald-500 bg-transparent text-emerald-400 hover:bg-emerald-900 hover:border-emerald-600 hover:text-white font-bold text-center py-2.5 rounded-full shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer group"
+            >
+              <Smartphone className="w-4 h-4 text-emerald-400 group-hover:text-white transition-colors" />
+              <span>Abrir App Móvil (/app)</span>
             </Link>
-            <Link href="/visor" onClick={() => setMobileMenuOpen(false)} className="bg-white text-black font-semibold text-center py-2.5 rounded-full shadow-sm hover:bg-zinc-200 transition">
-              🛰️ Lanzar Visor Satelital (/visor)
+            <Link 
+              href="/visor" 
+              onClick={() => setMobileMenuOpen(false)} 
+              className="bg-white text-black font-semibold text-center py-2.5 rounded-full shadow-sm hover:bg-zinc-200 transition flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Satellite className="w-4 h-4" />
+              <span>Lanzar Visor Satelital (/visor)</span>
             </Link>
             <a href="#como-funciona" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Cómo funciona</a>
             <a href="#diagnostico" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Diagnóstico 30m</a>
@@ -294,20 +307,22 @@ export default function SuperpowerTerraquipuLanding() {
               100+ indicadores agroclimáticos. Un plan diseñado para tu cuenca. Todo lo que necesitas para proteger tus cultivos frente a El Niño.
             </p>
 
-            {/* Exact Superpower Button Styles: Emerald App Pill + Solid White Visor Pill */}
+            {/* Exact Superpower Button Styles: Outline Emerald App Pill + Solid White Visor Pill */}
             <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <Link 
                 href="/app" 
-                className="px-7 py-3.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm transition shadow-[0_0_25px_rgba(16,185,129,0.35)] flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99]"
+                className="px-7 py-3.5 rounded-full border-2 border-emerald-500 bg-transparent text-emerald-300 hover:bg-emerald-900 hover:border-emerald-400 hover:text-white font-bold text-sm transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] flex items-center justify-center gap-2.5 hover:scale-[1.01] active:scale-[0.99] cursor-pointer group"
               >
-                <span>🌱 Abrir App Móvil PWA</span>
-                <ArrowRight className="w-4 h-4" />
+                <Smartphone className="w-4 h-4 text-emerald-400 group-hover:text-white transition-colors" />
+                <span>Abrir App Móvil PWA</span>
+                <ArrowRight className="w-4 h-4 text-emerald-400 group-hover:translate-x-0.5 group-hover:text-white transition-all" />
               </Link>
               <Link 
                 href="/visor" 
-                className="px-7 py-3.5 rounded-full bg-white text-black font-semibold text-sm hover:bg-zinc-100 transition shadow-[0_0_25px_rgba(255,255,255,0.25)] flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99]"
+                className="px-7 py-3.5 rounded-full bg-white text-black font-semibold text-sm hover:bg-zinc-100 transition shadow-[0_0_25px_rgba(255,255,255,0.25)] flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
               >
-                <span>🛰️ Visor Técnico GIS</span>
+                <Satellite className="w-4 h-4 text-zinc-900" />
+                <span>Visor Técnico GIS</span>
               </Link>
               <a 
                 href="#como-funciona" 
@@ -1094,10 +1109,18 @@ export default function SuperpowerTerraquipuLanding() {
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link 
-              href="/visor" 
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-wider hover:bg-zinc-200 transition shadow-2xl"
+              href="/app" 
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full border-2 border-emerald-500 bg-transparent text-emerald-300 hover:bg-emerald-900 hover:border-emerald-400 hover:text-white font-semibold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-2xl cursor-pointer group"
             >
-              Lanzar Visor Satelital
+              <Smartphone className="w-4 h-4 text-emerald-400 group-hover:text-white transition-colors" />
+              <span>Abrir App Móvil</span>
+            </Link>
+            <Link 
+              href="/visor" 
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-wider hover:bg-zinc-200 transition shadow-2xl flex items-center justify-center gap-2"
+            >
+              <Satellite className="w-4 h-4 text-zinc-900" />
+              <span>Lanzar Visor Satelital</span>
             </Link>
             <a 
               href="https://github.com/TerraQuipu" 
@@ -1132,8 +1155,18 @@ export default function SuperpowerTerraquipuLanding() {
           <div className="space-y-2">
             <div className="font-mono text-[11px] uppercase tracking-wider font-bold text-zinc-900">Plataforma</div>
             <ul className="space-y-1.5 text-xs">
-              <li><Link href="/app" className="hover:text-black transition font-semibold text-emerald-800">🌱 App Móvil PWA (/app)</Link></li>
-              <li><Link href="/visor" className="hover:text-black transition">🛰️ Visor GIS Satelital (/visor)</Link></li>
+              <li>
+                <Link href="/app" className="hover:text-emerald-950 transition font-semibold text-emerald-800 flex items-center gap-1.5">
+                  <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>App Móvil PWA (/app)</span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/visor" className="hover:text-black transition flex items-center gap-1.5 text-zinc-600">
+                  <Satellite className="w-3.5 h-3.5 text-zinc-500" />
+                  <span>Visor GIS Satelital (/visor)</span>
+                </Link>
+              </li>
               <li><a href="#como-funciona" className="hover:text-black transition">Cómo Funciona</a></li>
               <li><a href="#diagnostico" className="hover:text-black transition">Diagnóstico 30m</a></li>
               <li><a href="#quipu" className="hover:text-black transition">Plan Quipu de Rotación</a></li>

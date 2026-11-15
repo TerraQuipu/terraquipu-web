@@ -466,6 +466,8 @@ export default function MobileApp() {
               lon={profile.lon}
               profile={profile}
               climaNasa={climaNasa}
+              microcuencas={microcuencas}
+              cultivos={cultivos}
               onToast={triggerToast}
               onUpdateProfile={handleUpdateProfile}
             />
