@@ -94,6 +94,8 @@ export interface FarmerProfile {
   cropCoverNdvi?: 'sembrado' | 'barbecho' | 'pasto' | 'suelo_desnudo';
   waterSource?: 'secano' | 'auxilio' | 'permanente';
   sowingWindow?: 'esta_semana' | '2_4_semanas' | '1_2_meses' | 'proxima_campana';
+  pest?: 'sano' | 'gorgojo' | 'rancha';
+  pestLabel?: string;
 }
 
 export interface RotationRecommendation {

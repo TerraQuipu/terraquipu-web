@@ -468,7 +468,6 @@ export default function MobileApp() {
               climaNasa={climaNasa}
               onToast={triggerToast}
               onUpdateProfile={handleUpdateProfile}
-              onOpenWizard={() => setShowOnboarding(true)}
             />
           </div>
         )}

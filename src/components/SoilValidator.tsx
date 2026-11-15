@@ -11,6 +11,7 @@ import {
   Layers,
   ChevronDown,
   ChevronUp,
+  ArrowRight,
 } from 'lucide-react';
 import {
   playBubblePop,
@@ -26,6 +27,7 @@ interface SoilValidatorProps {
   profile?: FarmerProfile;
   climaNasa?: ClimaNasa | null;
   onToast: (msg: string) => void;
+  onUpdateProfile?: (updatedProfile: Partial<FarmerProfile>) => void;
 }
 
 export default function SoilValidator({
@@ -35,21 +37,73 @@ export default function SoilValidator({
   profile,
   climaNasa,
   onToast,
+  onUpdateProfile,
 }: SoilValidatorProps) {
+  // 1. Humedad edáfica
   const [moisture, setMoisture] = useState<'SECO' | 'HUMEDAD_MEDIA' | 'SATURADO'>(
     profile?.moisture || 'HUMEDAD_MEDIA'
   );
-  const [pest, setPest] = useState<'sano' | 'gorgojo' | 'rancha'>('sano');
+  // 2. Sanidad fitosanitaria
+  const [pest, setPest] = useState<'sano' | 'gorgojo' | 'rancha'>(
+    profile?.pest || 'sano'
+  );
+  // 3. Textura del suelo
+  const [soilTexture, setSoilTexture] = useState<'arena' | 'franca' | 'arcilla'>(
+    profile?.soilTexture || 'franca'
+  );
+  // 4. Pedregosidad y profundidad
+  const [soilStoniness, setSoilStoniness] = useState<'pedregoso' | 'profundo'>(
+    profile?.soilStoniness || 'profundo'
+  );
+  // 5. Cobertura NDVI
+  const [cropCoverNdvi, setCropCoverNdvi] = useState<'sembrado' | 'barbecho' | 'pasto' | 'suelo_desnudo'>(
+    profile?.cropCoverNdvi || 'barbecho'
+  );
+  // 6. Fuente de agua
+  const [waterSource, setWaterSource] = useState<'secano' | 'auxilio' | 'permanente'>(
+    profile?.waterSource || 'auxilio'
+  );
+  // 7. Ventana de siembra
+  const [sowingWindow, setSowingWindow] = useState<'esta_semana' | '2_4_semanas' | '1_2_meses' | 'proxima_campana'>(
+    profile?.sowingWindow || '2_4_semanas'
+  );
+  // 8. Cultivo previo
+  const [previousCropId, setPreviousCropId] = useState<string>(
+    profile?.previousCropId || 'papa_nativa'
+  );
+  // 9. Prioridad
+  const [priority, setPriority] = useState<'tierra' | 'comida' | 'mercado'>(
+    profile?.priority || 'tierra'
+  );
+
+  const [showMoreQuestions, setShowMoreQuestions] = useState(false);
   const [showMatrixDetails, setShowMatrixDetails] = useState(false);
   const [loading, setLoading] = useState(false);
   const [offlineCount, setOfflineCount] = useState(0);
   const [recentReports, setRecentReports] = useState<ReporteAgricultor[]>([]);
 
+  // Sincronizar estados locales si el profile exterior cambia
   useEffect(() => {
-    if (profile?.moisture) {
-      setMoisture(profile.moisture);
-    }
-  }, [profile?.moisture]);
+    if (profile?.moisture) setMoisture(profile.moisture);
+    if (profile?.pest) setPest(profile.pest);
+    if (profile?.soilTexture) setSoilTexture(profile.soilTexture);
+    if (profile?.soilStoniness) setSoilStoniness(profile.soilStoniness);
+    if (profile?.cropCoverNdvi) setCropCoverNdvi(profile.cropCoverNdvi);
+    if (profile?.waterSource) setWaterSource(profile.waterSource);
+    if (profile?.sowingWindow) setSowingWindow(profile.sowingWindow);
+    if (profile?.previousCropId) setPreviousCropId(profile.previousCropId);
+    if (profile?.priority) setPriority(profile.priority);
+  }, [
+    profile?.moisture,
+    profile?.pest,
+    profile?.soilTexture,
+    profile?.soilStoniness,
+    profile?.cropCoverNdvi,
+    profile?.waterSource,
+    profile?.sowingWindow,
+    profile?.previousCropId,
+    profile?.priority,
+  ]);
 
   useEffect(() => {
     loadOfflineQueue();
@@ -81,28 +135,6 @@ export default function SoilValidator({
     setRecentReports(data);
   };
 
-  const handleSelectMoisture = (val: 'SECO' | 'HUMEDAD_MEDIA' | 'SATURADO') => {
-    playBubblePop();
-    setMoisture(val);
-    const labels = {
-      SECO: 'Seca y Dura',
-      HUMEDAD_MEDIA: 'Húmeda y Mullida',
-      SATURADO: 'Encharcada / Barro',
-    };
-    onToast(`✓ Tierra calibrada: ${labels[val]}`);
-  };
-
-  const handleSelectPest = (val: 'sano' | 'gorgojo' | 'rancha') => {
-    playBubblePop();
-    setPest(val);
-    const labels = {
-      sano: 'Chacra Sana (Sin Plagas)',
-      gorgojo: 'Alerta: Gorgojo de los Andes detectado',
-      rancha: 'Alerta: Rancha / Tizón tardío detectado',
-    };
-    onToast(`✓ Estado sanitario: ${labels[val]}`);
-  };
-
   // Compute 10-Parameter Matrix & Ground-Truth Calibration
   const smapPercent = climaNasa?.humedad_suelo_smap_m3m3
     ? Math.round(climaNasa.humedad_suelo_smap_m3m3 * 100)
@@ -113,31 +145,144 @@ export default function SoilValidator({
   const tempMin = climaNasa?.temp_min_c ?? 3.8;
   const frostAlert = climaNasa?.alerta_helada || tempMin <= 2.0;
 
-  // Health Score Calculation based on ground-truth + satellite
+  // Cálculo del Índice de Salud Edáfica (0 - 100)
   const calculateHealthScore = (): number => {
-    let score = 70;
-    if (moisture === 'HUMEDAD_MEDIA') score += 15;
-    if (moisture === 'SECO') score -= 10;
-    if (moisture === 'SATURADO') score -= 5;
+    let score = 55;
+    if (moisture === 'HUMEDAD_MEDIA') score += 12;
+    else if (moisture === 'SECO') score -= 8;
+    else if (moisture === 'SATURADO') score -= 5;
+
     if (pest === 'sano') score += 10;
-    if (pest === 'gorgojo') score -= 20;
-    if (pest === 'rancha') score -= 15;
-    if (profile?.cropCoverNdvi === 'sembrado' || profile?.cropCoverNdvi === 'barbecho') score += 5;
-    return Math.max(20, Math.min(98, score));
+    else if (pest === 'gorgojo') score -= 18;
+    else if (pest === 'rancha') score -= 14;
+
+    if (soilTexture === 'franca') score += 10;
+    else if (soilTexture === 'arcilla') score += 4;
+    else if (soilTexture === 'arena') score -= 5;
+
+    if (soilStoniness === 'profundo') score += 8;
+    else score -= 4;
+
+    if (cropCoverNdvi === 'sembrado') score += 7;
+    else if (cropCoverNdvi === 'barbecho') score += 5;
+    else if (cropCoverNdvi === 'suelo_desnudo') score -= 10;
+
+    if (waterSource === 'permanente') score += 8;
+    else if (waterSource === 'auxilio') score += 5;
+
+    if (previousCropId.includes('haba') || previousCropId.includes('tarwi')) score += 8;
+    else if (previousCropId.includes('papa')) score -= 4;
+
+    return Math.max(15, Math.min(99, score));
   };
 
   const healthScore = calculateHealthScore();
 
-  // The 10 Parameters Matrix Definition
+  // Helper de sincronización automática en segundo plano
+  const autoSyncAnswer = (partial: Partial<FarmerProfile>, toastMsg: string) => {
+    playBubblePop();
+    if (onUpdateProfile) {
+      onUpdateProfile(partial);
+    }
+    onToast(toastMsg);
+  };
+
+  // Handlers para cada pregunta
+  const handleSelectMoisture = (val: 'SECO' | 'HUMEDAD_MEDIA' | 'SATURADO') => {
+    setMoisture(val);
+    const labels = {
+      SECO: 'Seca y Dura',
+      HUMEDAD_MEDIA: 'Húmeda y Mullida',
+      SATURADO: 'Encharcada / Barro',
+    };
+    autoSyncAnswer(
+      { moisture: val, moistureLabel: labels[val] },
+      `✓ Humedad calibrada: ${labels[val]}`
+    );
+  };
+
+  const handleSelectPest = (val: 'sano' | 'gorgojo' | 'rancha') => {
+    setPest(val);
+    const labels = {
+      sano: 'Chacra Sana (Sin Plagas)',
+      gorgojo: 'Gorgojo de los Andes detectado',
+      rancha: 'Rancha / Tizón tardío detectado',
+    };
+    autoSyncAnswer(
+      { pest: val, pestLabel: labels[val] },
+      `✓ Sanidad: ${labels[val]}`
+    );
+  };
+
+  const handleSelectTexture = (val: 'arena' | 'franca' | 'arcilla') => {
+    setSoilTexture(val);
+    const labels = {
+      franca: 'Franca (Equilibrada)',
+      arena: 'Arenosa (Drenante)',
+      arcilla: 'Arcillosa (Retentiva)',
+    };
+    autoSyncAnswer({ soilTexture: val }, `✓ Textura: ${labels[val]}`);
+  };
+
+  const handleSelectStoniness = (val: 'pedregoso' | 'profundo') => {
+    setSoilStoniness(val);
+    const labels = {
+      profundo: 'Tierra Profunda y Fértil',
+      pedregoso: 'Suelo Delgado / Pedregoso',
+    };
+    autoSyncAnswer({ soilStoniness: val }, `✓ Perfil: ${labels[val]}`);
+  };
+
+  const handleSelectCover = (val: 'sembrado' | 'barbecho' | 'pasto' | 'suelo_desnudo') => {
+    setCropCoverNdvi(val);
+    const labels = {
+      sembrado: 'Cultivo en Crecimiento',
+      barbecho: 'Descanso con Rastrojo',
+      pasto: 'Pasto Natural / Pradera',
+      suelo_desnudo: 'Tierra Pelada (Expuesta)',
+    };
+    autoSyncAnswer({ cropCoverNdvi: val }, `✓ Cobertura: ${labels[val]}`);
+  };
+
+  const handleSelectWater = (val: 'secano' | 'auxilio' | 'permanente') => {
+    setWaterSource(val);
+    const labels = {
+      secano: 'Solo Lluvia (Secano)',
+      auxilio: 'Canal de Auxilio / Turnos',
+      permanente: 'Riego Permanente Tecnificado',
+    };
+    autoSyncAnswer({ waterSource: val }, `✓ Riego: ${labels[val]}`);
+  };
+
+  const handleSelectSowingWindow = (val: 'esta_semana' | '2_4_semanas' | '1_2_meses' | 'proxima_campana') => {
+    setSowingWindow(val);
+    const labels = {
+      esta_semana: 'Esta semana',
+      '2_4_semanas': 'En 2 a 4 semanas',
+      '1_2_meses': 'En 1 a 2 meses',
+      proxima_campana: 'Próxima campaña',
+    };
+    autoSyncAnswer({ sowingWindow: val }, `✓ Ventana de Siembra: ${labels[val]}`);
+  };
+
+  // Matriz de Triangulación de 10 Parámetros
   const matrixParameters = [
     {
       id: 1,
       title: 'Humedad Superficial Edáfica',
       satellite: `NASA SMAP: ${smapPercent}% vol`,
       peruOfficial: 'SENAMHI Balance Hídrico',
-      fieldReport: moisture === 'HUMEDAD_MEDIA' ? 'Tierra Mullida (Puño)' : moisture === 'SECO' ? 'Tierra Seca / Polvo' : 'Suelo Encharcado',
+      fieldReport:
+        moisture === 'HUMEDAD_MEDIA'
+          ? 'Tierra Mullida (Puño)'
+          : moisture === 'SECO'
+          ? 'Tierra Seca / Polvo'
+          : 'Suelo Encharcado',
       status: moisture === 'HUMEDAD_MEDIA' ? 'Calibrado Óptimo' : 'Divergencia Detectada',
-      statusColor: moisture === 'HUMEDAD_MEDIA' ? 'bg-emerald-100 text-emerald-900 border-emerald-300' : 'bg-amber-100 text-amber-900 border-amber-300',
+      statusColor:
+        moisture === 'HUMEDAD_MEDIA'
+          ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+          : 'bg-amber-100 text-amber-900 border-amber-300',
       icon: '💧',
     },
     {
@@ -145,7 +290,13 @@ export default function SoilValidator({
       title: 'Capacidad de Retención de Humedad',
       satellite: 'SoilGrids Texture Map (30m)',
       peruOfficial: 'Estudio de Suelos INIA Cusco',
-      fieldReport: `Textura: ${profile?.soilTexture === 'franca' ? 'Franca (Equilibrada)' : profile?.soilTexture === 'arena' ? 'Arenosa (Drenaje Rápido)' : 'Arcillosa (Retentiva)'}`,
+      fieldReport: `Textura: ${
+        soilTexture === 'franca'
+          ? 'Franca (Equilibrada)'
+          : soilTexture === 'arena'
+          ? 'Arenosa (Drenante)'
+          : 'Arcillosa (Retentiva)'
+      }`,
       status: 'Consistente',
       statusColor: 'bg-emerald-100 text-emerald-900 border-emerald-300',
       icon: '🌱',
@@ -155,8 +306,8 @@ export default function SoilValidator({
       title: 'Pedregosidad y Profundidad Efectiva',
       satellite: 'SRTM / Copernicus DEM 30m',
       peruOfficial: 'Carta Geológica INGEMMET',
-      fieldReport: `Perfil: ${profile?.soilStoniness === 'profundo' ? 'Profundo y Suelto' : 'Pedregoso'}`,
-      status: 'Sin Restricción',
+      fieldReport: `Perfil: ${soilStoniness === 'profundo' ? 'Profundo y Fértil' : 'Pedregoso'}`,
+      status: soilStoniness === 'profundo' ? 'Sin Restricción' : 'Manejo de Terrazas',
       statusColor: 'bg-emerald-100 text-emerald-900 border-emerald-300',
       icon: '⛰️',
     },
@@ -165,9 +316,15 @@ export default function SoilValidator({
       title: 'Precipitación Acumulada Reciente',
       satellite: `NASA GPM IMERG: ${rainfallMm} mm`,
       peruOfficial: 'Pluviómetro SENAMHI',
-      fieldReport: moisture === 'SECO' ? 'Secano estricto sin lluvia' : 'Llovizna reciente en parcela',
+      fieldReport:
+        moisture === 'SECO'
+          ? 'Secano estricto sin lluvia'
+          : 'Humedad presente en parcela',
       status: rainfallMm < 5 ? 'Déficit Pluvial' : 'Aporte Pluvial Normal',
-      statusColor: rainfallMm < 5 ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-emerald-100 text-emerald-900 border-emerald-300',
+      statusColor:
+        rainfallMm < 5
+          ? 'bg-amber-100 text-amber-900 border-amber-300'
+          : 'bg-emerald-100 text-emerald-900 border-emerald-300',
       icon: '🌧️',
     },
     {
@@ -175,9 +332,12 @@ export default function SoilValidator({
       title: 'Riesgo de Helada Agronómica Nocturna',
       satellite: `NASA POWER Tmin: ${tempMin.toFixed(1)}°C`,
       peruOfficial: 'Boletín de Heladas SENAMHI',
-      fieldReport: frostAlert ? 'Alerta activa: Escarcha visible al amanecer' : 'Sin helada crítica hoy',
+      fieldReport: frostAlert ? 'Alerta activa: Escarcha visible' : 'Sin helada crítica hoy',
       status: frostAlert ? 'Alerta Crítica' : 'Zona Segura',
-      statusColor: frostAlert ? 'bg-red-100 text-red-900 border-red-300' : 'bg-emerald-100 text-emerald-900 border-emerald-300',
+      statusColor:
+        frostAlert
+          ? 'bg-red-100 text-red-900 border-red-300'
+          : 'bg-emerald-100 text-emerald-900 border-emerald-300',
       icon: '❄️',
     },
     {
@@ -185,9 +345,20 @@ export default function SoilValidator({
       title: 'Vigor Vegetal y Cobertura (NDVI)',
       satellite: 'Sentinel-2 ESA (NDVI: 0.62)',
       peruOfficial: 'Mapa MIDAGRI de Cobertura',
-      fieldReport: `Estado: ${profile?.cropCoverNdvi === 'sembrado' ? 'Cultivo en Crecimiento' : profile?.cropCoverNdvi === 'barbecho' ? 'Suelo en Barbecho' : 'Rastrojo y Mulch'}`,
-      status: 'Vegetación Activa',
-      statusColor: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+      fieldReport: `Estado: ${
+        cropCoverNdvi === 'sembrado'
+          ? 'Cultivo en Crecimiento'
+          : cropCoverNdvi === 'barbecho'
+          ? 'Suelo en Barbecho'
+          : cropCoverNdvi === 'pasto'
+          ? 'Pradera / Forraje'
+          : 'Suelo Desnudo'
+      }`,
+      status: cropCoverNdvi === 'suelo_desnudo' ? 'Riesgo Erosión' : 'Vegetación Protegida',
+      statusColor:
+        cropCoverNdvi === 'suelo_desnudo'
+          ? 'bg-amber-100 text-amber-900 border-amber-300'
+          : 'bg-emerald-100 text-emerald-900 border-emerald-300',
       icon: '🌿',
     },
     {
@@ -195,9 +366,18 @@ export default function SoilValidator({
       title: 'Disponibilidad de Agua y Riego',
       satellite: 'Sentinel-1 SAR Radar Superficie',
       peruOfficial: 'Junta de Usuarios de Agua',
-      fieldReport: `Riego: ${profile?.waterSource === 'permanente' ? 'Riego Permanente' : profile?.waterSource === 'auxilio' ? 'Riego por Auxilio' : 'Secano Estricto'}`,
-      status: profile?.waterSource === 'secano' ? 'Vulnerable a Sequía' : 'Asegurado por Canal',
-      statusColor: profile?.waterSource === 'secano' ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-emerald-100 text-emerald-900 border-emerald-300',
+      fieldReport: `Riego: ${
+        waterSource === 'permanente'
+          ? 'Riego Permanente'
+          : waterSource === 'auxilio'
+          ? 'Canal de Auxilio'
+          : 'Secano Estricto'
+      }`,
+      status: waterSource === 'secano' ? 'Vulnerable a Sequía' : 'Asegurado por Canal',
+      statusColor:
+        waterSource === 'secano'
+          ? 'bg-amber-100 text-amber-900 border-amber-300'
+          : 'bg-emerald-100 text-emerald-900 border-emerald-300',
       icon: '🌊',
     },
     {
@@ -205,7 +385,15 @@ export default function SoilValidator({
       title: 'Ventana Favorable de Siembra',
       satellite: 'Pronóstico Multimodel NOAA/NASA',
       peruOfficial: 'Calendario Agrícola INIA Cusco',
-      fieldReport: `Ventana: ${profile?.sowingWindow === 'esta_semana' ? 'Esta semana' : profile?.sowingWindow === '2_4_semanas' ? 'En 2 a 4 semanas' : profile?.sowingWindow === '1_2_meses' ? 'En 1 a 2 meses' : 'Próxima campaña'}`,
+      fieldReport: `Ventana: ${
+        sowingWindow === 'esta_semana'
+          ? 'Esta semana'
+          : sowingWindow === '2_4_semanas'
+          ? 'En 2 a 4 semanas'
+          : sowingWindow === '1_2_meses'
+          ? 'En 1 a 2 meses'
+          : 'Próxima campaña'
+      }`,
       status: 'Ventana Abierta',
       statusColor: 'bg-emerald-100 text-emerald-900 border-emerald-300',
       icon: '📅',
@@ -215,9 +403,13 @@ export default function SoilValidator({
       title: 'Balance de Nitrógeno y Predecesor',
       satellite: 'Sentinel-2 Índices de Clorofila',
       peruOfficial: 'Manual de Abonamiento INIA',
-      fieldReport: `Cosecha previa: ${profile?.previousCropName || 'Papa Nativa'}`,
-      status: profile?.previousCropId?.includes('papa') ? 'Déficit -70 kg N/ha' : 'Nitrógeno Positivo (+75 kg)',
-      statusColor: profile?.previousCropId?.includes('papa') ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-emerald-100 text-emerald-900 border-emerald-300',
+      fieldReport: `Predecesor: ${profile?.previousCropName || 'Papa Nativa'}`,
+      status: previousCropId.includes('papa')
+        ? 'Déficit -70 kg N/ha'
+        : 'Nitrógeno Positivo (+75 kg)',
+      statusColor: previousCropId.includes('papa')
+        ? 'bg-amber-100 text-amber-900 border-amber-300'
+        : 'bg-emerald-100 text-emerald-900 border-emerald-300',
       icon: '🧪',
     },
     {
@@ -225,13 +417,22 @@ export default function SoilValidator({
       title: 'Alerta Fitosanitaria y Rompe-Ciclo',
       satellite: 'MODIS Fenología Anomalías',
       peruOfficial: 'CIP & SENASA Vigilancia Gorgojo',
-      fieldReport: pest === 'sano' ? 'Chacra Sana (Sin Plagas)' : pest === 'gorgojo' ? 'Gorgojo detectado' : 'Rancha detectada',
+      fieldReport:
+        pest === 'sano'
+          ? 'Chacra Sana (Sin Plagas)'
+          : pest === 'gorgojo'
+          ? 'Gorgojo detectado'
+          : 'Rancha detectada',
       status: pest === 'sano' ? 'Sanidad Certificada' : 'Rotación Obligatoria',
-      statusColor: pest === 'sano' ? 'bg-emerald-100 text-emerald-900 border-emerald-300' : 'bg-red-100 text-red-900 border-red-300',
+      statusColor:
+        pest === 'sano'
+          ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+          : 'bg-red-100 text-red-900 border-red-300',
       icon: '🛡️',
     },
   ];
 
+  // Envío manual o forzado a la nube
   const handleSubmit = async () => {
     playBubblePop();
     setLoading(true);
@@ -242,11 +443,13 @@ export default function SoilValidator({
         in_situ_moisture: moisture,
         pest_status: pest,
         health_score: healthScore,
-        soil_texture: profile?.soilTexture || 'franca',
-        soil_stoniness: profile?.soilStoniness || 'profundo',
-        water_source: profile?.waterSource || 'secano',
-        sowing_window: profile?.sowingWindow || '2_4_semanas',
+        soil_texture: soilTexture,
+        soil_stoniness: soilStoniness,
+        crop_cover: cropCoverNdvi,
+        water_source: waterSource,
+        sowing_window: sowingWindow,
         previous_crop: profile?.previousCropName || 'Papa Nativa',
+        priority: priority,
       },
     };
 
@@ -255,17 +458,17 @@ export default function SoilValidator({
       dispositivo_id: getDeviceId(),
       latitud: lat,
       longitud: lon,
-      cultivo_actual_id: profile?.previousCropId || 'papa_nativa',
+      cultivo_actual_id: previousCropId,
       humedad_suelo_estimada: moisture,
       presencia_gorgojo: pest === 'gorgojo',
       alerta_helada_observada: frostAlert,
       notas_voz_url: JSON.stringify(calibrationSummary),
       sincronizado_desde_outbox: false,
-      textura_suelo: profile?.soilTexture || 'franca',
-      pedregosidad: profile?.soilStoniness || 'profundo',
-      cobertura_ndvi_real: profile?.cropCoverNdvi || 'barbecho',
-      fuente_agua: profile?.waterSource || 'secano',
-      ventana_siembra: profile?.sowingWindow || '2_4_semanas',
+      textura_suelo: soilTexture,
+      pedregosidad: soilStoniness,
+      cobertura_ndvi_real: cropCoverNdvi,
+      fuente_agua: waterSource,
+      ventana_siembra: sowingWindow,
       indice_salud: healthScore,
     };
 
@@ -273,7 +476,7 @@ export default function SoilValidator({
       const res = await submitReportToCloud(report);
       if (res.success) {
         playSuccessFanfare();
-        onToast('✅ Reporte de 10 parámetros validado y sincronizado con Supabase');
+        onToast('✅ Calibración sincronizada con Supabase');
         loadReportsFromDatabase();
         setLoading(false);
         return;
@@ -331,18 +534,18 @@ export default function SoilValidator({
         <div className="flex items-center justify-between pb-2 border-b border-slate-100">
           <div>
             <h3 className="font-black text-sm text-slate-950 flex items-center gap-1.5">
-              <span>🌱 Laboratorio Táctil de Suelo</span>
+              <span>🌱 Diagnóstico y Calibración de Parcela</span>
             </h3>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Triangulación orbital NASA con sabiduría campesina andina
+              Telemetría orbital NASA calibrada con sabiduría de campo andina
             </p>
           </div>
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
-            3 Fuentes
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
+            En Vivo
           </span>
         </div>
 
-        {/* 3 Fuentes como fila limpia de píldoras (sin cajitas anidadas) */}
+        {/* 3 Fuentes como fila limpia de píldoras */}
         <div className="grid grid-cols-3 gap-2 text-center text-[10px]">
           <div className="py-1.5 px-2 rounded-xl bg-sky-50 text-sky-950 font-bold border border-sky-200/80">
             <span className="block text-xs">🛰️</span>
@@ -373,12 +576,14 @@ export default function SoilValidator({
           </div>
           <div className="text-right">
             <span className="text-[10px] text-emerald-200/80 block">10 Parámetros</span>
-            <span className="text-xs font-mono font-bold text-white">Contrastado</span>
+            <span className="text-xs font-mono font-bold text-white">Sincronizados</span>
           </div>
         </div>
       </div>
 
-      {/* 2. Prueba del Puño (Humedad) */}
+      {/* ======================================================== */}
+      {/* PREGUNTA 1: Humedad del Suelo (Prueba del Puño)           */}
+      {/* ======================================================== */}
       <div className="bg-white rounded-3xl border-2 border-slate-200 p-4 space-y-3 shadow-xs">
         <span className="text-xs font-black text-slate-950 block tracking-tight">
           1. ¿Cómo sientes hoy la tierra al pisar tu chacra? (Prueba del Puño)
@@ -396,7 +601,7 @@ export default function SoilValidator({
                 key={m.id}
                 type="button"
                 onClick={() => handleSelectMoisture(m.id as any)}
-                className={`w-full p-3 rounded-2xl border-2 border-b-4 text-left transition-all flex items-center justify-between cursor-pointer ${
+                className={`w-full p-3.5 rounded-2xl border-2 border-b-4 text-left transition-all flex items-center justify-between cursor-pointer ${
                   isSelected
                     ? 'border-emerald-600 border-b-emerald-700 bg-emerald-50 text-emerald-950 font-bold ring-2 ring-emerald-500/20 active:border-b-2 active:translate-y-0.5'
                     : 'border-slate-200 border-b-slate-300 bg-white hover:border-slate-300 hover:bg-slate-50 active:border-b-2 active:translate-y-0.5 text-slate-800'
@@ -406,7 +611,7 @@ export default function SoilValidator({
                   <span className="text-2xl">{m.emoji}</span>
                   <div>
                     <div className="text-xs font-bold text-slate-900">{m.label}</div>
-                    <div className="text-[11px] text-slate-500 mt-0.5">{m.desc}</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">{m.desc}</div>
                   </div>
                 </div>
                 {isSelected && (
@@ -422,59 +627,387 @@ export default function SoilValidator({
           <Sparkles className="w-4 h-4 text-emerald-700 flex-shrink-0 mt-0.5" />
           <div>
             <strong className="text-emerald-950 block font-bold">Diagnóstico de Kipu:</strong>
-            {moisture === 'SECO' && 'Suelo con déficit hídrico. No siembres tubérculos hoy; aprovecha para preparar surcos y mulch vegetal.'}
-            {moisture === 'HUMEDAD_MEDIA' && 'Condiciones óptimas. La capacidad de campo es ideal para la inoculación biológica de raíces y siembra.'}
-            {moisture === 'SATURADO' && 'Exceso de agua edáfica. Abre zanjas de drenaje para evitar pudrición por bacterias anaeróbicas.'}
+            {moisture === 'SECO' &&
+              'Suelo con déficit hídrico. No siembres tubérculos hoy; aprovecha para preparar surcos y colocar mulch vegetal protector.'}
+            {moisture === 'HUMEDAD_MEDIA' &&
+              'Condiciones óptimas. La capacidad de campo es ideal para la inoculación biológica de raíces, surcado y siembra.'}
+            {moisture === 'SATURADO' &&
+              'Exceso de agua edáfica. Abre zanjas de drenaje o sangrías para evitar asfixia radicular y pudrición por bacterias anaeróbicas.'}
           </div>
         </div>
       </div>
 
-      {/* 3. Semáforo Fitosanitario */}
+      {/* ======================================================== */}
+      {/* PREGUNTA 2: Sanidad Fitosanitaria                        */}
+      {/* ======================================================== */}
       <div className="bg-white rounded-3xl border-2 border-slate-200 p-4 space-y-3 shadow-xs">
         <span className="text-xs font-black text-slate-950 block tracking-tight">
           2. ¿Observas alguna plaga en tus plantas o rastrojo?
         </span>
-        <div className="grid grid-cols-3 gap-2 text-center text-xs">
-          <button
-            type="button"
-            onClick={() => handleSelectPest('sano')}
-            className={`p-3 rounded-2xl border-2 border-b-4 font-bold transition-all cursor-pointer ${
-              pest === 'sano'
-                ? 'border-emerald-600 border-b-emerald-700 bg-emerald-50 text-emerald-950 ring-2 ring-emerald-500/20 active:border-b-2 active:translate-y-0.5'
-                : 'border-slate-200 border-b-slate-300 bg-white hover:bg-slate-50 text-slate-700 active:border-b-2 active:translate-y-0.5'
-            }`}
-          >
-            <div className="text-2xl mb-1">🛡️</div>
-            <div className="font-extrabold text-xs">Chacra Sana</div>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSelectPest('gorgojo')}
-            className={`p-3 rounded-2xl border-2 border-b-4 font-bold transition-all cursor-pointer ${
-              pest === 'gorgojo'
-                ? 'border-amber-500 border-b-amber-600 bg-amber-50 text-amber-950 ring-2 ring-amber-500/20 active:border-b-2 active:translate-y-0.5'
-                : 'border-slate-200 border-b-slate-300 bg-white hover:bg-slate-50 text-slate-700 active:border-b-2 active:translate-y-0.5'
-            }`}
-          >
-            <div className="text-2xl mb-1">🪲</div>
-            <div className="font-extrabold text-xs">Gorgojo</div>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSelectPest('rancha')}
-            className={`p-3 rounded-2xl border-2 border-b-4 font-bold transition-all cursor-pointer ${
-              pest === 'rancha'
-                ? 'border-red-500 border-b-red-600 bg-red-50 text-red-950 ring-2 ring-red-500/20 active:border-b-2 active:translate-y-0.5'
-                : 'border-slate-200 border-b-slate-300 bg-white hover:bg-slate-50 text-slate-700 active:border-b-2 active:translate-y-0.5'
-            }`}
-          >
-            <div className="text-2xl mb-1">🍂</div>
-            <div className="font-extrabold text-xs">Rancha</div>
-          </button>
+
+        <div className="space-y-2">
+          {[
+            {
+              id: 'sano',
+              label: 'Chacra Sana (Sin Plagas)',
+              desc: 'Follaje limpio, sin galerías en tubérculos ni manchas de hongos',
+              emoji: '🛡️',
+            },
+            {
+              id: 'gorgojo',
+              label: 'Gorgojo de los Andes',
+              desc: 'Presencia de Premnotrypes suturicallus en tubérculos o suelo',
+              emoji: '🪲',
+            },
+            {
+              id: 'rancha',
+              label: 'Rancha / Tizón Tardío',
+              desc: 'Manchas marrones o moho en hojas (Phytophthora infestans)',
+              emoji: '🍂',
+            },
+          ].map((p) => {
+            const isSelected = pest === p.id;
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => handleSelectPest(p.id as any)}
+                className={`w-full p-3.5 rounded-2xl border-2 border-b-4 text-left transition-all flex items-center justify-between cursor-pointer ${
+                  isSelected
+                    ? p.id === 'sano'
+                      ? 'border-emerald-600 border-b-emerald-700 bg-emerald-50 text-emerald-950 font-bold ring-2 ring-emerald-500/20 active:border-b-2 active:translate-y-0.5'
+                      : p.id === 'gorgojo'
+                      ? 'border-amber-500 border-b-amber-600 bg-amber-50 text-amber-950 font-bold ring-2 ring-amber-500/20 active:border-b-2 active:translate-y-0.5'
+                      : 'border-red-500 border-b-red-600 bg-red-50 text-red-950 font-bold ring-2 ring-red-500/20 active:border-b-2 active:translate-y-0.5'
+                    : 'border-slate-200 border-b-slate-300 bg-white hover:border-slate-300 hover:bg-slate-50 active:border-b-2 active:translate-y-0.5 text-slate-800'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{p.emoji}</span>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900">{p.label}</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">{p.desc}</div>
+                  </div>
+                </div>
+                {isSelected && (
+                  <CheckCircle2
+                    className={`w-5 h-5 flex-shrink-0 ${
+                      p.id === 'sano'
+                        ? 'text-emerald-700'
+                        : p.id === 'gorgojo'
+                        ? 'text-amber-700'
+                        : 'text-red-700'
+                    }`}
+                  />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Diagnóstico Inmediato de Kipu */}
+        <div className="p-3 rounded-2xl bg-emerald-50/90 border border-emerald-300 flex items-start gap-2.5 text-xs text-slate-900 font-medium">
+          <Sparkles className="w-4 h-4 text-emerald-700 flex-shrink-0 mt-0.5" />
+          <div>
+            <strong className="text-emerald-950 block font-bold">Diagnóstico de Kipu:</strong>
+            {pest === 'sano' &&
+              '¡Sanidad vegetal certificada! Mantén la biodiversidad sembrando barreras vivas de tarwi o muña en los linderos para bloquear vectores.'}
+            {pest === 'gorgojo' &&
+              'Alerta de gorgojo: Es imperativo rotar con leguminosas (haba o tarwi) para romper el ciclo biológico y erradicar larvas del suelo.'}
+            {pest === 'rancha' &&
+              'Alerta de rancha: Airea bien los surcos, evita el encharcamiento nocturno y aplica caldos minerales o purín de cola de caballo.'}
+          </div>
         </div>
       </div>
 
-      {/* 4. Matriz de Triangulación y Envío */}
+      {/* Controles para abrir el Asistente Paso a Paso o expandir preguntas avanzadas */}
+      <div className="space-y-2">
+        <button
+          type="button"
+          onClick={() => {
+            playBubblePop();
+            setShowMoreQuestions(!showMoreQuestions);
+          }}
+          className="w-full py-3 px-4 rounded-2xl bg-slate-50 hover:bg-slate-100 border-2 border-slate-200 border-b-4 border-b-slate-300 flex items-center justify-between text-xs font-extrabold text-slate-800 transition active:border-b-2 active:translate-y-0.5 cursor-pointer"
+        >
+          <span className="flex items-center gap-2">
+            <span>⚙️</span>
+            <span>{showMoreQuestions ? 'Ocultar Preguntas Avanzadas' : 'Ver Preguntas Avanzadas en esta pantalla'}</span>
+          </span>
+          {showMoreQuestions ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
+        </button>
+      </div>
+
+      {/* Preguntas Avanzadas (Opcionales para evitar scroll innecesario) */}
+      {showMoreQuestions && (
+        <div className="space-y-4 animate-in fade-in duration-200">
+          {/* PREGUNTA 3: Textura del Suelo */}
+          <div className="bg-white rounded-3xl border-2 border-slate-200 p-4 space-y-3 shadow-xs">
+            <span className="text-xs font-black text-slate-950 block tracking-tight">
+              3. ¿Qué textura tiene la tierra al amasarla húmeda? (Infiltración)
+            </span>
+            <div className="space-y-2">
+              {[
+                {
+                  id: 'franca',
+                  label: 'Franca (Mullida y Equilibrada)',
+                  desc: 'Forma bola suave y cinta corta; retiene humedad y aire en balance óptimo',
+                  emoji: '🌱',
+                },
+                {
+                  id: 'arena',
+                  label: 'Arenosa (Sustrato Suelto)',
+                  desc: 'Se desgrana fácilmente; el agua escurre muy rápido y retiene poco abono',
+                  emoji: '🏜️',
+                },
+                {
+                  id: 'arcilla',
+                  label: 'Arcillosa (Pesada y Pegajosa)',
+                  desc: 'Forma cilindro brillante; alta retención hídrica pero riesgo de compactación',
+                  emoji: '🌊',
+                },
+              ].map((t) => {
+                const isSelected = soilTexture === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => handleSelectTexture(t.id as any)}
+                    className={`w-full p-3.5 rounded-2xl border-2 border-b-4 text-left transition-all flex items-center justify-between cursor-pointer ${
+                      isSelected
+                        ? 'border-emerald-600 border-b-emerald-700 bg-emerald-50 text-emerald-950 font-bold ring-2 ring-emerald-500/20 active:border-b-2 active:translate-y-0.5'
+                        : 'border-slate-200 border-b-slate-300 bg-white hover:border-slate-300 hover:bg-slate-50 active:border-b-2 active:translate-y-0.5 text-slate-800'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{t.emoji}</span>
+                      <div>
+                        <div className="text-xs font-bold text-slate-900">{t.label}</div>
+                        <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">{t.desc}</div>
+                      </div>
+                    </div>
+                    {isSelected && <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Diagnóstico Inmediato de Kipu */}
+            <div className="p-3 rounded-2xl bg-emerald-50/90 border border-emerald-300 flex items-start gap-2.5 text-xs text-slate-900 font-medium">
+              <Sparkles className="w-4 h-4 text-emerald-700 flex-shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-emerald-950 block font-bold">Diagnóstico de Kipu:</strong>
+                {soilTexture === 'franca' &&
+                  'Suelo franco equilibrado. Retención y drenaje balanceados; respuesta óptima para tubérculos y leguminosas sin riesgo de asfixia radicular.'}
+                {soilTexture === 'arena' &&
+                  'Suelo arenoso de drenaje rápido. Se lava el nitrógeno con facilidad; incorpora abundante compost, biol o rastrojo de haba para aumentar materia orgánica.'}
+                {soilTexture === 'arcilla' &&
+                  'Suelo arcilloso pesado. Alta capacidad de retención mineral pero riesgo de sellado y compactación superficial; trabaja en surcos altos y camellones.'}
+              </div>
+            </div>
+          </div>
+
+          {/* PREGUNTA 4: Pedregosidad */}
+          <div className="bg-white rounded-3xl border-2 border-slate-200 p-4 space-y-3 shadow-xs">
+            <span className="text-xs font-black text-slate-950 block tracking-tight">
+              4. ¿Cómo es el perfil y fondo de tu chacra? (Profundidad)
+            </span>
+            <div className="space-y-2">
+              {[
+                {
+                  id: 'profundo',
+                  label: 'Tierra Profunda y Fértil',
+                  desc: 'Capa arable de más de 40 cm sin piedras mayores; permite raíces hondas',
+                  emoji: '🌾',
+                },
+                {
+                  id: 'pedregoso',
+                  label: 'Suelo Delgado / Pedregoso',
+                  desc: 'Mucha piedra superficial o roca madre cercana; requiere camellones altos',
+                  emoji: '🪨',
+                },
+              ].map((s) => {
+                const isSelected = soilStoniness === s.id;
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => handleSelectStoniness(s.id as any)}
+                    className={`w-full p-3.5 rounded-2xl border-2 border-b-4 text-left transition-all flex items-center justify-between cursor-pointer ${
+                      isSelected
+                        ? 'border-emerald-600 border-b-emerald-700 bg-emerald-50 text-emerald-950 font-bold ring-2 ring-emerald-500/20 active:border-b-2 active:translate-y-0.5'
+                        : 'border-slate-200 border-b-slate-300 bg-white hover:border-slate-300 hover:bg-slate-50 active:border-b-2 active:translate-y-0.5 text-slate-800'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{s.emoji}</span>
+                      <div>
+                        <div className="text-xs font-bold text-slate-900">{s.label}</div>
+                        <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">{s.desc}</div>
+                      </div>
+                    </div>
+                    {isSelected && <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Diagnóstico Inmediato de Kipu */}
+            <div className="p-3 rounded-2xl bg-emerald-50/90 border border-emerald-300 flex items-start gap-2.5 text-xs text-slate-900 font-medium">
+              <Sparkles className="w-4 h-4 text-emerald-700 flex-shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-emerald-950 block font-bold">Diagnóstico de Kipu:</strong>
+                {soilStoniness === 'profundo' &&
+                  'Capa arable profunda (>40 cm). Permite desarrollo vigoroso de raíces pivotantes y tubérculos sin restricciones físicas ni deformaciones.'}
+                {soilStoniness === 'pedregoso' &&
+                  'Suelo pedregoso y poco profundo. Esencial aporcar con camellones altos y terrazas para retener tierra fértil y proteger los tubérculos.'}
+              </div>
+            </div>
+          </div>
+
+          {/* PREGUNTA 5: Cobertura NDVI */}
+          <div className="bg-white rounded-3xl border-2 border-slate-200 p-4 space-y-3 shadow-xs">
+            <span className="text-xs font-black text-slate-950 block tracking-tight">
+              5. ¿Cuál es la cobertura actual de tu lote? (Vigor NDVI)
+            </span>
+            <div className="space-y-2">
+              {[
+                {
+                  id: 'sembrado',
+                  label: 'Cultivo Sembrado en Crecimiento',
+                  desc: 'Plantas creciendo vigorosas, follaje verde activo cubriendo el suelo',
+                  emoji: '🌱',
+                },
+                {
+                  id: 'barbecho',
+                  label: 'Descanso con Rastrojo',
+                  desc: 'Suelo protegido con rastrojos y residuos secos de la cosecha previa',
+                  emoji: '🍂',
+                },
+                {
+                  id: 'pasto',
+                  label: 'Pasto Natural / Pradera',
+                  desc: 'Cobertura densa de forraje andino o pasturas protectoras',
+                  emoji: '🌾',
+                },
+                {
+                  id: 'suelo_desnudo',
+                  label: 'Tierra Pelada (Sin Rastrojo)',
+                  desc: 'Suelo expuesto al sol y viento; alto riesgo de erosión y pérdida de nutrientes',
+                  emoji: '🏜️',
+                },
+              ].map((c) => {
+                const isSelected = cropCoverNdvi === c.id;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => handleSelectCover(c.id as any)}
+                    className={`w-full p-3.5 rounded-2xl border-2 border-b-4 text-left transition-all flex items-center justify-between cursor-pointer ${
+                      isSelected
+                        ? 'border-emerald-600 border-b-emerald-700 bg-emerald-50 text-emerald-950 font-bold ring-2 ring-emerald-500/20 active:border-b-2 active:translate-y-0.5'
+                        : 'border-slate-200 border-b-slate-300 bg-white hover:border-slate-300 hover:bg-slate-50 active:border-b-2 active:translate-y-0.5 text-slate-800'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{c.emoji}</span>
+                      <div>
+                        <div className="text-xs font-bold text-slate-900">{c.label}</div>
+                        <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">{c.desc}</div>
+                      </div>
+                    </div>
+                    {isSelected && <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Diagnóstico Inmediato de Kipu */}
+            <div className="p-3 rounded-2xl bg-emerald-50/90 border border-emerald-300 flex items-start gap-2.5 text-xs text-slate-900 font-medium">
+              <Sparkles className="w-4 h-4 text-emerald-700 flex-shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-emerald-950 block font-bold">Diagnóstico de Kipu:</strong>
+                {cropCoverNdvi === 'sembrado' &&
+                  'Cultivo activo con vigor vegetativo óptimo. Intercepción solar adecuada para fotosíntesis y protección del suelo vivo.'}
+                {cropCoverNdvi === 'barbecho' &&
+                  'Suelo en descanso con rastrojo. Los residuos vegetales nutren la fauna edáfica y evitan la pérdida de humedad por evaporación.'}
+                {cropCoverNdvi === 'pasto' &&
+                  'Cobertura de pradera andina. Excelente anclaje radicular para prevenir la erosión pluvial en laderas pronunciadas.'}
+                {cropCoverNdvi === 'suelo_desnudo' &&
+                  'Suelo desnudo vulnerable. Riesgo crítico de erosión por viento y lluvia; cubre con mulch o prepara siembra inmediata.'}
+              </div>
+            </div>
+          </div>
+
+          {/* PREGUNTA 6: Fuente de Agua */}
+          <div className="bg-white rounded-3xl border-2 border-slate-200 p-4 space-y-3 shadow-xs">
+            <span className="text-xs font-black text-slate-950 block tracking-tight">
+              6. ¿De dónde se abastece de agua esta parcela? (Seguridad Hídrica)
+            </span>
+            <div className="space-y-2">
+              {[
+                {
+                  id: 'secano',
+                  label: 'Solo Lluvia (Secano Estricto)',
+                  desc: 'Depende 100% del ciclo de lluvias; sensible a veranillos de El Niño',
+                  emoji: '🌧️',
+                },
+                {
+                  id: 'auxilio',
+                  label: 'Lluvia + Canal de Auxilio',
+                  desc: 'Agua por turnos comunales (mita) o reservorio rústico ante sequía',
+                  emoji: '💧',
+                },
+                {
+                  id: 'permanente',
+                  label: 'Riego Permanente Tecnificado',
+                  desc: 'Aspersión o goteo constante; permite cultivos de alto rendimiento',
+                  emoji: '🚰',
+                },
+              ].map((w) => {
+                const isSelected = waterSource === w.id;
+                return (
+                  <button
+                    key={w.id}
+                    type="button"
+                    onClick={() => handleSelectWater(w.id as any)}
+                    className={`w-full p-3.5 rounded-2xl border-2 border-b-4 text-left transition-all flex items-center justify-between cursor-pointer ${
+                      isSelected
+                        ? 'border-emerald-600 border-b-emerald-700 bg-emerald-50 text-emerald-950 font-bold ring-2 ring-emerald-500/20 active:border-b-2 active:translate-y-0.5'
+                        : 'border-slate-200 border-b-slate-300 bg-white hover:border-slate-300 hover:bg-slate-50 active:border-b-2 active:translate-y-0.5 text-slate-800'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{w.emoji}</span>
+                      <div>
+                        <div className="text-xs font-bold text-slate-900">{w.label}</div>
+                        <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">{w.desc}</div>
+                      </div>
+                    </div>
+                    {isSelected && <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Diagnóstico Inmediato de Kipu */}
+            <div className="p-3 rounded-2xl bg-emerald-50/90 border border-emerald-300 flex items-start gap-2.5 text-xs text-slate-900 font-medium">
+              <Sparkles className="w-4 h-4 text-emerald-700 flex-shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-emerald-950 block font-bold">Diagnóstico de Kipu:</strong>
+                {waterSource === 'secano' &&
+                  'Secano estricto. Alta vulnerabilidad a veranillos andinos; alinea siembras con el radar satelital NASA GPM para garantizar humedad.'}
+                {waterSource === 'auxilio' &&
+                  'Canal de auxilio comunal. Permite riegos de emergencia durante floración o aporcado; cuida la mita para momentos críticos de sequía.'}
+                {waterSource === 'permanente' &&
+                  'Riego permanente tecnificado. Control hídrico total; favorece fertilización disuelta y siembras fuera de temporada de lluvias.'}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 10. Matriz de Triangulación y Envío */}
       <div className="bg-white rounded-3xl border-2 border-slate-200 p-4 space-y-3 shadow-xs">
         <button
           type="button"
@@ -573,7 +1106,7 @@ export default function SoilValidator({
         </div>
       </div>
 
-      {/* 5. Historial de Reportes Sincronizados */}
+      {/* 11. Historial de Reportes Sincronizados */}
       <div className="bg-white rounded-3xl border-2 border-slate-200 p-4 space-y-3 shadow-xs">
         <div className="flex justify-between items-center pb-2 border-b border-slate-100">
           <h4 className="font-black text-xs uppercase tracking-wider text-slate-700">
