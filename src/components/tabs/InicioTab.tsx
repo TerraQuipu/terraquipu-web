@@ -5,7 +5,7 @@ import { ClimaNasa, FarmerProfile } from '@/lib/types';
 import { Tractor } from 'lucide-react';
 import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
 import KipuCarouselBanner from '@/components/KipuCarouselBanner';
-import KipuDetailedInfoCard from '@/components/KipuDetailedInfoCard';
+import CuatroPilaresBanner from '@/components/CuatroPilaresBanner';
 
 interface InicioTabProps {
   profile: FarmerProfile;
@@ -60,8 +60,27 @@ export default function InicioTab({
         onNavigateToClima={onNavigateToClima}
       />
 
-      {/* 2. Tarjeta Destacada de Entrada a Mi Chacra */}
-      <div className="p-4 rounded-3xl bg-gradient-to-r from-emerald-800 to-teal-900 text-white shadow-md flex items-center justify-between">
+      {/* 2. Los Cuatro Pilares para Vencer a la Sequía (Banner Deslizable con Texto e Imagen) */}
+      <CuatroPilaresBanner />
+
+      {/* 3. Chip Banner: 3 Boletines ENOS & INIA disponibles */}
+      <div className="flex justify-center pt-0.5 pb-0.5">
+        <button
+          type="button"
+          onClick={() => {
+            playBubblePop();
+            onOpenNews();
+          }}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-2xs hover:shadow-xs hover:border-amber-300 text-xs font-bold text-slate-700 active:scale-95 transition cursor-pointer"
+        >
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+          <span>3 Boletines ENOS &amp; INIA disponibles</span>
+          <span className="text-slate-400 font-normal">↗</span>
+        </button>
+      </div>
+
+      {/* 4. Tarjeta Destacada: Tu Chacra Calibrada (Ubicada al final) */}
+      <div className="p-4 rounded-3xl bg-gradient-to-r from-emerald-800 to-teal-900 text-white shadow-md flex items-center justify-between border-2 border-emerald-700/50">
         <div>
           <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-300 block">
             TU CHACRA CALIBRADA
@@ -85,25 +104,6 @@ export default function InicioTab({
           <span>Entrar a Mi Chacra</span>
         </button>
       </div>
-
-      {/* 3. Chip Banner: 3 Boletines ENOS & INIA disponibles */}
-      <div className="flex justify-center pt-0.5 pb-0.5">
-        <button
-          type="button"
-          onClick={() => {
-            playBubblePop();
-            onOpenNews();
-          }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-2xs hover:shadow-xs hover:border-amber-300 text-xs font-bold text-slate-700 active:scale-95 transition cursor-pointer"
-        >
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-          <span>3 Boletines ENOS &amp; INIA disponibles</span>
-          <span className="text-slate-400 font-normal">↗</span>
-        </button>
-      </div>
-
-      {/* 4. Información Detallada de Kipu (Saberes Ancestrales & Ficha Agronómica) */}
-      <KipuDetailedInfoCard />
     </div>
   );
 }
