@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  RefreshCw,
+  ArrowLeft,
   ChevronDown,
-  Settings,
-  Droplets,
-  Thermometer,
-  Sliders,
+  RefreshCw,
+  SlidersHorizontal,
+  Newspaper,
+  Sprout,
+  Cpu,
 } from 'lucide-react';
 import {
   Microcuenca,
@@ -29,27 +30,25 @@ import {
 } from '@/lib/supabaseClient';
 import { playBubblePop } from '@/lib/soundEffects';
 
-// Modular Tab & Subsystem Components
+// Modular Screen & View Components
 import InicioTab from '@/components/tabs/InicioTab';
 import ChacraTab from '@/components/tabs/ChacraTab';
 import RotationTab from '@/components/tabs/RotationTab';
 import CopilotTab from '@/components/tabs/CopilotTab';
-import BottomNav, { MainTab } from '@/components/layout/BottomNav';
+import FloatingNavFAB, { AppScreen } from '@/components/layout/FloatingNavFAB';
 import SoilDiagnosticWizardModal from '@/components/SoilDiagnosticWizardModal';
-import SettingsModal from '@/components/SettingsModal';
-import AgroClimaNewsFeed from '@/components/AgroClimaNewsFeed';
+import SettingsFullScreenView from '@/components/views/SettingsFullScreenView';
+import NewsFullScreenView from '@/components/views/NewsFullScreenView';
 import WelcomeSplash from '@/components/WelcomeSplash';
 import KipuFullScreenWizard from '@/components/KipuFullScreenWizard';
 
 export default function MobileApp() {
-  const [activeTab, setActiveTab] = useState<MainTab>('inicio');
-  const [previousTab, setPreviousTab] = useState<MainTab>('inicio');
+  const [currentScreen, setCurrentScreen] = useState<AppScreen>('inicio');
+  const [previousScreen, setPreviousScreen] = useState<AppScreen>('inicio');
   const [copilotVoice, setCopilotVoice] = useState<'astro' | 'kipu'>('astro');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [hardwareId, setHardwareId] = useState('TQ-HW-C249');
-  const [isNewsOpen, setIsNewsOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Full-screen first-time setup / onboarding state
   const [showWelcome, setShowWelcome] = useState(false);
@@ -88,21 +87,21 @@ export default function MobileApp() {
       setIsOnline(navigator.onLine);
       const handleOnline = () => {
         setIsOnline(true);
-        triggerToast('🟢 Conexión reestablecida con la nube');
+        triggerToast('Conexión reestablecida con la nube');
       };
       const handleOffline = () => {
         setIsOnline(false);
-        triggerToast('🟠 Modo Sin Señal activado (100% Funcional)');
+        triggerToast('Modo Sin Señal activado (100% Funcional)');
       };
 
       window.addEventListener('online', handleOnline);
       window.addEventListener('offline', handleOffline);
 
-      // Deterministic Hardware Signature Detection
+      // Hardware Signature Detection
       const hw = generateHardwareProfile();
       setHardwareId(hw.deviceId || 'TQ-HW-C249');
 
-      // Support ?welcome=1, ?reset=1 or ?wizard=1 in URL for instant verification
+      // Support ?welcome=1, ?reset=1 or ?wizard=1 in URL
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('welcome') === '1' || urlParams.get('welcome') === 'true') {
         setShowWelcome(true);
@@ -150,12 +149,21 @@ export default function MobileApp() {
     setToastMessage(msg);
     setTimeout(() => {
       setToastMessage(null);
-    }, 3800);
+    }, 3500);
+  };
+
+  const navigateTo = (screen: AppScreen) => {
+    setPreviousScreen(currentScreen);
+    setCurrentScreen(screen);
+  };
+
+  const goBack = () => {
+    setCurrentScreen(previousScreen === currentScreen ? 'inicio' : previousScreen);
   };
 
   const handleRefreshData = async () => {
     setIsRefreshing(true);
-    triggerToast('🔄 Conectando con Supabase & NASA SMAP...');
+    triggerToast('Conectando con Supabase y NASA SMAP...');
 
     try {
       const [cuencasData, cultivosData] = await Promise.all([
@@ -179,10 +187,10 @@ export default function MobileApp() {
         second: '2-digit',
       });
 
-      triggerToast(`🟢 Telemetría actualizada (Hora Perú: ${peruTime})`);
+      triggerToast(`Telemetría actualizada (Hora Perú: ${peruTime})`);
     } catch (e) {
       console.error(e);
-      triggerToast('⚠️ Error al conectar con la nube');
+      triggerToast('Error al conectar con la nube');
     } finally {
       setTimeout(() => {
         setIsRefreshing(false);
@@ -194,7 +202,7 @@ export default function MobileApp() {
     const saved = saveDeviceProfile(newProfile);
     setProfile(saved);
     setShowOnboarding(false);
-    triggerToast(`🌾 Chacra (${saved.areaHa} ha) calibrada en hardware [${saved.deviceId}]`);
+    triggerToast(`Chacra (${saved.areaHa} ha) calibrada en hardware [${saved.deviceId}]`);
 
     submitReportToCloud({
       id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `rep-${Date.now()}`,
@@ -210,7 +218,7 @@ export default function MobileApp() {
       created_at: new Date().toISOString(),
     }).then((res) => {
       if (res.success) {
-        triggerToast('🛰️ Calibración triangulada enviada a Supabase (Ground-Truth Comunal)');
+        triggerToast('Calibración enviada a Supabase (Ground-Truth Comunal)');
       }
     }).catch(() => {});
   };
@@ -226,7 +234,7 @@ export default function MobileApp() {
   // Live SMAP calculation
   const smapPercent = climaNasa?.humedad_suelo_smap_m3m3
     ? Math.round(climaNasa.humedad_suelo_smap_m3m3 * 100)
-    : 35;
+    : 16;
 
   if (showWelcome) {
     return (
@@ -264,17 +272,37 @@ export default function MobileApp() {
     );
   }
 
-  const handleOpenDiagnostic = (fromTab?: MainTab) => {
-    setPreviousTab(fromTab || (activeTab === 'diagnostico' ? 'inicio' : activeTab));
-    setActiveTab('diagnostico');
-  };
+  // Full Screen View: Ajustes & Hardware
+  if (currentScreen === 'ajustes') {
+    return (
+      <div className="flex flex-col h-full min-h-screen bg-[#F7F9F6] text-[#132A1C]">
+        <SettingsFullScreenView
+          onBack={goBack}
+          profile={profile}
+          hardwareId={hardwareId}
+          microcuencas={microcuencas}
+          onToast={triggerToast}
+          onOpenWizard={() => setShowOnboarding(true)}
+          onReset={() => setShowWelcome(true)}
+          onUpdateProfile={handleUpdateProfile}
+        />
+        <FloatingNavFAB currentScreen={currentScreen} onNavigate={navigateTo} />
+      </div>
+    );
+  }
 
-  const handleCloseDiagnostic = () => {
-    setActiveTab(previousTab === 'diagnostico' ? 'inicio' : previousTab);
-  };
+  // Full Screen View: Boletines & Noticias ENOS
+  if (currentScreen === 'noticias') {
+    return (
+      <div className="flex flex-col h-full min-h-screen bg-[#F7F9F6] text-[#132A1C]">
+        <NewsFullScreenView onBack={goBack} />
+        <FloatingNavFAB currentScreen={currentScreen} onNavigate={navigateTo} />
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col h-full min-h-screen bg-[#F7F9F6] text-[#132A1C] relative overflow-hidden font-sans selection:bg-[#84CC16] selection:text-[#132A1C]">
+    <div className="flex flex-col h-full min-h-screen bg-[#F7F9F6] text-[#132A1C] relative overflow-x-hidden font-sans selection:bg-[#84CC16] selection:text-[#132A1C]">
       {/* Toast Notification Pill */}
       {toastMessage && (
         <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-2xl bg-[#132A1C] text-white font-bold text-xs shadow-2xl backdrop-blur-md border border-emerald-500/40 flex items-center gap-2 animate-in fade-in">
@@ -282,116 +310,68 @@ export default function MobileApp() {
         </div>
       )}
 
-      {/* TOP HEADER: Light Organic Design (Hidden in Diagnóstico view to match Frame 006) */}
-      {activeTab !== 'diagnostico' && (
-        <header className="bg-white/90 backdrop-blur-md border-b border-[#E5ECE2] px-3.5 py-2.5 sticky top-0 z-40 shadow-xs">
-          <div className="max-w-md mx-auto w-full flex items-center justify-between gap-2">
-            {/* Left: Logo + Parcel Switcher Badge */}
-            <div className="flex items-center gap-2 min-w-0 shrink">
-              <div className="w-8 h-8 rounded-xl bg-[#132A1C] flex items-center justify-center text-[#A3E635] font-black text-sm shadow-xs shrink-0">
-                🌱
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-black text-sm text-[#132A1C] tracking-tight truncate">
-                    TerraQuipu
-                  </span>
-                  <span className="text-[8.5px] font-black uppercase px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
-                    Andes
-                  </span>
-                </div>
+      {/* SUB-SCREEN TOP NAVIGATION BAR: Only visible on secondary screens (NOT on Inicio or Diagnóstico) */}
+      {currentScreen !== 'inicio' && currentScreen !== 'diagnostico' && (
+        <header className="bg-white/95 backdrop-blur-md border-b border-[#E5ECE2] px-4 py-3 sticky top-0 z-40 shadow-xs">
+          <div className="max-w-md mx-auto w-full flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                playBubblePop();
+                navigateTo('inicio');
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-[#132A1C] font-bold text-xs transition cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Volver a Inicio</span>
+            </button>
 
-                {/* Active Parcel Badge: Click opens Settings/Hardware Modal */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    playBubblePop();
-                    setIsSettingsOpen(true);
-                  }}
-                  className="flex items-center gap-1 text-[10px] font-bold text-zinc-600 hover:text-emerald-800 transition cursor-pointer truncate max-w-[150px] sm:max-w-[200px]"
-                  title="Ver detalles de la chacra y hardware"
-                >
-                  <span className="truncate">
-                    {profile.parcelName} • {profile.distrito || 'Urubamba'}, {profile.altitude || 3380} msnm
-                  </span>
-                  <ChevronDown className="w-2.5 h-2.5 text-zinc-400 shrink-0" />
-                </button>
-              </div>
-            </div>
+            <span className="text-xs font-black text-[#132A1C] capitalize">
+              {currentScreen === 'parcelas' && 'Mis Parcelas'}
+              {currentScreen === 'rotacion' && 'Rotación de Cultivos'}
+              {currentScreen === 'copiloto' && 'Copiloto Andino'}
+            </span>
 
-            {/* Right: News + Refresh + Settings Trigger */}
-            <div className="flex items-center gap-1.5 shrink-0">
-              {/* News / ENOS Bulletins Trigger */}
-              <button
-                type="button"
-                onClick={() => {
-                  playBubblePop();
-                  setIsNewsOpen(true);
-                }}
-                className="relative w-8 h-8 rounded-full border border-[#E5ECE2] bg-white text-zinc-700 hover:text-emerald-800 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-2xs"
-                title="Boletines Científicos y Alertas ENOS"
-              >
-                <span className="text-xs">📰</span>
-                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-amber-500 text-white font-black text-[8px] flex items-center justify-center">
-                  3
-                </span>
-              </button>
-
-              {/* Refresh Button */}
-              <button
-                type="button"
-                onClick={handleRefreshData}
-                disabled={isRefreshing}
-                className={`w-8 h-8 rounded-full border border-[#E5ECE2] bg-white text-zinc-700 hover:text-emerald-800 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-2xs ${
-                  isRefreshing ? 'border-emerald-500 text-emerald-700' : ''
-                }`}
-                title="Actualizar datos satelitales (Hora Perú)"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-700' : ''}`} />
-              </button>
-
-              {/* Settings & Hardware Trigger */}
-              <button
-                type="button"
-                onClick={() => {
-                  playBubblePop();
-                  setIsSettingsOpen(true);
-                }}
-                className="w-8 h-8 rounded-full border border-[#E5ECE2] bg-[#F7F9F6] text-[#132A1C] hover:bg-emerald-50 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-2xs"
-                title="Ajustes de Parcela y Hardware"
-              >
-                <Settings className="w-4 h-4 text-emerald-900" />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleRefreshData}
+              disabled={isRefreshing}
+              className="w-8 h-8 rounded-full border border-[#E5ECE2] bg-white text-zinc-700 hover:text-emerald-800 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-2xs"
+              title="Actualizar datos satelitales"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-700' : ''}`} />
+            </button>
           </div>
         </header>
       )}
 
-      {/* Main Tab Content (Scrollable, Light Organic #F7F9F6) */}
-      <main className="flex-1 overflow-y-auto px-4 py-4 pb-28 space-y-4 max-w-md mx-auto w-full relative z-10">
-        {/* ================= TAB 1: INICIO ================= */}
-        {activeTab === 'inicio' && (
+      {/* Main Screen Content */}
+      <main className="flex-1 overflow-y-auto px-4 py-4 pb-28 max-w-md mx-auto w-full relative z-10">
+        {/* ================= SCREEN 1: INICIO (IMAGEN 3) ================= */}
+        {currentScreen === 'inicio' && (
           <InicioTab
             profile={profile}
             climaNasa={climaNasa}
             smapPercent={smapPercent}
             hardwareId={hardwareId}
-            onOpenWizard={() => handleOpenDiagnostic('inicio')}
-            onNavigateToParcelas={() => setActiveTab('parcelas')}
-            onNavigateToRotacion={() => setActiveTab('rotacion')}
-            onNavigateToCopiloto={() => setActiveTab('copiloto')}
+            onOpenWizard={() => navigateTo('diagnostico')}
+            onNavigateToParcelas={() => navigateTo('parcelas')}
+            onNavigateToRotacion={() => navigateTo('rotacion')}
+            onNavigateToCopiloto={() => navigateTo('copiloto')}
+            onOpenNews={() => navigateTo('noticias')}
+            onOpenSettings={() => navigateTo('ajustes')}
           />
         )}
 
-        {/* ================= TAB 2: PARCELAS ================= */}
-        {activeTab === 'parcelas' && (
+        {/* ================= SCREEN 2: PARCELAS ================= */}
+        {currentScreen === 'parcelas' && (
           <ChacraTab
             profile={profile}
             cultivos={cultivos}
             hardwareId={hardwareId}
             onToast={triggerToast}
             onRecalibrate={() => setShowOnboarding(true)}
-            onNavigateToInicio={() => setActiveTab('inicio')}
+            onNavigateToInicio={() => navigateTo('inicio')}
             onUpdateCrop={(cropId, cropName) => {
               handleUpdateProfile({
                 previousCropId: cropId,
@@ -407,78 +387,55 @@ export default function MobileApp() {
             onUpdateArea={(newArea) => {
               handleUpdateProfile({ areaHa: newArea });
             }}
-            onOpenWizard={() => handleOpenDiagnostic('parcelas')}
+            onOpenWizard={() => navigateTo('diagnostico')}
           />
         )}
 
-        {/* ================= TAB 3: DIAGNÓSTICO (CENTRAL FAB '+') ================= */}
-        {activeTab === 'diagnostico' && (
+        {/* ================= SCREEN 3: DIAGNÓSTICO (PANTALLA COMPLETA) ================= */}
+        {currentScreen === 'diagnostico' && (
           <SoilDiagnosticWizardModal
             isInline={true}
             isOpen={true}
-            onClose={handleCloseDiagnostic}
+            onClose={() => navigateTo(previousScreen === 'diagnostico' ? 'inicio' : previousScreen)}
             onCompleteToRotation={() => {
-              setActiveTab('rotacion');
-              triggerToast('🌱 Plan de rotación activado según resiliencia del suelo.');
+              navigateTo('rotacion');
+              triggerToast('Plan de rotación activado según resiliencia del suelo.');
             }}
-            onSaveProfileData={(data) => {
-              triggerToast('✓ Diagnóstico edáfico registrado');
+            onSaveProfileData={() => {
+              triggerToast('Diagnóstico edáfico registrado');
             }}
           />
         )}
 
-        {/* ================= TAB 4: ROTACIÓN ================= */}
-        {activeTab === 'rotacion' && (
+        {/* ================= SCREEN 4: ROTACIÓN ================= */}
+        {currentScreen === 'rotacion' && (
           <RotationTab
             profile={profile}
             onNavigateToCopiloto={(voice) => {
               setCopilotVoice(voice || 'kipu');
-              setActiveTab('copiloto');
+              navigateTo('copiloto');
             }}
             onToast={triggerToast}
           />
         )}
 
-        {/* ================= TAB 5: COPILOTO ================= */}
-        {activeTab === 'copiloto' && (
+        {/* ================= SCREEN 5: COPILOTO ================= */}
+        {currentScreen === 'copiloto' && (
           <CopilotTab
             profile={profile}
             climaNasa={climaNasa}
             smapPercent={smapPercent}
             initialVoice={copilotVoice}
-            onOpenDiagnostic={() => handleOpenDiagnostic('copiloto')}
+            onOpenDiagnostic={() => navigateTo('diagnostico')}
             onToast={triggerToast}
           />
         )}
       </main>
 
-      {/* Slide-Up Bottom Sheet for News & ENOS Bulletins */}
-      <AgroClimaNewsFeed isOpen={isNewsOpen} onClose={() => setIsNewsOpen(false)} />
-
-      {/* Settings & Hardware Modal (Triggered from Top Header) */}
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        profile={profile}
-        hardwareId={hardwareId}
-        microcuencas={microcuencas}
-        onToast={triggerToast}
-        onOpenWizard={() => setShowOnboarding(true)}
-        onReset={() => setShowWelcome(true)}
-        onUpdateProfile={handleUpdateProfile}
-      />
-
-      {/* Bottom Mobile Navigation Bar (Always visible matching Frames 001, 003, 006, 009, 013) */}
-      <BottomNav
-        activeTab={activeTab}
-        onSelectTab={(tab) => {
-          if (tab === 'diagnostico') {
-            handleOpenDiagnostic();
-          } else {
-            setActiveTab(tab);
-          }
-        }}
-        onOpenDiagnostic={() => handleOpenDiagnostic()}
+      {/* Floating Action Button Navigation (Fixed at bottom right) */}
+      <FloatingNavFAB
+        currentScreen={currentScreen}
+        onNavigate={navigateTo}
       />
     </div>
   );

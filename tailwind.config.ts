@@ -9,11 +9,11 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'Arial', 'Helvetica', 'sans-serif'],
-        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+        sans: ['Arial', 'Helvetica', 'sans-serif'],
+        serif: ['Arial', 'Helvetica', 'sans-serif'],
         mono: ['monospace'],
-        display: ['"Plus Jakarta Sans"', 'Arial', 'sans-serif'],
-        logo: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        display: ['Arial', 'Helvetica', 'sans-serif'],
+        logo: ['Arial', 'Helvetica', 'sans-serif'],
       },
       colors: {
         editorial: {

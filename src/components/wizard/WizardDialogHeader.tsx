@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, Satellite, Sprout } from 'lucide-react';
 import TypewriterText from '../TypewriterText';
 
 export interface DialogSpeakerConfig {
@@ -109,12 +109,17 @@ export default function WizardDialogHeader({
                   currentDialog.speaker === 'astro' ? 'bg-[#0284C7]' : 'bg-emerald-600'
                 }`} />
               </span>
-              <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${
+              <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border flex items-center gap-1 ${
                 currentDialog.speaker === 'astro'
                   ? 'bg-sky-50 text-sky-700 border-sky-200'
                   : 'bg-emerald-50 text-emerald-800 border-emerald-200'
               }`}>
-                {currentDialog.tag}
+                {currentDialog.speaker === 'astro' ? (
+                  <Satellite className="w-2.5 h-2.5 text-sky-600" />
+                ) : (
+                  <Sprout className="w-2.5 h-2.5 text-emerald-600" />
+                )}
+                <span>{currentDialog.tag}</span>
               </span>
             </div>
 

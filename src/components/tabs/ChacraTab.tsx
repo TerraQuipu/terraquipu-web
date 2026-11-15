@@ -58,28 +58,28 @@ export default function ChacraTab({
     playBubblePop();
     const next = !layerSmap;
     setLayerSmap(next);
-    onToast(next ? '🛰️ Capa SMAP humedad activada' : 'Capa SMAP desactivada');
+    onToast(next ? 'Capa SMAP humedad activada' : 'Capa SMAP desactivada');
   };
 
   const handleToggleNdvi = () => {
     playBubblePop();
     const next = !layerNdvi;
     setLayerNdvi(next);
-    onToast(next ? '🍃 Capa NDVI vegetación activada' : 'Capa NDVI desactivada');
+    onToast(next ? 'Capa NDVI vegetación activada' : 'Capa NDVI desactivada');
   };
 
   const handleToggleDrought = () => {
     playBubblePop();
     const next = !layerDrought;
     setLayerDrought(next);
-    onToast(next ? '☀️ Capa Calor y sequía activada' : 'Capa Sequía desactivada');
+    onToast(next ? 'Capa Calor y sequía activada' : 'Capa Sequía desactivada');
   };
 
   const handleAreaChange = (newArea: number) => {
     if (onUpdateArea) {
       onUpdateArea(newArea);
     }
-    onToast(`📐 Parcela calibrada a ${newArea} ha (≈ ${(newArea * 3.3).toFixed(1)} topos)`);
+    onToast(`Parcela calibrada a ${newArea} ha (≈ ${(newArea * 3.3).toFixed(1)} topos)`);
   };
 
   return (
