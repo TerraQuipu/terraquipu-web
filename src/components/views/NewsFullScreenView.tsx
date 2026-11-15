@@ -43,7 +43,7 @@ export default function NewsFullScreenView({ onBack }: NewsFullScreenViewProps) 
           </button>
 
           <div className="text-center">
-            <h1 className="text-sm font-black text-[#132A1C]">
+            <h1 className="text-sm font-semibold text-[#132A1C]">
               {selectedArticle ? 'Lectura Científica' : 'Boletines Científicos'}
             </h1>
             <span className="text-[10px] text-zinc-500 font-mono">
@@ -76,7 +76,7 @@ export default function NewsFullScreenView({ onBack }: NewsFullScreenViewProps) 
                 <span className="text-[10px] font-bold text-amber-300 uppercase tracking-widest block mb-1">
                   {selectedArticle.category}
                 </span>
-                <h2 className="text-base font-black text-white leading-tight">
+                <h2 className="text-base font-semibold text-white leading-tight">
                   {selectedArticle.title}
                 </h2>
               </div>
@@ -89,7 +89,7 @@ export default function NewsFullScreenView({ onBack }: NewsFullScreenViewProps) 
               </div>
 
               <div className="p-3.5 bg-amber-50/80 rounded-2xl border border-amber-200/80 space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 block">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-900 block">
                   RECOMENDACIÓN CLAVE
                 </span>
                 <p className="text-xs font-bold text-amber-950 leading-relaxed">
@@ -120,7 +120,7 @@ export default function NewsFullScreenView({ onBack }: NewsFullScreenViewProps) 
           /* Article List View */
           <div className="space-y-3 animate-in fade-in">
             <div className="bg-white rounded-3xl p-4 border border-[#E5ECE2] shadow-xs">
-              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-900/60 block">
                 VIGILANCIA AGROCLIMÁTICA 2026
               </span>
               <p className="text-xs text-zinc-600 mt-1 leading-relaxed">
@@ -146,10 +146,10 @@ export default function NewsFullScreenView({ onBack }: NewsFullScreenViewProps) 
                     />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <span className="text-[9.5px] font-black uppercase tracking-wider text-emerald-800 block">
+                    <span className="text-[9.5px] font-semibold uppercase tracking-wider text-emerald-800 block">
                       {article.category}
                     </span>
-                    <h3 className="text-xs font-black text-[#132A1C] leading-snug line-clamp-2 mt-0.5">
+                    <h3 className="text-xs font-semibold text-[#132A1C] leading-snug line-clamp-2 mt-0.5">
                       {article.title}
                     </h3>
                     <div className="flex items-center gap-2 mt-1 text-[10px] text-zinc-400">

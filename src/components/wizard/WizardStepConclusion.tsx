@@ -59,7 +59,7 @@ export default function WizardStepConclusion({
             <div className="absolute top-7 -left-2.5 w-4 h-4 bg-white border-b-2 border-l-2 border-emerald-600 transform rotate-45"></div>
 
             <div className="flex items-center justify-between gap-1 mb-1">
-              <span className="font-black text-xs text-emerald-950 uppercase tracking-wide flex items-center gap-1">
+              <span className="font-semibold text-xs text-emerald-950 uppercase tracking-wide flex items-center gap-1">
                 <span>KIPU COPILOTO</span>
                 <Sparkles className="w-3 h-3 text-amber-500" />
               </span>
@@ -91,7 +91,7 @@ export default function WizardStepConclusion({
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-300 block">
                 Índice de Salud Edáfica Calibrado
               </span>
-              <div className="text-xl font-black text-white flex items-center gap-2 mt-0.5">
+              <div className="text-xl font-semibold text-white flex items-center gap-2 mt-0.5">
                 <span>{healthScore} / 100</span>
                 <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-400/40">
                   {healthScore >= 80 ? '✓ Suelo Resiliente' : healthScore >= 60 ? '⚡ Requiere Abono' : '⚠️ Vulnerable'}
@@ -113,7 +113,7 @@ export default function WizardStepConclusion({
                 <span className="text-[10px] font-bold text-emerald-400 block uppercase">
                   Vulnerabilidad
                 </span>
-                <span className="font-black text-sm block">
+                <span className="font-semibold text-sm block">
                   {agroResult.nivelVulnerabilidad}
                 </span>
               </div>
@@ -121,7 +121,7 @@ export default function WizardStepConclusion({
                 <span className="text-[10px] font-bold text-amber-800 block uppercase">
                   Rotación A13
                 </span>
-                <span className="font-black text-sm block text-emerald-900">
+                <span className="font-semibold text-sm block text-emerald-900">
                   {agroResult.recomendacionA13.cultivo_sugerido} ({agroResult.recomendacionA13.confianza})
                 </span>
               </div>
@@ -162,7 +162,7 @@ export default function WizardStepConclusion({
             playBubblePop();
             onConfirm();
           }}
-          className="w-full py-4 rounded-2xl bg-emerald-800 hover:bg-emerald-900 border-2 border-emerald-900 border-b-4 border-b-emerald-950 text-white font-black text-sm flex items-center justify-center gap-2 shadow-md active:border-b-2 active:translate-y-0.5 transition cursor-pointer"
+          className="w-full py-4 rounded-2xl bg-emerald-800 hover:bg-emerald-900 border-2 border-emerald-900 border-b-4 border-b-emerald-950 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md active:border-b-2 active:translate-y-0.5 transition cursor-pointer"
         >
           <span>
             {mode === 'elnino'

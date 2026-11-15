@@ -42,10 +42,10 @@ export default function CopilotTab({
       {/* 1. Header Section */}
       <div className="flex items-start justify-between px-1 pt-1">
         <div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-900/60 block">
             DOS FORMAS DE LEER EL TERRITORIO
           </span>
-          <h1 className="text-xl sm:text-2xl font-black text-[#132A1C] leading-tight">
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#132A1C] leading-tight">
             Datos y memoria,{' '}
             <span className="font-serif italic text-emerald-800 font-normal">
               en conversación.
@@ -87,7 +87,7 @@ export default function CopilotTab({
               <Sun className="w-4 h-4 hidden" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-xs font-black text-[#132A1C] leading-none">Astro</h3>
+              <h3 className="text-xs font-semibold text-[#132A1C] leading-none">Astro</h3>
               <span className="text-[10px] text-zinc-500 truncate block mt-0.5">
                 Ojos en el cielo
               </span>
@@ -123,7 +123,7 @@ export default function CopilotTab({
               <Sprout className="w-4 h-4 hidden" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-xs font-black text-[#132A1C] leading-none">Kipu</h3>
+              <h3 className="text-xs font-semibold text-[#132A1C] leading-none">Kipu</h3>
               <span className="text-[10px] text-zinc-500 truncate block mt-0.5">
                 Saber de la tierra
               </span>
@@ -137,7 +137,7 @@ export default function CopilotTab({
       <div className="bg-[#1A3D24] rounded-3xl p-5 text-white shadow-md border border-emerald-900/60 space-y-4">
         {/* Card Header with Radar Widget */}
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-300">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-300">
             {activeVoice === 'astro'
               ? 'LECTURA SATELITAL · SMAP • GPM'
               : 'SABER ANCESTRAL · OBSERVACIÓN ANDINA'}
@@ -158,7 +158,7 @@ export default function CopilotTab({
         </div>
 
         {/* Title (Editorial Serif Italic) */}
-        <h2 className="text-xl font-black text-white leading-tight">
+        <h2 className="text-xl font-semibold text-white leading-tight">
           {activeVoice === 'astro' ? (
             <>
               La lluvia tarda.{' '}
@@ -185,7 +185,7 @@ export default function CopilotTab({
 
         {/* Inner Recommendation Card */}
         <div className="bg-[#132A1C]/90 rounded-2xl p-3.5 border border-emerald-800/40 space-y-1">
-          <span className="text-[9.5px] font-black uppercase tracking-wider text-emerald-400 block">
+          <span className="text-[9.5px] font-semibold uppercase tracking-wider text-emerald-400 block">
             {activeVoice === 'astro' ? 'RECOMENDACIÓN' : 'CONSEJO DE CHACRA'}
           </span>
           <p className="text-xs font-semibold text-white leading-snug">
@@ -205,12 +205,12 @@ export default function CopilotTab({
 
       {/* 4. Section: UNA ACCIÓN PARA HOY (Frame 013) */}
       <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] space-y-3">
-        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-900/60 block">
           UNA ACCIÓN PARA HOY
         </span>
 
         <div>
-          <h3 className="text-base font-black text-[#132A1C]">
+          <h3 className="text-base font-semibold text-[#132A1C]">
             Contrasta el dato con tu chacra.
           </h3>
           <p className="text-xs text-zinc-600 mt-0.5 leading-relaxed">
@@ -224,7 +224,7 @@ export default function CopilotTab({
             playSuccessFanfare();
             onOpenDiagnostic();
           }}
-          className="w-full py-3.5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-black text-xs flex items-center justify-center gap-2 shadow-xs transition active:scale-98 cursor-pointer"
+          className="w-full py-3.5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition active:scale-98 cursor-pointer"
         >
           <span>Evaluar suelo</span>
           <ArrowRight className="w-4 h-4" />

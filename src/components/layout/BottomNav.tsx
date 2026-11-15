@@ -29,8 +29,8 @@ export default function BottomNav({
           }}
           className={`flex-1 flex flex-col items-center justify-center py-1 transition-all cursor-pointer ${
             activeTab === 'inicio'
-              ? 'text-[#A3E635] font-black'
-              : 'text-zinc-400 hover:text-zinc-200 font-medium'
+              ? 'text-[#A3E635] font-semibold'
+              : 'text-zinc-400 hover:text-zinc-200 font-normal'
           }`}
           aria-label="Pestaña Inicio"
         >
@@ -50,8 +50,8 @@ export default function BottomNav({
           }}
           className={`flex-1 flex flex-col items-center justify-center py-1 transition-all cursor-pointer ${
             activeTab === 'parcelas'
-              ? 'text-[#A3E635] font-black'
-              : 'text-zinc-400 hover:text-zinc-200 font-medium'
+              ? 'text-[#A3E635] font-semibold'
+              : 'text-zinc-400 hover:text-zinc-200 font-normal'
           }`}
           aria-label="Pestaña Parcelas"
         >
@@ -78,7 +78,7 @@ export default function BottomNav({
             title="Diagnóstico rápido de suelo"
             aria-label="Abrir diagnóstico rápido de suelo"
           >
-            <Plus className="w-5 h-5 stroke-[3]" />
+            <Plus className="w-5 h-5 stroke-[2.5]" />
           </button>
         </div>
 
@@ -91,8 +91,8 @@ export default function BottomNav({
           }}
           className={`flex-1 flex flex-col items-center justify-center py-1 transition-all cursor-pointer ${
             activeTab === 'rotacion'
-              ? 'text-[#A3E635] font-black'
-              : 'text-zinc-400 hover:text-zinc-200 font-medium'
+              ? 'text-[#A3E635] font-semibold'
+              : 'text-zinc-400 hover:text-zinc-200 font-normal'
           }`}
           aria-label="Pestaña Rotación"
         >
@@ -112,8 +112,8 @@ export default function BottomNav({
           }}
           className={`flex-1 flex flex-col items-center justify-center py-1 transition-all cursor-pointer ${
             activeTab === 'copiloto'
-              ? 'text-[#A3E635] font-black'
-              : 'text-zinc-400 hover:text-zinc-200 font-medium'
+              ? 'text-[#A3E635] font-semibold'
+              : 'text-zinc-400 hover:text-zinc-200 font-normal'
           }`}
           aria-label="Pestaña Copiloto"
         >

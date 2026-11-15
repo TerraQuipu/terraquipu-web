@@ -108,7 +108,7 @@ export default function InicioTab({
   const windKm = 14;
 
   return (
-    <div className="space-y-4 animate-in fade-in -mx-4 -mt-4 pb-20">
+    <div className="space-y-4 animate-in fade-in -mx-4 -mt-4 pb-24">
       {/* =========================================================================
           HERO SUPERIOR: FOTO ANDINA + HEADER + GREETING + WEATHER GLASS CARD (IMAGEN 3)
          ========================================================================= */}
@@ -129,7 +129,7 @@ export default function InicioTab({
               <div className="w-8 h-8 rounded-xl bg-[#7BB63E] flex items-center justify-center text-[#132A1C] shadow-xs">
                 <Sprout className="w-5 h-5 text-[#132A1C]" />
               </div>
-              <span className="text-xl font-black text-white tracking-tight lowercase">
+              <span className="text-xl font-bold text-white tracking-tight lowercase">
                 terraquipu
               </span>
             </div>
@@ -151,28 +151,28 @@ export default function InicioTab({
           </div>
 
           {/* Farmer Greeting Chip */}
-          <div className="flex items-center gap-3 pt-1">
-            <div className="w-10 h-10 rounded-full bg-[#E5ECE2] text-[#132A1C] font-black text-sm flex items-center justify-center shadow-md border border-white/40">
+          <div className="flex items-center gap-3 pt-0.5">
+            <div className="w-10 h-10 rounded-full bg-[#E5ECE2] text-[#132A1C] font-bold text-sm flex items-center justify-center shadow-md border border-white/40">
               M
             </div>
             <div>
-              <h2 className="text-base font-black text-white leading-tight">
+              <h2 className="text-base font-bold text-white leading-tight">
                 Hola, Miguel
               </h2>
-              <p className="text-xs text-white/80 font-medium">
+              <p className="text-xs text-white/80 font-normal">
                 Comunidad {profile.distrito || 'Urubamba'}
               </p>
             </div>
           </div>
 
           {/* Weather Glassmorphic Dark Forest Green Card */}
-          <div className="bg-[#1B3B22]/85 backdrop-blur-md rounded-3xl p-4.5 border border-emerald-500/25 shadow-2xl text-white space-y-3.5">
+          <div className="bg-[#1B3B22]/90 backdrop-blur-md rounded-3xl p-5 border border-emerald-500/20 shadow-2xl text-white space-y-3.5">
             {/* Top Row: Location & Soleado */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-xs">
-                <MapPin className="w-4 h-4 text-[#A3E635] shrink-0" />
-                <div className="leading-tight">
-                  <span className="font-bold text-white block">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 text-xs min-w-0">
+                <MapPin className="w-3.5 h-3.5 text-[#A3E635] shrink-0" />
+                <div className="leading-tight truncate">
+                  <span className="font-semibold text-white/95 block truncate">
                     Microcuenca {profile.distrito || 'Vilcanota'}
                   </span>
                   <span className="text-[10px] text-white/70">
@@ -181,19 +181,19 @@ export default function InicioTab({
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-900/50 border border-emerald-500/20 text-[#FACC15] font-black text-[11px] tracking-wider uppercase">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-900/60 border border-emerald-500/20 text-[#FACC15] font-semibold text-[10.5px] tracking-wider uppercase shrink-0">
                 <Sun className="w-3.5 h-3.5 text-[#FACC15]" />
                 <span>SOLEADO</span>
               </div>
             </div>
 
-            {/* Middle Row: Big Temp 21°C + Riesgo de sequía */}
-            <div className="flex items-baseline gap-4 pt-0.5">
-              <span className="text-4xl font-black text-white tracking-tighter">
+            {/* Middle Row: Temperature + Riesgo de sequía */}
+            <div className="flex items-baseline gap-3 pt-0.5">
+              <span className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
                 {tempC}°C
               </span>
               <div className="space-y-0.5">
-                <span className="text-xs font-bold text-white block">
+                <span className="text-xs font-medium text-white/90 block">
                   Riesgo de sequía
                 </span>
                 <div className="flex items-center gap-1.5 text-[11px] text-zinc-300">
@@ -203,50 +203,49 @@ export default function InicioTab({
               </div>
             </div>
 
-            {/* Divider */}
-            <div className="border-t border-emerald-500/20 pt-2.5">
-              {/* Bottom Row: 3 Metrics with Lucide SVG Icons */}
+            {/* Divider + 3 Metrics Row */}
+            <div className="pt-2 border-t border-emerald-500/20">
               <div className="grid grid-cols-3 gap-2 text-left">
                 {/* Metric 1: Humedad SMAP */}
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-900/50 border border-emerald-500/30 flex items-center justify-center text-[#A3E635] shrink-0">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-900/60 border border-emerald-500/30 flex items-center justify-center text-[#A3E635] shrink-0">
                     <Droplets className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-[9.5px] text-zinc-300 block truncate">
+                    <span className="text-[9.5px] text-white/70 block truncate">
                       Humedad · SMAP
                     </span>
-                    <span className="text-xs font-black text-white">
+                    <span className="text-xs font-semibold text-white/95">
                       {smapPercent}%
                     </span>
                   </div>
                 </div>
 
                 {/* Metric 2: Lluvia GPM */}
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-900/50 border border-emerald-500/30 flex items-center justify-center text-[#A3E635] shrink-0">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-900/60 border border-emerald-500/30 flex items-center justify-center text-[#A3E635] shrink-0">
                     <CloudRain className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-[9.5px] text-zinc-300 block truncate">
+                    <span className="text-[9.5px] text-white/70 block truncate">
                       Lluvia · GPM
                     </span>
-                    <span className="text-xs font-black text-white">
+                    <span className="text-xs font-semibold text-white/95">
                       {rainMm} mm
                     </span>
                   </div>
                 </div>
 
                 {/* Metric 3: Viento */}
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-900/50 border border-emerald-500/30 flex items-center justify-center text-[#A3E635] shrink-0">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-900/60 border border-emerald-500/30 flex items-center justify-center text-[#A3E635] shrink-0">
                     <Wind className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-[9.5px] text-zinc-300 block truncate">
+                    <span className="text-[9.5px] text-white/70 block truncate">
                       Viento
                     </span>
-                    <span className="text-xs font-black text-white">
+                    <span className="text-xs font-semibold text-white/95">
                       {windKm} km/h
                     </span>
                   </div>
@@ -255,8 +254,8 @@ export default function InicioTab({
             </div>
 
             {/* Sub-bar: REPORTE DE CAMPO · HOY 08:40 */}
-            <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400 pt-1 border-t border-emerald-500/10">
-              <span className="font-bold tracking-wider text-emerald-300 uppercase">
+            <div className="flex items-center justify-between text-[10px] font-mono text-zinc-300/80 pt-2 border-t border-emerald-500/15">
+              <span className="font-semibold tracking-wider text-emerald-300 uppercase">
                 REPORTE DE CAMPO
               </span>
               <span>HOY · 08:40</span>
@@ -272,16 +271,16 @@ export default function InicioTab({
         {/* 1. SECCIÓN SALUD DEL SUELO (CIRCULAR GAUGE 78/100) */}
         <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-4">
           <div className="space-y-1.5 flex-1 min-w-0">
-            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-800/80 block">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-800/80 block">
               SALUD DEL SUELO
             </span>
-            <h1 className="text-xl sm:text-2xl font-black text-[#132A1C] leading-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-zinc-800 leading-tight">
               Tu suelo está{' '}
-              <span className="font-serif italic text-emerald-800 font-normal">
+              <span className="italic text-emerald-800 font-normal">
                 respondiendo bien.
               </span>
             </h1>
-            <p className="text-xs text-zinc-600 leading-relaxed">
+            <p className="text-xs text-zinc-600 leading-relaxed font-normal">
               Pequeñas prácticas de hoy protegen la cosecha de mañana.
             </p>
           </div>
@@ -294,7 +293,7 @@ export default function InicioTab({
                 cy="40"
                 r={radius}
                 stroke="#E5ECE2"
-                strokeWidth="6.5"
+                strokeWidth="6"
                 fill="transparent"
               />
               <circle
@@ -302,7 +301,7 @@ export default function InicioTab({
                 cy="40"
                 r={radius}
                 stroke="#7BB63E"
-                strokeWidth="6.5"
+                strokeWidth="6"
                 strokeDasharray={circumference}
                 strokeDashoffset={strokeDashoffset}
                 strokeLinecap="round"
@@ -311,10 +310,10 @@ export default function InicioTab({
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <span className="text-lg font-black text-[#132A1C] leading-none">
-                78<span className="text-[10px] text-zinc-500 font-semibold">/100</span>
+              <span className="text-lg font-bold text-zinc-800 leading-none">
+                78<span className="text-[10px] text-zinc-500 font-normal">/100</span>
               </span>
-              <span className="text-[7.5px] font-black text-emerald-800 uppercase tracking-tighter mt-0.5">
+              <span className="text-[7.5px] font-semibold text-emerald-800 uppercase tracking-tight mt-0.5">
                 BUEN ESTADO
               </span>
             </div>
@@ -336,10 +335,10 @@ export default function InicioTab({
               <AlertTriangle className="w-4 h-4 text-amber-700" />
             </div>
             <div className="min-w-0">
-              <h4 className="text-xs font-black text-[#132A1C] leading-tight truncate">
+              <h4 className="text-xs font-semibold text-zinc-800 leading-tight truncate">
                 Protege el suelo, no quemes el rastrojo
               </h4>
-              <p className="text-[11px] text-zinc-600 leading-snug mt-0.5">
+              <p className="text-[11px] text-zinc-600 leading-snug mt-0.5 font-normal">
                 La cobertura conserva humedad durante los días secos.
               </p>
             </div>
@@ -351,10 +350,10 @@ export default function InicioTab({
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
             <div>
-              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-900/60 block">
                 CAMPO Y SABERES
               </span>
-              <h2 className="text-lg font-black text-[#132A1C]">Mis parcelas</h2>
+              <h2 className="text-base sm:text-lg font-bold text-zinc-800">Mis parcelas</h2>
             </div>
             {onNavigateToParcelas && (
               <button
@@ -363,7 +362,7 @@ export default function InicioTab({
                   playBubblePop();
                   onNavigateToParcelas();
                 }}
-                className="text-xs font-bold text-emerald-800 hover:text-emerald-950 flex items-center gap-1 cursor-pointer transition"
+                className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 flex items-center gap-1 cursor-pointer transition"
               >
                 <span>Ver mapa</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -383,7 +382,7 @@ export default function InicioTab({
                     playBubblePop();
                     setSelectedCropFilter(filter);
                   }}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition cursor-pointer shrink-0 ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition cursor-pointer shrink-0 ${
                     isSelected
                       ? 'bg-[#7BB63E] text-white shadow-xs'
                       : 'bg-white text-zinc-700 border border-[#E5ECE2] hover:bg-zinc-50'
@@ -415,7 +414,7 @@ export default function InicioTab({
 
                 {/* Top Row: Crop Tag & Checkmark */}
                 <div className="relative z-10 flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-white/90 bg-[#132A1C]/80 px-2 py-0.5 rounded-full border border-white/10 backdrop-blur-xs">
+                  <span className="text-[10px] font-medium text-white/90 bg-[#132A1C]/80 px-2 py-0.5 rounded-full border border-white/10 backdrop-blur-xs">
                     {parcel.tag}
                   </span>
                   <div className="w-5 h-5 rounded-full bg-black/40 border border-white/20 flex items-center justify-center text-white/80">
@@ -428,10 +427,10 @@ export default function InicioTab({
                   <div className="w-7 h-7 rounded-xl bg-[#A3E635] flex items-center justify-center shadow-xs">
                     {parcel.icon}
                   </div>
-                  <h3 className="text-xs font-black text-white leading-tight">
+                  <h3 className="text-xs font-semibold text-white leading-tight">
                     {parcel.title}
                   </h3>
-                  <p className="text-[10px] text-zinc-300 leading-snug line-clamp-2">
+                  <p className="text-[10px] text-zinc-300 leading-snug line-clamp-2 font-normal">
                     {parcel.description}
                   </p>
                 </div>
@@ -444,10 +443,10 @@ export default function InicioTab({
         <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] space-y-3.5">
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-900/60 block">
                 CONSEJO DEL DÍA
               </span>
-              <h2 className="text-base font-black text-[#132A1C]">
+              <h2 className="text-base font-bold text-zinc-800">
                 Dos miradas, una chacra.
               </h2>
             </div>
@@ -458,7 +457,7 @@ export default function InicioTab({
                   playBubblePop();
                   onNavigateToCopiloto();
                 }}
-                className="text-xs font-bold text-emerald-800 hover:text-emerald-950 flex items-center gap-1 cursor-pointer transition"
+                className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 flex items-center gap-1 cursor-pointer transition"
               >
                 <span>Explorar</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -466,7 +465,7 @@ export default function InicioTab({
             )}
           </div>
 
-          {/* Dual Character Pills with LUCIDE SVG ICONS (NO EMOJIS!) */}
+          {/* Dual Character Pills with LUCIDE SVG ICONS */}
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -474,7 +473,7 @@ export default function InicioTab({
                 playBubblePop();
                 setActiveConsejoVoice('astro');
               }}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition cursor-pointer ${
                 activeConsejoVoice === 'astro'
                   ? 'bg-[#132A1C] text-white shadow-xs'
                   : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
@@ -490,7 +489,7 @@ export default function InicioTab({
                 playBubblePop();
                 setActiveConsejoVoice('kipu');
               }}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition cursor-pointer ${
                 activeConsejoVoice === 'kipu'
                   ? 'bg-[#132A1C] text-white shadow-xs'
                   : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
@@ -502,20 +501,20 @@ export default function InicioTab({
           </div>
 
           {/* Dynamic Advice Text */}
-          <div className="bg-[#F7F9F6] rounded-2xl p-3.5 border border-[#E5ECE2] text-xs text-zinc-800 leading-relaxed">
+          <div className="bg-[#F7F9F6] rounded-2xl p-3.5 border border-[#E5ECE2] text-xs text-zinc-700 leading-relaxed">
             {activeConsejoVoice === 'astro' ? (
-              <p className="font-serif italic text-zinc-800 text-[13px] leading-relaxed">
+              <p className="italic text-zinc-700 text-[12.5px] leading-relaxed font-normal">
                 &ldquo;SMAP observa humedad baja en la superficie. Mantén mulch de 5–8 cm y revisa el surco al amanecer.&rdquo;
               </p>
             ) : (
-              <p className="font-serif italic text-zinc-800 text-[13px] leading-relaxed">
+              <p className="italic text-zinc-700 text-[12.5px] leading-relaxed font-normal">
                 &ldquo;La luna menguante pide cuidar la humedad de la raíz. No remuevas la tierra en horas de sol fuerte y aporca con tierra fresca.&rdquo;
               </p>
             )}
           </div>
 
           {/* Footnote with Lucide Icon */}
-          <div className="text-[10px] text-zinc-500 flex items-center gap-1.5 font-medium pt-0.5">
+          <div className="text-[10px] text-zinc-500 flex items-center gap-1.5 font-normal pt-0.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
             <span>Datos satelitales actualizados · SMAP, GPM y NDVI</span>
           </div>

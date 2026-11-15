@@ -116,7 +116,7 @@ export default function SettingsFullScreenView({
           </button>
 
           <div className="text-center">
-            <h1 className="text-sm font-black text-[#132A1C]">Ajustes y Hardware</h1>
+            <h1 className="text-sm font-semibold text-[#132A1C]">Ajustes y Hardware</h1>
             <span className="text-[10px] text-zinc-500 font-mono">ID: {hardwareId || 'TQ-HW-C249'}</span>
           </div>
 
@@ -131,7 +131,7 @@ export default function SettingsFullScreenView({
         {/* Parcela Activa Card */}
         <div className="bg-white rounded-3xl p-5 border border-[#E5ECE2] shadow-xs space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-900/60">
               PARCELA ACTIVA
             </span>
             <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
@@ -193,7 +193,7 @@ export default function SettingsFullScreenView({
         {/* Microcuenca Selector */}
         {microcuencas.length > 0 && onUpdateProfile && (
           <div className="bg-white rounded-3xl p-5 border border-[#E5ECE2] shadow-xs space-y-2">
-            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-900/60 block">
               CAMBIAR MICROCUENCA ASOCIADA
             </span>
             <select
@@ -225,7 +225,7 @@ export default function SettingsFullScreenView({
         {/* Geolocation & GPS Diagnostic */}
         <div className="bg-white rounded-3xl p-5 border border-[#E5ECE2] shadow-xs space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-900/60">
               TELEMETRÍA GPS & SATÉLITE
             </span>
             <span className="text-[10px] font-mono text-zinc-500">
@@ -262,7 +262,7 @@ export default function SettingsFullScreenView({
               playSuccessFanfare();
               onOpenWizard();
             }}
-            className="w-full py-3.5 rounded-2xl bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-black text-xs flex items-center justify-center gap-2 shadow-xs transition active:scale-98 cursor-pointer"
+            className="w-full py-3.5 rounded-2xl bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition active:scale-98 cursor-pointer"
           >
             <Sparkles className="w-4 h-4" />
             <span>Calibrar chacra con Asistente Kipu</span>

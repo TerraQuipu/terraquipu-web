@@ -47,10 +47,10 @@ export default function RotationTab({
       {/* 1. Header Section */}
       <div className="flex items-start justify-between px-1 pt-1">
         <div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-900/60 block">
             PLAN DE CAMPAÑA · 2026–2027
           </span>
-          <h1 className="text-xl sm:text-2xl font-black text-[#132A1C] leading-tight">
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#132A1C] leading-tight">
             Rotar hoy,{' '}
             <span className="font-serif italic text-emerald-800 font-normal">
               cuidar mañana.
@@ -72,7 +72,7 @@ export default function RotationTab({
             playBubblePop();
             setActiveSeasonTab('inmediato');
           }}
-          className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition cursor-pointer text-center ${
+          className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold transition cursor-pointer text-center ${
             activeSeasonTab === 'inmediato'
               ? 'bg-white text-[#132A1C] shadow-xs'
               : 'text-zinc-600 hover:text-zinc-900'
@@ -88,7 +88,7 @@ export default function RotationTab({
             playBubblePop();
             setActiveSeasonTab('seca');
           }}
-          className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition cursor-pointer text-center ${
+          className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold transition cursor-pointer text-center ${
             activeSeasonTab === 'seca'
               ? 'bg-white text-[#132A1C] shadow-xs'
               : 'text-zinc-600 hover:text-zinc-900'
@@ -102,10 +102,10 @@ export default function RotationTab({
       {/* 3. Section: PRÓXIMOS CUATRO MESES (Lo que toca hacer - Frame 009) */}
       <div className="space-y-2.5">
         <div className="px-1">
-          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-900/60 block">
             PRÓXIMOS CUATRO MESES
           </span>
-          <h2 className="text-base font-black text-[#132A1C]">Lo que toca hacer</h2>
+          <h2 className="text-base font-semibold text-[#132A1C]">Lo que toca hacer</h2>
         </div>
 
         {activeSeasonTab === 'inmediato' ? (
@@ -118,14 +118,14 @@ export default function RotationTab({
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#7BB63E] ring-4 ring-lime-100 mb-1" />
-                  <span className="text-[9.5px] font-black text-emerald-900 uppercase">NOV</span>
+                  <span className="text-[9.5px] font-semibold text-emerald-900 uppercase">NOV</span>
                   <span className="text-[8px] text-zinc-400 font-mono">2026</span>
                 </div>
                 <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
                   <Tractor className="w-4 h-4 text-emerald-700" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-xs font-black text-[#132A1C] truncate">
+                  <h3 className="text-xs font-semibold text-[#132A1C] truncate">
                     Preparar surcos en contorno
                   </h3>
                   <p className="text-[10px] text-zinc-500 truncate mt-0.5">
@@ -141,14 +141,14 @@ export default function RotationTab({
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
                   <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
-                  <span className="text-[9.5px] font-black text-zinc-600 uppercase">DIC</span>
+                  <span className="text-[9.5px] font-semibold text-zinc-600 uppercase">DIC</span>
                   <span className="text-[8px] text-zinc-400 font-mono">2026</span>
                 </div>
                 <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
                   <Sprout className="w-4 h-4 text-emerald-700" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-xs font-black text-[#132A1C] truncate">
+                  <h3 className="text-xs font-semibold text-[#132A1C] truncate">
                     Sembrar Tarwi y Haba
                   </h3>
                   <p className="text-[10px] text-zinc-500 truncate mt-0.5">
@@ -164,14 +164,14 @@ export default function RotationTab({
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
                   <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
-                  <span className="text-[9.5px] font-black text-zinc-600 uppercase">ENE</span>
+                  <span className="text-[9.5px] font-semibold text-zinc-600 uppercase">ENE</span>
                   <span className="text-[8px] text-zinc-400 font-mono">2027</span>
                 </div>
                 <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
                   <Leaf className="w-4 h-4 text-emerald-700" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-xs font-black text-[#132A1C] truncate">
+                  <h3 className="text-xs font-semibold text-[#132A1C] truncate">
                     Revisar cobertura de rastrojo
                   </h3>
                   <p className="text-[10px] text-zinc-500 truncate mt-0.5">
@@ -187,14 +187,14 @@ export default function RotationTab({
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
                   <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
-                  <span className="text-[9.5px] font-black text-zinc-600 uppercase">FEB</span>
+                  <span className="text-[9.5px] font-semibold text-zinc-600 uppercase">FEB</span>
                   <span className="text-[8px] text-zinc-400 font-mono">2027</span>
                 </div>
                 <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
                   <Droplets className="w-4 h-4 text-emerald-700" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-xs font-black text-[#132A1C] truncate">
+                  <h3 className="text-xs font-semibold text-[#132A1C] truncate">
                     Medir humedad del suelo
                   </h3>
                   <p className="text-[10px] text-zinc-500 truncate mt-0.5">
@@ -214,14 +214,14 @@ export default function RotationTab({
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#7BB63E] ring-4 ring-lime-100 mb-1" />
-                  <span className="text-[9.5px] font-black text-emerald-900 uppercase">MAY</span>
+                  <span className="text-[9.5px] font-semibold text-emerald-900 uppercase">MAY</span>
                   <span className="text-[8px] text-zinc-400 font-mono">2027</span>
                 </div>
                 <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
                   <Wheat className="w-4 h-4 text-emerald-700" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-xs font-black text-[#132A1C] truncate">
+                  <h3 className="text-xs font-semibold text-[#132A1C] truncate">
                     Cosecha y selección de semilla
                   </h3>
                   <p className="text-[10px] text-zinc-500 truncate mt-0.5">
@@ -237,14 +237,14 @@ export default function RotationTab({
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
                   <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
-                  <span className="text-[9.5px] font-black text-zinc-600 uppercase">JUN</span>
+                  <span className="text-[9.5px] font-semibold text-zinc-600 uppercase">JUN</span>
                   <span className="text-[8px] text-zinc-400 font-mono">2027</span>
                 </div>
                 <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
                   <Leaf className="w-4 h-4 text-emerald-700" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-xs font-black text-[#132A1C] truncate">
+                  <h3 className="text-xs font-semibold text-[#132A1C] truncate">
                     Mulch protector contra heladas
                   </h3>
                   <p className="text-[10px] text-zinc-500 truncate mt-0.5">
@@ -260,14 +260,14 @@ export default function RotationTab({
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
                   <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
-                  <span className="text-[9.5px] font-black text-zinc-600 uppercase">JUL</span>
+                  <span className="text-[9.5px] font-semibold text-zinc-600 uppercase">JUL</span>
                   <span className="text-[8px] text-zinc-400 font-mono">2027</span>
                 </div>
                 <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
                   <Layers className="w-4 h-4 text-emerald-700" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-xs font-black text-[#132A1C] truncate">
+                  <h3 className="text-xs font-semibold text-[#132A1C] truncate">
                     Descanso del suelo y pastoreo
                   </h3>
                   <p className="text-[10px] text-zinc-500 truncate mt-0.5">
@@ -283,14 +283,14 @@ export default function RotationTab({
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
                   <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
-                  <span className="text-[9.5px] font-black text-zinc-600 uppercase">AGO</span>
+                  <span className="text-[9.5px] font-semibold text-zinc-600 uppercase">AGO</span>
                   <span className="text-[8px] text-zinc-400 font-mono">2027</span>
                 </div>
                 <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
                   <Sun className="w-4 h-4 text-emerald-700" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-xs font-black text-[#132A1C] truncate">
+                  <h3 className="text-xs font-semibold text-[#132A1C] truncate">
                     Acondicionar surcos y andenes
                   </h3>
                   <p className="text-[10px] text-zinc-500 truncate mt-0.5">
@@ -307,10 +307,10 @@ export default function RotationTab({
       {/* 4. Section: NUTRIENTES QUE SE QUEDAN (La secuencia importa - Frame 009) */}
       <div className="space-y-2.5">
         <div className="px-1">
-          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-900/60 block">
             NUTRIENTES QUE SE QUEDAN
           </span>
-          <h2 className="text-base font-black text-[#132A1C]">La secuencia importa</h2>
+          <h2 className="text-base font-semibold text-[#132A1C]">La secuencia importa</h2>
         </div>
 
         <div className="flex items-center gap-2">
@@ -322,8 +322,8 @@ export default function RotationTab({
             <span className="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400 block">
               CAMPAÑA 01
             </span>
-            <h4 className="text-xs font-black text-[#132A1C]">Papa nativa</h4>
-            <div className="text-sm font-black text-rose-700">
+            <h4 className="text-xs font-semibold text-[#132A1C]">Papa nativa</h4>
+            <div className="text-sm font-semibold text-rose-700">
               -70 <span className="text-[10px] font-normal text-zinc-500">kg N/ha</span>
             </div>
             <p className="text-[10px] text-zinc-500 leading-snug">
@@ -341,8 +341,8 @@ export default function RotationTab({
             <span className="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400 block">
               CAMPAÑA 02
             </span>
-            <h4 className="text-xs font-black text-[#132A1C]">Tarwi / Haba</h4>
-            <div className="text-sm font-black text-emerald-700">
+            <h4 className="text-xs font-semibold text-[#132A1C]">Tarwi / Haba</h4>
+            <div className="text-sm font-semibold text-emerald-700">
               +95 <span className="text-[10px] font-normal text-zinc-500">kg N/ha</span>
             </div>
             <p className="text-[10px] text-zinc-500 leading-snug">
@@ -362,7 +362,7 @@ export default function RotationTab({
       <div className="bg-[#1B3B22] rounded-3xl p-5 text-white shadow-md border border-emerald-900/60 space-y-4">
         {/* Caption + Gauge Icon */}
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-black uppercase tracking-widest text-[#A3E635]">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-[#A3E635]">
             SIMULADOR DE AHORRO
           </span>
           <div className="w-7 h-7 rounded-full bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-[#A3E635]">
@@ -372,7 +372,7 @@ export default function RotationTab({
 
         {/* Heading Editorial */}
         <div className="space-y-1">
-          <h3 className="text-xl font-black text-white leading-tight">
+          <h3 className="text-xl font-semibold text-white leading-tight">
             Menos insumos,{' '}
             <span className="font-serif italic text-[#A3E635] font-normal">
               más suelo vivo.
@@ -387,7 +387,7 @@ export default function RotationTab({
         <div className="space-y-2 pt-1">
           <div className="flex items-center justify-between text-xs font-bold">
             <span className="text-zinc-300">Área a rotar</span>
-            <span className="text-[#A3E635] text-sm font-black font-mono">
+            <span className="text-[#A3E635] text-sm font-semibold font-mono">
               {rotateAreaHa.toFixed(1)} ha
             </span>
           </div>
@@ -419,7 +419,7 @@ export default function RotationTab({
             </span>
           </div>
           <div className="text-right">
-            <span className="text-2xl font-black text-[#A3E635] leading-none">
+            <span className="text-2xl font-semibold text-[#A3E635] leading-none">
               S/ {calculatedSavings.toLocaleString()}
             </span>
           </div>

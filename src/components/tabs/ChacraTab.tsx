@@ -87,10 +87,10 @@ export default function ChacraTab({
       {/* 1. Header Section */}
       <div className="flex items-start justify-between px-1 pt-1">
         <div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-900/60 block">
             MICROCUENCA VILCANOTA · CUSCO
           </span>
-          <h1 className="text-xl sm:text-2xl font-black text-[#132A1C] leading-tight">
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#132A1C] leading-tight">
             Tu campo,{' '}
             <span className="font-serif italic text-emerald-800 font-normal">
               desde arriba.
@@ -114,7 +114,7 @@ export default function ChacraTab({
       {/* Info Popover if clicked */}
       {showInfoModal && (
         <div className="bg-white rounded-2xl p-3.5 border border-[#E5ECE2] shadow-sm text-xs text-zinc-700 space-y-2 animate-in fade-in">
-          <div className="flex items-center justify-between font-black text-emerald-900 text-[11px] uppercase">
+          <div className="flex items-center justify-between font-semibold text-emerald-900 text-[11px] uppercase">
             <span>Guía de Telemetría Satelital</span>
             <button
               type="button"
@@ -169,7 +169,7 @@ export default function ChacraTab({
 
         {/* Central Parcel Badge Tag */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
-          <div className="bg-[#7BB63E] text-[#132A1C] font-black text-xs px-3.5 py-1.5 rounded-full shadow-lg border border-white/40 flex items-center gap-1.5">
+          <div className="bg-[#7BB63E] text-[#132A1C] font-semibold text-xs px-3.5 py-1.5 rounded-full shadow-lg border border-white/40 flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-[#132A1C]" />
             <span>{profile.previousCropName || 'Papa Huayro'}</span>
           </div>
@@ -216,7 +216,7 @@ export default function ChacraTab({
             playBubblePop();
             setShowQgisTools(!showQgisTools);
           }}
-          className="absolute bottom-3 right-3 z-20 bg-white/90 hover:bg-white text-[#132A1C] text-[10px] font-black px-2.5 py-1 rounded-xl shadow-md border border-zinc-200 flex items-center gap-1 cursor-pointer transition active:scale-95"
+          className="absolute bottom-3 right-3 z-20 bg-white/90 hover:bg-white text-[#132A1C] text-[10px] font-semibold px-2.5 py-1 rounded-xl shadow-md border border-zinc-200 flex items-center gap-1 cursor-pointer transition active:scale-95"
           title="Herramienta de polígono libre QGIS"
         >
           <PenTool className="w-3 h-3 text-emerald-800" />
@@ -227,7 +227,7 @@ export default function ChacraTab({
       {/* Quick QGIS Area Resizer (if expanded) */}
       {showQgisTools && (
         <div className="bg-white rounded-2xl p-3.5 border border-[#E5ECE2] shadow-xs space-y-2 animate-in fade-in">
-          <div className="flex items-center justify-between text-xs font-black text-[#132A1C]">
+          <div className="flex items-center justify-between text-xs font-semibold text-[#132A1C]">
             <span className="flex items-center gap-1.5">
               <Sliders className="w-3.5 h-3.5 text-emerald-700" />
               Dimensionar Parcela Georreferenciada
@@ -345,10 +345,10 @@ export default function ChacraTab({
         {/* Header row: PARCELA SELECCIONADA + Name + Chevron button */}
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-900/60 block">
               PARCELA SELECCIONADA · Andén 03
             </span>
-            <h2 className="text-xl font-black text-[#132A1C] mt-0.5">
+            <h2 className="text-xl font-semibold text-[#132A1C] mt-0.5">
               {profile.previousCropName || 'Papa Huayro'}
             </h2>
           </div>
@@ -370,19 +370,19 @@ export default function ChacraTab({
         <div className="grid grid-cols-3 divide-x divide-[#E5ECE2] border-t border-b border-[#E5ECE2] py-3 text-center">
           <div className="px-1">
             <span className="text-[10px] font-semibold text-zinc-500 block">Área total</span>
-            <span className="text-sm font-black text-[#132A1C] mt-0.5 block">
+            <span className="text-sm font-semibold text-[#132A1C] mt-0.5 block">
               {currentArea} ha
             </span>
           </div>
           <div className="px-1">
             <span className="text-[10px] font-semibold text-zinc-500 block">Edad cultivo</span>
-            <span className="text-sm font-black text-[#132A1C] mt-0.5 block">
+            <span className="text-sm font-semibold text-[#132A1C] mt-0.5 block">
               45 días
             </span>
           </div>
           <div className="px-1">
             <span className="text-[10px] font-semibold text-zinc-500 block">Rendimiento est.</span>
-            <span className="text-sm font-black text-[#132A1C] mt-0.5 block">
+            <span className="text-sm font-semibold text-[#132A1C] mt-0.5 block">
               {Math.max(4, Math.round(currentArea * 3.4))} t
             </span>
           </div>
@@ -396,7 +396,7 @@ export default function ChacraTab({
               <Droplets className="w-4 h-4 text-emerald-700" />
             </div>
             <span className="text-[10px] font-bold text-zinc-500 block">Humedad suelo</span>
-            <span className="text-xl font-black text-[#132A1C] block leading-none">
+            <span className="text-xl font-semibold text-[#132A1C] block leading-none">
               35%
             </span>
             <span className="text-[9.5px] text-zinc-400 block font-mono">SMAP</span>
@@ -408,7 +408,7 @@ export default function ChacraTab({
               <Leaf className="w-4 h-4 text-emerald-700" />
             </div>
             <span className="text-[10px] font-bold text-zinc-500 block">Salud planta</span>
-            <span className="text-xl font-black text-[#132A1C] block leading-none">
+            <span className="text-xl font-semibold text-[#132A1C] block leading-none">
               78%
             </span>
             <span className="text-[9.5px] text-zinc-400 block font-mono">NDVI</span>
@@ -420,7 +420,7 @@ export default function ChacraTab({
               <Layers className="w-4 h-4 text-emerald-700" />
             </div>
             <span className="text-[10px] font-bold text-zinc-500 block">Calidad suelo</span>
-            <span className="text-xl font-black text-[#132A1C] block leading-none">
+            <span className="text-xl font-semibold text-[#132A1C] block leading-none">
               75%
             </span>
             <span className="text-[9.5px] text-zinc-400 block font-mono">Muestreo local</span>
@@ -432,7 +432,7 @@ export default function ChacraTab({
               <AlertTriangle className="w-4 h-4 text-emerald-700" />
             </div>
             <span className="text-[10px] font-bold text-zinc-500 block">Riesgo erosión</span>
-            <span className="text-xl font-black text-[#132A1C] block leading-none">
+            <span className="text-xl font-semibold text-[#132A1C] block leading-none">
               15%
             </span>
             <span className="text-[9.5px] text-zinc-400 block font-mono">Bajo</span>

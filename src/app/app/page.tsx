@@ -35,16 +35,19 @@ import InicioTab from '@/components/tabs/InicioTab';
 import ChacraTab from '@/components/tabs/ChacraTab';
 import RotationTab from '@/components/tabs/RotationTab';
 import CopilotTab from '@/components/tabs/CopilotTab';
-import FloatingNavFAB, { AppScreen } from '@/components/layout/FloatingNavFAB';
+import BottomNav, { MainTab } from '@/components/layout/BottomNav';
+import FloatingNewsFAB from '@/components/layout/FloatingNewsFAB';
 import SoilDiagnosticWizardModal from '@/components/SoilDiagnosticWizardModal';
 import SettingsFullScreenView from '@/components/views/SettingsFullScreenView';
 import NewsFullScreenView from '@/components/views/NewsFullScreenView';
 import WelcomeSplash from '@/components/WelcomeSplash';
 import KipuFullScreenWizard from '@/components/KipuFullScreenWizard';
 
+export type ScreenState = MainTab | 'ajustes' | 'noticias';
+
 export default function MobileApp() {
-  const [currentScreen, setCurrentScreen] = useState<AppScreen>('inicio');
-  const [previousScreen, setPreviousScreen] = useState<AppScreen>('inicio');
+  const [currentScreen, setCurrentScreen] = useState<ScreenState>('inicio');
+  const [previousScreen, setPreviousScreen] = useState<ScreenState>('inicio');
   const [copilotVoice, setCopilotVoice] = useState<'astro' | 'kipu'>('astro');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
@@ -152,7 +155,7 @@ export default function MobileApp() {
     }, 3500);
   };
 
-  const navigateTo = (screen: AppScreen) => {
+  const navigateTo = (screen: ScreenState) => {
     setPreviousScreen(currentScreen);
     setCurrentScreen(screen);
   };
@@ -256,7 +259,7 @@ export default function MobileApp() {
     return (
       <div className="flex flex-col h-full min-h-screen bg-[#F7F9F6]">
         {toastMessage && (
-          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-2xl bg-[#132A1C] text-white font-bold text-xs shadow-2xl backdrop-blur-md border border-emerald-500/40 flex items-center gap-2">
+          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-2xl bg-[#132A1C] text-white font-medium text-xs shadow-2xl backdrop-blur-md border border-emerald-500/40 flex items-center gap-2">
             <span>{toastMessage}</span>
           </div>
         )}
@@ -286,7 +289,6 @@ export default function MobileApp() {
           onReset={() => setShowWelcome(true)}
           onUpdateProfile={handleUpdateProfile}
         />
-        <FloatingNavFAB currentScreen={currentScreen} onNavigate={navigateTo} />
       </div>
     );
   }
@@ -296,7 +298,6 @@ export default function MobileApp() {
     return (
       <div className="flex flex-col h-full min-h-screen bg-[#F7F9F6] text-[#132A1C]">
         <NewsFullScreenView onBack={goBack} />
-        <FloatingNavFAB currentScreen={currentScreen} onNavigate={navigateTo} />
       </div>
     );
   }
@@ -305,14 +306,14 @@ export default function MobileApp() {
     <div className="flex flex-col h-full min-h-screen bg-[#F7F9F6] text-[#132A1C] relative overflow-x-hidden font-sans selection:bg-[#84CC16] selection:text-[#132A1C]">
       {/* Toast Notification Pill */}
       {toastMessage && (
-        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-2xl bg-[#132A1C] text-white font-bold text-xs shadow-2xl backdrop-blur-md border border-emerald-500/40 flex items-center gap-2 animate-in fade-in">
+        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-2xl bg-[#132A1C] text-white font-medium text-xs shadow-2xl backdrop-blur-md border border-emerald-500/40 flex items-center gap-2 animate-in fade-in">
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* SUB-SCREEN TOP NAVIGATION BAR: Only visible on secondary screens (NOT on Inicio or Diagnóstico) */}
       {currentScreen !== 'inicio' && currentScreen !== 'diagnostico' && (
-        <header className="bg-white/95 backdrop-blur-md border-b border-[#E5ECE2] px-4 py-3 sticky top-0 z-40 shadow-xs">
+        <header className="bg-white/95 backdrop-blur-md border-b border-[#E5ECE2] px-4 py-3 sticky top-0 z-30 shadow-xs">
           <div className="max-w-md mx-auto w-full flex items-center justify-between gap-3">
             <button
               type="button"
@@ -320,13 +321,13 @@ export default function MobileApp() {
                 playBubblePop();
                 navigateTo('inicio');
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-[#132A1C] font-bold text-xs transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-[#132A1C] font-semibold text-xs transition cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Volver a Inicio</span>
             </button>
 
-            <span className="text-xs font-black text-[#132A1C] capitalize">
+            <span className="text-xs font-semibold text-zinc-800 capitalize">
               {currentScreen === 'parcelas' && 'Mis Parcelas'}
               {currentScreen === 'rotacion' && 'Rotación de Cultivos'}
               {currentScreen === 'copiloto' && 'Copiloto Andino'}
@@ -432,11 +433,17 @@ export default function MobileApp() {
         )}
       </main>
 
-      {/* Floating Action Button Navigation (Fixed at bottom right) */}
-      <FloatingNavFAB
-        currentScreen={currentScreen}
-        onNavigate={navigateTo}
-      />
+      {/* Floating Action Button for News / Boletines ENOS (Positioned comfortably on the right above the bottom nav) */}
+      <FloatingNewsFAB onOpenNews={() => navigateTo('noticias')} />
+
+      {/* Bottom Mobile Navigation Bar (Fixed at the bottom across all main tabs) */}
+      {currentScreen !== 'diagnostico' && (
+        <BottomNav
+          activeTab={currentScreen === 'inicio' || currentScreen === 'parcelas' || currentScreen === 'rotacion' || currentScreen === 'copiloto' ? currentScreen : 'inicio'}
+          onSelectTab={(tab) => navigateTo(tab)}
+          onOpenDiagnostic={() => navigateTo('diagnostico')}
+        />
+      )}
     </div>
   );
 }
