@@ -118,7 +118,7 @@ export default function CuatroPilaresBanner() {
           <h4 className="font-black text-base sm:text-lg text-slate-950 tracking-tight leading-snug">
             {currentPilar.title}
           </h4>
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-sans mt-1">
+          <p className="text-xs sm:text-sm text-black font-medium leading-relaxed font-sans mt-1">
             {currentPilar.description}
           </p>
         </div>
