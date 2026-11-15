@@ -40,10 +40,11 @@ import FloatingNewsFAB from '@/components/layout/FloatingNewsFAB';
 import SoilDiagnosticWizardModal from '@/components/SoilDiagnosticWizardModal';
 import SettingsFullScreenView from '@/components/views/SettingsFullScreenView';
 import NewsFullScreenView from '@/components/views/NewsFullScreenView';
+import ParcelDrawerFullScreenView from '@/components/views/ParcelDrawerFullScreenView';
 import WelcomeSplash from '@/components/WelcomeSplash';
 import KipuFullScreenWizard from '@/components/KipuFullScreenWizard';
 
-export type ScreenState = MainTab | 'ajustes' | 'noticias';
+export type ScreenState = MainTab | 'ajustes' | 'noticias' | 'visor_qgis';
 
 export default function MobileApp() {
   const [currentScreen, setCurrentScreen] = useState<ScreenState>('inicio');
@@ -302,6 +303,30 @@ export default function MobileApp() {
     );
   }
 
+  // Full Screen View: Visor Satelital QGIS
+  if (currentScreen === 'visor_qgis') {
+    return (
+      <ParcelDrawerFullScreenView
+        onBack={goBack}
+        onParcelCreated={(newParcel) => {
+          handleUpdateProfile({
+            parcelName: newParcel.name,
+            areaHa: newParcel.areaHa,
+            lat: newParcel.lat,
+            lon: newParcel.lon,
+            altitude: newParcel.altitudeMsnm,
+            previousCropName: newParcel.cropName,
+          });
+          triggerToast(`Parcela "${newParcel.name}" guardada con éxito`);
+          navigateTo('parcelas');
+        }}
+        initialLat={profile.lat}
+        initialLon={profile.lon}
+        initialAreaHa={profile.areaHa || 1.73}
+      />
+    );
+  }
+
   return (
     <div className="flex flex-col h-full min-h-screen bg-[#F7F9F6] text-[#132A1C] relative overflow-x-hidden font-sans selection:bg-[#84CC16] selection:text-[#132A1C]">
       {/* Toast Notification Pill */}
@@ -389,6 +414,7 @@ export default function MobileApp() {
               handleUpdateProfile({ areaHa: newArea });
             }}
             onOpenWizard={() => navigateTo('diagnostico')}
+            onOpenQgisDrawer={() => navigateTo('visor_qgis')}
           />
         )}
 
@@ -417,6 +443,7 @@ export default function MobileApp() {
               navigateTo('copiloto');
             }}
             onToast={triggerToast}
+            onOpenQgisDrawer={() => navigateTo('visor_qgis')}
           />
         )}
 
@@ -442,6 +469,7 @@ export default function MobileApp() {
           activeTab={currentScreen === 'inicio' || currentScreen === 'parcelas' || currentScreen === 'rotacion' || currentScreen === 'copiloto' ? currentScreen : 'inicio'}
           onSelectTab={(tab) => navigateTo(tab)}
           onOpenDiagnostic={() => navigateTo('diagnostico')}
+          onOpenQgisDrawer={() => navigateTo('visor_qgis')}
         />
       )}
     </div>

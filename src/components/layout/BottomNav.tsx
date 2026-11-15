@@ -10,12 +10,14 @@ interface BottomNavProps {
   activeTab: MainTab;
   onSelectTab: (tab: MainTab) => void;
   onOpenDiagnostic: () => void;
+  onOpenQgisDrawer?: () => void;
 }
 
 export default function BottomNav({
   activeTab,
   onSelectTab,
   onOpenDiagnostic,
+  onOpenQgisDrawer,
 }: BottomNavProps) {
   return (
     <nav className="fixed bottom-3 left-3 right-3 max-w-md mx-auto z-40 bg-[#132A1C] rounded-full px-3 py-1.5 shadow-2xl border border-emerald-900/60 backdrop-blur-md">
@@ -62,21 +64,25 @@ export default function BottomNav({
           )}
         </button>
 
-        {/* Tab 3: Central FAB Button (+) -> Diagnóstico de Suelo */}
+        {/* Tab 3: Central FAB Button (+) -> Visor Satelital QGIS a Pantalla Completa */}
         <div className="flex flex-col items-center justify-center -translate-y-1.5 px-1 shrink-0">
           <button
             type="button"
             onClick={() => {
               playSuccessFanfare();
-              onOpenDiagnostic();
+              if (onOpenQgisDrawer) {
+                onOpenQgisDrawer();
+              } else {
+                onOpenDiagnostic();
+              }
             }}
             className={`w-11 h-11 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] flex items-center justify-center shadow-lg shadow-lime-600/40 transition transform active:scale-90 cursor-pointer ${
               activeTab === 'diagnostico'
                 ? 'ring-4 ring-[#A3E635]/60 scale-105'
                 : 'ring-2 ring-emerald-900/60'
             }`}
-            title="Diagnóstico rápido de suelo"
-            aria-label="Abrir diagnóstico rápido de suelo"
+            title="Delimitar parcela con visor satelital QGIS"
+            aria-label="Delimitar parcela con visor satelital QGIS"
           >
             <Plus className="w-5 h-5 stroke-[2.5]" />
           </button>

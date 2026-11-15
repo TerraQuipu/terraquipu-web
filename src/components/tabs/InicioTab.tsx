@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ClimaNasa, FarmerProfile } from '@/lib/types';
 import {
   Bell,
@@ -96,11 +96,22 @@ export default function InicioTab({
     ? parcelsData
     : parcelsData.filter((p) => p.cropCategory === selectedCropFilter);
 
-  // Circular gauge calculations (78/100)
-  const healthScore = 78;
+  // Circular gauge calculations and dynamic smooth animation
+  const healthScore = (profile as any)?.healthScore || 78;
+  const [animatedScore, setAnimatedScore] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimatedScore(healthScore);
+    }, 120);
+    return () => clearTimeout(timer);
+  }, [healthScore]);
+
   const radius = 34;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (healthScore / 100) * circumference;
+  const strokeDashoffset = circumference - (animatedScore / 100) * circumference;
+  const scoreStatus = healthScore >= 75 ? 'BUEN ESTADO' : healthScore >= 50 ? 'REGULAR' : 'ALERTA';
+  const scoreColor = healthScore >= 75 ? '#7BB63E' : healthScore >= 50 ? '#F59E0B' : '#EF4444';
 
   // Real or calibrated telemetry readings
   const tempC = climaNasa?.temp_media_c ? Math.round(climaNasa.temp_media_c) : 21;
@@ -286,8 +297,8 @@ export default function InicioTab({
           </div>
 
           {/* Circular Gauge 78/100 */}
-          <div className="relative shrink-0 flex flex-col items-center justify-center w-22 h-22">
-            <svg className="w-22 h-22 transform -rotate-90" viewBox="0 0 80 80">
+          <div className="relative shrink-0 flex flex-col items-center justify-center w-20 h-20">
+            <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 80 80" width={80} height={80}>
               <circle
                 cx="40"
                 cy="40"
@@ -300,7 +311,7 @@ export default function InicioTab({
                 cx="40"
                 cy="40"
                 r={radius}
-                stroke="#7BB63E"
+                stroke={scoreColor}
                 strokeWidth="6"
                 strokeDasharray={circumference}
                 strokeDashoffset={strokeDashoffset}
@@ -309,12 +320,12 @@ export default function InicioTab({
                 className="transition-all duration-1000 ease-out"
               />
             </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
               <span className="text-lg font-bold text-zinc-800 leading-none">
-                78<span className="text-[10px] text-zinc-500 font-normal">/100</span>
+                {healthScore}<span className="text-[10px] text-zinc-500 font-normal">/100</span>
               </span>
               <span className="text-[7.5px] font-semibold text-emerald-800 uppercase tracking-tight mt-0.5">
-                BUEN ESTADO
+                {scoreStatus}
               </span>
             </div>
           </div>

@@ -108,3 +108,27 @@ export interface RotationRecommendation {
   advice: string;
   sequence: Cultivo[];
 }
+
+export interface ParcelItem {
+  id: string;
+  name: string;
+  cropId: string;
+  cropName: string;
+  cropCategory: string; // 'Papa nativa' | 'Maíz' | 'Quinua' | 'Cebada' | 'Habas' | 'Hortalizas'
+  areaHa: number;
+  areaTopos: number;
+  lat: number;
+  lon: number;
+  altitudeMsnm: number;
+  microcuenca: string;
+  polygonCoords?: [number, number][];
+  plantAgeDays: number;
+  estimatedYieldTons: number;
+  healthScore: number;
+  smapHumidity: number;
+  ndviScore: number;
+  photoUrl: string;
+  notes?: string;
+  createdAt: string;
+}
+
