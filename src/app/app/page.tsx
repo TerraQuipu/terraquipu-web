@@ -276,102 +276,105 @@ export default function MobileApp() {
   }
 
   return (
-    <div className="flex flex-col h-full min-h-screen bg-white relative overflow-hidden">
+    <div className="flex flex-col h-full min-h-screen bg-[#0A1A0F] text-slate-100 relative overflow-hidden font-sans selection:bg-emerald-500 selection:text-white">
       {/* Toast Notification Pill */}
       {toastMessage && (
-        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-2xl bg-slate-900/95 text-white font-bold text-xs shadow-xl backdrop-blur-md border border-slate-700 flex items-center gap-2">
+        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-2xl bg-slate-900/95 text-white font-bold text-xs shadow-2xl backdrop-blur-md border border-emerald-500/40 flex items-center gap-2">
           <span className="contrast-bold-white">{toastMessage}</span>
         </div>
       )}
 
-      {/* Top Mobile App Header */}
-      <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 px-2.5 py-1.5 sticky top-0 z-40 flex items-center justify-between shadow-xs gap-1.5">
-        <div className="flex items-center gap-1.5 min-w-0 shrink">
-          <div className="w-7 h-7 rounded-xl bg-emerald-800 flex items-center justify-center text-white font-bold text-xs shadow-xs shrink-0">
-            🌱
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-1">
-              <span className="font-extrabold text-xs text-slate-950 tracking-tight truncate">
-                TerraQuipu
-              </span>
-              <span className="text-[8px] font-black uppercase px-1 py-0.2 rounded bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
-                Móvil
-              </span>
+      {/* Top Mobile App Header - Dark Forest Glassmorphism */}
+      <header className="bg-[#0A1A0F]/85 backdrop-blur-xl border-b border-emerald-500/20 px-3 py-2 sticky top-0 z-40 shadow-lg">
+        <div className="max-w-md mx-auto w-full flex items-center justify-between gap-1.5">
+          <div className="flex items-center gap-2 min-w-0 shrink">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-800 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-emerald-950/60 shrink-0 border border-emerald-400/30">
+              🌱
             </div>
-            {/* Quick Parcel Switcher / Profile Pill */}
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="font-black text-sm text-white tracking-tight truncate">
+                  TerraQuipu
+                </span>
+                <span className="text-[8.5px] font-black uppercase px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shrink-0">
+                  Móvil
+                </span>
+              </div>
+              {/* Quick Parcel Switcher / Profile Pill */}
+              <button
+                type="button"
+                onClick={() => setActiveTab('ajustes')}
+                className="flex items-center gap-1 text-[10px] font-bold text-emerald-300 hover:text-emerald-100 transition cursor-pointer truncate max-w-[130px] sm:max-w-[170px]"
+                title="Ir a ajustes de la parcela"
+              >
+                <span className="truncate">{profile.parcelName} • {profile.distrito}</span>
+                <ChevronDown className="w-2.5 h-2.5 text-emerald-400 shrink-0" />
+              </button>
+            </div>
+          </div>
+
+          {/* Right: Refresh button + Compact Telemetry (Humedad & Temperatura) */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Refresh button with green border */}
             <button
               type="button"
-              onClick={() => setActiveTab('ajustes')}
-              className="flex items-center gap-0.5 text-[10px] font-bold text-slate-700 hover:text-slate-950 transition cursor-pointer truncate max-w-[125px] sm:max-w-[160px]"
-              title="Ir a ajustes de la parcela"
+              onClick={handleRefreshData}
+              disabled={isRefreshing}
+              className={`w-7 h-7 rounded-full border border-emerald-500/40 bg-[#132A1C]/80 text-emerald-400 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-sm hover:bg-emerald-900/60 shrink-0 ${
+                isRefreshing ? 'border-emerald-400 bg-emerald-900/80' : ''
+              }`}
+              title="Recibir datos frescos de la nube (Hora Perú)"
             >
-              <span className="truncate">{profile.parcelName} • {profile.distrito}</span>
-              <ChevronDown className="w-2.5 h-2.5 text-slate-500 shrink-0" />
+              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-300' : 'text-emerald-400'}`} />
             </button>
-          </div>
-        </div>
 
-        {/* Right: Refresh button + Compact Telemetry (Humedad & Temperatura) */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          {/* Refresh button with green border */}
-          <button
-            type="button"
-            onClick={handleRefreshData}
-            disabled={isRefreshing}
-            className={`w-7 h-7 rounded-full border-2 border-emerald-400 bg-emerald-50 text-emerald-800 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-2xs hover:bg-emerald-100 shrink-0 ${
-              isRefreshing ? 'border-emerald-600 bg-emerald-100' : ''
-            }`}
-            title="Recibir datos frescos de la nube (Hora Perú)"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-600' : 'text-emerald-700'}`} />
-          </button>
+            {/* Compact Humedad SMAP Pill */}
+            <div className="px-2 py-0.5 rounded-xl bg-[#132A1C]/80 border border-cyan-500/30 text-left leading-tight shadow-sm backdrop-blur-md">
+              <div className="flex items-center gap-0.5 text-[8.5px] font-bold text-cyan-300">
+                <Droplets className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
+                <span className="truncate">Humedad SMAP</span>
+              </div>
+              <div className="text-[11px] font-black text-white leading-none my-0.5">
+                {smapPercent}% <span className="text-[8px] font-normal text-cyan-200/70">vol</span>
+              </div>
+              <div className="text-[7.5px] font-extrabold text-emerald-400 truncate leading-none">
+                {smapPercent < 20 ? '⚠️ Déficit' : '✓ Adecuada'}
+              </div>
+            </div>
 
-          {/* Compact Humedad SMAP Pill */}
-          <div className="px-2 py-0.5 rounded-xl bg-sky-50/80 border border-sky-200 text-left leading-tight shadow-2xs">
-            <div className="flex items-center gap-0.5 text-[8.5px] font-bold text-sky-800">
-              <Droplets className="w-2.5 h-2.5 text-sky-600 shrink-0" />
-              <span className="truncate">Humedad SMAP</span>
-            </div>
-            <div className="text-[11px] font-black text-slate-900 leading-none my-0.5">
-              {smapPercent}% <span className="text-[8px] font-normal text-slate-500">vol</span>
-            </div>
-            <div className="text-[7.5px] font-extrabold text-emerald-700 truncate leading-none">
-              {smapPercent < 20 ? '⚠️ Déficit' : '✓ Adecuada'}
-            </div>
-          </div>
-
-          {/* Compact Temperatura Pill */}
-          <div className="px-2 py-0.5 rounded-xl bg-amber-50/80 border border-amber-200 text-left leading-tight shadow-2xs">
-            <div className="flex items-center gap-0.5 text-[8.5px] font-bold text-amber-800">
-              <Thermometer className="w-2.5 h-2.5 text-amber-600 shrink-0" />
-              <span className="truncate">Temperatura</span>
-            </div>
-            <div className="text-[11px] font-black text-slate-900 leading-none my-0.5">
-              {climaNasa?.temp_media_c ? `${climaNasa.temp_media_c} °C` : '11.1 °C'}
-            </div>
-            <div className="text-[7.5px] font-medium text-slate-500 truncate leading-none">
-              NASA POWER
+            {/* Compact Temperatura Pill */}
+            <div className="px-2 py-0.5 rounded-xl bg-[#132A1C]/80 border border-amber-500/30 text-left leading-tight shadow-sm backdrop-blur-md">
+              <div className="flex items-center gap-0.5 text-[8.5px] font-bold text-amber-300">
+                <Thermometer className="w-2.5 h-2.5 text-amber-400 shrink-0" />
+                <span className="truncate">Temperatura</span>
+              </div>
+              <div className="text-[11px] font-black text-white leading-none my-0.5">
+                {climaNasa?.temp_media_c ? `${climaNasa.temp_media_c} °C` : '11.1 °C'}
+              </div>
+              <div className="text-[7.5px] font-medium text-amber-200/70 truncate leading-none">
+                NASA POWER
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Paisaje de los Andes de Fondo: Más claro, nítido y fuerte desde arriba, degradando suavemente a blanquito */}
+      {/* Paisaje Andino Oscuro de Fondo (Dark Forest Atmosphere) */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
         <div
-          className="absolute top-0 inset-x-0 h-[620px] bg-top bg-cover bg-no-repeat"
+          className="absolute top-0 inset-x-0 h-[640px] bg-top bg-cover bg-no-repeat"
           style={{
             backgroundImage: `url('/images/andes_bright.jpg')`,
-            opacity: 0.92,
+            opacity: 0.12,
+            filter: 'saturate(1.2) brightness(0.8)',
             maskImage:
-              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 20%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0) 92%)',
+              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0) 90%)',
             WebkitMaskImage:
-              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 20%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0) 92%)',
+              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0) 90%)',
           }}
         />
-        {/* Degradé suave que disuelve limpiamente a blanquito */}
-        <div className="absolute top-0 inset-x-0 h-[620px] bg-gradient-to-b from-transparent via-white/20 via-40% via-white/75 via-65% to-white" />
+        {/* Degradé profundo al Dark Forest */}
+        <div className="absolute top-0 inset-x-0 h-[700px] bg-gradient-to-b from-[#0F2918]/60 via-[#0A1A0F]/90 to-[#0A1A0F]" />
       </div>
 
       {/* Main Tab Content (Scrollable, z-10 sobre el fondo andino) */}
@@ -414,6 +417,13 @@ export default function MobileApp() {
                 priorityName: prioName,
               }));
             }}
+            onUpdateArea={(newArea) => {
+              setProfile((prev) => {
+                const updated = { ...prev, areaHa: newArea };
+                saveDeviceProfile(updated);
+                return updated;
+              });
+            }}
           />
         )}
 
@@ -434,27 +444,27 @@ export default function MobileApp() {
         {/* ================= TAB 4: DIAGNÓSTICO DE SUELO ================= */}
         {activeTab === 'tierra' && (
           <div className="space-y-4 animate-in fade-in">
-            {/* Kipu Agrónomo Mascot con Globo de Diálogo (Mismo branding de Inicio y Clima) */}
+            {/* Kipu Agrónomo Mascot con Globo de Diálogo Glassmorphic */}
             <div className="flex items-center gap-3.5 pt-1 pb-1 min-h-[155px]">
               <div className="w-28 sm:w-32 h-36 sm:h-40 shrink-0 relative flex items-center justify-center">
                 <img
                   src="/images/kipu_llama.png"
                   alt="Kipu Suelo"
-                  className="w-full h-full object-contain filter drop-shadow-md"
+                  className="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]"
                 />
               </div>
-              <div className="flex-1 relative bg-white border-2 border-emerald-600 border-b-4 border-b-emerald-700 rounded-3xl p-3.5 shadow-xs">
-                <div className="absolute top-7 -left-2.5 w-4 h-4 bg-white border-b-2 border-l-2 border-emerald-600 transform rotate-45"></div>
+              <div className="flex-1 relative bg-[#132A1C]/80 border border-emerald-500/40 rounded-3xl p-3.5 shadow-xl backdrop-blur-md text-slate-100">
+                <div className="absolute top-7 -left-2.5 w-4 h-4 bg-[#132A1C] border-b border-l border-emerald-500/40 transform rotate-45"></div>
                 <div className="flex items-center justify-between gap-1 mb-1.5">
-                  <span className="font-black text-xs text-emerald-950 uppercase tracking-wide">
+                  <span className="font-black text-xs text-emerald-400 uppercase tracking-wide">
                     KIPU AGRÓNOMO
                   </span>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-300 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-md">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                     Laboratorio
                   </span>
                 </div>
-                <p className="text-xs text-black font-semibold leading-relaxed font-sans">
+                <p className="text-xs text-slate-200 font-medium leading-relaxed font-sans">
                   Tocar la tierra con tus manos revela su estructura y humedad al instante. Realiza la prueba del puño para calibrar los sensores NASA con tu terreno:
                 </p>
               </div>
@@ -477,21 +487,21 @@ export default function MobileApp() {
         {/* ================= TAB 5: SABERES ANDINOS ================= */}
         {activeTab === 'saberes' && (
           <div className="space-y-4 animate-in fade-in">
-            {/* Kipu Sabio Mascot */}
+            {/* Kipu Sabio Mascot Glassmorphic */}
             <div className="flex items-center gap-3.5 pt-1 pb-1 min-h-[155px]">
               <div className="w-28 sm:w-32 h-36 sm:h-40 shrink-0 relative flex items-center justify-center">
                 <img
                   src="/images/kipu_llama.png"
                   alt="Kipu Saberes"
-                  className="w-full h-full object-contain filter drop-shadow-md"
+                  className="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]"
                 />
               </div>
-              <div className="flex-1 relative bg-white border-2 border-purple-600 border-b-4 border-b-purple-700 rounded-3xl p-3.5 shadow-xs">
-                <div className="absolute top-7 -left-2.5 w-4 h-4 bg-white border-b-2 border-l-2 border-purple-600 transform rotate-45"></div>
-                <span className="font-extrabold text-xs text-purple-950 uppercase tracking-wide block mb-1">
+              <div className="flex-1 relative bg-[#132A1C]/80 border border-purple-500/40 rounded-3xl p-3.5 shadow-xl backdrop-blur-md text-slate-100">
+                <div className="absolute top-7 -left-2.5 w-4 h-4 bg-[#132A1C] border-b border-l border-purple-500/40 transform rotate-45"></div>
+                <span className="font-extrabold text-xs text-purple-400 uppercase tracking-wide block mb-1">
                   KIPU SABIO
                 </span>
-                <p className="text-xs text-black font-semibold leading-relaxed font-sans">
+                <p className="text-xs text-slate-200 font-medium leading-relaxed font-sans">
                   Nuestros abuelos perfeccionaron los andenes y las asociaciones de cultivos. Aplica estos saberes en tu chacra para no depender de químicos:
                 </p>
               </div>

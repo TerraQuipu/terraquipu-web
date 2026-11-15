@@ -543,17 +543,17 @@ export default function DecisionPanel({
                 </span>
               </div>
 
-              {/* Radar GPM Rainfall & NDVI */}
+              {/* Radar GPM Rainfall & NDVI Calibrado */}
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200">
                   <span className="text-[10px] text-zinc-500 font-medium flex items-center gap-1">
                     <CloudRain className="w-3 h-3 text-blue-500" /> Lluvia Radar GPM
                   </span>
                   <span className="font-bold text-zinc-950 text-sm font-mono block mt-0.5">
-                    {climateMode === 'nino' ? '510 mm' : '680 mm'}
+                    {climateMode === 'nino' ? '517 mm' : '680 mm'}
                   </span>
                   <span className="text-[10px] text-zinc-500 font-mono">
-                    {climateMode === 'nino' ? '-170 mm déficit' : 'Promedio normal'}
+                    {climateMode === 'nino' ? '-24% déficit ENOS' : 'Línea base histórica'}
                   </span>
                 </div>
 
@@ -564,7 +564,9 @@ export default function DecisionPanel({
                   <span className="font-bold text-emerald-700 text-sm font-mono block mt-0.5">
                     {activeParcel.ndvi.toFixed(2)}
                   </span>
-                  <span className="text-[10px] text-zinc-500">Salud vegetal buena</span>
+                  <span className="text-[10px] text-zinc-500">
+                    {activeParcel.groundTruthCalibrated ? '✓ Calibrado en campo' : 'Telemetría orbital'}
+                  </span>
                 </div>
               </div>
 

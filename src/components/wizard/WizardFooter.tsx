@@ -25,12 +25,12 @@ export default function WizardFooter({
   onFinish,
 }: WizardFooterProps) {
   return (
-    <div className="pt-4 pb-2 border-t border-slate-100 flex items-center justify-between gap-3 sticky bottom-0 bg-white">
+    <div className="pt-4 pb-4 border-t border-emerald-500/20 flex items-center justify-between gap-3 sticky bottom-0 bg-[#0A1A0F]/90 backdrop-blur-xl px-2">
       {step > 1 ? (
         <button
           type="button"
           onClick={onPrev}
-          className="py-3 px-4 rounded-2xl bg-white border-2 border-slate-200 border-b-4 border-b-slate-300 text-slate-700 font-bold text-xs flex items-center gap-1.5 active:border-b-2 active:translate-y-0.5 transition cursor-pointer"
+          className="py-3 px-4 rounded-2xl bg-[#132A1C]/80 border border-emerald-500/30 text-emerald-300 hover:text-white font-bold text-xs flex items-center gap-1.5 active:scale-95 transition cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Atrás</span>
@@ -44,15 +44,13 @@ export default function WizardFooter({
           type="button"
           disabled={!canProceed}
           onClick={onNext}
-          className={`flex-1 max-w-[240px] py-4 px-6 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 transition ml-auto ${
+          className={`flex-1 max-w-[240px] py-4 px-6 rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition ml-auto ${
             canProceed
-              ? speaker === 'astro'
-                ? 'bg-sky-600 hover:bg-sky-700 border-b-4 border-b-sky-800 text-white shadow-md active:border-b-2 active:translate-y-0.5 cursor-pointer animate-in fade-in'
-                : 'bg-emerald-700 hover:bg-emerald-800 border-b-4 border-b-emerald-900 text-white shadow-md active:border-b-2 active:translate-y-0.5 cursor-pointer animate-in fade-in'
-              : 'bg-slate-100 border-2 border-slate-200 border-b-4 border-b-slate-300 text-slate-400 cursor-not-allowed opacity-70'
+              ? 'bg-gradient-to-r from-lime-400 to-emerald-400 hover:from-lime-300 hover:to-emerald-300 text-slate-950 shadow-lg shadow-lime-500/20 active:scale-95 cursor-pointer animate-in fade-in'
+              : 'bg-[#132A1C]/50 border border-emerald-500/20 text-slate-500 cursor-not-allowed opacity-60'
           }`}
         >
-          <span className={canProceed ? 'contrast-bold-white' : ''}>Continuar</span>
+          <span>Continuar</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       ) : (
@@ -60,16 +58,14 @@ export default function WizardFooter({
           type="button"
           disabled={!canProceed}
           onClick={onFinish}
-          className={`flex-1 py-4 px-6 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 transition ${
+          className={`flex-1 py-4 px-6 rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition ${
             canProceed
-              ? 'bg-emerald-700 hover:bg-emerald-800 border-b-4 border-b-emerald-900 text-white shadow-lg active:border-b-2 active:translate-y-0.5 cursor-pointer animate-in fade-in'
-              : 'bg-slate-100 border-2 border-slate-200 border-b-4 border-b-slate-300 text-slate-400 cursor-not-allowed opacity-70'
+              ? 'bg-gradient-to-r from-lime-400 to-emerald-400 hover:from-lime-300 hover:to-emerald-300 text-slate-950 shadow-xl shadow-lime-500/30 active:scale-95 cursor-pointer animate-in fade-in'
+              : 'bg-[#132A1C]/50 border border-emerald-500/20 text-slate-500 cursor-not-allowed opacity-60'
           }`}
         >
-          <Check className="w-5 h-5 text-emerald-200" />
-          <span className={canProceed ? 'contrast-bold-white' : ''}>
-            Guardar &amp; Entrar a mi Chacra ({areaHa} ha)
-          </span>
+          <Check className="w-5 h-5 text-emerald-950" />
+          <span>Completar y Calibrar Parcela</span>
         </button>
       )}
     </div>

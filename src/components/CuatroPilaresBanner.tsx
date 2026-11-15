@@ -99,37 +99,46 @@ export default function CuatroPilaresBanner() {
 
   return (
     <div className="space-y-2.5">
-      {/* Título de la Sección sin emoji ni contador 1 de 4 */}
-      <div className="px-1">
-        <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">
+      {/* Título de la Sección */}
+      <div className="px-1 flex items-center justify-between">
+        <h3 className="text-xs font-black uppercase tracking-wider text-emerald-400">
           Los Cuatro Pilares para Vencer a la Sequía
         </h3>
+        <span className="text-[10px] text-emerald-400/80 font-bold">
+          {currentIndex + 1} / {PILARES.length}
+        </span>
       </div>
 
-      {/* Slide Deslizable sin marco ni fondo verde */}
+      {/* Slide Deslizable Dark Forest Glassmorphism */}
       <div
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className="transition-all duration-300 select-none cursor-grab active:cursor-grabbing px-1 space-y-2"
+        className="glass-panel p-3.5 space-y-2.5 transition-all duration-300 select-none cursor-grab active:cursor-grabbing"
       >
-        {/* Solo Título y Descripción con alto contraste sobre fondo claro */}
+        {/* Título y Descripción con alto contraste */}
         <div>
-          <h4 className="font-black text-base sm:text-lg text-slate-950 tracking-tight leading-snug">
+          <div className="inline-block px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[9px] font-black tracking-wider uppercase mb-1 border border-emerald-500/30">
+            {currentPilar.badge}
+          </div>
+          <h4 className="font-black text-base sm:text-lg text-white tracking-tight leading-snug">
             {currentPilar.title}
           </h4>
-          <p className="text-xs sm:text-sm text-black font-medium leading-relaxed font-sans mt-1">
+          <p className="text-xs sm:text-sm text-slate-200 font-normal leading-relaxed font-sans mt-1">
             {currentPilar.description}
           </p>
         </div>
 
         {/* Imagen limpia del Pilar Abajo */}
-        <div className="w-full h-44 sm:h-52 rounded-2xl overflow-hidden relative shadow-md border border-slate-200/90 bg-slate-100">
+        <div className="w-full h-44 sm:h-52 rounded-2xl overflow-hidden relative shadow-lg border border-emerald-500/30 bg-slate-950">
           <img
             src={currentPilar.image}
             alt={currentPilar.title}
             className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
           />
+          <div className="absolute bottom-2.5 left-2.5 px-2.5 py-1 rounded-xl bg-slate-950/80 backdrop-blur-md border border-emerald-500/40 text-[10px] font-bold text-emerald-300">
+            {currentPilar.highlight}
+          </div>
         </div>
       </div>
 
@@ -138,7 +147,7 @@ export default function CuatroPilaresBanner() {
         <button
           type="button"
           onClick={prevSlide}
-          className="p-1 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-200/60 transition active:scale-90 cursor-pointer"
+          className="w-7 h-7 rounded-full bg-[#132A1C]/80 border border-emerald-500/30 text-emerald-300 hover:text-white flex items-center justify-center transition active:scale-90 cursor-pointer shadow-sm"
           title="Pilar anterior"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -146,17 +155,20 @@ export default function CuatroPilaresBanner() {
 
         {/* Puntos Indicadores */}
         <div className="flex items-center gap-1.5">
-          {PILARES.map((pilar, idx) => (
+          {PILARES.map((_, idx) => (
             <button
-              key={pilar.id}
+              key={idx}
               type="button"
-              onClick={() => goToSlide(idx)}
-              className={`transition-all rounded-full cursor-pointer ${
+              onClick={() => {
+                playBubblePop();
+                setCurrentIndex(idx);
+              }}
+              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                 idx === currentIndex
-                  ? 'w-6 h-1.5 bg-emerald-700'
-                  : 'w-1.5 h-1.5 bg-slate-300 hover:bg-slate-400'
+                  ? 'w-6 bg-lime-400 shadow-xs shadow-lime-400/50'
+                  : 'w-1.5 bg-emerald-800/60 hover:bg-emerald-700'
               }`}
-              title={`Ir al pilar ${pilar.id}`}
+              title={`Ir al pilar ${idx + 1}`}
             />
           ))}
         </div>
@@ -164,7 +176,7 @@ export default function CuatroPilaresBanner() {
         <button
           type="button"
           onClick={nextSlide}
-          className="p-1 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-200/60 transition active:scale-90 cursor-pointer"
+          className="w-7 h-7 rounded-full bg-[#132A1C]/80 border border-emerald-500/30 text-emerald-300 hover:text-white flex items-center justify-center transition active:scale-90 cursor-pointer shadow-sm"
           title="Pilar siguiente"
         >
           <ChevronRight className="w-4 h-4" />

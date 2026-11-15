@@ -74,36 +74,37 @@ export default function SettingsTab({
     }
   };
 
+  const area = profile.areaHa || 1.0;
+  const topos = (area * 3.3).toFixed(1);
+
   return (
-    <div className="space-y-4 animate-in fade-in pb-8">
-      {/* Kipu Hardware con su Globo de Diálogo (Mismo branding de Inicio y Clima) */}
+    <div className="space-y-4 animate-in fade-in pb-16 pt-1">
+      {/* 1. KIPU HARDWARE CON GLOBO GLASSMORPHIC */}
       <div className="flex items-center gap-3.5 pt-1 pb-1 min-h-[155px]">
-        {/* Llama Avatar libre sin fondo blanco */}
+        {/* Llama Avatar libre */}
         <div className="w-28 sm:w-32 h-36 sm:h-40 shrink-0 relative flex items-center justify-center">
           <img
             src="/images/kipu_llama.png"
             alt="Kipu Ajustes"
-            className="w-full h-full object-contain filter drop-shadow-md"
+            className="w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.6)]"
           />
         </div>
 
-        {/* Globo de Diálogo apuntando a Kipu */}
-        <div className="flex-1 relative bg-white border-2 border-emerald-600 border-b-4 border-b-emerald-700 rounded-3xl p-3.5 shadow-xs">
-          <div className="absolute top-7 -left-2.5 w-4 h-4 bg-white border-b-2 border-l-2 border-emerald-600 transform rotate-45"></div>
+        {/* Globo de Diálogo Glassmorphic */}
+        <div className="flex-1 relative bg-[#132A1C]/80 border border-emerald-500/40 rounded-3xl p-3.5 shadow-xl backdrop-blur-md text-slate-100">
+          <div className="absolute top-7 -left-2.5 w-4 h-4 bg-[#132A1C] border-b border-l border-emerald-500/40 transform rotate-45"></div>
 
           <div className="flex items-center justify-between gap-1 mb-1.5">
-            <span className="font-black text-xs text-emerald-950 uppercase tracking-wide">
-              KIPU AJUSTES
+            <span className="font-black text-xs text-emerald-400 uppercase tracking-wide flex items-center gap-1.5">
+              <span>KIPU AJUSTES</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
             </span>
-            <div className="flex items-center gap-1.5">
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
-                En Línea
-              </span>
-            </div>
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-300 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-md">
+              En Línea
+            </span>
           </div>
 
-          <p className="text-xs text-black font-semibold leading-relaxed font-sans">
+          <p className="text-xs text-slate-200 font-medium leading-relaxed font-sans">
             <TypewriterText
               key={hardwareId}
               text={`¡Chacra calibrada! Dispositivo vinculado a ${profile.distrito} (${profile.altitude} msnm). Telemetría satelital NASA SMAP y parámetros edáficos sincronizados.`}
@@ -113,86 +114,86 @@ export default function SettingsTab({
         </div>
       </div>
 
-      {/* Telemetría de Dispositivo: Barra oscura limpia sin tarjetas anidadas */}
-      <div className="p-3.5 bg-slate-900 rounded-2xl text-white shadow-xs space-y-2">
+      {/* 2. IDENTIFICADOR FÍSICO DE DISPOSITIVO (DARK FOREST GLASS PANEL) */}
+      <div className="glass-panel p-3.5 space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
             <Cpu className="w-4 h-4 text-emerald-400" />
             <span>Identificador Físico de Dispositivo</span>
           </span>
-          <span className="text-[11px] font-mono font-bold bg-emerald-800 text-white px-2.5 py-0.5 rounded-lg border border-emerald-500">
+          <span className="text-[11px] font-mono font-bold bg-emerald-950/80 text-emerald-300 px-2.5 py-0.5 rounded-lg border border-emerald-500/40">
             {hardwareId}
           </span>
         </div>
-        <div className="text-[11px] text-slate-300 grid grid-cols-2 gap-2 pt-1 font-mono border-t border-slate-800">
+        <div className="text-[11px] text-slate-300 grid grid-cols-2 gap-2 pt-1 font-mono border-t border-emerald-500/20">
           <div>
-            <span className="text-slate-400 block text-[10px]">Pantalla:</span>
+            <span className="text-emerald-400/80 block text-[10px]">Pantalla:</span>
             <span>{typeof window !== 'undefined' ? `${window.screen.width}x${window.screen.height}` : 'Mobile'}</span>
           </div>
           <div>
-            <span className="text-slate-400 block text-[10px]">Zona Horaria:</span>
+            <span className="text-emerald-400/80 block text-[10px]">Zona Horaria:</span>
             <span>America/Lima</span>
           </div>
         </div>
       </div>
 
-      {/* Parámetros de la Parcela: Lista elegante sin cajitas dentro de cajitas */}
-      <div className="bg-white rounded-3xl border-2 border-slate-200 p-4 space-y-3 shadow-xs">
-        <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
+      {/* 3. PARÁMETROS DE LA PARCELA (SIN CARDS ANIDADOS INNECESARIOS) */}
+      <div className="glass-panel p-4 space-y-3">
+        <div className="flex items-center justify-between pb-2.5 border-b border-emerald-500/20">
           <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-emerald-700" />
-            <h4 className="font-black text-sm text-slate-950">Parámetros de la Parcela</h4>
+            <MapPin className="w-4 h-4 text-emerald-400" />
+            <h4 className="font-black text-sm text-white">Parámetros de la Parcela</h4>
           </div>
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
             Sincronizado
           </span>
         </div>
 
-        {/* Rejilla limpia de pares clave-valor sin micro-cards ni bordes innecesarios */}
+        {/* Rejilla limpia de pares clave-valor */}
         <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
           <div>
-            <span className="text-[11px] text-slate-500 font-medium block">Microcuenca</span>
-            <span className="font-bold text-slate-950 block truncate">{profile.cuencaName}</span>
+            <span className="text-[11px] text-emerald-400/80 font-medium block">Microcuenca</span>
+            <span className="font-bold text-white block truncate">{profile.cuencaName}</span>
           </div>
           <div>
-            <span className="text-[11px] text-slate-500 font-medium block">Ubicación</span>
-            <span className="font-bold text-slate-950 block truncate">
+            <span className="text-[11px] text-emerald-400/80 font-medium block">Ubicación</span>
+            <span className="font-bold text-white block truncate">
               {profile.distrito}, {profile.provincia}
             </span>
           </div>
           <div>
-            <span className="text-[11px] text-slate-500 font-medium block">Altitud Oficial</span>
-            <span className="font-bold text-slate-950 block">{profile.altitude} msnm</span>
+            <span className="text-[11px] text-emerald-400/80 font-medium block">Altitud Oficial</span>
+            <span className="font-bold text-white block">{profile.altitude} msnm</span>
           </div>
           <div>
-            <span className="text-[11px] text-slate-500 font-medium block">Coordenadas</span>
-            <span className="font-bold text-slate-950 block font-mono text-[11px]">
+            <span className="text-[11px] text-emerald-400/80 font-medium block">Coordenadas</span>
+            <span className="font-bold text-slate-200 block font-mono text-[11px]">
               {profile.lat.toFixed(3)}, {profile.lon.toFixed(3)}
             </span>
           </div>
           <div>
-            <span className="text-[11px] text-slate-500 font-medium block">Área de Parcela</span>
-            <span className="font-bold text-emerald-900 block font-mono">
-              {profile.areaHa || 2.4} ha ({((profile.areaHa || 2.4) * 3.3).toFixed(1)} topos)
+            <span className="text-[11px] text-emerald-400/80 font-medium block">Área de Parcela</span>
+            <span className="font-bold text-lime-300 block font-mono">
+              {area} ha ({topos} topos)
             </span>
           </div>
           <div>
-            <span className="text-[11px] text-slate-500 font-medium block">Cosecha Previa</span>
-            <span className="font-bold text-slate-950 block">{profile.previousCropName}</span>
+            <span className="text-[11px] text-emerald-400/80 font-medium block">Cosecha Previa</span>
+            <span className="font-bold text-white block">{profile.previousCropName}</span>
           </div>
-          <div className="col-span-2 pt-2 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-[11px] text-slate-500 font-medium">Prioridad de Campaña:</span>
-            <span className="font-black text-emerald-900 text-xs bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200">
+          <div className="col-span-2 pt-2 border-t border-emerald-500/20 flex items-center justify-between">
+            <span className="text-[11px] text-emerald-400/80 font-medium">Prioridad de Campaña:</span>
+            <span className="font-black text-slate-950 text-xs bg-lime-400 px-2.5 py-0.5 rounded-lg border border-lime-500">
               {profile.priorityName}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Acciones de Calibración */}
-      <div className="bg-white rounded-3xl border-2 border-slate-200 p-4 space-y-3 shadow-xs">
-        <h4 className="font-black text-sm text-slate-950 flex items-center gap-2">
-          <Sliders className="w-4 h-4 text-emerald-700" />
+      {/* 4. ACCIONES DE CALIBRACIÓN */}
+      <div className="glass-panel p-4 space-y-3">
+        <h4 className="font-black text-sm text-white flex items-center gap-2">
+          <Sliders className="w-4 h-4 text-emerald-400" />
           <span>Acciones de Calibración</span>
         </h4>
 
@@ -200,10 +201,10 @@ export default function SettingsTab({
         <button
           type="button"
           onClick={onOpenWizard}
-          className="w-full py-3 px-4 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs active:scale-95 transition cursor-pointer"
+          className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg active:scale-95 transition cursor-pointer border border-emerald-400/40"
         >
-          <RotateCcw className="w-4 h-4 text-emerald-200" />
-          <span className="contrast-bold-white">Reconfigurar Chacra con Asistente Kipu</span>
+          <RotateCcw className="w-4 h-4 text-lime-300" />
+          <span>Reconfigurar Chacra con Asistente Kipu</span>
         </button>
 
         {/* Probar GPS */}
@@ -211,16 +212,16 @@ export default function SettingsTab({
           type="button"
           onClick={testGPS}
           disabled={gpsTesting}
-          className="w-full py-3 px-4 rounded-2xl bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs active:scale-95 transition cursor-pointer"
+          className="w-full py-3 px-4 rounded-2xl bg-cyan-950/70 hover:bg-cyan-900/80 border border-cyan-500/40 text-cyan-200 font-bold text-xs flex items-center justify-center gap-2 shadow-sm active:scale-95 transition cursor-pointer"
         >
-          <Navigation className={`w-4 h-4 text-sky-100 ${gpsTesting ? 'animate-spin' : ''}`} />
-          <span className="contrast-bold-white">
+          <Navigation className={`w-4 h-4 text-cyan-400 ${gpsTesting ? 'animate-spin' : ''}`} />
+          <span>
             {gpsTesting ? 'Comprobando Satélites GPS...' : 'Comprobar Señal GPS Satelital'}
           </span>
         </button>
 
         {gpsResult && (
-          <div className="p-3 rounded-2xl bg-slate-100 border border-slate-200 text-xs text-slate-800 font-medium">
+          <div className="p-3 rounded-2xl bg-slate-950/80 border border-emerald-500/40 text-xs text-emerald-200 font-mono">
             {gpsResult}
           </div>
         )}
@@ -229,43 +230,43 @@ export default function SettingsTab({
         <button
           type="button"
           onClick={handleResetProfile}
-          className="w-full py-2.5 px-4 rounded-2xl border border-red-300 text-red-700 hover:bg-red-50 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer"
+          className="w-full py-2.5 px-4 rounded-2xl border border-red-500/40 bg-red-950/30 text-red-300 hover:bg-red-950/60 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer"
         >
-          <Trash2 className="w-4 h-4 text-red-600" />
+          <Trash2 className="w-4 h-4 text-red-400" />
           <span>Desvincular Chacra de este Dispositivo</span>
         </button>
       </div>
 
-      {/* Estado de Conectividad con la Nube y APIs */}
-      <div className="bg-white rounded-3xl border-2 border-slate-200 p-4 space-y-2.5 shadow-xs text-xs">
-        <h4 className="font-black text-sm text-slate-950 flex items-center gap-2">
-          <Database className="w-4 h-4 text-slate-700" />
+      {/* 5. ESTADO DE CONECTIVIDAD CON LA NUBE Y APIS */}
+      <div className="glass-panel p-4 space-y-2.5 text-xs">
+        <h4 className="font-black text-sm text-white flex items-center gap-2">
+          <Database className="w-4 h-4 text-emerald-400" />
           <span>Conectividad de Base de Datos &amp; APIs</span>
         </h4>
 
         <div className="space-y-2 pt-1">
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200">
-            <span className="font-bold text-slate-900 flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#0A1A0F]/60 border border-emerald-500/20">
+            <span className="font-bold text-slate-200 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
               <span>Supabase Cloud (PostGIS)</span>
             </span>
-            <span className="font-mono text-[10px] text-emerald-800 font-bold bg-white px-2 py-0.5 rounded border border-emerald-200">200 OK</span>
+            <span className="font-mono text-[10px] text-emerald-300 font-bold bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30">200 OK</span>
           </div>
 
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200">
-            <span className="font-bold text-slate-900 flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#0A1A0F]/60 border border-emerald-500/20">
+            <span className="font-bold text-slate-200 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
               <span>NASA SMAP L4 (Humedad Suelo)</span>
             </span>
-            <span className="font-mono text-[10px] text-emerald-800 font-bold bg-white px-2 py-0.5 rounded border border-emerald-200">ACTIVO</span>
+            <span className="font-mono text-[10px] text-emerald-300 font-bold bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30">ACTIVO</span>
           </div>
 
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200">
-            <span className="font-bold text-slate-900 flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
-              <span>OpenStreetMap &amp; Leaflet Tiles</span>
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#0A1A0F]/60 border border-emerald-500/20">
+            <span className="font-bold text-slate-200 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <span>ESRI World Imagery &amp; QGIS OSM</span>
             </span>
-            <span className="font-mono text-[10px] text-emerald-800 font-bold bg-white px-2 py-0.5 rounded border border-emerald-200">CONECTADO</span>
+            <span className="font-mono text-[10px] text-emerald-300 font-bold bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30">CONECTADO</span>
           </div>
         </div>
       </div>

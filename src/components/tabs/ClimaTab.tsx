@@ -66,17 +66,17 @@ export default function ClimaTab({
 
           <AgroClimaNewsFeed isOpen={isNewsOpen} onClose={() => setIsNewsOpen(false)} />
 
-          {/* Módulos Temáticos Limpios: Imagen a la izquierda, sin card de fondo ni redundancias */}
-          <div className="space-y-4 pt-1">
+          {/* Módulos Temáticos Dark Forest Glassmorphism */}
+          <div className="space-y-3 pt-1">
             {/* Tarjeta 1: Pronóstico 5 Días & Heladas */}
             <div
               onClick={() => {
                 playBubblePop();
                 setClimaView('forecast');
               }}
-              className="flex items-center gap-3.5 pt-1 pb-1 animate-in fade-in duration-300 min-h-[140px] px-1 group cursor-pointer"
+              className="p-3.5 rounded-3xl bg-[#132A1C]/75 hover:bg-[#183925]/85 border border-emerald-500/30 hover:border-emerald-400/60 shadow-xl backdrop-blur-md transition-all duration-300 flex items-center gap-3.5 group cursor-pointer"
             >
-              <div className="w-28 sm:w-32 h-28 sm:h-32 rounded-2xl overflow-hidden shrink-0 shadow-md border border-slate-200/90 bg-slate-900">
+              <div className="w-24 sm:w-28 h-24 sm:h-28 rounded-2xl overflow-hidden shrink-0 shadow-lg border border-emerald-500/30 bg-slate-950">
                 <img
                   src="/images/andes_poster.jpg"
                   alt="Cordillera de los Andes Pronóstico"
@@ -85,16 +85,16 @@ export default function ClimaTab({
               </div>
 
               <div className="flex-1 min-w-0 space-y-1">
-                <h3 className="font-black text-base text-slate-950 group-hover:text-sky-900 transition leading-snug">
+                <h3 className="font-black text-sm sm:text-base text-white group-hover:text-emerald-300 transition leading-snug">
                   Pronóstico a 5 Días &amp; Heladas
                 </h3>
-                <p className="text-xs text-black font-semibold font-sans leading-relaxed">
+                <p className="text-xs text-slate-300 font-medium font-sans leading-relaxed line-clamp-2">
                   Temperaturas mín/máx, radiación solar UV y alerta de heladas nocturnas para {profile.distrito}.
                 </p>
                 <div className="pt-1">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-800 hover:bg-sky-700 text-white text-xs font-bold shadow-xs active:scale-95 transition">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-cyan-950/80 border border-cyan-500/40 text-cyan-200 text-xs font-bold shadow-sm group-hover:bg-cyan-900 transition">
                     <span>Ver pronóstico</span>
-                    <ArrowRight className="w-3 h-3 text-sky-200" />
+                    <ArrowRight className="w-3 h-3 text-cyan-300" />
                   </span>
                 </div>
               </div>
@@ -106,9 +106,9 @@ export default function ClimaTab({
                 playBubblePop();
                 setClimaView('elnino');
               }}
-              className="flex items-center gap-3.5 pt-1 pb-1 animate-in fade-in duration-300 min-h-[140px] px-1 group cursor-pointer"
+              className="p-3.5 rounded-3xl bg-[#132A1C]/75 hover:bg-[#183925]/85 border border-emerald-500/30 hover:border-emerald-400/60 shadow-xl backdrop-blur-md transition-all duration-300 flex items-center gap-3.5 group cursor-pointer"
             >
-              <div className="w-28 sm:w-32 h-28 sm:h-32 rounded-2xl overflow-hidden shrink-0 shadow-md border border-slate-200/90 bg-slate-900">
+              <div className="w-24 sm:w-28 h-24 sm:h-28 rounded-2xl overflow-hidden shrink-0 shadow-lg border border-emerald-500/30 bg-slate-950">
                 <img
                   src="/images/cultivos_poster.jpg"
                   alt="Simulador Sequía El Niño"
@@ -117,16 +117,16 @@ export default function ClimaTab({
               </div>
 
               <div className="flex-1 min-w-0 space-y-1">
-                <h3 className="font-black text-base text-slate-950 group-hover:text-amber-900 transition leading-snug">
+                <h3 className="font-black text-sm sm:text-base text-white group-hover:text-amber-300 transition leading-snug">
                   Simulador Sequía El Niño &amp; Plagas
                 </h3>
-                <p className="text-xs text-black font-semibold font-sans leading-relaxed">
+                <p className="text-xs text-slate-300 font-medium font-sans leading-relaxed line-clamp-2">
                   Simula escenarios de sequía andina, variedades de contingencia (Tarwi) y corte del gorgojo.
                 </p>
                 <div className="pt-1">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-800 hover:bg-amber-700 text-white text-xs font-bold shadow-xs active:scale-95 transition">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-950/80 border border-amber-500/40 text-amber-200 text-xs font-bold shadow-sm group-hover:bg-amber-900 transition">
                     <span>Abrir simulador</span>
-                    <ArrowRight className="w-3 h-3 text-amber-200" />
+                    <ArrowRight className="w-3 h-3 text-amber-300" />
                   </span>
                 </div>
               </div>
@@ -138,9 +138,9 @@ export default function ClimaTab({
                 playBubblePop();
                 setIsSanidadOpen(true);
               }}
-              className="flex items-center gap-3.5 pt-1 pb-1 animate-in fade-in duration-300 min-h-[140px] px-1 group cursor-pointer"
+              className="p-3.5 rounded-3xl bg-[#132A1C]/75 hover:bg-[#183925]/85 border border-emerald-500/30 hover:border-emerald-400/60 shadow-xl backdrop-blur-md transition-all duration-300 flex items-center gap-3.5 group cursor-pointer"
             >
-              <div className="w-28 sm:w-32 h-28 sm:h-32 rounded-2xl overflow-hidden shrink-0 shadow-md border border-slate-200/90 bg-slate-900">
+              <div className="w-24 sm:w-28 h-24 sm:h-28 rounded-2xl overflow-hidden shrink-0 shadow-lg border border-emerald-500/30 bg-slate-950">
                 <img
                   src="/images/tarwi_chocho.jpg"
                   alt="Sanidad Vegetal Tarwi Biocontrol"
@@ -149,16 +149,16 @@ export default function ClimaTab({
               </div>
 
               <div className="flex-1 min-w-0 space-y-1">
-                <h3 className="font-black text-base text-slate-950 group-hover:text-emerald-900 transition leading-snug">
+                <h3 className="font-black text-sm sm:text-base text-white group-hover:text-emerald-300 transition leading-snug">
                   Sanidad Vegetal &amp; Biocontrol Andino
                 </h3>
-                <p className="text-xs text-black font-semibold font-sans leading-relaxed">
-                  Barrera perimetral de Tarwi con alcaloides repelentes (-84% gorgojo), zanjas trampa con ceniza y Beauveria bassiana.
+                <p className="text-xs text-slate-300 font-medium font-sans leading-relaxed line-clamp-2">
+                  Barrera perimetral de Tarwi con alcaloides repelentes (-84% gorgojo) y zanjas trampa.
                 </p>
                 <div className="pt-1">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs active:scale-95 transition">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-200 text-xs font-bold shadow-sm group-hover:bg-emerald-900 transition">
                     <span>Ver sanidad vegetal</span>
-                    <ArrowRight className="w-3 h-3 text-emerald-200" />
+                    <ArrowRight className="w-3 h-3 text-emerald-300" />
                   </span>
                 </div>
               </div>
@@ -170,9 +170,9 @@ export default function ClimaTab({
                 playBubblePop();
                 setIsAssistantOpen(true);
               }}
-              className="flex items-center gap-3.5 pt-1 pb-1 animate-in fade-in duration-300 min-h-[140px] px-1 group cursor-pointer"
+              className="p-3.5 rounded-3xl bg-[#132A1C]/75 hover:bg-[#183925]/85 border border-emerald-500/30 hover:border-emerald-400/60 shadow-xl backdrop-blur-md transition-all duration-300 flex items-center gap-3.5 group cursor-pointer"
             >
-              <div className="w-28 sm:w-32 h-28 sm:h-32 rounded-2xl overflow-hidden shrink-0 shadow-md border border-slate-200/90 bg-slate-900">
+              <div className="w-24 sm:w-28 h-24 sm:h-28 rounded-2xl overflow-hidden shrink-0 shadow-lg border border-emerald-500/30 bg-slate-950">
                 <img
                   src="/images/quipu_plan.jpg"
                   alt="Asistente Agroambiental El Niño"
@@ -181,16 +181,16 @@ export default function ClimaTab({
               </div>
 
               <div className="flex-1 min-w-0 space-y-1">
-                <h3 className="font-black text-base text-slate-950 group-hover:text-emerald-900 transition leading-snug">
+                <h3 className="font-black text-sm sm:text-base text-white group-hover:text-lime-300 transition leading-snug">
                   Asistente Agroambiental &amp; Calendario
                 </h3>
-                <p className="text-xs text-black font-semibold font-sans leading-relaxed">
-                  Calendario preventivo en 4 bloques temporales y rotación A13 para proteger tu suelo ante El Niño en Piuray-Qorimarca y Cusco.
+                <p className="text-xs text-slate-300 font-medium font-sans leading-relaxed line-clamp-2">
+                  Calendario preventivo en 4 bloques temporales y rotación A13 para proteger tu suelo ante El Niño.
                 </p>
                 <div className="pt-1">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs active:scale-95 transition">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gradient-to-r from-lime-400 to-emerald-400 text-slate-950 text-xs font-black shadow-md group-hover:from-lime-300 group-hover:to-emerald-300 transition">
                     <span>Consultar Asistente</span>
-                    <ArrowRight className="w-3 h-3 text-emerald-200" />
+                    <ArrowRight className="w-3 h-3 text-slate-950" />
                   </span>
                 </div>
               </div>
@@ -217,9 +217,9 @@ export default function ClimaTab({
               playBubblePop();
               setClimaView('index');
             }}
-            className="px-4 py-2 rounded-2xl bg-white border-2 border-slate-200 border-b-4 border-b-slate-300 text-slate-800 font-bold text-xs flex items-center gap-2 transition active:border-b-2 active:translate-y-0.5 cursor-pointer"
+            className="px-4 py-2 rounded-2xl bg-[#132A1C]/80 border border-emerald-500/40 text-emerald-200 hover:text-white font-bold text-xs flex items-center gap-2 transition active:scale-95 cursor-pointer shadow-lg backdrop-blur-md"
           >
-            <ArrowLeft className="w-4 h-4 text-slate-600" />
+            <ArrowLeft className="w-4 h-4 text-emerald-400" />
             <span>Volver al Índice de Clima</span>
           </button>
 
@@ -227,6 +227,8 @@ export default function ClimaTab({
             clima={climaNasa}
             cuencaName={profile.distrito}
             isElNino={isElNino}
+            lat={profile.lat}
+            lon={profile.lon}
           />
         </div>
       )}
@@ -240,9 +242,9 @@ export default function ClimaTab({
               playBubblePop();
               setClimaView('index');
             }}
-            className="px-4 py-2 rounded-2xl bg-white border-2 border-slate-200 border-b-4 border-b-slate-300 text-slate-800 font-bold text-xs flex items-center gap-2 transition active:border-b-2 active:translate-y-0.5 cursor-pointer"
+            className="px-4 py-2 rounded-2xl bg-[#132A1C]/80 border border-emerald-500/40 text-emerald-200 hover:text-white font-bold text-xs flex items-center gap-2 transition active:scale-95 cursor-pointer shadow-lg backdrop-blur-md"
           >
-            <ArrowLeft className="w-4 h-4 text-slate-600" />
+            <ArrowLeft className="w-4 h-4 text-emerald-400" />
             <span>Volver al Índice de Clima</span>
           </button>
 

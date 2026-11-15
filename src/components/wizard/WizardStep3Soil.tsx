@@ -36,10 +36,10 @@ export default function WizardStep3Soil({
   return (
     <div className="space-y-3 animate-in fade-in flex-1">
       <div>
-        <h2 className="text-base sm:text-lg font-bold text-slate-950 tracking-tight">
+        <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
           1. ¿Cómo se siente tu tierra al apretarla húmeda?
         </h2>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <p className="text-xs text-emerald-400/80 mt-0.5">
           Prueba del puño para corregir SoilGrids y medir infiltración:
         </p>
       </div>
@@ -52,20 +52,20 @@ export default function WizardStep3Soil({
               key={opt.id}
               type="button"
               onClick={() => onSelect(opt.id)}
-              className={`w-full p-4 rounded-2xl border-2 border-b-4 text-left transition-all flex items-center justify-between cursor-pointer ${
+              className={`w-full p-4 rounded-2xl text-left transition-all flex items-center justify-between cursor-pointer ${
                 isSelected
-                  ? 'border-emerald-600 border-b-emerald-700 bg-emerald-50 text-emerald-950 font-bold ring-2 ring-emerald-500/20 active:border-b-2 active:translate-y-0.5'
-                  : 'border-slate-200 border-b-slate-300 bg-white hover:border-slate-300 hover:bg-slate-50 active:border-b-2 active:translate-y-0.5 text-slate-800'
+                  ? 'border-2 border-lime-400 bg-emerald-950/90 text-white shadow-xl shadow-emerald-950/50 ring-2 ring-lime-500/30'
+                  : 'border border-emerald-500/25 bg-[#132A1C]/70 hover:bg-[#183925]/90 hover:border-emerald-500/50 text-slate-200'
               }`}
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{opt.emoji}</span>
                 <div>
-                  <div className="text-xs font-bold text-slate-900">{opt.label}</div>
-                  <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">{opt.desc}</div>
+                  <div className="text-xs font-bold text-white">{opt.label}</div>
+                  <div className="text-[11px] text-emerald-300/80 mt-0.5 leading-snug">{opt.desc}</div>
                 </div>
               </div>
-              {isSelected && <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0" />}
+              {isSelected && <CheckCircle2 className="w-5 h-5 text-lime-400 flex-shrink-0" />}
             </button>
           );
         })}

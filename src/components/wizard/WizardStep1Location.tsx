@@ -26,10 +26,10 @@ export default function WizardStep1Location({
   return (
     <div className="space-y-3 animate-in fade-in flex-1">
       <div>
-        <h2 className="text-base sm:text-lg font-bold text-slate-950 tracking-tight">
+        <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
           ¿Dónde se ubica tu parcela?
         </h2>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <p className="text-xs text-emerald-400/80 mt-0.5">
           Astro conectará los radares satelitales a tus coordenadas:
         </p>
       </div>
@@ -38,24 +38,24 @@ export default function WizardStep1Location({
         onClick={onGPSDetect}
         type="button"
         disabled={gpsLoading}
-        className="w-full py-3.5 px-4 rounded-2xl bg-sky-500 hover:bg-sky-600 border-2 border-sky-600 border-b-4 border-b-sky-700 active:border-b-2 active:translate-y-0.5 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
+        className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-cyan-600 to-sky-700 hover:from-cyan-500 hover:to-sky-600 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all cursor-pointer border border-cyan-400/40"
       >
         <Navigation className={`w-4 h-4 ${gpsLoading ? 'animate-spin' : ''}`} />
-        <span className="contrast-bold-white">
+        <span>
           {gpsLoading ? 'Detectando satélites GPS...' : 'Detectar con mi GPS actual'}
         </span>
       </button>
 
       {gpsStatus && (
-        <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-300 text-xs text-emerald-950 font-medium flex items-start gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-700 flex-shrink-0 mt-0.5" />
+        <div className="p-3 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 text-xs text-emerald-200 font-mono flex items-start gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
           <span>{gpsStatus}</span>
         </div>
       )}
 
       {gpsError && (
-        <div className="p-3 rounded-2xl bg-amber-50 border border-amber-300 text-xs text-amber-950 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5" />
+        <div className="p-3 rounded-2xl bg-amber-950/80 border border-amber-500/40 text-xs text-amber-200 flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
           <span>{gpsError}</span>
         </div>
       )}
@@ -68,22 +68,22 @@ export default function WizardStep1Location({
               key={c.id}
               type="button"
               onClick={() => onSelectCuenca(c.id)}
-              className={`w-full p-3.5 rounded-2xl border-2 border-b-4 text-left transition-all flex items-center justify-between cursor-pointer ${
+              className={`w-full p-3.5 rounded-2xl text-left transition-all flex items-center justify-between cursor-pointer ${
                 isSelected
-                  ? 'border-sky-600 border-b-sky-700 bg-sky-50/80 text-sky-950 ring-2 ring-sky-500/20 active:border-b-2 active:translate-y-0.5'
-                  : 'border-slate-200 border-b-slate-300 bg-white hover:border-slate-300 hover:bg-slate-50/60 active:border-b-2 active:translate-y-0.5 text-slate-800'
+                  ? 'border-2 border-cyan-400 bg-cyan-950/90 text-white shadow-xl shadow-cyan-950/50 ring-2 ring-cyan-500/30'
+                  : 'border border-emerald-500/25 bg-[#132A1C]/70 hover:bg-[#183925]/90 hover:border-emerald-500/50 text-slate-200'
               }`}
             >
               <div>
-                <div className="font-bold text-sm text-slate-950">{c.nombre}</div>
-                <div className="text-xs text-slate-500 mt-0.5">
+                <div className="font-bold text-sm text-white">{c.nombre}</div>
+                <div className="text-xs text-emerald-300/80 mt-0.5">
                   {c.elevacion_media_msnm} msnm • Distrito {c.distrito}, {c.provincia}
                 </div>
               </div>
               {isSelected ? (
-                <CheckCircle2 className="w-5 h-5 text-sky-700 flex-shrink-0" />
+                <CheckCircle2 className="w-5 h-5 text-cyan-400 flex-shrink-0" />
               ) : (
-                <MapPin className="w-4 h-4 text-slate-300 flex-shrink-0" />
+                <MapPin className="w-4 h-4 text-emerald-500/40 flex-shrink-0" />
               )}
             </button>
           );

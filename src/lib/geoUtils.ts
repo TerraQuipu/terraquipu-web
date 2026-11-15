@@ -311,6 +311,9 @@ export interface RealTerrainResult {
   ndvi: number;
   isOcean: boolean;
   source: string;
+  precipitationTodayMm?: number;
+  soilTempC?: number;
+  evapotranspirationMm?: number;
 }
 
 const terrainCache = new Map<string, RealTerrainResult>();
@@ -343,9 +346,9 @@ export async function fetchRealTerrainMetrics(
       `https://api.open-meteo.com/v1/elevation?latitude=${lats}&longitude=${lngs}`
     ).then((r) => r.json());
 
-    // Fetch NASA SMAP L4 / ECMWF Land volumetric soil moisture (0-1cm)
+    // Fetch NASA SMAP L4 / ECMWF Land volumetric soil moisture (0-1cm) & precipitation & temperature
     const moisturePromise = fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(6)}&longitude=${lng.toFixed(6)}&current=soil_moisture_0_to_1cm`
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(6)}&longitude=${lng.toFixed(6)}&current=temperature_2m,precipitation,soil_moisture_0_to_1cm,soil_temperature_0_to_7cm&daily=et0_fao_evapotranspiration&timezone=America%2FLima`
     )
       .then((r) => r.json())
       .catch(() => null);
@@ -366,7 +369,7 @@ export async function fetchRealTerrainMetrics(
         slopePct = Number((Math.sqrt(slopeNS * slopeNS + slopeEW * slopeEW) * 100).toFixed(1));
       }
 
-      // Soil moisture from satellite API
+      // Soil moisture from satellite API (SMAP L4 0-1cm)
       let smapPct = 35.0;
       const rawMoisture = moistureData?.current?.soil_moisture_0_to_1cm;
       if (rawMoisture !== undefined && rawMoisture !== null) {
@@ -375,8 +378,14 @@ export async function fetchRealTerrainMetrics(
         smapPct = isOcean ? 100.0 : 36.5;
       }
 
-      // NDVI estimate based on elevation and region
-      const ndvi = isOcean ? 0.02 : centerElev > 3800 ? 0.48 : centerElev < 500 ? 0.28 : 0.65;
+      const precipToday = moistureData?.current?.precipitation ?? 0.0;
+      const soilTemp = moistureData?.current?.soil_temperature_0_to_7cm ?? 16.0;
+      const et0 = moistureData?.daily?.et0_fao_evapotranspiration?.[0] ?? 3.8;
+
+      // Realist vegetative vigor based on moisture and altitude
+      const ndvi = isOcean
+        ? 0.02
+        : Number(Math.min(0.85, Math.max(0.18, (smapPct / 100) * 0.9 + (centerElev > 3800 ? 0.2 : 0.35))).toFixed(2));
 
       const result: RealTerrainResult = {
         elevationMsnm: Math.max(0, Math.round(centerElev)),
@@ -384,7 +393,10 @@ export async function fetchRealTerrainMetrics(
         smapMoisturePct: smapPct,
         ndvi,
         isOcean,
-        source: 'DEM Copernicus 30m / SRTM (API en Vivo)',
+        source: 'DEM Copernicus 30m / SRTM & NASA SMAP (API en Vivo)',
+        precipitationTodayMm: precipToday,
+        soilTempC: soilTemp,
+        evapotranspirationMm: et0,
       };
 
       terrainCache.set(key, result);

@@ -14,7 +14,7 @@ import {
   DEFAULT_CROPS,
 } from '@/lib/supabase';
 import { CropRecord, ReporteAgricultor } from '@/types';
-import { ActiveParcel } from '@/lib/geoUtils';
+import { ActiveParcel, fetchRealTerrainMetrics } from '@/lib/geoUtils';
 
 const DEFAULT_PARCEL: ActiveParcel = {
   id: 'P-01',
@@ -65,9 +65,10 @@ export default function TerraQuipuSuitePage() {
       setIsSyncing(true);
       setDbStatus('syncing');
 
-      const [cropsRes, reportsRes] = await Promise.all([
+      const [cropsRes, reportsRes, terrainRes] = await Promise.all([
         fetchCropMatrix(),
         fetchFarmerReports(),
+        fetchRealTerrainMetrics(DEFAULT_PARCEL.center, DEFAULT_PARCEL.areaHa).catch(() => null),
       ]);
 
       if (cropsRes.data && cropsRes.data.length > 0) {
@@ -75,6 +76,15 @@ export default function TerraQuipuSuitePage() {
       }
       if (reportsRes.data && reportsRes.data.length > 0) {
         setFarmerReports(reportsRes.data);
+      }
+      if (terrainRes) {
+        setActiveParcel((prev) => ({
+          ...prev,
+          elevationMsnm: terrainRes.elevationMsnm,
+          slopePct: terrainRes.slopePct,
+          smapMoisturePct: terrainRes.smapMoisturePct,
+          ndvi: terrainRes.ndvi,
+        }));
       }
 
       setIsSyncing(false);

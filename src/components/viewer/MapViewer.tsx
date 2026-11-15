@@ -537,12 +537,27 @@ export default function MapViewer({
   };
 
   // Handle Preset Selection
-  const handleSelectPreset = (key: 'yanacona' | 'taucca' | 'cuper') => {
+  // Handle Preset Selection with Real-time Satellite Telemetry
+  const handleSelectPreset = async (key: 'yanacona' | 'taucca' | 'cuper') => {
     const preset = PRESET_PARCELS[key];
     if (preset) {
       handleCancelDrawing();
       onSelectParcel(preset);
-      onShowToast(`Sector ${preset.name} seleccionado`);
+      onShowToast(`Consultando telemetría satelital en vivo para ${preset.name}...`);
+
+      try {
+        const real = await fetchRealTerrainMetrics(preset.center, preset.areaHa);
+        onSelectParcel({
+          ...preset,
+          elevationMsnm: real.elevationMsnm,
+          slopePct: real.slopePct,
+          smapMoisturePct: real.smapMoisturePct,
+          ndvi: real.ndvi,
+        });
+        onShowToast(`Telemetría en vivo actualizada: DEM Copernicus 30m y NASA SMAP`);
+      } catch (err) {
+        console.warn('Fallback a preset base:', err);
+      }
     }
   };
 

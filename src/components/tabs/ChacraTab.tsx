@@ -1,9 +1,21 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Cultivo, FarmerProfile } from '@/lib/types';
-import { RotateCcw, ArrowRight, CheckCircle2 } from 'lucide-react';
-import { playBubblePop } from '@/lib/soundEffects';
+import {
+  RotateCcw,
+  ArrowRight,
+  Sliders,
+  PenTool,
+  Droplets,
+  Sprout,
+  ShieldAlert,
+  Sparkles,
+  MapPin,
+  TrendingUp,
+  Layers,
+} from 'lucide-react';
+import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
 import ParcelMap from '@/components/ParcelMap';
 import QuipuRotationCard from '@/components/QuipuRotationCard';
 
@@ -16,8 +28,17 @@ interface ChacraTabProps {
   onRecalibrate: () => void;
   onUpdateCrop: (cropId: string, cropName: string) => void;
   onUpdatePriority: (priority: 'tierra' | 'comida' | 'mercado', priorityName: string) => void;
+  onUpdateArea?: (areaHa: number) => void;
   onNavigateToSuelo?: () => void;
 }
+
+const PRESET_SIZES = [
+  { label: '0.5 ha', ha: 0.5, topos: '1.7 topos' },
+  { label: '1.0 ha', ha: 1.0, topos: '3.3 topos' },
+  { label: '2.3 ha', ha: 2.3, topos: '7.6 topos' },
+  { label: '5.0 ha', ha: 5.0, topos: '16.5 topos' },
+  { label: '10.0 ha', ha: 10.0, topos: '33.0 topos' },
+];
 
 export default function ChacraTab({
   profile,
@@ -28,236 +49,232 @@ export default function ChacraTab({
   onRecalibrate,
   onUpdateCrop,
   onUpdatePriority,
+  onUpdateArea,
   onNavigateToSuelo,
 }: ChacraTabProps) {
   const currentArea = profile.areaHa !== undefined ? profile.areaHa : 1.0;
   const topos = (currentArea * 3.3).toFixed(1);
+
+  const [activeArea, setActiveArea] = useState<number>(currentArea);
 
   const handleOpenWizard = () => {
     playBubblePop();
     onRecalibrate();
   };
 
+  const handleAreaChange = (newArea: number) => {
+    setActiveArea(newArea);
+    if (onUpdateArea) {
+      onUpdateArea(newArea);
+    }
+    onToast(`📐 Parcela redimensionada a ${newArea} ha (≈ ${(newArea * 3.3).toFixed(1)} topos)`);
+  };
+
   return (
-    <div className="space-y-4 animate-in fade-in">
-      {/* Encabezado */}
-      <div className="flex items-center justify-between pb-0.5">
-        <div>
-          <h1 className="text-lg font-black text-slate-950 tracking-tight flex items-center gap-1.5">
-            <span>🚜 Mi Chacra &amp; Parcela</span>
-          </h1>
-          <p className="text-xs text-slate-500">
-            Datos de tu terreno, cartografía satelital y rotación científica
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={handleOpenWizard}
-          className="text-xs font-black text-emerald-900 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-xl border border-emerald-300 transition cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
-          title="Actualizar datos de la parcela"
-        >
-          <RotateCcw className="w-3.5 h-3.5 text-emerald-700" />
-          <span>Actualizar Parcela</span>
-        </button>
-      </div>
-
-      {/* Botón Principal Destacado: Actualizar mi Parcela (Cuestionario Paso a Paso tipo Bienvenida) */}
-      <button
-        type="button"
-        onClick={handleOpenWizard}
-        className="w-full p-4 rounded-3xl bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 border-2 border-emerald-500 border-b-4 border-b-emerald-950 text-white flex items-center justify-between shadow-md active:border-b-2 active:translate-y-0.5 transition cursor-pointer group"
-      >
-        <div className="flex items-center gap-3.5 text-left">
-          <span className="p-2.5 rounded-2xl bg-white/20 text-2xl backdrop-blur-xs flex-shrink-0 shadow-xs">
-            🚜
-          </span>
+    <div className="space-y-4 animate-in fade-in pb-16 pt-1">
+      {/* 1. TOP FLOATING GLASS CARD (SCREEN 3 STYLE) */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#132A1C]/90 via-[#0F2418]/85 to-[#0A1A0F]/90 border border-emerald-500/30 p-4 sm:p-5 shadow-2xl backdrop-blur-xl space-y-3">
+        <div className="flex items-center justify-between border-b border-emerald-500/20 pb-3">
           <div>
-            <div className="text-sm font-black text-white flex items-center gap-2">
-              <span>Actualizar mi Parcela</span>
-              <span className="text-[10px] bg-emerald-300/30 text-emerald-100 font-extrabold px-2 py-0.5 rounded-full border border-emerald-300/40">
-                Paso a Paso
-              </span>
-            </div>
-            <p className="text-xs text-emerald-100/90 mt-0.5 leading-snug">
-              Cuestionario interactivo con Kipu para actualizar cultivo, suelo y agua sin scrollear
-            </p>
-          </div>
-        </div>
-        <div className="w-9 h-9 rounded-2xl bg-white/15 flex items-center justify-center shrink-0 group-hover:bg-white/25 transition">
-          <ArrowRight className="w-5 h-5 text-emerald-200 group-hover:translate-x-0.5 transition-transform" />
-        </div>
-      </button>
-
-      {/* 1. Tarjeta Ficha Técnica con los Datos Dinámicos del Perfil */}
-      <div className="bg-white rounded-3xl border-2 border-emerald-600 border-b-4 border-b-emerald-700 p-4 shadow-xs space-y-3">
-        <div className="flex items-center justify-between border-b pb-2.5 border-emerald-100">
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-xl bg-emerald-100 text-emerald-800">
-              📋
+            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">
+              FICHA DE MI CHACRA • TERRITORIO ANDINO
             </span>
-            <div>
-              <h3 className="font-extrabold text-sm text-slate-950">
-                Ficha de Parcela Calibrada
-              </h3>
-              <span className="text-[10px] text-slate-500 font-mono">
-                Hardware: {hardwareId}
-              </span>
-            </div>
+            <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-1.5 mt-0.5">
+              <span>{profile.parcelName}</span>
+              <span className="text-xs text-emerald-300 font-normal">({profile.distrito})</span>
+            </h2>
           </div>
           <button
             type="button"
             onClick={handleOpenWizard}
-            className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300 flex items-center gap-1 transition cursor-pointer"
+            className="text-[10px] font-bold text-emerald-300 bg-emerald-950/60 border border-emerald-500/30 px-2.5 py-1 rounded-xl flex items-center gap-1 hover:text-white transition cursor-pointer"
           >
-            <span>{currentArea} ha • ≈ {topos} topos</span>
-            <span className="text-emerald-700 font-bold">✏️</span>
+            <RotateCcw className="w-3 h-3 text-emerald-400" />
+            <span>Recalibrar</span>
           </button>
         </div>
 
-        {/* Grid de Datos Catastrales y de Campaña de la Parcela */}
+        {/* 4 Summary Stats: Area, Plant Age, Previous Crop, Priority */}
         <div className="grid grid-cols-2 gap-2 text-xs">
-          <div
-            onClick={handleOpenWizard}
-            className="p-2.5 rounded-2xl bg-slate-50 hover:bg-emerald-50/70 hover:border-emerald-300 border border-slate-200 transition cursor-pointer group"
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] text-slate-500 font-bold">Ubicación y Relieve:</span>
-              <span className="text-[9px] text-slate-400 group-hover:text-emerald-700 font-bold">✏️</span>
-            </div>
-            <span className="font-extrabold text-slate-900 block mt-0.5">
-              {profile.distrito}, {profile.provincia}
+          <div className="p-2.5 rounded-2xl bg-[#0A1A0F]/60 border border-emerald-500/20">
+            <span className="text-[10px] text-emerald-400 font-bold block">Área Total:</span>
+            <span className="font-extrabold text-white text-sm">
+              {currentArea} ha
             </span>
-            <span className="text-[10px] text-slate-600 font-mono">
-              {profile.altitude} msnm • {profile.slope}% pend.
+            <span className="text-[10px] text-emerald-300/80 font-mono block">
+              ≈ {topos} topos andinos
             </span>
           </div>
 
-          <div
-            onClick={handleOpenWizard}
-            className="p-2.5 rounded-2xl bg-slate-50 hover:bg-emerald-50/70 hover:border-emerald-300 border border-slate-200 transition cursor-pointer group"
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] text-slate-500 font-bold">Dimensión de Parcela:</span>
-              <span className="text-[9px] text-slate-400 group-hover:text-emerald-700 font-bold">✏️</span>
-            </div>
-            <span className="font-extrabold text-slate-900 block mt-0.5">
-              {currentArea} ha (≈ {topos} topos)
+          <div className="p-2.5 rounded-2xl bg-[#0A1A0F]/60 border border-emerald-500/20">
+            <span className="text-[10px] text-emerald-400 font-bold block">Etapa de Campaña:</span>
+            <span className="font-extrabold text-white text-sm">
+              45 Días
             </span>
-            <span className="text-[10px] text-slate-600 font-mono">
-              GPS: {profile.lat.toFixed(4)}°, {profile.lon.toFixed(4)}°
+            <span className="text-[10px] text-emerald-300/80 font-mono block">
+              Fase Desarrollo Vegetativo
             </span>
           </div>
 
-          <div
-            onClick={handleOpenWizard}
-            className="p-2.5 rounded-2xl bg-slate-50 hover:bg-emerald-50/70 hover:border-emerald-300 border border-slate-200 transition cursor-pointer group"
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] text-slate-500 font-bold">Última Cosecha:</span>
-              <span className="text-[9px] text-slate-400 group-hover:text-emerald-700 font-bold">✏️</span>
-            </div>
-            <span className="font-extrabold text-slate-900 block mt-0.5">
+          <div className="p-2.5 rounded-2xl bg-[#0A1A0F]/60 border border-emerald-500/20">
+            <span className="text-[10px] text-emerald-400 font-bold block">Cosecha Previa:</span>
+            <span className="font-extrabold text-white text-xs truncate block mt-0.5">
               {profile.previousCropName}
             </span>
-            <span className="text-[10px] text-amber-700 font-bold">
-              {profile.previousCropId.includes('papa')
-                ? '-70 kg N extraído'
-                : profile.previousCropId.includes('haba') || profile.previousCropId.includes('tarwi')
-                ? '+75 kg N fijado'
-                : 'Consumo moderado N'}
-            </span>
+            <span className="text-[9px] text-slate-400 block">Suelo en Descanso / Ayni</span>
           </div>
 
-          <div
-            onClick={handleOpenWizard}
-            className="p-2.5 rounded-2xl bg-slate-50 hover:bg-emerald-50/70 hover:border-emerald-300 border border-slate-200 transition cursor-pointer group"
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] text-slate-500 font-bold">Objetivo de Campaña:</span>
-              <span className="text-[9px] text-slate-400 group-hover:text-emerald-700 font-bold">✏️</span>
-            </div>
-            <span className="font-extrabold text-emerald-950 block mt-0.5">
+          <div className="p-2.5 rounded-2xl bg-[#0A1A0F]/60 border border-emerald-500/20">
+            <span className="text-[10px] text-emerald-400 font-bold block">Prioridad Campaña:</span>
+            <span className="font-extrabold text-white text-xs truncate block mt-0.5">
               {profile.priorityName}
             </span>
-            <span className="text-[10px] text-slate-500">
-              {profile.priority === 'tierra'
-                ? 'Regenerar fertilidad'
-                : profile.priority === 'comida'
-                ? 'Autoconsumo'
-                : 'Venta en feria'}
-            </span>
+            <span className="text-[9px] text-emerald-400/80 block">Abono &amp; Nutrientes</span>
           </div>
-        </div>
-
-        {/* Acceso Rápido al Laboratorio de Suelo (Sin duplicación de preguntas en Mi Chacra) */}
-        <div className="p-3 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <span className="p-2 rounded-xl bg-emerald-100 text-emerald-800 text-lg">
-              🌱
-            </span>
-            <div>
-              <span className="text-[11px] font-black text-emerald-950 block">
-                Laboratorio Edáfico &amp; Telemetría NASA
-              </span>
-              <p className="text-[10px] text-slate-600 mt-0.5">
-                Prueba del puño, sanidad vegetal y satélite SMAP en la pestaña Suelo
-              </p>
-            </div>
-          </div>
-          {onNavigateToSuelo && (
-            <button
-              type="button"
-              onClick={() => {
-                playBubblePop();
-                onNavigateToSuelo();
-              }}
-              className="text-xs font-black text-emerald-900 bg-white hover:bg-emerald-100 border border-emerald-300 px-3 py-1.5 rounded-xl transition cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95 shrink-0"
-            >
-              <span>Ir a Suelo</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
-
-        <div className="text-center pt-1">
-          <button
-            type="button"
-            onClick={handleOpenWizard}
-            className="text-[11px] font-black text-emerald-800 hover:text-emerald-950 inline-flex items-center gap-1 cursor-pointer underline underline-offset-2"
-          >
-            <span>Toca cualquier dato para abrir el Cuestionario Kipu paso a paso</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
         </div>
       </div>
 
-      {/* 2. Mapa Satelital de la Parcela (ESRI/QGIS HD) */}
-      <div className="bg-white rounded-3xl border-2 border-slate-200 border-b-4 border-b-slate-300 p-4 shadow-xs space-y-3">
+      {/* 2. DUAL PARCEL SELECTOR (POR TAMAÑOS / HECTÁREAS O TRAZADO LIBRE QGIS) */}
+      <div className="glass-panel p-3.5 space-y-3">
         <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-bold text-sm text-slate-950">
-              {profile.parcelName} ({currentArea} ha)
+          <div className="flex items-center gap-1.5">
+            <Sliders className="w-4 h-4 text-lime-400" />
+            <h3 className="text-xs font-black uppercase tracking-wider text-emerald-300">
+              Seleccionar Tamaño o Trazar con QGIS
             </h3>
-            <p className="text-xs text-slate-500">
-              {profile.distrito} • {profile.lat.toFixed(4)}°, {profile.lon.toFixed(4)}°
-            </p>
           </div>
-          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-            Satélite QGIS/ESRI
+          <span className="text-[10px] font-mono text-emerald-400 font-bold">
+            {currentArea} ha • {topos} topos
           </span>
         </div>
 
-        <ParcelMap
-          lat={profile.lat}
-          lon={profile.lon}
-          parcelName={`${profile.parcelName} (${currentArea} ha)`}
-          altitude={profile.altitude}
-          slope={profile.slope}
-          areaHa={currentArea}
-        />
+        {/* Chips de Tamaños Rápidos */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none no-scrollbar">
+          {PRESET_SIZES.map((preset) => {
+            const isSelected = Math.abs(currentArea - preset.ha) < 0.05;
+            return (
+              <button
+                key={preset.label}
+                type="button"
+                onClick={() => {
+                  playBubblePop();
+                  handleAreaChange(preset.ha);
+                }}
+                className={`px-3 py-1.5 rounded-2xl text-xs font-black transition-all duration-200 cursor-pointer shrink-0 ${
+                  isSelected
+                    ? 'bg-lime-400 text-slate-950 shadow-md shadow-lime-400/30 scale-102'
+                    : 'bg-[#132A1C]/80 border border-emerald-500/30 text-emerald-200/80 hover:bg-[#183925] hover:text-white'
+                }`}
+              >
+                <span>{preset.label}</span>
+                <span className="text-[9px] opacity-75 ml-1">({preset.topos})</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Slider continuo de hectáreas */}
+        <div className="space-y-1 pt-1">
+          <div className="flex justify-between text-[10px] text-slate-400 font-mono">
+            <span>0.1 ha (Mínimo)</span>
+            <span className="text-lime-300 font-bold">{currentArea} Hectáreas ({topos} Topos)</span>
+            <span>15.0 ha (Chacra Grande)</span>
+          </div>
+          <input
+            type="range"
+            min="0.1"
+            max="15.0"
+            step="0.1"
+            value={currentArea}
+            onChange={(e) => handleAreaChange(parseFloat(e.target.value))}
+            className="w-full accent-lime-400 bg-emerald-950/80 rounded-lg h-2 cursor-pointer border border-emerald-500/30"
+          />
+        </div>
       </div>
 
-      {/* 3. Ruta Quipu de Rotación Científica */}
+      {/* 3. MAPA SATELITAL DE LA PARCELA CON TRAZADO LIBRE QGIS */}
+      <ParcelMap
+        lat={profile.lat}
+        lon={profile.lon}
+        parcelName={`${profile.parcelName} (${currentArea} ha)`}
+        altitude={profile.altitude}
+        slope={profile.slope}
+        areaHa={currentArea}
+        onUpdateArea={handleAreaChange}
+      />
+
+      {/* 4. FLOATING 4-QUADRANT METRICS GRID (SCREEN 3 STYLE) */}
+      <div className="grid grid-cols-2 gap-2.5">
+        {/* Metric 1: Water Depth / Humedad SMAP */}
+        <div className="glass-panel p-3 space-y-1">
+          <div className="flex items-center justify-between text-cyan-300">
+            <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+              <Droplets className="w-3 h-3 text-cyan-400" />
+              <span>Humedad SMAP</span>
+            </span>
+            <span className="text-[9px] text-cyan-400/80 font-mono">0-5 cm</span>
+          </div>
+          <div className="text-xl font-black text-white">
+            12% <span className="text-xs font-normal text-slate-400">vol</span>
+          </div>
+          <div className="text-[9px] font-bold text-amber-400">
+            ⚠️ Déficit Hídrico Activo
+          </div>
+        </div>
+
+        {/* Metric 2: Plant Health / NDVI */}
+        <div className="glass-panel p-3 space-y-1">
+          <div className="flex items-center justify-between text-emerald-300">
+            <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+              <Sprout className="w-3 h-3 text-emerald-400" />
+              <span>Salud Vegetal</span>
+            </span>
+            <span className="text-[9px] text-emerald-400/80 font-mono">NDVI</span>
+          </div>
+          <div className="text-xl font-black text-white">
+            0.68 <span className="text-xs font-normal text-slate-400">/ 1.0</span>
+          </div>
+          <div className="text-[9px] font-bold text-emerald-400">
+            ✓ Vigor Andino Fuerte
+          </div>
+        </div>
+
+        {/* Metric 3: Soil Quality / Calidad Suelo */}
+        <div className="glass-panel p-3 space-y-1">
+          <div className="flex items-center justify-between text-lime-300">
+            <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-lime-400" />
+              <span>Calidad Suelo</span>
+            </span>
+            <span className="text-[9px] text-lime-400/80 font-mono">Índice A13</span>
+          </div>
+          <div className="text-xl font-black text-white">
+            75 <span className="text-xs font-normal text-slate-400">/ 100</span>
+          </div>
+          <div className="text-[9px] font-bold text-lime-300">
+            ✓ Mullido y Fértil
+          </div>
+        </div>
+
+        {/* Metric 4: Pest Risk / Riesgo Gorgojo */}
+        <div className="glass-panel p-3 space-y-1">
+          <div className="flex items-center justify-between text-amber-300">
+            <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+              <ShieldAlert className="w-3 h-3 text-amber-400" />
+              <span>Riesgo Gorgojo</span>
+            </span>
+            <span className="text-[9px] text-amber-400/80 font-mono">INIA</span>
+          </div>
+          <div className="text-xl font-black text-white">
+            10% <span className="text-xs font-normal text-slate-400">Bajo</span>
+          </div>
+          <div className="text-[9px] font-bold text-emerald-400">
+            ✓ Control Biológico
+          </div>
+        </div>
+      </div>
+
+      {/* 5. RUTA QUIPU DE ROTACIÓN CIENTÍFICA (3 CAMPAÑAS) */}
       <QuipuRotationCard
         cultivos={cultivos}
         isElNino={isElNino}
