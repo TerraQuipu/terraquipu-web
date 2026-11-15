@@ -117,17 +117,7 @@ export default function CuatroPilaresBanner() {
         onTouchEnd={handleTouchEnd}
         className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-800 to-teal-900 text-white shadow-md border-2 border-emerald-700/50 transition-all duration-300 select-none cursor-grab active:cursor-grabbing"
       >
-        {/* Encabezado del Slide */}
-        <div className="flex items-center justify-between gap-2 mb-1.5">
-          <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-300 block">
-            {currentPilar.badge}
-          </span>
-          <span className="text-[10px] font-mono text-emerald-200/80">
-            Desliza para ver más &rarr;
-          </span>
-        </div>
-
-        {/* Título y Descripción */}
+        {/* Solo Título y Descripción */}
         <h4 className="font-extrabold text-base text-white tracking-tight leading-snug">
           {currentPilar.title}
         </h4>
@@ -135,22 +125,13 @@ export default function CuatroPilaresBanner() {
           {currentPilar.description}
         </p>
 
-        {/* Imagen del Pilar Abajo */}
+        {/* Imagen limpia del Pilar Abajo */}
         <div className="mt-3.5 w-full h-36 sm:h-44 rounded-2xl overflow-hidden relative border border-emerald-600/40 shadow-inner bg-slate-900">
           <img
             src={currentPilar.image}
             alt={currentPilar.title}
             className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
-          <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between">
-            <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-md bg-emerald-700/90 text-white shadow-xs backdrop-blur-xs">
-              {currentPilar.highlight}
-            </span>
-            <span className="text-[10px] font-mono text-emerald-200">
-              {currentPilar.id}/4
-            </span>
-          </div>
         </div>
       </div>
 

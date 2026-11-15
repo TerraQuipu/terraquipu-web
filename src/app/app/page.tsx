@@ -246,7 +246,7 @@ export default function MobileApp() {
   }
 
   return (
-    <div className="flex flex-col h-full min-h-screen bg-[#FAF8F5] relative overflow-hidden">
+    <div className="flex flex-col h-full min-h-screen bg-white relative overflow-hidden">
       {/* Toast Notification Pill */}
       {toastMessage && (
         <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-2xl bg-slate-900/95 text-white font-bold text-xs shadow-xl backdrop-blur-md border border-slate-700 flex items-center gap-2">
@@ -327,19 +327,21 @@ export default function MobileApp() {
         </div>
       </header>
 
-      {/* Paisaje de los Andes de Fondo con degradé suave de arriba a abajo */}
+      {/* Paisaje de los Andes de Fondo: Más claro, nítido y fuerte desde arriba, degradando suavemente a blanquito */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
         <div
-          className="absolute top-11 inset-x-0 h-[680px] bg-top bg-cover bg-no-repeat opacity-35"
+          className="absolute top-0 inset-x-0 h-[620px] bg-top bg-cover bg-no-repeat"
           style={{
-            backgroundImage: `url('/images/andes_poster.jpg')`,
+            backgroundImage: `url('/images/andes_bright.jpg')`,
+            opacity: 0.92,
             maskImage:
-              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 25%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0.05) 85%, rgba(0,0,0,0) 100%)',
+              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 20%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0) 92%)',
             WebkitMaskImage:
-              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 25%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0.05) 85%, rgba(0,0,0,0) 100%)',
+              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 20%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0) 92%)',
           }}
         />
-        <div className="absolute top-11 inset-x-0 h-[680px] bg-gradient-to-b from-[#FAF8F5]/10 via-[#FAF8F5]/45 to-[#FAF8F5]" />
+        {/* Degradé suave que disuelve limpiamente a blanquito */}
+        <div className="absolute top-0 inset-x-0 h-[620px] bg-gradient-to-b from-transparent via-white/20 via-40% via-white/75 via-65% to-white" />
       </div>
 
       {/* Main Tab Content (Scrollable, z-10 sobre el fondo andino) */}
