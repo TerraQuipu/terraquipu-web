@@ -34,7 +34,7 @@ export default function InicioTab({
 
   return (
     <div className="space-y-4 animate-in fade-in pb-16 pt-1">
-      {/* 1. Kipu Carousel Banner (Kipu y la burbuja interactivos con slides de rotación y clima) */}
+      {/* 1. Kipu Carousel Banner (Módulo limpio con imagen derecha, título, texto y botón de acción) */}
       <KipuCarouselBanner
         profile={profile}
         climaNasa={climaNasa}
@@ -43,6 +43,7 @@ export default function InicioTab({
         isElNino={isElNino}
         onOpenWizard={onOpenWizard}
         onNavigateToClima={onNavigateToClima}
+        onNavigateToChacra={onNavigateToChacra}
       />
 
       {/* 2. Los Cuatro Pilares para Vencer a la Sequía (Banner Deslizable con Texto e Imagen) */}
