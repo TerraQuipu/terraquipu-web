@@ -33,22 +33,7 @@ export default function InicioTab({
   const currentArea = profile.areaHa !== undefined ? profile.areaHa : 1.0;
 
   return (
-    <div className="space-y-4 animate-in fade-in pb-16">
-      {/* Encabezado Principal */}
-      <div className="flex items-center justify-between pb-0.5">
-        <div>
-          <h1 className="text-lg font-black text-slate-950 tracking-tight flex items-center gap-1.5">
-            <span>🌿 TerraQuipu Móvil</span>
-          </h1>
-          <p className="text-xs text-slate-500 font-medium">
-            Copiloto andino satelital para la conservación de suelos frente a El Niño
-          </p>
-        </div>
-        <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 shrink-0">
-          {profile.distrito}
-        </span>
-      </div>
-
+    <div className="space-y-4 animate-in fade-in pb-16 pt-1">
       {/* 1. Kipu Carousel Banner (Kipu y la burbuja interactivos con slides de rotación y clima) */}
       <KipuCarouselBanner
         profile={profile}

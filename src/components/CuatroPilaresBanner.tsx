@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { playBubblePop } from '@/lib/soundEffects';
 
 interface Pilar {
@@ -98,35 +98,33 @@ export default function CuatroPilaresBanner() {
   const currentPilar = PILARES[currentIndex];
 
   return (
-    <div className="space-y-2">
-      {/* Título de la Sección */}
-      <div className="flex items-center justify-between px-1">
-        <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
-          <span>Los Cuatro Pilares para Vencer a la Sequía</span>
+    <div className="space-y-2.5">
+      {/* Título de la Sección sin emoji ni contador 1 de 4 */}
+      <div className="px-1">
+        <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">
+          Los Cuatro Pilares para Vencer a la Sequía
         </h3>
-        <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-full border border-emerald-300">
-          {currentIndex + 1} de {PILARES.length}
-        </span>
       </div>
 
-      {/* Tarjeta Deslizable con el estilo exacto de Tu Chacra Calibrada */}
+      {/* Slide Deslizable sin marco ni fondo verde */}
       <div
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-800 to-teal-900 text-white shadow-md border-2 border-emerald-700/50 transition-all duration-300 select-none cursor-grab active:cursor-grabbing"
+        className="transition-all duration-300 select-none cursor-grab active:cursor-grabbing px-1 space-y-2"
       >
-        {/* Solo Título y Descripción */}
-        <h4 className="font-extrabold text-base text-white tracking-tight leading-snug">
-          {currentPilar.title}
-        </h4>
-        <p className="text-xs text-emerald-100/90 leading-relaxed font-sans mt-1">
-          {currentPilar.description}
-        </p>
+        {/* Solo Título y Descripción con alto contraste sobre fondo claro */}
+        <div>
+          <h4 className="font-black text-base sm:text-lg text-slate-950 tracking-tight leading-snug">
+            {currentPilar.title}
+          </h4>
+          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-sans mt-1">
+            {currentPilar.description}
+          </p>
+        </div>
 
         {/* Imagen limpia del Pilar Abajo */}
-        <div className="mt-3.5 w-full h-36 sm:h-44 rounded-2xl overflow-hidden relative border border-emerald-600/40 shadow-inner bg-slate-900">
+        <div className="w-full h-44 sm:h-52 rounded-2xl overflow-hidden relative shadow-md border border-slate-200/90 bg-slate-100">
           <img
             src={currentPilar.image}
             alt={currentPilar.title}

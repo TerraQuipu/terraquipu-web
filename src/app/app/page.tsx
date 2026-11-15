@@ -273,11 +273,11 @@ export default function MobileApp() {
             <button
               type="button"
               onClick={() => setActiveTab('ajustes')}
-              className="flex items-center gap-0.5 text-[10px] font-semibold text-slate-600 hover:text-slate-950 transition cursor-pointer truncate max-w-[105px] sm:max-w-[140px]"
+              className="flex items-center gap-0.5 text-[10px] font-bold text-slate-700 hover:text-slate-950 transition cursor-pointer truncate max-w-[125px] sm:max-w-[160px]"
               title="Ir a ajustes de la parcela"
             >
-              <span className="truncate">{profile.parcelName}</span>
-              <ChevronDown className="w-2.5 h-2.5 text-slate-400 shrink-0" />
+              <span className="truncate">{profile.parcelName} • {profile.distrito}</span>
+              <ChevronDown className="w-2.5 h-2.5 text-slate-500 shrink-0" />
             </button>
           </div>
         </div>
