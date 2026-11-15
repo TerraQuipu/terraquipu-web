@@ -3,12 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import {
   RefreshCw,
-  Sun,
-  AlertTriangle,
   ChevronDown,
-  WifiOff,
+  Settings,
   Droplets,
   Thermometer,
+  Sliders,
 } from 'lucide-react';
 import {
   Microcuenca,
@@ -33,22 +32,23 @@ import { playBubblePop } from '@/lib/soundEffects';
 // Modular Tab & Subsystem Components
 import InicioTab from '@/components/tabs/InicioTab';
 import ChacraTab from '@/components/tabs/ChacraTab';
-import ClimaTab from '@/components/tabs/ClimaTab';
-import BottomNav from '@/components/layout/BottomNav';
-import SoilValidator from '@/components/SoilValidator';
-import SaberesCard from '@/components/SaberesCard';
-import SettingsTab from '@/components/SettingsTab';
-import KipuFullScreenWizard from '@/components/KipuFullScreenWizard';
+import RotationTab from '@/components/tabs/RotationTab';
+import CopilotTab from '@/components/tabs/CopilotTab';
+import BottomNav, { MainTab } from '@/components/layout/BottomNav';
+import SoilDiagnosticWizardModal from '@/components/SoilDiagnosticWizardModal';
+import SettingsModal from '@/components/SettingsModal';
 import AgroClimaNewsFeed from '@/components/AgroClimaNewsFeed';
 import WelcomeSplash from '@/components/WelcomeSplash';
+import KipuFullScreenWizard from '@/components/KipuFullScreenWizard';
 
 export default function MobileApp() {
-  const [activeTab, setActiveTab] = useState<'inicio' | 'elnino' | 'chacra' | 'tierra' | 'saberes' | 'ajustes'>('inicio');
-  const [isElNino, setIsElNino] = useState(false);
+  const [activeTab, setActiveTab] = useState<MainTab>('inicio');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
-  const [hardwareId, setHardwareId] = useState('TQ-HW-INIT');
+  const [hardwareId, setHardwareId] = useState('TQ-HW-C249');
   const [isNewsOpen, setIsNewsOpen] = useState(false);
+  const [isDiagnosticOpen, setIsDiagnosticOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Full-screen first-time setup / onboarding state
   const [showWelcome, setShowWelcome] = useState(false);
@@ -65,20 +65,20 @@ export default function MobileApp() {
     cuencaId: '29699448-afa8-4fb4-b502-24e3e577ef90',
     cuencaName: 'Microcuenca Vilcanota - Urubamba',
     parcelName: 'Chacra Maras',
-    distrito: 'Maras',
+    distrito: 'Urubamba',
     provincia: 'Urubamba',
     departamento: 'Cusco',
     moisture: 'HUMEDAD_MEDIA',
     moistureLabel: 'Húmeda y Mullida',
     previousCropId: 'papa_nativa',
-    previousCropName: 'Papa Nativa',
+    previousCropName: 'Papa Huayro',
     priority: 'tierra',
     priorityName: 'Curar y Abonar Suelo',
     lat: -13.332,
     lon: -72.158,
     altitude: 3380,
     slope: 12,
-    areaHa: 1.0,
+    areaHa: 3.5,
   });
 
   // Check online status and detect hardware profile
@@ -99,7 +99,7 @@ export default function MobileApp() {
 
       // Deterministic Hardware Signature Detection
       const hw = generateHardwareProfile();
-      setHardwareId(hw.deviceId);
+      setHardwareId(hw.deviceId || 'TQ-HW-C249');
 
       // Support ?welcome=1, ?reset=1 or ?wizard=1 in URL for instant verification
       const urlParams = new URLSearchParams(window.location.search);
@@ -111,15 +111,11 @@ export default function MobileApp() {
       } else if (urlParams.get('wizard') === '1' || urlParams.get('wizard') === 'true') {
         setShowOnboarding(true);
       } else {
-        // Check for persistent profile stored on this hardware
         const stored = getStoredDeviceProfile();
         if (stored) {
           setProfile(stored);
           setShowOnboarding(false);
           setShowWelcome(false);
-        } else {
-          // First time on this hardware device: display welcome splash (Screen 1)
-          setShowWelcome(true);
         }
       }
 
@@ -140,7 +136,6 @@ export default function MobileApp() {
       setMicrocuencas(cuencasData);
       setCultivos(cultivosData);
 
-      // Match microcuenca by profile
       const activeCuenca = cuencasData.find((c) => c.id === profile.cuencaId) || cuencasData[0];
       if (activeCuenca) {
         const climaData = await getClimaNasa(activeCuenca.id);
@@ -200,7 +195,6 @@ export default function MobileApp() {
     setShowOnboarding(false);
     triggerToast(`🌾 Chacra (${saved.areaHa} ha) calibrada en hardware [${saved.deviceId}]`);
 
-    // Sincronización transparente con Supabase para el Visor Territorial y Ground-Truth Comunal
     submitReportToCloud({
       id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `rep-${Date.now()}`,
       dispositivo_id: saved.deviceId,
@@ -226,42 +220,16 @@ export default function MobileApp() {
       saveDeviceProfile(next);
       return next;
     });
-
-    // Sincronización transparente en segundo plano con Supabase para el Visor Territorial
-    if (typeof window !== 'undefined' && navigator.onLine) {
-      submitReportToCloud({
-        id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `rep-${Date.now()}`,
-        dispositivo_id: hardwareId,
-        cuenca_id: profile.cuencaId,
-        latitud: profile.lat,
-        longitud: profile.lon,
-        cultivo_actual_id: updatedFields.previousCropId || profile.previousCropId,
-        humedad_suelo_estimada: updatedFields.moisture || profile.moisture,
-        presencia_gorgojo: (updatedFields.pest || profile.pest) === 'gorgojo',
-        alerta_helada_observada: false,
-        textura_suelo: updatedFields.soilTexture || profile.soilTexture || 'franca',
-        pedregosidad: updatedFields.soilStoniness || profile.soilStoniness || 'profundo',
-        cobertura_ndvi_real: updatedFields.cropCoverNdvi || profile.cropCoverNdvi || 'barbecho',
-        fuente_agua: updatedFields.waterSource || profile.waterSource || 'auxilio',
-        ventana_siembra: updatedFields.sowingWindow || profile.sowingWindow || '2_4_semanas',
-        sincronizado_desde_outbox: false,
-        created_at: new Date().toISOString(),
-      }).catch(() => {});
-    }
   };
 
-  // Calculate live SMAP percentage from Supabase or cuenca defaults
+  // Live SMAP calculation
   const smapPercent = climaNasa?.humedad_suelo_smap_m3m3
     ? Math.round(climaNasa.humedad_suelo_smap_m3m3 * 100)
-    : profile.cuencaId === '29699448-afa8-4fb4-b502-24e3e577ef90'
-    ? 12
-    : profile.cuencaId === '5ca30027-bcea-4223-a073-ee6eadb6c702'
-    ? 35
-    : 38;
+    : 35;
 
   if (showWelcome) {
     return (
-      <div className="flex flex-col h-full min-h-screen bg-[#0A1A0F]">
+      <div className="flex flex-col h-full min-h-screen bg-[#F7F9F6]">
         <WelcomeSplash
           onStartWizard={() => {
             setShowWelcome(false);
@@ -277,11 +245,10 @@ export default function MobileApp() {
 
   if (showOnboarding) {
     return (
-      <div className="flex flex-col h-full min-h-screen bg-[#0A1A0F]">
-        {/* Toast Notification Pill */}
+      <div className="flex flex-col h-full min-h-screen bg-[#F7F9F6]">
         {toastMessage && (
-          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-2xl bg-slate-900/95 text-white font-bold text-xs shadow-2xl backdrop-blur-md border border-emerald-500/40 flex items-center gap-2">
-            <span className="contrast-bold-white">{toastMessage}</span>
+          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-2xl bg-[#132A1C] text-white font-bold text-xs shadow-2xl backdrop-blur-md border border-emerald-500/40 flex items-center gap-2">
+            <span>{toastMessage}</span>
           </div>
         )}
 
@@ -297,108 +264,82 @@ export default function MobileApp() {
   }
 
   return (
-    <div className="flex flex-col h-full min-h-screen bg-[#0A1A0F] text-slate-100 relative overflow-hidden font-sans selection:bg-emerald-500 selection:text-white">
+    <div className="flex flex-col h-full min-h-screen bg-[#F7F9F6] text-[#132A1C] relative overflow-hidden font-sans selection:bg-[#84CC16] selection:text-[#132A1C]">
       {/* Toast Notification Pill */}
       {toastMessage && (
-        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-2xl bg-slate-900/95 text-white font-bold text-xs shadow-2xl backdrop-blur-md border border-emerald-500/40 flex items-center gap-2">
-          <span className="contrast-bold-white">{toastMessage}</span>
+        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-2xl bg-[#132A1C] text-white font-bold text-xs shadow-2xl backdrop-blur-md border border-emerald-500/40 flex items-center gap-2 animate-in fade-in">
+          <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Top Mobile App Header - Dark Forest Glassmorphism */}
-      <header className="bg-[#0A1A0F]/85 backdrop-blur-xl border-b border-emerald-500/20 px-3 py-2 sticky top-0 z-40 shadow-lg">
-        <div className="max-w-md mx-auto w-full flex items-center justify-between gap-1.5">
+      {/* TOP HEADER: Light Organic Design */}
+      <header className="bg-white/90 backdrop-blur-md border-b border-[#E5ECE2] px-3.5 py-2.5 sticky top-0 z-40 shadow-xs">
+        <div className="max-w-md mx-auto w-full flex items-center justify-between gap-2">
+          {/* Left: Logo + Parcel Switcher Badge */}
           <div className="flex items-center gap-2 min-w-0 shrink">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-800 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-emerald-950/60 shrink-0 border border-emerald-400/30">
+            <div className="w-8 h-8 rounded-xl bg-[#132A1C] flex items-center justify-center text-[#A3E635] font-black text-sm shadow-xs shrink-0">
               🌱
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="font-black text-sm text-white tracking-tight truncate">
+                <span className="font-black text-sm text-[#132A1C] tracking-tight truncate">
                   TerraQuipu
                 </span>
-                <span className="text-[8.5px] font-black uppercase px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shrink-0">
-                  Móvil
+                <span className="text-[8.5px] font-black uppercase px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
+                  Andes
                 </span>
               </div>
-              {/* Quick Parcel Switcher / Profile Pill */}
+
+              {/* Active Parcel Badge: Click opens Settings/Hardware Modal */}
               <button
                 type="button"
-                onClick={() => setActiveTab('ajustes')}
-                className="flex items-center gap-1 text-[10px] font-bold text-emerald-300 hover:text-emerald-100 transition cursor-pointer truncate max-w-[130px] sm:max-w-[170px]"
-                title="Ir a ajustes de la parcela"
+                onClick={() => {
+                  playBubblePop();
+                  setIsSettingsOpen(true);
+                }}
+                className="flex items-center gap-1 text-[10px] font-bold text-zinc-600 hover:text-emerald-800 transition cursor-pointer truncate max-w-[150px] sm:max-w-[200px]"
+                title="Ver detalles de la chacra y hardware"
               >
-                <span className="truncate">{profile.parcelName} • {profile.distrito}</span>
-                <ChevronDown className="w-2.5 h-2.5 text-emerald-400 shrink-0" />
+                <span className="truncate">
+                  {profile.parcelName} • {profile.distrito || 'Urubamba'}, {profile.altitude || 3380} msnm
+                </span>
+                <ChevronDown className="w-2.5 h-2.5 text-zinc-400 shrink-0" />
               </button>
             </div>
           </div>
 
-          {/* Right: Refresh button + Compact Telemetry (Humedad & Temperatura) */}
+          {/* Right: Refresh button + Settings/Profile Modal Trigger */}
           <div className="flex items-center gap-1.5 shrink-0">
-            {/* Refresh button with green border */}
+            {/* Refresh Button */}
             <button
               type="button"
               onClick={handleRefreshData}
               disabled={isRefreshing}
-              className={`w-7 h-7 rounded-full border border-emerald-500/40 bg-[#132A1C]/80 text-emerald-400 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-sm hover:bg-emerald-900/60 shrink-0 ${
-                isRefreshing ? 'border-emerald-400 bg-emerald-900/80' : ''
+              className={`w-8 h-8 rounded-full border border-[#E5ECE2] bg-white text-zinc-700 hover:text-emerald-800 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-2xs ${
+                isRefreshing ? 'border-emerald-500 text-emerald-700' : ''
               }`}
-              title="Recibir datos frescos de la nube (Hora Perú)"
+              title="Actualizar datos satelitales (Hora Perú)"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-300' : 'text-emerald-400'}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-700' : ''}`} />
             </button>
 
-            {/* Compact Humedad SMAP Pill */}
-            <div className="px-2 py-0.5 rounded-xl bg-[#132A1C]/80 border border-cyan-500/30 text-left leading-tight shadow-sm backdrop-blur-md">
-              <div className="flex items-center gap-0.5 text-[8.5px] font-bold text-cyan-300">
-                <Droplets className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
-                <span className="truncate">Humedad SMAP</span>
-              </div>
-              <div className="text-[11px] font-black text-white leading-none my-0.5">
-                {smapPercent}% <span className="text-[8px] font-normal text-cyan-200/70">vol</span>
-              </div>
-              <div className="text-[7.5px] font-extrabold text-emerald-400 truncate leading-none">
-                {smapPercent < 20 ? '⚠️ Déficit' : '✓ Adecuada'}
-              </div>
-            </div>
-
-            {/* Compact Temperatura Pill */}
-            <div className="px-2 py-0.5 rounded-xl bg-[#132A1C]/80 border border-amber-500/30 text-left leading-tight shadow-sm backdrop-blur-md">
-              <div className="flex items-center gap-0.5 text-[8.5px] font-bold text-amber-300">
-                <Thermometer className="w-2.5 h-2.5 text-amber-400 shrink-0" />
-                <span className="truncate">Temperatura</span>
-              </div>
-              <div className="text-[11px] font-black text-white leading-none my-0.5">
-                {climaNasa?.temp_media_c ? `${climaNasa.temp_media_c} °C` : '11.1 °C'}
-              </div>
-              <div className="text-[7.5px] font-medium text-amber-200/70 truncate leading-none">
-                NASA POWER
-              </div>
-            </div>
+            {/* Settings & Hardware Trigger */}
+            <button
+              type="button"
+              onClick={() => {
+                playBubblePop();
+                setIsSettingsOpen(true);
+              }}
+              className="w-8 h-8 rounded-full border border-[#E5ECE2] bg-[#F7F9F6] text-[#132A1C] hover:bg-emerald-50 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-2xs"
+              title="Ajustes de Parcela y Hardware"
+            >
+              <Settings className="w-4 h-4 text-emerald-900" />
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Paisaje Andino Oscuro de Fondo (Dark Forest Atmosphere) */}
-      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        <div
-          className="absolute top-0 inset-x-0 h-[640px] bg-top bg-cover bg-no-repeat"
-          style={{
-            backgroundImage: `url('/images/andes_bright.jpg')`,
-            opacity: 0.12,
-            filter: 'saturate(1.2) brightness(0.8)',
-            maskImage:
-              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0) 90%)',
-            WebkitMaskImage:
-              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0) 90%)',
-          }}
-        />
-        {/* Degradé profundo al Dark Forest */}
-        <div className="absolute top-0 inset-x-0 h-[700px] bg-gradient-to-b from-[#0F2918]/60 via-[#0A1A0F]/90 to-[#0A1A0F]" />
-      </div>
-
-      {/* Main Tab Content (Scrollable, z-10 sobre el fondo andino) */}
+      {/* Main Tab Content (Scrollable, Light Organic #F7F9F6) */}
       <main className="flex-1 overflow-y-auto px-4 py-4 pb-28 space-y-4 max-w-md mx-auto w-full relative z-10">
         {/* ================= TAB 1: INICIO ================= */}
         {activeTab === 'inicio' && (
@@ -407,151 +348,64 @@ export default function MobileApp() {
             climaNasa={climaNasa}
             smapPercent={smapPercent}
             hardwareId={hardwareId}
-            isElNino={isElNino}
-            onOpenWizard={() => setShowOnboarding(true)}
-            onNavigateToClima={() => setActiveTab('elnino')}
-            onNavigateToChacra={() => setActiveTab('chacra')}
-            onOpenNews={() => setIsNewsOpen(true)}
+            onOpenWizard={() => setIsDiagnosticOpen(true)}
+            onNavigateToParcelas={() => setActiveTab('parcelas')}
+            onNavigateToRotacion={() => setActiveTab('rotacion')}
+            onNavigateToCopiloto={() => setActiveTab('copiloto')}
           />
         )}
 
-        {/* ================= TAB 2: MI CHACRA & ROTACIÓN ================= */}
-        {activeTab === 'chacra' && (
+        {/* ================= TAB 2: PARCELAS ================= */}
+        {activeTab === 'parcelas' && (
           <ChacraTab
             profile={profile}
             cultivos={cultivos}
-            isElNino={isElNino}
             hardwareId={hardwareId}
             onToast={triggerToast}
             onRecalibrate={() => setShowOnboarding(true)}
             onNavigateToInicio={() => setActiveTab('inicio')}
             onUpdateCrop={(cropId, cropName) => {
-              setProfile((prev) => ({
-                ...prev,
+              handleUpdateProfile({
                 previousCropId: cropId,
                 previousCropName: cropName,
-              }));
-            }}
-            onUpdatePriority={(prio, prioName) => {
-              setProfile((prev) => ({
-                ...prev,
-                priority: prio,
-                priorityName: prioName,
-              }));
-            }}
-            onUpdateArea={(newArea) => {
-              setProfile((prev) => {
-                const updated = { ...prev, areaHa: newArea };
-                saveDeviceProfile(updated);
-                return updated;
               });
             }}
+            onUpdatePriority={(prio, prioName) => {
+              handleUpdateProfile({
+                priority: prio,
+                priorityName: prioName,
+              });
+            }}
+            onUpdateArea={(newArea) => {
+              handleUpdateProfile({ areaHa: newArea });
+            }}
+            onOpenWizard={() => setIsDiagnosticOpen(true)}
           />
         )}
 
-        {/* ================= TAB 3: CLIMA & ALERTA EL NIÑO ================= */}
-        {activeTab === 'elnino' && (
-          <ClimaTab
+        {/* ================= TAB 4: ROTACIÓN ================= */}
+        {activeTab === 'rotacion' && (
+          <RotationTab
+            profile={profile}
+            onNavigateToCopiloto={() => setActiveTab('copiloto')}
+            onToast={triggerToast}
+          />
+        )}
+
+        {/* ================= TAB 5: COPILOTO ================= */}
+        {activeTab === 'copiloto' && (
+          <CopilotTab
             profile={profile}
             climaNasa={climaNasa}
-            isElNino={isElNino}
+            smapPercent={smapPercent}
+            onOpenDiagnostic={() => setIsDiagnosticOpen(true)}
             onToast={triggerToast}
-            onToggleElNino={(val) => {
-              setIsElNino(val);
-              triggerToast(val ? '⚠️ Modo Sequía El Niño activo' : '☀️ Modo Normal activo');
-            }}
           />
-        )}
-
-        {/* ================= TAB 4: DIAGNÓSTICO DE SUELO ================= */}
-        {activeTab === 'tierra' && (
-          <div className="space-y-4 animate-in fade-in">
-            {/* Kipu Agrónomo Mascot con Globo de Diálogo Glassmorphic */}
-            <div className="flex items-center gap-3.5 pt-1 pb-1 min-h-[155px]">
-              <div className="w-28 sm:w-32 h-36 sm:h-40 shrink-0 relative flex items-center justify-center">
-                <img
-                  src="/images/kipu_llama.png"
-                  alt="Kipu Suelo"
-                  className="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]"
-                />
-              </div>
-              <div className="flex-1 relative bg-[#132A1C]/80 border border-emerald-500/40 rounded-3xl p-3.5 shadow-xl backdrop-blur-md text-slate-100">
-                <div className="absolute top-7 -left-2.5 w-4 h-4 bg-[#132A1C] border-b border-l border-emerald-500/40 transform rotate-45"></div>
-                <div className="flex items-center justify-between gap-1 mb-1.5">
-                  <span className="font-black text-xs text-emerald-400 uppercase tracking-wide">
-                    KIPU AGRÓNOMO
-                  </span>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-300 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-md">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    Laboratorio
-                  </span>
-                </div>
-                <p className="text-xs text-slate-200 font-medium leading-relaxed font-sans">
-                  Tocar la tierra con tus manos revela su estructura y humedad al instante. Realiza la prueba del puño para calibrar los sensores NASA con tu terreno:
-                </p>
-              </div>
-            </div>
-
-            <SoilValidator
-              cuencaId={profile.cuencaId}
-              lat={profile.lat}
-              lon={profile.lon}
-              profile={profile}
-              climaNasa={climaNasa}
-              microcuencas={microcuencas}
-              cultivos={cultivos}
-              onToast={triggerToast}
-              onUpdateProfile={handleUpdateProfile}
-            />
-          </div>
-        )}
-
-        {/* ================= TAB 5: SABERES ANDINOS ================= */}
-        {activeTab === 'saberes' && (
-          <div className="space-y-4 animate-in fade-in">
-            {/* Kipu Sabio Mascot Glassmorphic */}
-            <div className="flex items-center gap-3.5 pt-1 pb-1 min-h-[155px]">
-              <div className="w-28 sm:w-32 h-36 sm:h-40 shrink-0 relative flex items-center justify-center">
-                <img
-                  src="/images/kipu_llama.png"
-                  alt="Kipu Saberes"
-                  className="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]"
-                />
-              </div>
-              <div className="flex-1 relative bg-[#132A1C]/80 border border-purple-500/40 rounded-3xl p-3.5 shadow-xl backdrop-blur-md text-slate-100">
-                <div className="absolute top-7 -left-2.5 w-4 h-4 bg-[#132A1C] border-b border-l border-purple-500/40 transform rotate-45"></div>
-                <span className="font-extrabold text-xs text-purple-400 uppercase tracking-wide block mb-1">
-                  KIPU SABIO
-                </span>
-                <p className="text-xs text-slate-200 font-medium leading-relaxed font-sans">
-                  Nuestros abuelos perfeccionaron los andenes y las asociaciones de cultivos. Aplica estos saberes en tu chacra para no depender de químicos:
-                </p>
-              </div>
-            </div>
-
-            <SaberesCard />
-          </div>
-        )}
-
-        {/* ================= TAB 6: AJUSTES & HARDWARE ================= */}
-        {activeTab === 'ajustes' && (
-          <div className="space-y-4 animate-in fade-in">
-            <SettingsTab
-              profile={profile}
-              hardwareId={hardwareId}
-              onOpenWizard={() => setShowOnboarding(true)}
-              onOpenWelcome={() => setShowWelcome(true)}
-              onToast={triggerToast}
-              onReset={() => {
-                setShowWelcome(true);
-              }}
-            />
-          </div>
         )}
       </main>
 
-      {/* Floating News Button Container (Elevated cleanly above navbar, aligned to max-w-md, z-50 so NEVER behind BottomNav) */}
-      <div className="fixed bottom-24 inset-x-0 max-w-md mx-auto pointer-events-none z-50 px-4">
+      {/* Floating News Button Container */}
+      <div className="fixed bottom-24 inset-x-0 max-w-md mx-auto pointer-events-none z-30 px-4">
         <div className="flex justify-end">
           <button
             type="button"
@@ -559,12 +413,11 @@ export default function MobileApp() {
               playBubblePop();
               setIsNewsOpen(true);
             }}
-            className="pointer-events-auto relative w-13 h-13 rounded-2xl bg-emerald-900 hover:bg-emerald-800 border-2 border-emerald-600 text-white flex items-center justify-center shadow-2xl transition transform active:scale-95 cursor-pointer group hover:shadow-emerald-900/50"
+            className="pointer-events-auto relative w-12 h-12 rounded-2xl bg-white hover:bg-zinc-50 border border-[#E5ECE2] text-[#132A1C] flex items-center justify-center shadow-md transition transform active:scale-95 cursor-pointer"
             title="Abrir Boletines Científicos y Alertas ENOS"
           >
-            <span className="text-2xl">📰</span>
-            {/* Notification Badge with '3' */}
-            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-500 text-white font-black text-[10px] flex items-center justify-center border-2 border-white shadow-md animate-pulse">
+            <span className="text-xl">📰</span>
+            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 text-white font-black text-[9px] flex items-center justify-center shadow-xs">
               3
             </span>
           </button>
@@ -574,8 +427,39 @@ export default function MobileApp() {
       {/* Slide-Up Bottom Sheet for News & ENOS Bulletins */}
       <AgroClimaNewsFeed isOpen={isNewsOpen} onClose={() => setIsNewsOpen(false)} />
 
+      {/* Central Diagnostic Wizard Modal (Triggered by FAB '+' button or "Evaluar suelo") */}
+      <SoilDiagnosticWizardModal
+        isOpen={isDiagnosticOpen}
+        onClose={() => setIsDiagnosticOpen(false)}
+        onCompleteToRotation={() => {
+          setIsDiagnosticOpen(false);
+          setActiveTab('rotacion');
+          triggerToast('🌱 Plan de rotación activado según resiliencia del suelo.');
+        }}
+        onSaveProfileData={(data) => {
+          triggerToast('✓ Diagnóstico edáfico registrado');
+        }}
+      />
+
+      {/* Settings & Hardware Modal (Triggered from Top Header) */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        profile={profile}
+        hardwareId={hardwareId}
+        microcuencas={microcuencas}
+        onToast={triggerToast}
+        onOpenWizard={() => setShowOnboarding(true)}
+        onReset={() => setShowWelcome(true)}
+        onUpdateProfile={handleUpdateProfile}
+      />
+
       {/* Bottom Mobile Navigation Bar */}
-      <BottomNav activeTab={activeTab} onSelectTab={setActiveTab} />
+      <BottomNav
+        activeTab={activeTab}
+        onSelectTab={setActiveTab}
+        onOpenDiagnostic={() => setIsDiagnosticOpen(true)}
+      />
     </div>
   );
 }

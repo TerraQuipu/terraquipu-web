@@ -16,6 +16,11 @@
   font-family: Arial, Helvetica, "Plus Jakarta Sans", sans-serif;
 }
 
+/* Editorial Serif: Playfair Display for key phrases */
+.font-serif, [class*="font-serif"], .font-editorial-serif, .font-editorial-serif * {
+  font-family: 'Playfair Display', Georgia, Cambria, 'Times New Roman', serif !important;
+}
+
 /* Hero Headline: Playfair Display (Editorial Serif) */
 .hero-headline, .hero-headline * {
   font-family: 'Playfair Display', Georgia, Cambria, 'Times New Roman', serif !important;
