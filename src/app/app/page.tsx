@@ -40,6 +40,7 @@ import SaberesCard from '@/components/SaberesCard';
 import SettingsTab from '@/components/SettingsTab';
 import KipuFullScreenWizard from '@/components/KipuFullScreenWizard';
 import AgroClimaNewsFeed from '@/components/AgroClimaNewsFeed';
+import WelcomeSplash from '@/components/WelcomeSplash';
 
 export default function MobileApp() {
   const [activeTab, setActiveTab] = useState<'inicio' | 'elnino' | 'chacra' | 'tierra' | 'saberes' | 'ajustes'>('inicio');
@@ -50,6 +51,7 @@ export default function MobileApp() {
   const [isNewsOpen, setIsNewsOpen] = useState(false);
 
   // Full-screen first-time setup / onboarding state
+  const [showWelcome, setShowWelcome] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -99,11 +101,13 @@ export default function MobileApp() {
       const hw = generateHardwareProfile();
       setHardwareId(hw.deviceId);
 
-      // Support ?reset=1 or ?wizard=1 in URL for instant verification
+      // Support ?welcome=1, ?reset=1 or ?wizard=1 in URL for instant verification
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('reset') === '1' || urlParams.get('reset') === 'true') {
+      if (urlParams.get('welcome') === '1' || urlParams.get('welcome') === 'true') {
+        setShowWelcome(true);
+      } else if (urlParams.get('reset') === '1' || urlParams.get('reset') === 'true') {
         resetDeviceProfile();
-        setShowOnboarding(true);
+        setShowWelcome(true);
       } else if (urlParams.get('wizard') === '1' || urlParams.get('wizard') === 'true') {
         setShowOnboarding(true);
       } else {
@@ -112,9 +116,10 @@ export default function MobileApp() {
         if (stored) {
           setProfile(stored);
           setShowOnboarding(false);
+          setShowWelcome(false);
         } else {
-          // First time on this hardware device: display full-screen onboarding wizard
-          setShowOnboarding(true);
+          // First time on this hardware device: display welcome splash (Screen 1)
+          setShowWelcome(true);
         }
       }
 
@@ -254,12 +259,28 @@ export default function MobileApp() {
     ? 35
     : 38;
 
+  if (showWelcome) {
+    return (
+      <div className="flex flex-col h-full min-h-screen bg-[#0A1A0F]">
+        <WelcomeSplash
+          onStartWizard={() => {
+            setShowWelcome(false);
+            setShowOnboarding(true);
+          }}
+          onEnterDirect={() => {
+            setShowWelcome(false);
+          }}
+        />
+      </div>
+    );
+  }
+
   if (showOnboarding) {
     return (
-      <div className="flex flex-col h-full min-h-screen bg-white">
+      <div className="flex flex-col h-full min-h-screen bg-[#0A1A0F]">
         {/* Toast Notification Pill */}
         {toastMessage && (
-          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-2xl bg-slate-900/95 text-white font-bold text-xs shadow-xl backdrop-blur-md border border-slate-700 flex items-center gap-2">
+          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-2xl bg-slate-900/95 text-white font-bold text-xs shadow-2xl backdrop-blur-md border border-emerald-500/40 flex items-center gap-2">
             <span className="contrast-bold-white">{toastMessage}</span>
           </div>
         )}
@@ -403,6 +424,7 @@ export default function MobileApp() {
             hardwareId={hardwareId}
             onToast={triggerToast}
             onRecalibrate={() => setShowOnboarding(true)}
+            onNavigateToInicio={() => setActiveTab('inicio')}
             onUpdateCrop={(cropId, cropName) => {
               setProfile((prev) => ({
                 ...prev,
@@ -518,9 +540,10 @@ export default function MobileApp() {
               profile={profile}
               hardwareId={hardwareId}
               onOpenWizard={() => setShowOnboarding(true)}
+              onOpenWelcome={() => setShowWelcome(true)}
               onToast={triggerToast}
               onReset={() => {
-                setShowOnboarding(true);
+                setShowWelcome(true);
               }}
             />
           </div>

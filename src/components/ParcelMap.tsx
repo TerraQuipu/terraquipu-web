@@ -14,6 +14,7 @@ interface ParcelMapProps {
   altitude?: number;
   slope?: number;
   areaHa?: number;
+  cropName?: string;
   onLocateGPS?: () => void;
   onUpdateArea?: (newAreaHa: number) => void;
 }
@@ -26,6 +27,7 @@ export default function ParcelMap({
   altitude = 3380,
   slope = 12,
   areaHa = 1.0,
+  cropName = 'Papa Nativa',
   onLocateGPS,
   onUpdateArea,
 }: ParcelMapProps) {
@@ -33,6 +35,7 @@ export default function ParcelMap({
   const mapInstanceRef = useRef<any>(null);
   const polygonLayerRef = useRef<any>(null);
   const markerLayerRef = useRef<any>(null);
+  const vertexMarkersRef = useRef<any[]>([]);
   const osmLayerRef = useRef<any>(null);
   const esriLayerRef = useRef<any>(null);
   const esriLabelsRef = useRef<any>(null);
@@ -251,6 +254,12 @@ export default function ParcelMap({
       if (markerLayerRef.current) {
         try { map.removeLayer(markerLayerRef.current); } catch (e) {}
       }
+      if (vertexMarkersRef.current.length > 0) {
+        vertexMarkersRef.current.forEach((vm) => {
+          try { map.removeLayer(vm); } catch (e) {}
+        });
+        vertexMarkersRef.current = [];
+      }
 
       // Calculate dynamic parcel polygon dimensions based on real areaHa
       const effectiveArea = parcelAreaHa > 0 ? parcelAreaHa : 1.0;
@@ -269,21 +278,41 @@ export default function ParcelMap({
         color: '#10b981',
         weight: 3.5,
         fillColor: '#34d399',
-        fillOpacity: 0.4,
+        fillOpacity: 0.35,
         dashArray: '6, 6',
       }).addTo(map);
 
+      // Render vertex dots with glowing white/emerald accent matching Screen 3
+      polygonCoords.forEach((coord) => {
+        const vertexIcon = L.divIcon({
+          className: 'vertex-dot',
+          html: '<div style="width:10px;height:10px;background:#ffffff;border:2.5px solid #10b981;border-radius:50%;box-shadow:0 0 10px rgba(16,185,129,0.9);"></div>',
+          iconSize: [10, 10],
+          iconAnchor: [5, 5],
+        });
+        const vm = L.marker(coord, { icon: vertexIcon, interactive: false }).addTo(map);
+        vertexMarkersRef.current.push(vm);
+      });
+
+      // Active Crop Badge Pill on the parcel marker (Screen 3 Inspiration)
+      const cropLabel = cropName || 'Papa Nativa';
       const markerHtml = `
-        <div style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;background:#059669;border:3px solid #ffffff;border-radius:50%;box-shadow:0 6px 16px rgba(0,0,0,0.4);cursor:pointer;animation:pulse 2s infinite;">
-          <span style="font-size:20px;line-height:1;">🌱</span>
+        <div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;">
+          <div style="display:inline-flex;align-items:center;gap:4px;background:#132A1C;color:#34D399;font-weight:900;font-size:11px;font-family:system-ui,sans-serif;padding:3px 10px;border-radius:9999px;border:1.5px solid #34D399;box-shadow:0 4px 14px rgba(0,0,0,0.6);margin-bottom:4px;white-space:nowrap;">
+            <span>🥔</span>
+            <span>${cropLabel}</span>
+          </div>
+          <div style="width:36px;height:36px;background:#059669;border:3px solid #ffffff;border-radius:50%;box-shadow:0 6px 16px rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:18px;animation:pulse 2s infinite;">
+            🌱
+          </div>
         </div>
       `;
 
       const customIcon = L.divIcon({
         className: 'custom-parcel-marker',
         html: markerHtml,
-        iconSize: [40, 40],
-        iconAnchor: [20, 20],
+        iconSize: [120, 65],
+        iconAnchor: [60, 50],
       });
 
       const marker = L.marker([latitude, longitude], { icon: customIcon }).addTo(map);

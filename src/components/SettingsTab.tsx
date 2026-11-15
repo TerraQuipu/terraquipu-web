@@ -20,6 +20,7 @@ interface SettingsTabProps {
   profile: FarmerProfile;
   hardwareId: string;
   onOpenWizard: () => void;
+  onOpenWelcome?: () => void;
   onToast: (msg: string) => void;
   onReset: () => void;
 }
@@ -28,6 +29,7 @@ export default function SettingsTab({
   profile,
   hardwareId,
   onOpenWizard,
+  onOpenWelcome,
   onToast,
   onReset,
 }: SettingsTabProps) {
@@ -196,6 +198,18 @@ export default function SettingsTab({
           <Sliders className="w-4 h-4 text-emerald-400" />
           <span>Acciones de Calibración</span>
         </h4>
+
+        {/* Ver Pantalla de Bienvenida (Screen 1 Inspiración) */}
+        {onOpenWelcome && (
+          <button
+            type="button"
+            onClick={onOpenWelcome}
+            className="w-full py-2.5 px-4 rounded-2xl bg-[#132A1C]/90 hover:bg-[#183925] text-emerald-300 hover:text-white font-bold text-xs flex items-center justify-center gap-2 border border-emerald-500/30 transition cursor-pointer shadow-sm"
+          >
+            <span>🌱</span>
+            <span>Ver Pantalla de Bienvenida (Screen 1)</span>
+          </button>
+        )}
 
         {/* Reabrir Wizard */}
         <button

@@ -15,6 +15,7 @@ import {
   ChevronRight,
   TrendingUp,
   ShieldCheck,
+  Bell,
 } from 'lucide-react';
 import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
 import KipuCarouselBanner from '@/components/KipuCarouselBanner';
@@ -126,6 +127,40 @@ export default function InicioTab({
 
   return (
     <div className="space-y-4 animate-in fade-in pb-16 pt-1">
+      {/* 0. USER GREETING ROW (SCREEN 2 INSPIRATION) */}
+      <div className="flex items-center justify-between gap-2 px-1 pt-0.5">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-10 h-10 rounded-2xl border border-emerald-400/40 bg-gradient-to-br from-emerald-800 to-teal-950 p-0.5 overflow-hidden shrink-0 shadow-md shadow-emerald-950/60 flex items-center justify-center">
+            <img
+              src="/images/kipu_llama.png"
+              alt="Perfil Kipu"
+              className="w-full h-full object-contain filter drop-shadow"
+            />
+          </div>
+          <div className="min-w-0">
+            <span className="text-[11px] font-semibold text-emerald-300/80 block leading-tight">
+              Allillanchu, {profile.parcelName.replace('Chacra ', '')}
+            </span>
+            <span className="text-sm font-black text-white block leading-tight truncate">
+              ¡Bienvenido de nuevo!
+            </span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            playBubblePop();
+            onOpenNews();
+          }}
+          className="relative w-9 h-9 rounded-2xl bg-[#132A1C]/90 hover:bg-[#183925] border border-emerald-500/30 flex items-center justify-center text-emerald-300 hover:text-white transition cursor-pointer shadow-md"
+          title="Ver Alertas ENOS & Boletines"
+        >
+          <Bell className="w-4 h-4" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+        </button>
+      </div>
+
       {/* 1. KIPU COPILOTO & DIALOG BUBBLE (DARK FOREST GLASSMORPHISM) */}
       <KipuCarouselBanner
         profile={profile}

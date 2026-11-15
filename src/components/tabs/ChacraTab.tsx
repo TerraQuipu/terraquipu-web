@@ -14,6 +14,7 @@ import {
   MapPin,
   TrendingUp,
   Layers,
+  ChevronLeft,
 } from 'lucide-react';
 import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
 import ParcelMap from '@/components/ParcelMap';
@@ -26,6 +27,7 @@ interface ChacraTabProps {
   hardwareId: string;
   onToast: (msg: string) => void;
   onRecalibrate: () => void;
+  onNavigateToInicio?: () => void;
   onUpdateCrop: (cropId: string, cropName: string) => void;
   onUpdatePriority: (priority: 'tierra' | 'comida' | 'mercado', priorityName: string) => void;
   onUpdateArea?: (areaHa: number) => void;
@@ -47,6 +49,7 @@ export default function ChacraTab({
   hardwareId,
   onToast,
   onRecalibrate,
+  onNavigateToInicio,
   onUpdateCrop,
   onUpdatePriority,
   onUpdateArea,
@@ -72,64 +75,76 @@ export default function ChacraTab({
 
   return (
     <div className="space-y-4 animate-in fade-in pb-16 pt-1">
-      {/* 1. TOP FLOATING GLASS CARD (SCREEN 3 STYLE) */}
+      {/* 1. TOP FLOATING GLASS CARD (SCREEN 3 STYLE: BACK BUTTON + FIELD NAME + AVATAR) */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#132A1C]/90 via-[#0F2418]/85 to-[#0A1A0F]/90 border border-emerald-500/30 p-4 sm:p-5 shadow-2xl backdrop-blur-xl space-y-3">
         <div className="flex items-center justify-between border-b border-emerald-500/20 pb-3">
-          <div>
-            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">
-              FICHA DE MI CHACRA • TERRITORIO ANDINO
-            </span>
-            <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-1.5 mt-0.5">
-              <span>{profile.parcelName}</span>
-              <span className="text-xs text-emerald-300 font-normal">({profile.distrito})</span>
-            </h2>
+          <div className="flex items-center gap-2 min-w-0">
+            {onNavigateToInicio && (
+              <button
+                type="button"
+                onClick={onNavigateToInicio}
+                className="w-8 h-8 rounded-full bg-[#0A1A0F]/80 border border-emerald-500/30 text-emerald-300 hover:text-white flex items-center justify-center transition cursor-pointer shrink-0"
+                title="Volver al Inicio"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+            )}
+            <div className="min-w-0">
+              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block truncate">
+                MI CHACRA • MAPA SATELITAL
+              </span>
+              <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-1.5 mt-0.5 truncate">
+                <span>{profile.parcelName}</span>
+                <span className="text-xs text-emerald-300 font-normal">({profile.distrito})</span>
+              </h2>
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={handleOpenWizard}
-            className="text-[10px] font-bold text-emerald-300 bg-emerald-950/60 border border-emerald-500/30 px-2.5 py-1 rounded-xl flex items-center gap-1 hover:text-white transition cursor-pointer"
-          >
-            <RotateCcw className="w-3 h-3 text-emerald-400" />
-            <span>Recalibrar</span>
-          </button>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={handleOpenWizard}
+              className="text-[10px] font-bold text-emerald-300 bg-emerald-950/60 border border-emerald-500/30 px-2 py-1 rounded-xl flex items-center gap-1 hover:text-white transition cursor-pointer"
+            >
+              <RotateCcw className="w-3 h-3 text-emerald-400" />
+              <span>Recalibrar</span>
+            </button>
+            <div className="w-8 h-8 rounded-full border border-emerald-400/40 bg-emerald-950/70 p-0.5 overflow-hidden shrink-0 shadow-md">
+              <img src="/images/kipu_llama.png" alt="Perfil" className="w-full h-full object-contain" />
+            </div>
+          </div>
         </div>
 
-        {/* 4 Summary Stats: Area, Plant Age, Previous Crop, Priority */}
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          <div className="p-2.5 rounded-2xl bg-[#0A1A0F]/60 border border-emerald-500/20">
-            <span className="text-[10px] text-emerald-400 font-bold block">Área Total:</span>
-            <span className="font-extrabold text-white text-sm">
+        {/* 3 Key Stats matching Screen 3: Total Area, Plant Age, Yield */}
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          <div className="p-2.5 rounded-2xl bg-[#0A1A0F]/60 border border-emerald-500/20 text-left">
+            <span className="text-[9.5px] text-emerald-400 font-bold block">Área Total:</span>
+            <span className="font-extrabold text-white text-xs sm:text-sm block mt-0.5">
               {currentArea} ha
             </span>
-            <span className="text-[10px] text-emerald-300/80 font-mono block">
-              ≈ {topos} topos andinos
+            <span className="text-[9px] text-emerald-300/80 font-mono block">
+              {topos} topos
             </span>
           </div>
 
-          <div className="p-2.5 rounded-2xl bg-[#0A1A0F]/60 border border-emerald-500/20">
-            <span className="text-[10px] text-emerald-400 font-bold block">Etapa de Campaña:</span>
-            <span className="font-extrabold text-white text-sm">
+          <div className="p-2.5 rounded-2xl bg-[#0A1A0F]/60 border border-emerald-500/20 text-left">
+            <span className="text-[9.5px] text-emerald-400 font-bold block">Edad Planta:</span>
+            <span className="font-extrabold text-white text-xs sm:text-sm block mt-0.5">
               45 Días
             </span>
-            <span className="text-[10px] text-emerald-300/80 font-mono block">
-              Fase Desarrollo Vegetativo
+            <span className="text-[9px] text-emerald-300/80 font-mono block">
+              Vegetativa
             </span>
           </div>
 
-          <div className="p-2.5 rounded-2xl bg-[#0A1A0F]/60 border border-emerald-500/20">
-            <span className="text-[10px] text-emerald-400 font-bold block">Cosecha Previa:</span>
-            <span className="font-extrabold text-white text-xs truncate block mt-0.5">
-              {profile.previousCropName}
+          <div className="p-2.5 rounded-2xl bg-[#0A1A0F]/60 border border-emerald-500/20 text-left">
+            <span className="text-[9.5px] text-emerald-400 font-bold block">Rendimiento:</span>
+            <span className="font-extrabold text-white text-xs sm:text-sm block mt-0.5">
+              {Math.max(1, Math.round(currentArea * 14))} Ton
             </span>
-            <span className="text-[9px] text-slate-400 block">Suelo en Descanso / Ayni</span>
-          </div>
-
-          <div className="p-2.5 rounded-2xl bg-[#0A1A0F]/60 border border-emerald-500/20">
-            <span className="text-[10px] text-emerald-400 font-bold block">Prioridad Campaña:</span>
-            <span className="font-extrabold text-white text-xs truncate block mt-0.5">
-              {profile.priorityName}
+            <span className="text-[9px] text-emerald-300/80 font-mono block">
+              Proyección
             </span>
-            <span className="text-[9px] text-emerald-400/80 block">Abono &amp; Nutrientes</span>
           </div>
         </div>
       </div>
@@ -200,6 +215,7 @@ export default function ChacraTab({
         altitude={profile.altitude}
         slope={profile.slope}
         areaHa={currentArea}
+        cropName={profile.previousCropName}
         onUpdateArea={handleAreaChange}
       />
 
