@@ -59,7 +59,7 @@ export default function CopilotTab({
     {
       id: 'm1',
       sender: 'kipu',
-      text: `¡Allillanchu, hermano agricultor! Soy Kipu, tu compañero andino. Veo que en tu parcela "${profile.parcelName || 'Chacra Maras'}" la humedad SMAP está en ${smapPercent}%. ¿Sobre qué labor agrícola deseas conversar hoy?`,
+      text: `¡Allillanchu, ${profile.farmerName ? `hermano ${profile.farmerName}` : 'hermano agricultor'}! Soy Kipu, tu compañero andino. Veo que en tu parcela "${profile.parcelName || 'Chacra Maras'}" la humedad SMAP está en ${smapPercent}%. ¿Sobre qué labor agrícola deseas conversar hoy?`,
       timestamp: '08:42',
     },
   ]);

@@ -71,6 +71,7 @@ export interface ReporteAgricultor {
 }
 
 export interface FarmerProfile {
+  farmerName?: string;
   cuencaId: string;
   cuencaName: string;
   parcelName: string;

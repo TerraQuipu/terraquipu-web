@@ -120,7 +120,9 @@ export default function ParcelMap({
 
         const map = L.map(mapContainerRef.current, {
           center: [effectiveLat, effectiveLon],
-          zoom: 16,
+          zoom: 15,
+          minZoom: 12,
+          maxZoom: 18,
           zoomControl: false,
           attributionControl: false,
         });
@@ -128,7 +130,7 @@ export default function ParcelMap({
         // 1. ESRI World Imagery
         const esriSat = L.tileLayer(
           'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-          { maxZoom: 19, crossOrigin: true }
+          { maxNativeZoom: 17, maxZoom: 19, crossOrigin: true }
         );
 
         // 2. ESRI Reference Labels

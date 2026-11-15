@@ -161,17 +161,19 @@ interface ParcelDrawerFullScreenViewProps {
   initialLon?: number;
   initialAreaHa?: number;
   cultivos?: Cultivo[];
+  farmerName?: string;
+  initialCommunityName?: string;
 }
 
 // Verified Peruvian Agricultural & Regional Coordinates
 const PRESET_REGIONS = [
-  { id: 'maras', name: 'Maras', fullName: 'Maras • Valle Sagrado', lat: -13.332, lon: -72.158, altitude: 3380 },
-  { id: 'chinchero', name: 'Chinchero', fullName: 'Chinchero • Cusco', lat: -13.393, lon: -72.049, altitude: 3760 },
+  { id: 'maras', name: 'Maras', fullName: 'Maras · Valle Sagrado', lat: -13.332, lon: -72.158, altitude: 3380 },
+  { id: 'chinchero', name: 'Chinchero', fullName: 'Chinchero · Cusco', lat: -13.393, lon: -72.049, altitude: 3760 },
   { id: 'urubamba', name: 'Urubamba', fullName: 'Valle de Urubamba', lat: -13.305, lon: -72.115, altitude: 2870 },
   { id: 'anta', name: 'Anta', fullName: 'Pampa de Anta', lat: -13.415, lon: -72.235, altitude: 3450 },
-  { id: 'ayaviri', name: 'Ayaviri', fullName: 'Melgar • Ayaviri', lat: -14.882, lon: -70.589, altitude: 3910 },
+  { id: 'ayaviri', name: 'Ayaviri', fullName: 'Melgar · Ayaviri', lat: -14.882, lon: -70.589, altitude: 3910 },
   { id: 'majes', name: 'Majes', fullName: 'Irrigación Majes', lat: -16.325, lon: -72.208, altitude: 1400 },
-  { id: 'puno', name: 'Puno', fullName: 'Puno • Titicaca', lat: -15.84, lon: -70.021, altitude: 3812 },
+  { id: 'puno', name: 'Puno', fullName: 'Puno · Titicaca', lat: -15.84, lon: -70.021, altitude: 3812 },
 ];
 
 export function getCropImage(cropId: string, nombreComun: string): string {
@@ -193,11 +195,14 @@ export default function ParcelDrawerFullScreenView({
   initialLon = -72.158,
   initialAreaHa = 1.73,
   cultivos: propCultivos = [],
+  farmerName = '',
+  initialCommunityName = '',
 }: ParcelDrawerFullScreenViewProps) {
   // Wizard Step: 1 = Delimitar en mapa, 2 = Confirmar telemetría, 3 = Nombre de chacra, 4 = Seleccionar cultivo real
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
 
   // Drawing Mode: 'freehand' (clics para vértices libres) vs 'box' (chacra rápida 1 clic + slider)
+  // En trazo libre, iniciamos limpio sin polígono predefinido para que el agricultor marque libremente
   const [drawMode, setDrawMode] = useState<'freehand' | 'box'>('freehand');
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -211,10 +216,10 @@ export default function ParcelDrawerFullScreenView({
   const satLayerRef = useRef<any>(null);
   const osmLayerRef = useRef<any>(null);
 
-  // State Coordinates & Geometry
+  // State Coordinates & Geometry (Comienza limpio con 0 vértices y 0 área)
   const [currentLat, setCurrentLat] = useState(initialLat);
   const [currentLon, setCurrentLon] = useState(initialLon);
-  const [areaHa, setAreaHa] = useState(initialAreaHa);
+  const [areaHa, setAreaHa] = useState(0);
   const [polygonCoords, setPolygonCoords] = useState<[number, number][]>([]);
   const polygonCoordsRef = useRef<[number, number][]>([]);
   polygonCoordsRef.current = polygonCoords;
@@ -223,14 +228,18 @@ export default function ParcelDrawerFullScreenView({
   const [altitudeMsnm, setAltitudeMsnm] = useState(3380);
   const [slopePct, setSlopePct] = useState(12.0);
   const [smapMoisturePct, setSmapMoisturePct] = useState(18.0);
-  const [activeRegionId, setActiveRegionId] = useState('maras');
+  const [activeRegionId, setActiveRegionId] = useState(
+    initialCommunityName ? initialCommunityName.toLowerCase() : 'maras'
+  );
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
 
   // Form Fields
-  const [parcelName, setParcelName] = useState('Chacra Yanacona');
+  const [parcelName, setParcelName] = useState(
+    farmerName ? `Chacra de ${farmerName}` : 'Mi Chacra Andina'
+  );
   const [notes, setNotes] = useState('Suelo franco arcilloso, delimitado con precisión satelital.');
 
   // Live Supabase Crops Data (Real Data, zero mockups)
@@ -298,19 +307,26 @@ export default function ParcelDrawerFullScreenView({
         delete (mapContainerRef.current as any)._leaflet_id;
       }
 
+      // Zoom 15 provides an optimal landscape view of the valley without tile errors
       const map = L.map(mapContainerRef.current, {
         center: [currentLat, currentLon],
-        zoom: 16,
+        zoom: 15,
+        minZoom: 12,
+        maxZoom: 18,
         zoomControl: false,
         attributionControl: false,
       });
 
       mapInstanceRef.current = map;
 
-      // Base Satellite (Esri World Imagery)
+      // Base Satellite (Esri World Imagery) with maxNativeZoom: 17 to prevent grey "Map data not yet available" tiles
       const satLayer = L.tileLayer(
         'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        { maxZoom: 19 }
+        {
+          maxNativeZoom: 17,
+          maxZoom: 19,
+          attribution: 'Tiles &copy; Esri',
+        }
       );
       satLayerRef.current = satLayer;
 
@@ -323,12 +339,8 @@ export default function ParcelDrawerFullScreenView({
 
       satLayer.addTo(map);
 
-      // Initial Box Coordinates
-      const initialCoords = generateBoxCoords(currentLat, currentLon, initialAreaHa);
-      setPolygonCoords(initialCoords);
-      polygonCoordsRef.current = initialCoords;
-
-      renderPolygon(L, map, initialCoords, initialAreaHa);
+      // Limpio al inicio: NO se dibuja parcela predefinida en modo trazo libre
+      // El agricultor inicia con el mapa despejado para colocar sus propios vértices con toques directos
 
       // Handle map clicks based on drawMode
       map.on('click', (e: any) => {
@@ -492,6 +504,28 @@ export default function ParcelDrawerFullScreenView({
     }
     setPolygonCoords([]);
     polygonCoordsRef.current = [];
+    setAreaHa(0);
+  };
+
+  // Switch between Freehand Polygon (clean start) and Box (Chacra Rápida)
+  const handleSwitchDrawMode = (mode: 'freehand' | 'box') => {
+    playBubblePop();
+    setDrawMode(mode);
+    if (mode === 'box') {
+      const defaultHa = areaHa > 0 ? areaHa : 1.73;
+      setAreaHa(defaultHa);
+      const newBox = generateBoxCoords(currentLat, currentLon, defaultHa);
+      setPolygonCoords(newBox);
+      polygonCoordsRef.current = newBox;
+      if (mapInstanceRef.current) {
+        import('leaflet').then((mod) => {
+          renderPolygon(mod.default, mapInstanceRef.current, newBox, defaultHa);
+        });
+      }
+    } else {
+      // Freehand starts completely clean with no polygon
+      handleClearPoints();
+    }
   };
 
   // Undo last vertex
@@ -513,8 +547,12 @@ export default function ParcelDrawerFullScreenView({
           setAreaHa(safeArea);
           renderPolygon(L, mapInstanceRef.current, updated, safeArea);
         } else {
+          setAreaHa(0);
           if (polygonLayerRef.current) mapInstanceRef.current.removeLayer(polygonLayerRef.current);
           if (centroidMarkerRef.current) mapInstanceRef.current.removeLayer(centroidMarkerRef.current);
+          if (updated.length > 0 && tempPolylineRef.current) {
+            tempPolylineRef.current.setLatLngs(updated);
+          }
         }
       });
     }
@@ -541,17 +579,24 @@ export default function ParcelDrawerFullScreenView({
     setCurrentLat(region.lat);
     setCurrentLon(region.lon);
     setAltitudeMsnm(region.altitude);
-    setParcelName(`Chacra ${region.name}`);
-
-    const newCoords = generateBoxCoords(region.lat, region.lon, areaHa);
-    setPolygonCoords(newCoords);
-    polygonCoordsRef.current = newCoords;
+    if (!parcelName || parcelName === 'Mi Chacra Andina' || parcelName.startsWith('Chacra ')) {
+      setParcelName(farmerName ? `Chacra de ${farmerName}` : `Chacra ${region.name}`);
+    }
 
     if (mapInstanceRef.current) {
-      mapInstanceRef.current.flyTo([region.lat, region.lon], 16, { duration: 1.2 });
-      import('leaflet').then((mod) => {
-        renderPolygon(mod.default, mapInstanceRef.current, newCoords, areaHa);
-      });
+      mapInstanceRef.current.flyTo([region.lat, region.lon], 15, { duration: 1.2 });
+    }
+
+    if (drawMode === 'box') {
+      const targetHa = areaHa > 0 ? areaHa : 1.73;
+      const newCoords = generateBoxCoords(region.lat, region.lon, targetHa);
+      setPolygonCoords(newCoords);
+      polygonCoordsRef.current = newCoords;
+      if (mapInstanceRef.current) {
+        import('leaflet').then((mod) => {
+          renderPolygon(mod.default, mapInstanceRef.current, newCoords, targetHa);
+        });
+      }
     }
   };
 
@@ -574,15 +619,21 @@ export default function ParcelDrawerFullScreenView({
         setCurrentLon(lon);
         setParcelName(searchQuery);
 
-        const newCoords = generateBoxCoords(lat, lon, areaHa);
-        setPolygonCoords(newCoords);
-        polygonCoordsRef.current = newCoords;
-
         if (mapInstanceRef.current) {
-          mapInstanceRef.current.flyTo([lat, lon], 16, { duration: 1.2 });
-          import('leaflet').then((mod) => {
-            renderPolygon(mod.default, mapInstanceRef.current, newCoords, areaHa);
-          });
+          mapInstanceRef.current.flyTo([lat, lon], 15, { duration: 1.2 });
+        }
+
+        if (drawMode === 'box') {
+          const targetHa = areaHa > 0 ? areaHa : 1.73;
+          const newCoords = generateBoxCoords(lat, lon, targetHa);
+          setPolygonCoords(newCoords);
+          polygonCoordsRef.current = newCoords;
+
+          if (mapInstanceRef.current) {
+            import('leaflet').then((mod) => {
+              renderPolygon(mod.default, mapInstanceRef.current, newCoords, targetHa);
+            });
+          }
         }
       }
     } catch (err) {
@@ -783,10 +834,7 @@ export default function ParcelDrawerFullScreenView({
               <div className="bg-[#132A1C]/90 backdrop-blur-md p-1 rounded-full border border-white/15 flex items-center gap-1">
                 <button
                   type="button"
-                  onClick={() => {
-                    playBubblePop();
-                    setDrawMode('freehand');
-                  }}
+                  onClick={() => handleSwitchDrawMode('freehand')}
                   className={`px-3 py-1 rounded-full text-[10.5px] font-semibold transition cursor-pointer flex items-center gap-1.5 ${
                     drawMode === 'freehand'
                       ? 'bg-[#7BB63E] text-[#132A1C] shadow-xs'
@@ -799,10 +847,7 @@ export default function ParcelDrawerFullScreenView({
 
                 <button
                   type="button"
-                  onClick={() => {
-                    playBubblePop();
-                    setDrawMode('box');
-                  }}
+                  onClick={() => handleSwitchDrawMode('box')}
                   className={`px-3 py-1 rounded-full text-[10.5px] font-semibold transition cursor-pointer flex items-center gap-1.5 ${
                     drawMode === 'box'
                       ? 'bg-[#7BB63E] text-[#132A1C] shadow-xs'
@@ -852,7 +897,10 @@ export default function ParcelDrawerFullScreenView({
               <span>VISOR QGIS</span>
             </div>
             <div className="text-xs font-semibold text-white">
-              {areaHa} ha <span className="text-[10px] text-zinc-400">({topos} topos)</span>
+              {areaHa > 0 ? `${areaHa} ha` : '0.00 ha'}{' '}
+              <span className="text-[10px] text-zinc-400">
+                ({areaHa > 0 ? topos : '0.0'} topos)
+              </span>
             </div>
             <div className="text-[9.5px] text-zinc-300 font-mono">
               {altitudeMsnm} msnm
@@ -870,7 +918,11 @@ export default function ParcelDrawerFullScreenView({
           <div className="absolute bottom-28 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
             <div className="bg-black/75 backdrop-blur-sm px-3.5 py-1.5 rounded-full border border-white/20 text-[10.5px] text-white shadow-md text-center whitespace-nowrap">
               {drawMode === 'freehand'
-                ? 'Toca el mapa para marcar los vértices de tu chacra'
+                ? polygonCoords.length === 0
+                  ? 'Toca el mapa para marcar el primer vértice de tu chacra'
+                  : polygonCoords.length < 3
+                  ? `Marca ${3 - polygonCoords.length} vértice(s) más para cerrar el terreno`
+                  : 'Terreno delimitado. Toca más vértices o confirma abajo'
                 : 'Toca el mapa para posicionar el polígono de tu chacra'}
             </div>
           </div>

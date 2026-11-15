@@ -42,9 +42,11 @@ import SettingsFullScreenView from '@/components/views/SettingsFullScreenView';
 import NewsFullScreenView from '@/components/views/NewsFullScreenView';
 import ParcelDrawerFullScreenView from '@/components/views/ParcelDrawerFullScreenView';
 import WelcomeSplash from '@/components/WelcomeSplash';
+import KipuFarmerWelcomeView from '@/components/views/KipuFarmerWelcomeView';
 import KipuFullScreenWizard from '@/components/KipuFullScreenWizard';
 
 export type ScreenState = MainTab | 'ajustes' | 'noticias' | 'visor_qgis';
+export type OnboardingPhase = 'none' | 'welcome' | 'kipu_name' | 'parcel_setup';
 
 export default function MobileApp() {
   const [currentScreen, setCurrentScreen] = useState<ScreenState>('inicio');
@@ -55,7 +57,7 @@ export default function MobileApp() {
   const [hardwareId, setHardwareId] = useState('TQ-HW-C249');
 
   // Full-screen first-time setup / onboarding state
-  const [showWelcome, setShowWelcome] = useState(false);
+  const [onboardingPhase, setOnboardingPhase] = useState<OnboardingPhase>('none');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -105,21 +107,26 @@ export default function MobileApp() {
       const hw = generateHardwareProfile();
       setHardwareId(hw.deviceId || 'TQ-HW-C249');
 
-      // Support ?welcome=1, ?reset=1 or ?wizard=1 in URL
+      // Support ?welcome=1, ?reset=1, ?kipu=1 or ?wizard=1 in URL
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('welcome') === '1' || urlParams.get('welcome') === 'true') {
-        setShowWelcome(true);
+        setOnboardingPhase('welcome');
       } else if (urlParams.get('reset') === '1' || urlParams.get('reset') === 'true') {
         resetDeviceProfile();
-        setShowWelcome(true);
+        setOnboardingPhase('welcome');
+      } else if (urlParams.get('kipu') === '1' || urlParams.get('kipu') === 'true') {
+        setOnboardingPhase('kipu_name');
       } else if (urlParams.get('wizard') === '1' || urlParams.get('wizard') === 'true') {
         setShowOnboarding(true);
       } else {
         const stored = getStoredDeviceProfile();
-        if (stored) {
+        if (stored && stored.isConfigured) {
           setProfile(stored);
           setShowOnboarding(false);
-          setShowWelcome(false);
+          setOnboardingPhase('none');
+        } else {
+          // New device detected on the system! Promptly show welcome splash
+          setOnboardingPhase('welcome');
         }
       }
 
@@ -240,19 +247,97 @@ export default function MobileApp() {
     ? Math.round(climaNasa.humedad_suelo_smap_m3m3 * 100)
     : 16;
 
-  if (showWelcome) {
+  // =========================================================================
+  // ONBOARDING WORKFLOW (NUEVO DISPOSITIVO: BIENVENIDA -> KIPU PERFIL -> DELIMITAR PARCELA)
+  // =========================================================================
+
+  // Paso 1 de Onboarding: Welcome Splash (Adaptado de Imagen 4)
+  if (onboardingPhase === 'welcome') {
     return (
-      <div className="flex flex-col h-full min-h-screen bg-[#F7F9F6]">
+      <div className="flex flex-col h-full min-h-screen bg-[#0A1A0F]">
         <WelcomeSplash
           onStartWizard={() => {
-            setShowWelcome(false);
-            setShowOnboarding(true);
+            playBubblePop();
+            setOnboardingPhase('kipu_name');
           }}
           onEnterDirect={() => {
-            setShowWelcome(false);
+            playBubblePop();
+            const configured = saveDeviceProfile({
+              ...profile,
+              farmerName: profile.farmerName || 'Miguel',
+            });
+            setProfile(configured);
+            setOnboardingPhase('none');
           }}
         />
       </div>
+    );
+  }
+
+  // Paso 2 de Onboarding: Kipu Copiloto pregunta Nombre y Comunidad
+  if (onboardingPhase === 'kipu_name') {
+    return (
+      <div className="flex flex-col h-full min-h-screen bg-[#0A1A0F]">
+        <KipuFarmerWelcomeView
+          initialName={profile.farmerName || ''}
+          initialCommunityId={profile.distrito ? profile.distrito.toLowerCase() : 'maras'}
+          onBack={() => setOnboardingPhase('welcome')}
+          onContinue={(farmerName, community) => {
+            setProfile((prev) => ({
+              ...prev,
+              farmerName,
+              cuencaName: community.fullName,
+              distrito: community.name,
+              lat: community.lat,
+              lon: community.lon,
+              altitude: community.altitude,
+              parcelName: `Chacra de ${farmerName}`,
+            }));
+            setOnboardingPhase('parcel_setup');
+          }}
+          onSkip={() => {
+            const configured = saveDeviceProfile({
+              ...profile,
+              farmerName: profile.farmerName || 'Miguel',
+            });
+            setProfile(configured);
+            setOnboardingPhase('none');
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Paso 3 de Onboarding: Delimitar Primera Parcela en Visor Satelital QGIS
+  if (onboardingPhase === 'parcel_setup') {
+    return (
+      <ParcelDrawerFullScreenView
+        onBack={() => setOnboardingPhase('kipu_name')}
+        cultivos={cultivos}
+        initialLat={profile.lat}
+        initialLon={profile.lon}
+        initialAreaHa={profile.areaHa || 1.73}
+        farmerName={profile.farmerName}
+        initialCommunityName={profile.distrito}
+        onParcelCreated={(newParcel) => {
+          const updatedProfile: FarmerProfile = {
+            ...profile,
+            farmerName: profile.farmerName || 'Miguel',
+            parcelName: newParcel.name,
+            areaHa: newParcel.areaHa,
+            lat: newParcel.lat,
+            lon: newParcel.lon,
+            altitude: newParcel.altitudeMsnm,
+            previousCropName: newParcel.cropName,
+            previousCropId: newParcel.cropId,
+          };
+          saveDeviceProfile(updatedProfile);
+          setProfile(updatedProfile);
+          setOnboardingPhase('none');
+          triggerToast(`¡Bienvenido ${updatedProfile.farmerName}! Tu chacra "${newParcel.name}" ha sido guardada.`);
+          navigateTo('inicio');
+        }}
+      />
     );
   }
 
@@ -287,7 +372,7 @@ export default function MobileApp() {
           microcuencas={microcuencas}
           onToast={triggerToast}
           onOpenWizard={() => setShowOnboarding(true)}
-          onReset={() => setShowWelcome(true)}
+          onReset={() => setOnboardingPhase('welcome')}
           onUpdateProfile={handleUpdateProfile}
         />
       </div>
@@ -309,6 +394,8 @@ export default function MobileApp() {
       <ParcelDrawerFullScreenView
         onBack={goBack}
         cultivos={cultivos}
+        farmerName={profile.farmerName}
+        initialCommunityName={profile.distrito}
         onParcelCreated={(newParcel) => {
           handleUpdateProfile({
             parcelName: newParcel.name,
@@ -317,6 +404,7 @@ export default function MobileApp() {
             lon: newParcel.lon,
             altitude: newParcel.altitudeMsnm,
             previousCropName: newParcel.cropName,
+            previousCropId: newParcel.cropId,
           });
           triggerToast(`Parcela "${newParcel.name}" guardada con éxito`);
           navigateTo('parcelas');

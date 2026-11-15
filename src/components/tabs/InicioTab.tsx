@@ -164,14 +164,14 @@ export default function InicioTab({
           {/* Farmer Greeting Chip */}
           <div className="flex items-center gap-3 pt-0.5">
             <div className="w-10 h-10 rounded-full bg-[#E5ECE2] text-[#132A1C] font-bold text-sm flex items-center justify-center shadow-md border border-white/40">
-              M
+              {(profile?.farmerName || 'Miguel').charAt(0).toUpperCase()}
             </div>
             <div>
               <h2 className="text-base font-bold text-white leading-tight">
-                Hola, Miguel
+                Hola, {profile?.farmerName || 'Miguel'}
               </h2>
               <p className="text-xs text-white/80 font-normal">
-                Comunidad {profile.distrito || 'Urubamba'}
+                Comunidad {profile.distrito || profile.cuencaName || 'Urubamba'}
               </p>
             </div>
           </div>
@@ -515,7 +515,7 @@ export default function InicioTab({
           <div className="bg-[#F7F9F6] rounded-2xl p-3.5 border border-[#E5ECE2] text-xs text-zinc-700 leading-relaxed">
             {activeConsejoVoice === 'astro' ? (
               <p className="italic text-zinc-700 text-[12.5px] leading-relaxed font-normal">
-                &ldquo;SMAP observa humedad baja en la superficie. Mantén mulch de 5–8 cm y revisa el surco al amanecer.&rdquo;
+                &ldquo;SMAP observa humedad baja en la superficie. Mantén mulch de 5 a 8 cm y revisa el surco al amanecer.&rdquo;
               </p>
             ) : (
               <p className="italic text-zinc-700 text-[12.5px] leading-relaxed font-normal">
