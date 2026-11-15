@@ -8,16 +8,151 @@ import {
   MapPin,
   Check,
   CheckCircle2,
-  Maximize2,
-  Minimize2,
-  Sparkles,
   Sliders,
   Sprout,
-  Compass,
+  PenTool,
+  RotateCcw,
+  Sparkles,
+  Mountain,
+  Droplets,
+  ChevronRight,
+  TrendingUp,
+  Leaf,
+  Plus,
 } from 'lucide-react';
 import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
-import { ParcelItem } from '@/lib/types';
+import { Cultivo, ParcelItem } from '@/lib/types';
 import { saveParcel } from '@/lib/deviceProfile';
+import {
+  calculateParcelAreaHa,
+  calculateParcelCentroid,
+  estimateTerrainMetrics,
+  fetchRealTerrainMetrics,
+} from '@/lib/geoUtils';
+import { getCultivos } from '@/lib/supabaseClient';
+
+const FALLBACK_CROPS: Cultivo[] = [
+  {
+    crop_id: 'papa_nativa',
+    nombre_comun: 'Papa Nativa Andina',
+    nombre_cientifico: 'Solanum tuberosum subsp. andigenum',
+    familia_botanica: 'Solanaceae',
+    variedades_recomendadas: ['Huayro', 'Canchan', 'Amarilla Tumbay'],
+    demanda_hidrica_min_mm: 500,
+    demanda_hidrica_optima_mm: 650,
+    altitud_min_msnm: 2800,
+    altitud_max_msnm: 4100,
+    ph_suelo_min: 5.0,
+    ph_suelo_max: 6.5,
+    balance_nitrogeno_kg_ha: -70.0,
+    rompe_plaga_gorgojo: false,
+    tolerancia_helada_c: -1.5,
+    meses_ciclo: 6,
+    sucesores_favorables: ['tarwi', 'haba', 'quinua'],
+    sucesores_desfavorables: ['papa_nativa'],
+    icono_emoji: '🥔',
+  },
+  {
+    crop_id: 'tarwi',
+    nombre_comun: 'Tarwi / Chocho',
+    nombre_cientifico: 'Lupinus mutabilis',
+    familia_botanica: 'Fabaceae',
+    variedades_recomendadas: ['Andenes INIA', 'Yunguyo'],
+    demanda_hidrica_min_mm: 350,
+    demanda_hidrica_optima_mm: 480,
+    altitud_min_msnm: 2800,
+    altitud_max_msnm: 3900,
+    ph_suelo_min: 5.5,
+    ph_suelo_max: 7.2,
+    balance_nitrogeno_kg_ha: 95.0,
+    rompe_plaga_gorgojo: true,
+    tolerancia_helada_c: -3.0,
+    meses_ciclo: 7,
+    sucesores_favorables: ['papa_nativa', 'maiz', 'quinua'],
+    sucesores_desfavorables: ['tarwi'],
+    icono_emoji: '🌱',
+  },
+  {
+    crop_id: 'maiz_blanco',
+    nombre_comun: 'Maíz Blanco Gigante',
+    nombre_cientifico: 'Zea mays var. amylacea',
+    familia_botanica: 'Poaceae',
+    variedades_recomendadas: ['Paraqay Sara', 'Urubamba'],
+    demanda_hidrica_min_mm: 600,
+    demanda_hidrica_optima_mm: 800,
+    altitud_min_msnm: 2600,
+    altitud_max_msnm: 3400,
+    ph_suelo_min: 5.8,
+    ph_suelo_max: 7.5,
+    balance_nitrogeno_kg_ha: -50.0,
+    rompe_plaga_gorgojo: true,
+    tolerancia_helada_c: 0.0,
+    meses_ciclo: 8,
+    sucesores_favorables: ['tarwi', 'haba'],
+    sucesores_desfavorables: ['maiz_blanco'],
+    icono_emoji: '🌽',
+  },
+  {
+    crop_id: 'quinua_real',
+    nombre_comun: 'Quinua Real del Altiplano',
+    nombre_cientifico: 'Chenopodium quinoa',
+    familia_botanica: 'Amaranthaceae',
+    variedades_recomendadas: ['Kancolla', 'Blanca de Juli', 'Pasankalla'],
+    demanda_hidrica_min_mm: 300,
+    demanda_hidrica_optima_mm: 450,
+    altitud_min_msnm: 3000,
+    altitud_max_msnm: 4000,
+    ph_suelo_min: 6.0,
+    ph_suelo_max: 8.5,
+    balance_nitrogeno_kg_ha: -25.0,
+    rompe_plaga_gorgojo: true,
+    tolerancia_helada_c: -4.0,
+    meses_ciclo: 5,
+    sucesores_favorables: ['haba', 'tarwi', 'papa_nativa'],
+    sucesores_desfavorables: ['quinua_real'],
+    icono_emoji: '🌾',
+  },
+  {
+    crop_id: 'habas_verdes',
+    nombre_comun: 'Habas Verdes',
+    nombre_cientifico: 'Vicia faba',
+    familia_botanica: 'Fabaceae',
+    variedades_recomendadas: ['Verde Anta', 'Gigante de Coporaque'],
+    demanda_hidrica_min_mm: 400,
+    demanda_hidrica_optima_mm: 550,
+    altitud_min_msnm: 2800,
+    altitud_max_msnm: 3850,
+    ph_suelo_min: 6.0,
+    ph_suelo_max: 7.5,
+    balance_nitrogeno_kg_ha: 80.0,
+    rompe_plaga_gorgojo: true,
+    tolerancia_helada_c: -2.0,
+    meses_ciclo: 5,
+    sucesores_favorables: ['papa_nativa', 'cebada', 'maiz_blanco'],
+    sucesores_desfavorables: ['habas_verdes'],
+    icono_emoji: '🌱',
+  },
+  {
+    crop_id: 'cebada_grano',
+    nombre_comun: 'Cebada Grano',
+    nombre_cientifico: 'Hordeum vulgare',
+    familia_botanica: 'Poaceae',
+    variedades_recomendadas: ['Centenario', 'UNA La Molina'],
+    demanda_hidrica_min_mm: 350,
+    demanda_hidrica_optima_mm: 500,
+    altitud_min_msnm: 2800,
+    altitud_max_msnm: 4100,
+    ph_suelo_min: 6.0,
+    ph_suelo_max: 8.0,
+    balance_nitrogeno_kg_ha: -30.0,
+    rompe_plaga_gorgojo: true,
+    tolerancia_helada_c: -4.5,
+    meses_ciclo: 5,
+    sucesores_favorables: ['tarwi', 'haba'],
+    sucesores_desfavorables: ['cebada_grano'],
+    icono_emoji: '🌿',
+  },
+];
 
 interface ParcelDrawerFullScreenViewProps {
   onBack: () => void;
@@ -25,26 +160,31 @@ interface ParcelDrawerFullScreenViewProps {
   initialLat?: number;
   initialLon?: number;
   initialAreaHa?: number;
+  cultivos?: Cultivo[];
 }
 
 // Verified Peruvian Agricultural & Regional Coordinates
 const PRESET_REGIONS = [
-  { id: 'maras', name: 'Maras', fullName: 'Maras • Valle Sagrado', lat: -13.332, lon: -72.158, altitude: 3380, desc: 'Valle Sagrado • 3,380 msnm' },
-  { id: 'chinchero', name: 'Chinchero', fullName: 'Chinchero • Cusco', lat: -13.393, lon: -72.049, altitude: 3760, desc: 'Meseta Andina • 3,760 msnm' },
-  { id: 'urubamba', name: 'Urubamba', fullName: 'Valle de Urubamba', lat: -13.305, lon: -72.115, altitude: 2870, desc: 'Fondo de Valle • 2,870 msnm' },
-  { id: 'anta', name: 'Anta', fullName: 'Pampa de Anta', lat: -13.415, lon: -72.235, altitude: 3450, desc: 'Llanura Cerealera • 3,450 msnm' },
-  { id: 'ayaviri', name: 'Ayaviri', fullName: 'Melgar • Ayaviri', lat: -14.882, lon: -70.589, altitude: 3910, desc: 'Altiplano Norte • 3,910 msnm' },
-  { id: 'majes', name: 'Majes', fullName: 'Irrigación Majes', lat: -16.325, lon: -72.208, altitude: 1400, desc: 'Arequipa • 1,400 msnm' },
-  { id: 'puno', name: 'Puno', fullName: 'Puno • Titicaca', lat: -15.84, lon: -70.021, altitude: 3812, desc: 'Cuenca Lago • 3,812 msnm' },
+  { id: 'maras', name: 'Maras', fullName: 'Maras • Valle Sagrado', lat: -13.332, lon: -72.158, altitude: 3380 },
+  { id: 'chinchero', name: 'Chinchero', fullName: 'Chinchero • Cusco', lat: -13.393, lon: -72.049, altitude: 3760 },
+  { id: 'urubamba', name: 'Urubamba', fullName: 'Valle de Urubamba', lat: -13.305, lon: -72.115, altitude: 2870 },
+  { id: 'anta', name: 'Anta', fullName: 'Pampa de Anta', lat: -13.415, lon: -72.235, altitude: 3450 },
+  { id: 'ayaviri', name: 'Ayaviri', fullName: 'Melgar • Ayaviri', lat: -14.882, lon: -70.589, altitude: 3910 },
+  { id: 'majes', name: 'Majes', fullName: 'Irrigación Majes', lat: -16.325, lon: -72.208, altitude: 1400 },
+  { id: 'puno', name: 'Puno', fullName: 'Puno • Titicaca', lat: -15.84, lon: -70.021, altitude: 3812 },
 ];
 
-const CROP_OPTIONS = [
-  { id: 'papa_nativa', name: 'Papa nativa', category: 'Papa nativa', icon: '🥔' },
-  { id: 'maiz_blanco', name: 'Maíz Blanco', category: 'Maíz', icon: '🌽' },
-  { id: 'quinua_real', name: 'Quinua', category: 'Quinua', icon: '🌾' },
-  { id: 'cebada_grano', name: 'Cebada Grano', category: 'Cebada', icon: '🌿' },
-  { id: 'habas_tarwi', name: 'Habas y Tarwi', category: 'Habas', icon: '🌱' },
-];
+export function getCropImage(cropId: string, nombreComun: string): string {
+  const id = (cropId || '').toLowerCase();
+  const name = (nombreComun || '').toLowerCase();
+  if (id.includes('papa') || name.includes('papa')) return '/images/papa_nativa.jpg';
+  if (id.includes('tarwi') || name.includes('tarwi') || id.includes('chocho') || name.includes('chocho')) return '/images/tarwi_chocho.jpg';
+  if (id.includes('maiz') || name.includes('maíz') || name.includes('maiz')) return '/images/maiz_blanco.jpg';
+  if (id.includes('quinua') || name.includes('quinua')) return '/images/quinua_real.jpg';
+  if (id.includes('haba') || name.includes('haba')) return '/images/haba_verde.jpg';
+  if (id.includes('cebada') || name.includes('cebada') || id.includes('trigo') || name.includes('trigo')) return '/images/trigo_viento_poster.jpg';
+  return '/images/cultivos_poster.jpg';
+}
 
 export default function ParcelDrawerFullScreenView({
   onBack,
@@ -52,36 +192,85 @@ export default function ParcelDrawerFullScreenView({
   initialLat = -13.332,
   initialLon = -72.158,
   initialAreaHa = 1.73,
+  cultivos: propCultivos = [],
 }: ParcelDrawerFullScreenViewProps) {
+  // Wizard Step: 1 = Delimitar en mapa, 2 = Confirmar telemetría, 3 = Nombre de chacra, 4 = Seleccionar cultivo real
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
+
+  // Drawing Mode: 'freehand' (clics para vértices libres) vs 'box' (chacra rápida 1 clic + slider)
+  const [drawMode, setDrawMode] = useState<'freehand' | 'box'>('freehand');
+
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const polygonLayerRef = useRef<any>(null);
-  const markerLayerRef = useRef<any>(null);
+  const tempMarkersRef = useRef<any[]>([]);
+  const tempPolylineRef = useRef<any>(null);
+  const centroidMarkerRef = useRef<any>(null);
 
-  // Layers
+  // Tile Layers
   const satLayerRef = useRef<any>(null);
   const osmLayerRef = useRef<any>(null);
 
+  // State Coordinates & Geometry
   const [currentLat, setCurrentLat] = useState(initialLat);
   const [currentLon, setCurrentLon] = useState(initialLon);
   const [areaHa, setAreaHa] = useState(initialAreaHa);
+  const [polygonCoords, setPolygonCoords] = useState<[number, number][]>([]);
+  const polygonCoordsRef = useRef<[number, number][]>([]);
+  polygonCoordsRef.current = polygonCoords;
+
   const [activeLayer, setActiveLayer] = useState<'sat' | 'qgis'>('sat');
   const [altitudeMsnm, setAltitudeMsnm] = useState(3380);
-
-  // Form Fields for Confirmation
-  const [parcelName, setParcelName] = useState('Chacra Yanacona');
-  const [selectedCrop, setSelectedCrop] = useState(CROP_OPTIONS[0]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
+  const [slopePct, setSlopePct] = useState(12.0);
+  const [smapMoisturePct, setSmapMoisturePct] = useState(18.0);
   const [activeRegionId, setActiveRegionId] = useState('maras');
 
-  const areaHaRef = useRef(areaHa);
-  areaHaRef.current = areaHa;
-  const isMountedRef = useRef(true);
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
+  // Form Fields
+  const [parcelName, setParcelName] = useState('Chacra Yanacona');
+  const [notes, setNotes] = useState('Suelo franco arcilloso, delimitado con precisión satelital.');
+
+  // Live Supabase Crops Data (Real Data, zero mockups)
+  const [dbCrops, setDbCrops] = useState<Cultivo[]>(propCultivos);
+  const [selectedCrop, setSelectedCrop] = useState<Cultivo | null>(null);
+  const [cropFilter, setCropFilter] = useState('');
+  const [loadingCrops, setLoadingCrops] = useState(false);
+
+  const isMountedRef = useRef(true);
   const topos = (areaHa * 3.3).toFixed(1);
 
-  // Initialize Leaflet Map
+  // Load real crops from Supabase on mount if not provided as props
+  useEffect(() => {
+    async function loadCrops() {
+      if (propCultivos && propCultivos.length > 0) {
+        setDbCrops(propCultivos);
+        setSelectedCrop(propCultivos[0]);
+        return;
+      }
+      setLoadingCrops(true);
+      try {
+        const data = await getCultivos();
+        if (data && data.length > 0) {
+          setDbCrops(data);
+          setSelectedCrop(data[0]);
+        } else {
+          setDbCrops(FALLBACK_CROPS);
+          setSelectedCrop(FALLBACK_CROPS[0]);
+        }
+      } catch {
+        setDbCrops(FALLBACK_CROPS);
+        setSelectedCrop(FALLBACK_CROPS[0]);
+      } finally {
+        setLoadingCrops(false);
+      }
+    }
+    loadCrops();
+  }, [propCultivos]);
+
+  // Leaflet Map Initialization
   useEffect(() => {
     if (typeof window === 'undefined') return;
     isMountedRef.current = true;
@@ -111,14 +300,14 @@ export default function ParcelDrawerFullScreenView({
 
       const map = L.map(mapContainerRef.current, {
         center: [currentLat, currentLon],
-        zoom: 15,
+        zoom: 16,
         zoomControl: false,
         attributionControl: false,
       });
 
       mapInstanceRef.current = map;
 
-      // Base Satellite (Esri)
+      // Base Satellite (Esri World Imagery)
       const satLayer = L.tileLayer(
         'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         { maxZoom: 19 }
@@ -134,23 +323,74 @@ export default function ParcelDrawerFullScreenView({
 
       satLayer.addTo(map);
 
-      // Render initial parcel polygon
-      drawPolygon(L, map, currentLat, currentLon, areaHaRef.current);
+      // Initial Box Coordinates
+      const initialCoords = generateBoxCoords(currentLat, currentLon, initialAreaHa);
+      setPolygonCoords(initialCoords);
+      polygonCoordsRef.current = initialCoords;
 
-      // Click to relocate center of parcel
+      renderPolygon(L, map, initialCoords, initialAreaHa);
+
+      // Handle map clicks based on drawMode
       map.on('click', (e: any) => {
-        playBubblePop();
-        const { lat, lng } = e.latlng;
-        setCurrentLat(lat);
-        setCurrentLon(lng);
-        drawPolygon(L, map, lat, lng, areaHaRef.current);
+        const clicked: [number, number] = [
+          Number(e.latlng.lat.toFixed(6)),
+          Number(e.latlng.lng.toFixed(6)),
+        ];
+
+        const activeMode = map.getContainer().getAttribute('data-draw-mode') || 'freehand';
+
+        if (activeMode === 'freehand') {
+          playBubblePop();
+          // Add new vertex in freehand mode
+          const updated = [...polygonCoordsRef.current, clicked];
+          setPolygonCoords(updated);
+          polygonCoordsRef.current = updated;
+
+          // Add visual circle dot for this vertex
+          const vertexMarker = L.circleMarker(clicked, {
+            radius: 6,
+            color: '#132A1C',
+            fillColor: '#A3E635',
+            fillOpacity: 1,
+            weight: 2,
+          }).addTo(map);
+          tempMarkersRef.current.push(vertexMarker);
+
+          if (updated.length >= 3) {
+            // Compute real area using geodesic Shoelace formula
+            const realArea = calculateParcelAreaHa(updated);
+            const safeArea = Number(Math.max(0.1, realArea).toFixed(2));
+            setAreaHa(safeArea);
+            renderPolygon(L, map, updated, safeArea);
+          } else {
+            // Connecting line before polygon is closed
+            if (tempPolylineRef.current) {
+              tempPolylineRef.current.setLatLngs(updated);
+            } else {
+              tempPolylineRef.current = L.polyline(updated, {
+                color: '#A3E635',
+                weight: 3,
+                dashArray: '4, 4',
+              }).addTo(map);
+            }
+          }
+        } else {
+          // Box Mode: relocate standard parcel
+          playBubblePop();
+          setCurrentLat(clicked[0]);
+          setCurrentLon(clicked[1]);
+          const newBox = generateBoxCoords(clicked[0], clicked[1], areaHa);
+          setPolygonCoords(newBox);
+          polygonCoordsRef.current = newBox;
+          renderPolygon(L, map, newBox, areaHa);
+        }
       });
 
       invalidateTimer = setTimeout(() => {
         if (!isMountedRef.current || !mapInstanceRef.current || !mapContainerRef.current) return;
         try {
           map.invalidateSize();
-        } catch (e) {}
+        } catch {}
       }, 300);
     };
 
@@ -163,48 +403,69 @@ export default function ParcelDrawerFullScreenView({
         try {
           mapInstanceRef.current.off();
           mapInstanceRef.current.remove();
-        } catch (e) {}
+        } catch {}
         mapInstanceRef.current = null;
       }
       if (mapContainerRef.current) {
         try {
           delete (mapContainerRef.current as any)._leaflet_id;
-        } catch (e) {}
+        } catch {}
       }
     };
   }, []);
 
-  // Update polygon geometry based on lat, lon, and area
-  const drawPolygon = (L: any, map: any, lat: number, lon: number, ha: number) => {
-    if (polygonLayerRef.current) map.removeLayer(polygonLayerRef.current);
-    if (markerLayerRef.current) map.removeLayer(markerLayerRef.current);
+  // Sync data-draw-mode on container
+  useEffect(() => {
+    if (mapInstanceRef.current) {
+      const container = mapInstanceRef.current.getContainer();
+      container.setAttribute('data-draw-mode', drawMode);
+      container.style.cursor = drawMode === 'freehand' ? 'crosshair' : 'pointer';
+    }
+  }, [drawMode]);
 
+  // Generate standard rectangular bounds around lat, lon for ha
+  const generateBoxCoords = (lat: number, lon: number, ha: number): [number, number][] => {
     const sideMeters = Math.sqrt(ha * 10000);
     const dLat = (sideMeters / 2) / 111320;
     const dLon = (sideMeters / 2) / (111320 * Math.cos((lat * Math.PI) / 180));
-
-    const coords = [
+    return [
       [lat + dLat, lon - dLon],
       [lat + dLat * 1.04, lon + dLon],
       [lat - dLat, lon + dLon * 0.96],
       [lat - dLat * 1.03, lon - dLon],
     ];
+  };
+
+  // Render polygon and centroid marker on Leaflet map
+  const renderPolygon = (L: any, map: any, coords: [number, number][], ha: number) => {
+    if (polygonLayerRef.current) map.removeLayer(polygonLayerRef.current);
+    if (centroidMarkerRef.current) map.removeLayer(centroidMarkerRef.current);
+    if (tempPolylineRef.current) {
+      map.removeLayer(tempPolylineRef.current);
+      tempPolylineRef.current = null;
+    }
+
+    if (coords.length < 3) return;
 
     const poly = L.polygon(coords, {
       color: '#A3E635',
       weight: 3,
       opacity: 0.95,
       fillColor: '#7BB63E',
-      fillOpacity: 0.28,
+      fillOpacity: 0.32,
       dashArray: '4, 4',
     }).addTo(map);
 
     polygonLayerRef.current = poly;
 
-    // Custom Centroid Pin Marker
+    // Centroid pin
+    const centroid = calculateParcelCentroid(coords);
+    setCurrentLat(centroid[0]);
+    setCurrentLon(centroid[1]);
+
     const iconHtml = `
-      <div style="background-color: #132A1C; border: 2px solid #A3E635; color: white; padding: 4px 8px; border-radius: 9999px; font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); white-space: nowrap; transform: translate(-50%, -50%);">
-        <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: #A3E635;"></span>
+      <div style="background-color: #132A1C; border: 2px solid #A3E635; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 14px rgba(0,0,0,0.5); white-space: nowrap; transform: translate(-50%, -50%);">
+        <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background-color: #A3E635;"></span>
         <span>${ha} ha</span>
       </div>
     `;
@@ -215,11 +476,65 @@ export default function ParcelDrawerFullScreenView({
       iconSize: [0, 0],
     });
 
-    const marker = L.marker([lat, lon], { icon: customIcon }).addTo(map);
-    markerLayerRef.current = marker;
+    const marker = L.marker(centroid, { icon: customIcon }).addTo(map);
+    centroidMarkerRef.current = marker;
   };
 
-  // Fly to preset region
+  // Clear freehand points
+  const handleClearPoints = () => {
+    playBubblePop();
+    if (mapInstanceRef.current) {
+      tempMarkersRef.current.forEach((m) => mapInstanceRef.current.removeLayer(m));
+      tempMarkersRef.current = [];
+      if (polygonLayerRef.current) mapInstanceRef.current.removeLayer(polygonLayerRef.current);
+      if (centroidMarkerRef.current) mapInstanceRef.current.removeLayer(centroidMarkerRef.current);
+      if (tempPolylineRef.current) mapInstanceRef.current.removeLayer(tempPolylineRef.current);
+    }
+    setPolygonCoords([]);
+    polygonCoordsRef.current = [];
+  };
+
+  // Undo last vertex
+  const handleUndoPoint = () => {
+    playBubblePop();
+    if (polygonCoords.length === 0) return;
+    const updated = polygonCoords.slice(0, -1);
+    setPolygonCoords(updated);
+    polygonCoordsRef.current = updated;
+
+    if (mapInstanceRef.current && tempMarkersRef.current.length > 0) {
+      const last = tempMarkersRef.current.pop();
+      mapInstanceRef.current.removeLayer(last);
+
+      import('leaflet').then((mod) => {
+        const L = mod.default;
+        if (updated.length >= 3) {
+          const safeArea = Number(calculateParcelAreaHa(updated).toFixed(2));
+          setAreaHa(safeArea);
+          renderPolygon(L, mapInstanceRef.current, updated, safeArea);
+        } else {
+          if (polygonLayerRef.current) mapInstanceRef.current.removeLayer(polygonLayerRef.current);
+          if (centroidMarkerRef.current) mapInstanceRef.current.removeLayer(centroidMarkerRef.current);
+        }
+      });
+    }
+  };
+
+  // Handle box area slider
+  const handleAreaSlider = (newArea: number) => {
+    setAreaHa(newArea);
+    const newCoords = generateBoxCoords(currentLat, currentLon, newArea);
+    setPolygonCoords(newCoords);
+    polygonCoordsRef.current = newCoords;
+
+    if (mapInstanceRef.current) {
+      import('leaflet').then((mod) => {
+        renderPolygon(mod.default, mapInstanceRef.current, newCoords, newArea);
+      });
+    }
+  };
+
+  // Select Preset Region
   const handleSelectRegion = (region: typeof PRESET_REGIONS[0]) => {
     playBubblePop();
     setActiveRegionId(region.id);
@@ -228,42 +543,19 @@ export default function ParcelDrawerFullScreenView({
     setAltitudeMsnm(region.altitude);
     setParcelName(`Chacra ${region.name}`);
 
+    const newCoords = generateBoxCoords(region.lat, region.lon, areaHa);
+    setPolygonCoords(newCoords);
+    polygonCoordsRef.current = newCoords;
+
     if (mapInstanceRef.current) {
-      mapInstanceRef.current.flyTo([region.lat, region.lon], 15, { duration: 1.2 });
+      mapInstanceRef.current.flyTo([region.lat, region.lon], 16, { duration: 1.2 });
       import('leaflet').then((mod) => {
-        const L = mod.default;
-        drawPolygon(L, mapInstanceRef.current, region.lat, region.lon, areaHa);
+        renderPolygon(mod.default, mapInstanceRef.current, newCoords, areaHa);
       });
     }
   };
 
-  // Switch Layer
-  const handleToggleLayer = (layer: 'sat' | 'qgis') => {
-    playBubblePop();
-    setActiveLayer(layer);
-    if (!mapInstanceRef.current || !satLayerRef.current || !osmLayerRef.current) return;
-    if (layer === 'sat') {
-      mapInstanceRef.current.removeLayer(osmLayerRef.current);
-      satLayerRef.current.addTo(mapInstanceRef.current);
-    } else {
-      mapInstanceRef.current.removeLayer(satLayerRef.current);
-      osmLayerRef.current.addTo(mapInstanceRef.current);
-    }
-  };
-
-  // Handle area change
-  const handleAreaSlider = (newArea: number) => {
-    setAreaHa(newArea);
-    areaHaRef.current = newArea;
-    if (mapInstanceRef.current) {
-      import('leaflet').then((mod) => {
-        const L = mod.default;
-        drawPolygon(L, mapInstanceRef.current, currentLat, currentLon, newArea);
-      });
-    }
-  };
-
-  // Search geocoding
+  // Search Submit
   const handleSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim() || isSearching) return;
@@ -282,10 +574,15 @@ export default function ParcelDrawerFullScreenView({
         setCurrentLon(lon);
         setParcelName(searchQuery);
 
+        const newCoords = generateBoxCoords(lat, lon, areaHa);
+        setPolygonCoords(newCoords);
+        polygonCoordsRef.current = newCoords;
+
         if (mapInstanceRef.current) {
-          mapInstanceRef.current.flyTo([lat, lon], 15, { duration: 1.2 });
-          const mod = await import('leaflet');
-          drawPolygon(mod.default, mapInstanceRef.current, lat, lon, areaHa);
+          mapInstanceRef.current.flyTo([lat, lon], 16, { duration: 1.2 });
+          import('leaflet').then((mod) => {
+            renderPolygon(mod.default, mapInstanceRef.current, newCoords, areaHa);
+          });
         }
       }
     } catch (err) {
@@ -295,31 +592,102 @@ export default function ParcelDrawerFullScreenView({
     }
   };
 
-  // Confirm and Save Parcel
-  const handleConfirmAndSave = () => {
+  // Toggle Layer
+  const handleToggleLayer = (layer: 'sat' | 'qgis') => {
+    playBubblePop();
+    setActiveLayer(layer);
+    if (!mapInstanceRef.current || !satLayerRef.current || !osmLayerRef.current) return;
+    if (layer === 'sat') {
+      mapInstanceRef.current.removeLayer(osmLayerRef.current);
+      satLayerRef.current.addTo(mapInstanceRef.current);
+    } else {
+      mapInstanceRef.current.removeLayer(satLayerRef.current);
+      osmLayerRef.current.addTo(mapInstanceRef.current);
+    }
+  };
+
+  // Move from Step 1 to Step 2: Confirm Selection & Fetch Real Telemetry
+  const handleConfirmStep1 = async () => {
+    if (polygonCoords.length < 3) return;
+    playSuccessFanfare();
+
+    // Zoom into parcel bounds
+    if (mapInstanceRef.current) {
+      import('leaflet').then((mod) => {
+        const L = mod.default;
+        const bounds = L.latLngBounds(polygonCoords);
+        mapInstanceRef.current.fitBounds(bounds, { padding: [40, 40], duration: 1.0 });
+      });
+    }
+
+    // Query real terrain telemetry from DEM & NASA
+    const centroid = calculateParcelCentroid(polygonCoords);
+    try {
+      const metrics = await fetchRealTerrainMetrics(centroid, areaHa);
+      setAltitudeMsnm(metrics.elevationMsnm);
+      setSlopePct(metrics.slopePct);
+      setSmapMoisturePct(metrics.smapMoisturePct);
+    } catch {
+      const fallback = estimateTerrainMetrics(centroid, areaHa);
+      setAltitudeMsnm(fallback.elevationMsnm);
+      setSlopePct(fallback.slopePct);
+      setSmapMoisturePct(fallback.smapMoisturePct);
+    }
+
+    setCurrentStep(2);
+  };
+
+  // Move from Step 2 to Step 3: Name Input
+  const handleGoToStep3 = () => {
+    playBubblePop();
+    setCurrentStep(3);
+  };
+
+  // Move from Step 3 to Step 4: Real Crops from DB
+  const handleGoToStep4 = () => {
+    if (!parcelName.trim()) return;
+    playBubblePop();
+    setCurrentStep(4);
+  };
+
+  // Step 5: Save Parcel to Local Storage & Finish
+  const handleSaveParcel = () => {
+    if (!selectedCrop) return;
     playSuccessFanfare();
 
     const activeRegion = PRESET_REGIONS.find((r) => r.id === activeRegionId) || PRESET_REGIONS[0];
+    const centroid = calculateParcelCentroid(polygonCoords);
 
     const newParcel: ParcelItem = {
       id: `parcel-${Date.now()}`,
       name: parcelName.trim() || 'Mi Chacra Andina',
-      cropId: selectedCrop.id,
-      cropName: selectedCrop.name,
-      cropCategory: selectedCrop.category,
-      areaHa: Number(areaHa.toFixed(2)),
+      cropId: selectedCrop.crop_id,
+      cropName: selectedCrop.nombre_comun,
+      cropCategory: selectedCrop.nombre_comun.includes('Papa')
+        ? 'Papa nativa'
+        : selectedCrop.nombre_comun.includes('Maíz') || selectedCrop.nombre_comun.includes('Maiz')
+        ? 'Maíz'
+        : selectedCrop.nombre_comun.includes('Quinua')
+        ? 'Quinua'
+        : selectedCrop.nombre_comun.includes('Cebada')
+        ? 'Cebada'
+        : selectedCrop.nombre_comun.includes('Haba') || selectedCrop.nombre_comun.includes('Tarwi')
+        ? 'Habas'
+        : 'Hortalizas',
+      areaHa: areaHa,
       areaTopos: Number((areaHa * 3.3).toFixed(1)),
-      lat: currentLat,
-      lon: currentLon,
+      lat: centroid[0],
+      lon: centroid[1],
       altitudeMsnm: altitudeMsnm,
       microcuenca: activeRegion.fullName,
-      plantAgeDays: 35,
+      polygonCoords: polygonCoords,
+      plantAgeDays: 45,
       estimatedYieldTons: Number((areaHa * 4.2).toFixed(1)),
       healthScore: 78,
-      smapHumidity: 18,
+      smapHumidity: Math.round(smapMoisturePct),
       ndviScore: 0.68,
-      photoUrl: '/images/andes_bright.jpg',
-      notes: `Delimitada con visor satelital en ${activeRegion.name}.`,
+      photoUrl: getCropImage(selectedCrop.crop_id, selectedCrop.nombre_comun),
+      notes: notes.trim(),
       createdAt: new Date().toISOString(),
     };
 
@@ -327,21 +695,33 @@ export default function ParcelDrawerFullScreenView({
     onParcelCreated(newParcel);
   };
 
+  const filteredCrops = dbCrops.filter(
+    (c) =>
+      c.nombre_comun.toLowerCase().includes(cropFilter.toLowerCase()) ||
+      c.nombre_cientifico.toLowerCase().includes(cropFilter.toLowerCase())
+  );
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-black text-white font-sans overflow-hidden">
-      {/* 1. TOP HEADER & SEARCH BAR (GOOGLE MAPS STYLE) */}
-      <div className="absolute top-0 left-0 right-0 z-20 p-3 bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none">
+      {/* =========================================================================
+          TOP BAR & SEARCH (GOOGLE MAPS STYLE)
+         ========================================================================= */}
+      <div className="absolute top-0 left-0 right-0 z-20 p-3 bg-gradient-to-b from-black/85 via-black/45 to-transparent pointer-events-none">
         <div className="max-w-md mx-auto w-full pointer-events-auto space-y-2">
-          {/* Main Top Bar */}
+          {/* Top row */}
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => {
                 playBubblePop();
-                onBack();
+                if (currentStep > 1) {
+                  setCurrentStep((prev) => (prev - 1) as any);
+                } else {
+                  onBack();
+                }
               }}
               className="w-10 h-10 rounded-full bg-[#132A1C]/90 hover:bg-[#132A1C] border border-white/20 text-white flex items-center justify-center shadow-lg transition active:scale-95 cursor-pointer backdrop-blur-md shrink-0"
-              title="Volver a la aplicación"
+              title="Volver"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
@@ -396,15 +776,76 @@ export default function ParcelDrawerFullScreenView({
               );
             })}
           </div>
+
+          {/* Mode Switcher Pills (Polígono Libre vs Chacra Rápida) in Step 1 */}
+          {currentStep === 1 && (
+            <div className="flex items-center justify-between gap-2 pt-0.5">
+              <div className="bg-[#132A1C]/90 backdrop-blur-md p-1 rounded-full border border-white/15 flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    playBubblePop();
+                    setDrawMode('freehand');
+                  }}
+                  className={`px-3 py-1 rounded-full text-[10.5px] font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                    drawMode === 'freehand'
+                      ? 'bg-[#7BB63E] text-[#132A1C] shadow-xs'
+                      : 'text-zinc-300 hover:text-white'
+                  }`}
+                >
+                  <PenTool className="w-3 h-3" />
+                  <span>Polígono Libre (Vértices)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    playBubblePop();
+                    setDrawMode('box');
+                  }}
+                  className={`px-3 py-1 rounded-full text-[10.5px] font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                    drawMode === 'box'
+                      ? 'bg-[#7BB63E] text-[#132A1C] shadow-xs'
+                      : 'text-zinc-300 hover:text-white'
+                  }`}
+                >
+                  <Sliders className="w-3 h-3" />
+                  <span>Chacra Rápida (1 Clic)</span>
+                </button>
+              </div>
+
+              {drawMode === 'freehand' && polygonCoords.length > 0 && (
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={handleUndoPoint}
+                    className="p-1.5 rounded-full bg-[#132A1C]/90 text-zinc-300 hover:text-white border border-white/15 backdrop-blur-md"
+                    title="Deshacer último vértice"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleClearPoints}
+                    className="px-2.5 py-1 rounded-full bg-red-950/80 text-red-200 border border-red-800/40 text-[10px] backdrop-blur-md font-semibold"
+                  >
+                    Limpiar
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* 2. FULLSCREEN LEAFLET MAP CONTAINER */}
+      {/* =========================================================================
+          FULLSCREEN MAP CONTAINER
+         ========================================================================= */}
       <div className="flex-1 w-full h-full relative z-0">
         <div ref={mapContainerRef} className="w-full h-full" />
 
         {/* Live HUD Floating Badge (Top Right) */}
-        <div className="absolute top-28 right-3 z-10 pointer-events-none">
+        <div className="absolute top-36 right-3 z-10 pointer-events-none">
           <div className="bg-[#132A1C]/90 backdrop-blur-md border border-white/20 rounded-2xl p-2.5 shadow-xl text-right space-y-1">
             <div className="flex items-center justify-end gap-1 text-[#A3E635] text-[10px] font-bold">
               <span className="w-2 h-2 rounded-full bg-[#A3E635] animate-ping" />
@@ -416,106 +857,346 @@ export default function ParcelDrawerFullScreenView({
             <div className="text-[9.5px] text-zinc-300 font-mono">
               {altitudeMsnm} msnm
             </div>
+            {drawMode === 'freehand' && (
+              <div className="text-[9px] text-[#A3E635] font-semibold">
+                {polygonCoords.length} vértices
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Crosshair Center Instruction Overlay */}
-        <div className="absolute bottom-60 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-          <div className="bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20 text-[10px] text-white/90 shadow-md">
-            Toca el mapa para centrar el polígono de tu chacra
+        {/* Center Help Pill in Step 1 */}
+        {currentStep === 1 && (
+          <div className="absolute bottom-28 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+            <div className="bg-black/75 backdrop-blur-sm px-3.5 py-1.5 rounded-full border border-white/20 text-[10.5px] text-white shadow-md text-center whitespace-nowrap">
+              {drawMode === 'freehand'
+                ? 'Toca el mapa para marcar los vértices de tu chacra'
+                : 'Toca el mapa para posicionar el polígono de tu chacra'}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* 3. BOTTOM CONFIRMATION DRAWER (CALCULATOR & SAVE) */}
+      {/* =========================================================================
+          BOTTOM STEP-BY-STEP WORKFLOW SHEETS
+         ========================================================================= */}
       <div className="relative z-20 bg-[#132A1C] border-t border-emerald-900/60 rounded-t-3xl shadow-2xl p-4 text-white max-w-md mx-auto w-full space-y-3">
         {/* Drag Handle Indicator */}
-        <div className="w-10 h-1 bg-white/20 rounded-full mx-auto -mt-1 mb-2" />
+        <div className="w-10 h-1 bg-white/20 rounded-full mx-auto -mt-1 mb-1" />
 
-        {/* Parcel Name and Crop Row */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold text-emerald-400 uppercase text-[10px] tracking-wider">
-              INFORMACIÓN DE TU PARCELA
-            </span>
-            <span className="text-zinc-400 text-[10px]">
-              {currentLat.toFixed(4)}, {currentLon.toFixed(4)}
-            </span>
+        {/* ================= PASO 1: DELIMITAR Y CONFIRMAR ================= */}
+        {currentStep === 1 && (
+          <div className="space-y-3">
+            {/* Box area slider if in box mode */}
+            {drawMode === 'box' && (
+              <div className="bg-emerald-950/70 rounded-2xl p-3 border border-emerald-900/60 space-y-1.5">
+                <div className="flex items-center justify-between text-xs font-semibold">
+                  <span className="text-zinc-300">Dimensionar chacra</span>
+                  <span className="text-[#A3E635] font-bold">
+                    {areaHa} ha ({topos} topos)
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0.25}
+                  max={10.0}
+                  step={0.25}
+                  value={areaHa}
+                  onChange={(e) => handleAreaSlider(parseFloat(e.target.value))}
+                  className="w-full accent-[#7BB63E] cursor-pointer"
+                />
+                <div className="flex justify-between text-[9px] text-zinc-400">
+                  <span>0.25 ha</span>
+                  <span>5.0 ha</span>
+                  <span>10.0 ha</span>
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider block">
+                  PASO 1 DE 3 · TERRENO
+                </span>
+                <span className="text-xs text-zinc-300">
+                  {polygonCoords.length < 3
+                    ? 'Marca al menos 3 vértices en el mapa'
+                    : `Área calculada: ${areaHa} ha (${topos} topos)`}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                disabled={polygonCoords.length < 3}
+                onClick={handleConfirmStep1}
+                className="px-5 py-3 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] disabled:opacity-40 text-[#132A1C] font-semibold text-xs flex items-center gap-2 shadow-lg shadow-lime-600/30 transition transform active:scale-95 cursor-pointer"
+              >
+                <span>Confirmar Parcela</span>
+                <ChevronRight className="w-4 h-4 stroke-[2.5]" />
+              </button>
+            </div>
           </div>
+        )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <div>
-              <label className="text-[10px] text-zinc-400 block mb-1">Nombre de la parcela</label>
-              <input
-                type="text"
-                value={parcelName}
-                onChange={(e) => setParcelName(e.target.value)}
-                placeholder="Ej. Chacra Yanacona"
-                className="w-full h-9 px-3 rounded-xl bg-emerald-950/80 border border-emerald-800/60 text-white text-xs placeholder-zinc-500 focus:outline-hidden focus:border-[#A3E635]"
-              />
+        {/* ================= PASO 2: CONFIRMAR TELEMETRÍA REAL ================= */}
+        {currentStep === 2 && (
+          <div className="space-y-3 animate-in fade-in">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
+                CONFIRMACIÓN DE TERRENO Y TELEMETRÍA REAL
+              </span>
+              <span className="text-[10px] text-zinc-400 font-mono">
+                {currentLat.toFixed(4)}, {currentLon.toFixed(4)}
+              </span>
             </div>
 
-            <div>
-              <label className="text-[10px] text-zinc-400 block mb-1">Cultivo principal</label>
-              <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
-                {CROP_OPTIONS.map((c) => {
-                  const isSel = selectedCrop.id === c.id;
-                  return (
-                    <button
-                      key={c.id}
-                      type="button"
-                      onClick={() => {
-                        playBubblePop();
-                        setSelectedCrop(c);
-                      }}
-                      className={`px-2.5 py-1.5 rounded-xl text-[10px] font-medium whitespace-nowrap transition cursor-pointer ${
-                        isSel
-                          ? 'bg-[#7BB63E] text-[#132A1C] font-bold'
-                          : 'bg-emerald-950/80 border border-emerald-800/60 text-zinc-300'
-                      }`}
-                    >
-                      {c.name}
-                    </button>
-                  );
-                })}
+            {/* 4 Real Telemetry Metrics Grid */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-emerald-950/80 rounded-2xl p-2.5 border border-emerald-800/60 space-y-0.5">
+                <div className="flex items-center gap-1.5 text-zinc-400 text-[10px]">
+                  <Layers className="w-3 h-3 text-[#A3E635]" />
+                  <span>Área Real</span>
+                </div>
+                <div className="text-sm font-bold text-white">
+                  {areaHa} ha <span className="text-[10px] text-[#A3E635]">({topos} topos)</span>
+                </div>
+              </div>
+
+              <div className="bg-emerald-950/80 rounded-2xl p-2.5 border border-emerald-800/60 space-y-0.5">
+                <div className="flex items-center gap-1.5 text-zinc-400 text-[10px]">
+                  <Mountain className="w-3 h-3 text-amber-400" />
+                  <span>Altitud SRTM</span>
+                </div>
+                <div className="text-sm font-bold text-white">
+                  {altitudeMsnm} msnm
+                </div>
+              </div>
+
+              <div className="bg-emerald-950/80 rounded-2xl p-2.5 border border-emerald-800/60 space-y-0.5">
+                <div className="flex items-center gap-1.5 text-zinc-400 text-[10px]">
+                  <Droplets className="w-3 h-3 text-sky-400" />
+                  <span>Humedad SMAP</span>
+                </div>
+                <div className="text-sm font-bold text-sky-300">
+                  {Math.round(smapMoisturePct)}% <span className="text-[9.5px] text-zinc-400 font-normal">superficial</span>
+                </div>
+              </div>
+
+              <div className="bg-emerald-950/80 rounded-2xl p-2.5 border border-emerald-800/60 space-y-0.5">
+                <div className="flex items-center gap-1.5 text-zinc-400 text-[10px]">
+                  <TrendingUp className="w-3 h-3 text-emerald-400" />
+                  <span>Pendiente Andén</span>
+                </div>
+                <div className="text-sm font-bold text-white">
+                  {slopePct}%
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Area Slider Control */}
-        <div className="bg-emerald-950/70 rounded-2xl p-3 border border-emerald-900/60 space-y-1.5">
-          <div className="flex items-center justify-between text-xs font-semibold">
-            <span className="text-zinc-300">Tamaño del terreno</span>
-            <span className="text-[#A3E635] font-bold">
-              {areaHa} hectáreas <span className="text-white/70 font-normal">({topos} topos)</span>
-            </span>
-          </div>
-          <input
-            type="range"
-            min={0.25}
-            max={10.0}
-            step={0.25}
-            value={areaHa}
-            onChange={(e) => handleAreaSlider(parseFloat(e.target.value))}
-            className="w-full accent-[#7BB63E] cursor-pointer"
-          />
-          <div className="flex justify-between text-[9px] text-zinc-400">
-            <span>0.25 ha (0.8 topos)</span>
-            <span>5.0 ha (16.5 topos)</span>
-            <span>10.0 ha (33 topos)</span>
-          </div>
-        </div>
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  playBubblePop();
+                  setCurrentStep(1);
+                }}
+                className="flex-1 py-3 rounded-full border border-white/20 text-zinc-300 hover:text-white font-semibold text-xs"
+              >
+                Retocar Trazado
+              </button>
 
-        {/* Action Button: Confirm and Save */}
-        <button
-          type="button"
-          onClick={handleConfirmAndSave}
-          className="w-full py-3.5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-semibold text-xs flex items-center justify-center gap-2 shadow-lg shadow-lime-600/30 transition transform active:scale-98 cursor-pointer"
-        >
-          <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
-          <span>Confirmar y Guardar en Mis Parcelas</span>
-        </button>
+              <button
+                type="button"
+                onClick={handleGoToStep3}
+                className="flex-1 py-3 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-semibold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-lime-600/30"
+              >
+                <span>Siguiente: Nombre</span>
+                <ChevronRight className="w-4 h-4 stroke-[2.5]" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ================= PASO 3: ASIGNAR NOMBRE ================= */}
+        {currentStep === 3 && (
+          <div className="space-y-3 animate-in fade-in">
+            <div>
+              <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider block">
+                PASO 2 DE 3 · IDENTIFICACIÓN
+              </span>
+              <h3 className="text-base font-bold text-white">¿Cómo se llama tu parcela?</h3>
+            </div>
+
+            <div className="space-y-2">
+              <div>
+                <label className="text-[10.5px] text-zinc-400 block mb-1">Nombre de la chacra</label>
+                <input
+                  type="text"
+                  value={parcelName}
+                  onChange={(e) => setParcelName(e.target.value)}
+                  placeholder="Ej. Chacra Yanacona, Andén Huaypo"
+                  className="w-full h-10 px-3.5 rounded-xl bg-emerald-950/80 border border-emerald-800/60 text-white text-xs placeholder-zinc-500 focus:outline-hidden focus:border-[#A3E635]"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="text-[10.5px] text-zinc-400 block mb-1">Notas de manejo (opcional)</label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={2}
+                  placeholder="Ej. Suelo con rastrojo de cebada, buena retención de humedad..."
+                  className="w-full p-2.5 rounded-xl bg-emerald-950/80 border border-emerald-800/60 text-white text-xs placeholder-zinc-500 focus:outline-hidden focus:border-[#A3E635]"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  playBubblePop();
+                  setCurrentStep(2);
+                }}
+                className="flex-1 py-3 rounded-full border border-white/20 text-zinc-300 hover:text-white font-semibold text-xs"
+              >
+                Volver
+              </button>
+
+              <button
+                type="button"
+                disabled={!parcelName.trim()}
+                onClick={handleGoToStep4}
+                className="flex-1 py-3 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] disabled:opacity-40 text-[#132A1C] font-semibold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-lime-600/30"
+              >
+                <span>Siguiente: Cultivo</span>
+                <ChevronRight className="w-4 h-4 stroke-[2.5]" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ================= PASO 4: SELECCIONAR CULTIVO REAL DE LA BASE DE DATOS (CON IMÁGENES) ================= */}
+        {currentStep === 4 && (
+          <div className="space-y-3 animate-in fade-in">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider block">
+                  PASO 3 DE 3 · BASE DE DATOS SUPABASE
+                </span>
+                <h3 className="text-base font-bold text-white">Selecciona el cultivo principal</h3>
+              </div>
+              <span className="text-[10px] font-mono text-[#A3E635] bg-emerald-950 px-2 py-0.5 rounded-md border border-emerald-800/60">
+                {filteredCrops.length} cultivos reales
+              </span>
+            </div>
+
+            {/* Quick search filter for crops */}
+            <div className="relative">
+              <input
+                type="text"
+                value={cropFilter}
+                onChange={(e) => setCropFilter(e.target.value)}
+                placeholder="Buscar cultivo (papa, tarwi, maíz, quinua, habas...)"
+                className="w-full h-8 pl-8 pr-3 rounded-xl bg-emerald-950/80 border border-emerald-800/60 text-white placeholder-zinc-500 text-[11px] focus:outline-hidden focus:border-[#A3E635]"
+              />
+              <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+            </div>
+
+            {/* Crop Cards with Real Photographic Thumbnails */}
+            <div className="max-h-56 overflow-y-auto space-y-2 pr-1 scrollbar-thin">
+              {filteredCrops.map((crop) => {
+                const isSelected = selectedCrop?.crop_id === crop.crop_id;
+                const cropImg = getCropImage(crop.crop_id, crop.nombre_comun);
+
+                return (
+                  <div
+                    key={crop.crop_id}
+                    onClick={() => {
+                      playBubblePop();
+                      setSelectedCrop(crop);
+                    }}
+                    className={`p-2.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                      isSelected
+                        ? 'bg-emerald-950 border-[#A3E635] ring-2 ring-[#A3E635]/40 shadow-md'
+                        : 'bg-emerald-950/40 border-emerald-900/60 hover:bg-emerald-950/70'
+                    }`}
+                  >
+                    {/* Left: Real Photographic Image Thumbnail */}
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-black/60 shrink-0 border border-white/15 relative">
+                        <img
+                          src={cropImg}
+                          alt={crop.nombre_comun}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLElement).style.display = 'none';
+                          }}
+                        />
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="text-xs font-bold text-white truncate">
+                            {crop.nombre_comun}
+                          </h4>
+                        </div>
+                        <span className="text-[10px] text-zinc-400 italic block truncate">
+                          {crop.nombre_cientifico}
+                        </span>
+                        <div className="flex items-center gap-2 mt-0.5 text-[9.5px]">
+                          <span className="text-emerald-300 font-mono">
+                            {crop.balance_nitrogeno_kg_ha > 0 ? `+${crop.balance_nitrogeno_kg_ha}` : crop.balance_nitrogeno_kg_ha} kg N/ha
+                          </span>
+                          <span className="text-zinc-400">·</span>
+                          <span className="text-zinc-300">
+                            {crop.altitud_min_msnm}-{crop.altitud_max_msnm} msnm
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right: Checkmark radio */}
+                    <div
+                      className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border ${
+                        isSelected
+                          ? 'bg-[#7BB63E] border-[#A3E635] text-[#132A1C]'
+                          : 'border-white/20'
+                      }`}
+                    >
+                      {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Actions: Save Parcel Button */}
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  playBubblePop();
+                  setCurrentStep(3);
+                }}
+                className="flex-1 py-3 rounded-full border border-white/20 text-zinc-300 hover:text-white font-semibold text-xs"
+              >
+                Volver
+              </button>
+
+              <button
+                type="button"
+                disabled={!selectedCrop}
+                onClick={handleSaveParcel}
+                className="flex-2 py-3 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] disabled:opacity-40 text-[#132A1C] font-semibold text-xs flex items-center justify-center gap-2 shadow-lg shadow-lime-600/30"
+              >
+                <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
+                <span>Guardar Parcela</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

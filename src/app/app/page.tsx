@@ -308,6 +308,7 @@ export default function MobileApp() {
     return (
       <ParcelDrawerFullScreenView
         onBack={goBack}
+        cultivos={cultivos}
         onParcelCreated={(newParcel) => {
           handleUpdateProfile({
             parcelName: newParcel.name,
