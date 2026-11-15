@@ -110,27 +110,17 @@ export default function ClimaCarouselBanner({
               </span>
             </div>
 
-            <p className="text-xs text-slate-800 leading-relaxed font-sans font-medium">
+            <p className="text-xs text-black font-semibold leading-relaxed font-sans">
               <TypewriterText
-                key={`clima-${profile.distrito}-${temp}`}
-                text={`¡Kamisaraki! Monitoreo satelital activo en ${profile.distrito} (${profile.altitude} msnm). Temperatura media de ${temp}°C y lluvia prevista de ${rain} mm.`}
+                key={`clima-${profile.distrito}-${temp}-${isElNino}`}
+                text={
+                  isElNino
+                    ? `¡Allillanchu! Feedback actual: Se detecta déficit hídrico por veranillo en ${profile.distrito}. Recomendación: Aplica mulch protector en raíz y activa riego de auxilio nocturno.`
+                    : `¡Allillanchu! Feedback actual: Condiciones térmicas y edáficas favorables en ${profile.distrito}. Recomendación: Ventana óptima para labores de aporque y fertilización orgánica.`
+                }
                 speed={16}
               />
             </p>
-
-            <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 border border-amber-300 flex items-center gap-1">
-                <Thermometer className="w-2.5 h-2.5 text-amber-600" />
-                <span>{temp}°C</span>
-              </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-50 text-sky-900 border border-sky-300 flex items-center gap-1">
-                <CloudRain className="w-2.5 h-2.5 text-sky-600" />
-                <span>{rain} mm</span>
-              </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-900 border border-emerald-300">
-                {isElNino ? '⚠️ Sequía Activa' : '☀️ Año Normal'}
-              </span>
-            </div>
           </div>
         </div>
       )}

@@ -9,6 +9,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { playBubblePop } from '@/lib/soundEffects';
+import TypewriterText from './TypewriterText';
 
 interface KipuCarouselBannerProps {
   profile: FarmerProfile;
@@ -37,7 +38,6 @@ export default function KipuCarouselBanner({
 
   const totalSlides = 3;
 
-  // Auto-advance every 8 seconds unless user is interacting
   useEffect(() => {
     if (isPaused) return;
     const interval = setInterval(() => {
@@ -61,7 +61,6 @@ export default function KipuCarouselBanner({
     setCurrentSlide(idx);
   };
 
-  // Touch handlers for mobile swipe
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
   };
@@ -70,14 +69,14 @@ export default function KipuCarouselBanner({
     if (touchStartX.current === null) return;
     const diff = touchStartX.current - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 40) {
-      if (diff > 0) {
-        handleNext();
-      } else {
-        handlePrev();
-      }
+      if (diff > 0) handleNext();
+      else handlePrev();
     }
     touchStartX.current = null;
   };
+
+  const areaHa = profile.areaHa || 1.0;
+  const topos = (areaHa * 3.3).toFixed(1);
 
   return (
     <div
@@ -87,96 +86,54 @@ export default function KipuCarouselBanner({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* ================= SLIDE 0: KIPU COPILOTO (MISMO FORMATO DE IMAGEN A LA IZQUIERDA, SIN REDUNDANCIAS) ================= */}
+      {/* ================= SLIDE 0: KIPU Y SU GLOBO DE TEXTO (LIBRE, SIN FONDO BLANCO CUADRADO, TEXTO NEGRITO) ================= */}
       {currentSlide === 0 && (
-        <div className="flex items-center gap-3.5 pt-1 pb-1 animate-in fade-in duration-300 min-h-[155px] px-1">
-          {/* Imagen de Kipu a la izquierda en el mismo formato de card */}
-          <div className="w-28 sm:w-32 h-28 sm:h-32 rounded-2xl overflow-hidden shrink-0 shadow-md border border-slate-200/90 bg-white flex items-center justify-center">
+        <div className="flex items-center gap-3.5 pt-1 pb-1 animate-in fade-in duration-300 min-h-[160px]">
+          {/* Llama Avatar Libre sin fondo blanco */}
+          <div className="w-28 sm:w-32 h-36 sm:h-40 shrink-0 relative flex items-center justify-center">
             <img
               src="/images/kipu_llama.png"
               alt="Kipu Copiloto"
-              className="w-full h-full object-contain p-1.5 filter drop-shadow-xs"
+              className="w-full h-full object-contain filter drop-shadow-md"
             />
           </div>
 
-          {/* Información a la derecha: Título, Descripción en texto negro y Botón */}
-          <div className="flex-1 min-w-0 space-y-1">
-            <h3 className="font-black text-base text-slate-950 tracking-tight leading-snug">
-              Kipu Copiloto Andino
-            </h3>
-            <p className="text-xs text-black font-medium font-sans leading-relaxed">
-              Guardián edáfico que fusiona saberes ancestrales con radares NASA SMAP para optimizar tu siembra y proteger la vida del suelo andino.
-            </p>
-            <div className="pt-1">
+          {/* Globo de Diálogo Cósmico apuntando a Kipu */}
+          <div className="flex-1 relative bg-white border-2 border-emerald-600 border-b-4 border-b-emerald-700 rounded-3xl p-3.5 shadow-xs">
+            <div className="absolute top-7 -left-2.5 w-4 h-4 bg-white border-b-2 border-l-2 border-emerald-600 transform rotate-45"></div>
+
+            <div className="flex items-center justify-between gap-1 mb-1.5">
+              <span className="font-black text-xs text-emerald-950 uppercase tracking-wide">
+                KIPU COPILOTO
+              </span>
               <button
                 type="button"
                 onClick={() => {
                   playBubblePop();
                   onOpenWizard();
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs active:scale-95 transition cursor-pointer"
+                className="text-[10px] font-bold text-emerald-800 hover:text-emerald-950 bg-emerald-50 border border-emerald-300 px-2.5 py-0.5 rounded-lg flex items-center gap-1 active:scale-95 transition cursor-pointer"
+                title="Recalibrar datos con el asistente"
               >
-                <RotateCcw className="w-3 h-3 text-emerald-200" />
-                <span>Recalibrar Parcela</span>
+                <RotateCcw className="w-2.5 h-2.5 text-emerald-700" />
+                <span>Recalibrar</span>
               </button>
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* ================= SLIDE 1: MONITOREO METEOROLÓGICO (FEEDBACK ACTUAL + RECOMENDACIÓN EN TEXTO NEGRO) ================= */}
-      {currentSlide === 1 && (
-        <div className="flex items-center gap-3.5 pt-1 pb-1 animate-in fade-in duration-300 min-h-[155px] px-1">
-          {/* Imagen de Satélite NASA a la izquierda */}
-          <div className="w-28 sm:w-32 h-28 sm:h-32 rounded-2xl overflow-hidden shrink-0 shadow-md border border-slate-200/90 bg-slate-900">
-            <img
-              src="/images/nasa_satellite.jpg"
-              alt="Satélite NASA"
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          {/* Información a la derecha: Título, Feedback + Recomendación en negro, y Botón de clima */}
-          <div className="flex-1 min-w-0 space-y-1">
-            <h3 className="font-black text-base text-slate-950 tracking-tight leading-snug">
-              Reporte Agroclimático
-            </h3>
-            <p className="text-xs text-black font-medium font-sans leading-relaxed">
-              {smapPercent < 20 || isElNino ? (
-                <>
-                  <span className="font-black text-black">Feedback actual:</span> Suelo en déficit hídrico por veranillo.{' '}
-                  <span className="font-black text-black">Recomendación:</span> Aplica cobertura de mulch para conservar la humedad en raíz.
-                </>
-              ) : (
-                <>
-                  <span className="font-black text-black">Feedback actual:</span> Humedad edáfica óptima para labores en campo.{' '}
-                  <span className="font-black text-black">Recomendación:</span> Aprovecha la ventana de sol para deshierbe y aporque.
-                </>
-              )}
+            <p className="text-xs text-black font-semibold leading-relaxed font-sans">
+              <TypewriterText
+                key={`${profile.parcelName}-${smapPercent}`}
+                text={`¡Allillanchu! Parcela de ${areaHa} ha (${topos} topos) en ${profile.distrito} (${profile.altitude} msnm). Suelo ${profile.moistureLabel.toLowerCase()} con calibración satelital activa.`}
+                speed={16}
+              />
             </p>
-            <div className="pt-1">
-              {onNavigateToClima && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    playBubblePop();
-                    onNavigateToClima();
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs active:scale-95 transition cursor-pointer"
-                >
-                  <span>Abrir Clima</span>
-                  <ArrowRight className="w-3 h-3 text-emerald-200" />
-                </button>
-              )}
-            </div>
           </div>
         </div>
       )}
 
-      {/* ================= SLIDE 2: ROTACIÓN DE CULTIVOS (DESCRIPCIÓN EN TEXTO NEGRO CON FEEDBACK Y RECOMENDACIÓN) ================= */}
-      {currentSlide === 2 && (
-        <div className="flex items-center gap-3.5 pt-1 pb-1 animate-in fade-in duration-300 min-h-[155px] px-1">
-          {/* Imagen de Cultivos a la izquierda */}
+      {/* ================= SLIDE 1: ROTACIÓN DE CULTIVOS (IMAGEN IZQUIERDA, TEXTO NEGRITO, SIN CARD DE FONDO) ================= */}
+      {currentSlide === 1 && (
+        <div className="flex items-center gap-3.5 pt-1 pb-1 animate-in fade-in duration-300 min-h-[160px] px-1">
           <div className="w-28 sm:w-32 h-28 sm:h-32 rounded-2xl overflow-hidden shrink-0 shadow-md border border-slate-200/90 bg-slate-900">
             <img
               src="/images/crops_banner.jpg"
@@ -185,14 +142,12 @@ export default function KipuCarouselBanner({
             />
           </div>
 
-          {/* Información a la derecha: Título, Texto en negro y Botón */}
           <div className="flex-1 min-w-0 space-y-1">
             <h3 className="font-black text-base text-slate-950 tracking-tight leading-snug">
               Rotación Óptima de 3 Campañas
             </h3>
-            <p className="text-xs text-black font-medium font-sans leading-relaxed">
-              <span className="font-black text-black">Feedback actual:</span> Parcela lista para rotación tras cosechar {profile.previousCropName || 'Tarwi'}.{' '}
-              <span className="font-black text-black">Recomendación:</span> Alterna con leguminosas para inyectar nitrógeno orgánico y cortar plagas.
+            <p className="text-xs text-black font-semibold font-sans leading-relaxed">
+              Tras cosechar {profile.previousCropName || 'Tarwi'}, el INIA recomienda alternar con leguminosas para inyectar nitrógeno orgánico y cortar plagas.
             </p>
             <div className="pt-1">
               {onNavigateToChacra && (
@@ -205,6 +160,43 @@ export default function KipuCarouselBanner({
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs active:scale-95 transition cursor-pointer"
                 >
                   <span>Ver Mi Chacra</span>
+                  <ArrowRight className="w-3 h-3 text-emerald-200" />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= SLIDE 2: MONITOREO SATELITAL NASA (IMAGEN IZQUIERDA, TEXTO NEGRITO, SIN CARD DE FONDO) ================= */}
+      {currentSlide === 2 && (
+        <div className="flex items-center gap-3.5 pt-1 pb-1 animate-in fade-in duration-300 min-h-[160px] px-1">
+          <div className="w-28 sm:w-32 h-28 sm:h-32 rounded-2xl overflow-hidden shrink-0 shadow-md border border-slate-200/90 bg-slate-900">
+            <img
+              src="/images/nasa_satellite.jpg"
+              alt="Satélite NASA"
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          <div className="flex-1 min-w-0 space-y-1">
+            <h3 className="font-black text-base text-slate-950 tracking-tight leading-snug">
+              Monitoreo Satelital de Suelos
+            </h3>
+            <p className="text-xs text-black font-semibold font-sans leading-relaxed">
+              Vigilancia continua con radares NASA SMAP y precipitación GPM calibrada en terreno para anticipar sequías y heladas.
+            </p>
+            <div className="pt-1">
+              {onNavigateToClima && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    playBubblePop();
+                    onNavigateToClima();
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs active:scale-95 transition cursor-pointer"
+                >
+                  <span>Abrir Clima</span>
                   <ArrowRight className="w-3 h-3 text-emerald-200" />
                 </button>
               )}
