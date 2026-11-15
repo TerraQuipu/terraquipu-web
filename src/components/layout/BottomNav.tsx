@@ -4,7 +4,7 @@ import React from 'react';
 import { Globe, MapPin, Plus, RotateCw, Sprout } from 'lucide-react';
 import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
 
-export type MainTab = 'inicio' | 'parcelas' | 'rotacion' | 'copiloto';
+export type MainTab = 'inicio' | 'parcelas' | 'diagnostico' | 'rotacion' | 'copiloto';
 
 interface BottomNavProps {
   activeTab: MainTab;
@@ -18,7 +18,7 @@ export default function BottomNav({
   onOpenDiagnostic,
 }: BottomNavProps) {
   return (
-    <nav className="fixed bottom-3 left-3 right-3 max-w-md mx-auto z-40 bg-[#132A1C] rounded-full px-3 py-2 shadow-2xl border border-emerald-900/50">
+    <nav className="fixed bottom-3 left-3 right-3 max-w-md mx-auto z-40 bg-[#132A1C] rounded-full px-3 py-1.5 shadow-2xl border border-emerald-900/60 backdrop-blur-md">
       <div className="flex items-center justify-between">
         {/* Tab 1: Inicio */}
         <button
@@ -62,19 +62,23 @@ export default function BottomNav({
           )}
         </button>
 
-        {/* Tab 3: Central Elevated FAB Button (+) -> Diagnóstico de Suelo */}
-        <div className="flex flex-col items-center justify-center -translate-y-4 px-1">
+        {/* Tab 3: Central FAB Button (+) -> Diagnóstico de Suelo */}
+        <div className="flex flex-col items-center justify-center -translate-y-1.5 px-1 shrink-0">
           <button
             type="button"
             onClick={() => {
               playSuccessFanfare();
               onOpenDiagnostic();
             }}
-            className="w-12 h-12 rounded-full bg-[#A3E635] hover:bg-[#8ce01b] text-[#132A1C] flex items-center justify-center shadow-lg shadow-lime-500/35 transition transform active:scale-90 cursor-pointer ring-4 ring-[#132A1C]"
+            className={`w-11 h-11 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] flex items-center justify-center shadow-lg shadow-lime-600/40 transition transform active:scale-90 cursor-pointer ${
+              activeTab === 'diagnostico'
+                ? 'ring-4 ring-[#A3E635]/60 scale-105'
+                : 'ring-2 ring-emerald-900/60'
+            }`}
             title="Diagnóstico rápido de suelo"
             aria-label="Abrir diagnóstico rápido de suelo"
           >
-            <Plus className="w-6 h-6 stroke-[3]" />
+            <Plus className="w-5 h-5 stroke-[3]" />
           </button>
         </div>
 

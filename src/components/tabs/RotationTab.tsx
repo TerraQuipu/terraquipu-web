@@ -13,12 +13,15 @@ import {
   Check,
   Calendar,
   Sparkles,
+  Wheat,
+  Sun,
+  Layers,
 } from 'lucide-react';
 import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
 
 interface RotationTabProps {
   profile: FarmerProfile;
-  onNavigateToCopiloto?: () => void;
+  onNavigateToCopiloto?: (voice?: 'astro' | 'kipu') => void;
   onToast?: (msg: string) => void;
 }
 
@@ -30,7 +33,7 @@ export default function RotationTab({
   const [activeSeasonTab, setActiveSeasonTab] = useState<'inmediato' | 'seca'>('inmediato');
   const [rotateAreaHa, setRotateAreaHa] = useState<number>(profile.areaHa || 3.5);
 
-  // Reference savings: S/ 286 per hectare
+  // Reference savings: S/ 286 per hectare (INIA Cusco validated)
   const savingsPerHa = 286;
   const calculatedSavings = Math.round(rotateAreaHa * savingsPerHa);
 
@@ -55,13 +58,13 @@ export default function RotationTab({
           </h1>
         </div>
 
-        <div className="bg-[#E5ECE2]/70 text-emerald-900 px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 border border-[#E5ECE2]">
-          <Leaf className="w-3 h-3 text-emerald-700" />
+        <div className="bg-[#EBF2E5] text-[#4E6B38] px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 border border-[#D5E5CD]">
+          <Leaf className="w-3 h-3 text-[#4E6B38]" />
           <span>ANDES SUR</span>
         </div>
       </div>
 
-      {/* 2. Season Selector Tabs */}
+      {/* 2. Season Selector Tabs (Frame 009) */}
       <div className="bg-[#EAEFE8] p-1 rounded-2xl flex items-center gap-1">
         <button
           type="button"
@@ -96,7 +99,7 @@ export default function RotationTab({
         </button>
       </div>
 
-      {/* 3. Section: PRÓXIMOS CUATRO MESES (Lo que toca hacer) */}
+      {/* 3. Section: PRÓXIMOS CUATRO MESES (Lo que toca hacer - Frame 009) */}
       <div className="space-y-2.5">
         <div className="px-1">
           <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
@@ -105,105 +108,203 @@ export default function RotationTab({
           <h2 className="text-base font-black text-[#132A1C]">Lo que toca hacer</h2>
         </div>
 
-        <div className="space-y-2 relative">
-          {/* Vertical connecting line */}
-          <div className="absolute left-[31px] top-6 bottom-6 w-0.5 bg-[#E5ECE2] z-0" />
+        {activeSeasonTab === 'inmediato' ? (
+          <div className="space-y-2 relative">
+            {/* Vertical connecting line */}
+            <div className="absolute left-[31px] top-6 bottom-6 w-0.5 bg-[#E5ECE2] z-0" />
 
-          {/* NOV 2026 */}
-          <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#84CC16] ring-4 ring-lime-100 mb-1" />
-                <span className="text-[9.5px] font-black text-emerald-900 uppercase">NOV</span>
-                <span className="text-[8px] text-zinc-400 font-mono">2026</span>
+            {/* NOV 2026 */}
+            <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#7BB63E] ring-4 ring-lime-100 mb-1" />
+                  <span className="text-[9.5px] font-black text-emerald-900 uppercase">NOV</span>
+                  <span className="text-[8px] text-zinc-400 font-mono">2026</span>
+                </div>
+                <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
+                  <Tractor className="w-4 h-4 text-emerald-700" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-xs font-black text-[#132A1C] truncate">
+                    Preparar surcos en contorno
+                  </h3>
+                  <p className="text-[10px] text-zinc-500 truncate mt-0.5">
+                    Semana 3 · Papa nativa · Retención de humedad
+                  </p>
+                </div>
               </div>
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-800 shrink-0">
-                <Tractor className="w-4 h-4 text-emerald-700" />
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-xs font-black text-[#132A1C] truncate">
-                  Preparar surcos en contorno
-                </h3>
-                <p className="text-[10px] text-zinc-500 truncate mt-0.5">
-                  Semana 3 · Papa nativa · Retención de humedad
-                </p>
-              </div>
+              <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
             </div>
-            <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
-          </div>
 
-          {/* DIC 2026 */}
-          <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
-                <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
-                <span className="text-[9.5px] font-black text-zinc-600 uppercase">DIC</span>
-                <span className="text-[8px] text-zinc-400 font-mono">2026</span>
+            {/* DIC 2026 */}
+            <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
+                  <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
+                  <span className="text-[9.5px] font-black text-zinc-600 uppercase">DIC</span>
+                  <span className="text-[8px] text-zinc-400 font-mono">2026</span>
+                </div>
+                <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
+                  <Sprout className="w-4 h-4 text-emerald-700" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-xs font-black text-[#132A1C] truncate">
+                    Sembrar Tarwi y Haba
+                  </h3>
+                  <p className="text-[10px] text-zinc-500 truncate mt-0.5">
+                    Primera lluvia · Asociar cultivos fijadores
+                  </p>
+                </div>
               </div>
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-800 shrink-0">
-                <Sprout className="w-4 h-4 text-emerald-700" />
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-xs font-black text-[#132A1C] truncate">
-                  Sembrar Tarwi y Haba
-                </h3>
-                <p className="text-[10px] text-zinc-500 truncate mt-0.5">
-                  Primera lluvia · Asociar cultivos fijadores
-                </p>
-              </div>
+              <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
             </div>
-            <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
-          </div>
 
-          {/* ENE 2027 */}
-          <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
-                <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
-                <span className="text-[9.5px] font-black text-zinc-600 uppercase">ENE</span>
-                <span className="text-[8px] text-zinc-400 font-mono">2027</span>
+            {/* ENE 2027 */}
+            <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
+                  <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
+                  <span className="text-[9.5px] font-black text-zinc-600 uppercase">ENE</span>
+                  <span className="text-[8px] text-zinc-400 font-mono">2027</span>
+                </div>
+                <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
+                  <Leaf className="w-4 h-4 text-emerald-700" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-xs font-black text-[#132A1C] truncate">
+                    Revisar cobertura de rastrojo
+                  </h3>
+                  <p className="text-[10px] text-zinc-500 truncate mt-0.5">
+                    Cada 10 días · Evitar evaporación del suelo
+                  </p>
+                </div>
               </div>
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-800 shrink-0">
-                <Leaf className="w-4 h-4 text-emerald-700" />
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-xs font-black text-[#132A1C] truncate">
-                  Revisar cobertura de rastrojo
-                </h3>
-                <p className="text-[10px] text-zinc-500 truncate mt-0.5">
-                  Cada 10 días · Evitar evaporación del suelo
-                </p>
-              </div>
+              <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
             </div>
-            <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
-          </div>
 
-          {/* FEB 2027 */}
-          <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
-                <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
-                <span className="text-[9.5px] font-black text-zinc-600 uppercase">FEB</span>
-                <span className="text-[8px] text-zinc-400 font-mono">2027</span>
+            {/* FEB 2027 */}
+            <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
+                  <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
+                  <span className="text-[9.5px] font-black text-zinc-600 uppercase">FEB</span>
+                  <span className="text-[8px] text-zinc-400 font-mono">2027</span>
+                </div>
+                <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
+                  <Droplets className="w-4 h-4 text-emerald-700" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-xs font-black text-[#132A1C] truncate">
+                    Medir humedad del suelo
+                  </h3>
+                  <p className="text-[10px] text-zinc-500 truncate mt-0.5">
+                    Después de lluvias fuertes · Calibrar SMAP
+                  </p>
+                </div>
               </div>
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-800 shrink-0">
-                <Droplets className="w-4 h-4 text-emerald-700" />
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-xs font-black text-[#132A1C] truncate">
-                  Medir humedad del suelo
-                </h3>
-                <p className="text-[10px] text-zinc-500 truncate mt-0.5">
-                  Después de lluvias fuertes · Calibrar SMAP
-                </p>
-              </div>
+              <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
             </div>
-            <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
           </div>
-        </div>
+        ) : (
+          <div className="space-y-2 relative">
+            <div className="absolute left-[31px] top-6 bottom-6 w-0.5 bg-[#E5ECE2] z-0" />
+
+            {/* MAY 2027 */}
+            <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#7BB63E] ring-4 ring-lime-100 mb-1" />
+                  <span className="text-[9.5px] font-black text-emerald-900 uppercase">MAY</span>
+                  <span className="text-[8px] text-zinc-400 font-mono">2027</span>
+                </div>
+                <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
+                  <Wheat className="w-4 h-4 text-emerald-700" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-xs font-black text-[#132A1C] truncate">
+                    Cosecha y selección de semilla
+                  </h3>
+                  <p className="text-[10px] text-zinc-500 truncate mt-0.5">
+                    Papa nativa de guarda · Clasificar tubérculos
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
+            </div>
+
+            {/* JUN 2027 */}
+            <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
+                  <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
+                  <span className="text-[9.5px] font-black text-zinc-600 uppercase">JUN</span>
+                  <span className="text-[8px] text-zinc-400 font-mono">2027</span>
+                </div>
+                <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
+                  <Leaf className="w-4 h-4 text-emerald-700" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-xs font-black text-[#132A1C] truncate">
+                    Mulch protector contra heladas
+                  </h3>
+                  <p className="text-[10px] text-zinc-500 truncate mt-0.5">
+                    Extender rastrojo de cebada · Cobertura 8 cm
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
+            </div>
+
+            {/* JUL 2027 */}
+            <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
+                  <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
+                  <span className="text-[9.5px] font-black text-zinc-600 uppercase">JUL</span>
+                  <span className="text-[8px] text-zinc-400 font-mono">2027</span>
+                </div>
+                <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
+                  <Layers className="w-4 h-4 text-emerald-700" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-xs font-black text-[#132A1C] truncate">
+                    Descanso del suelo y pastoreo
+                  </h3>
+                  <p className="text-[10px] text-zinc-500 truncate mt-0.5">
+                    Abonado orgánico natural con ganado
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
+            </div>
+
+            {/* AGO 2027 */}
+            <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
+                  <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
+                  <span className="text-[9.5px] font-black text-zinc-600 uppercase">AGO</span>
+                  <span className="text-[8px] text-zinc-400 font-mono">2027</span>
+                </div>
+                <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
+                  <Sun className="w-4 h-4 text-emerald-700" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-xs font-black text-[#132A1C] truncate">
+                    Acondicionar surcos y andenes
+                  </h3>
+                  <p className="text-[10px] text-zinc-500 truncate mt-0.5">
+                    Preparación previa a las lluvias de primavera
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* 4. Section: NUTRIENTES QUE SE QUEDAN (La secuencia importa) */}
+      {/* 4. Section: NUTRIENTES QUE SE QUEDAN (La secuencia importa - Frame 009) */}
       <div className="space-y-2.5">
         <div className="px-1">
           <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
@@ -215,7 +316,7 @@ export default function RotationTab({
         <div className="flex items-center gap-2">
           {/* Card 1: Papa nativa */}
           <div className="flex-1 bg-white rounded-2xl p-3.5 shadow-xs border border-[#E5ECE2] space-y-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-800">
+            <div className="w-7 h-7 rounded-lg bg-[#EAF3E3] flex items-center justify-center text-emerald-800">
               <Sprout className="w-4 h-4 text-emerald-700" />
             </div>
             <span className="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400 block">
@@ -234,7 +335,7 @@ export default function RotationTab({
 
           {/* Card 2: Tarwi / Haba */}
           <div className="flex-1 bg-white rounded-2xl p-3.5 shadow-xs border border-[#E5ECE2] space-y-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-800">
+            <div className="w-7 h-7 rounded-lg bg-[#EAF3E3] flex items-center justify-center text-emerald-800">
               <Leaf className="w-4 h-4 text-emerald-700" />
             </div>
             <span className="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400 block">
@@ -257,7 +358,7 @@ export default function RotationTab({
         </div>
       </div>
 
-      {/* 5. Section: SIMULADOR DE AHORRO (DARK FOREST CARD #1B3B22) */}
+      {/* 5. Section: SIMULADOR DE AHORRO (DARK FOREST CARD #1B3B22 - Frame 010) */}
       <div className="bg-[#1B3B22] rounded-3xl p-5 text-white shadow-md border border-emerald-900/60 space-y-4">
         {/* Caption + Gauge Icon */}
         <div className="flex items-center justify-between">
@@ -337,7 +438,7 @@ export default function RotationTab({
             type="button"
             onClick={() => {
               playBubblePop();
-              onNavigateToCopiloto();
+              onNavigateToCopiloto('kipu');
             }}
             className="font-bold text-emerald-800 hover:text-emerald-950 flex items-center gap-1 cursor-pointer transition"
           >

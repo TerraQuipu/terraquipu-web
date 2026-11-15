@@ -12,8 +12,7 @@ import {
   MapPin,
   PenTool,
   Sliders,
-  Check,
-  RotateCcw,
+  Sun,
 } from 'lucide-react';
 import { playBubblePop } from '@/lib/soundEffects';
 import ParcelMap from '@/components/ParcelMap';
@@ -131,10 +130,10 @@ export default function ChacraTab({
         </div>
       )}
 
-      {/* 2. SATELLITE MAP CONTAINER (CONCENTRIC RADAR RINGS & OVERLAYS) */}
-      <div className="relative overflow-hidden rounded-3xl bg-[#132A1C] border border-[#E5ECE2] shadow-sm min-h-[300px]">
+      {/* 2. SATELLITE MAP CONTAINER (CONCENTRIC RADAR RINGS & OVERLAYS - Frame 003) */}
+      <div className="relative overflow-hidden rounded-3xl bg-[#132A1C] border border-[#E5ECE2] shadow-sm min-h-[300px] h-[300px]">
         {/* Leaflet Satellite Map Layer */}
-        <div className="h-[300px] w-full relative z-0">
+        <div className="h-full w-full relative z-0">
           <ParcelMap
             lat={profile.lat}
             lon={profile.lon}
@@ -144,6 +143,7 @@ export default function ChacraTab({
             areaHa={currentArea}
             cropName={profile.previousCropName || 'Papa Huayro'}
             onUpdateArea={handleAreaChange}
+            isEditorialView={true}
           />
         </div>
 
@@ -154,7 +154,7 @@ export default function ChacraTab({
           <div className="w-80 h-80 rounded-full border border-white/10 border-dashed absolute" />
         </div>
 
-        {/* Top Floating Badge on Map: VILCANOTA · 3,400 MSNM · • EN VIVO */}
+        {/* Top Floating Badges on Map: VILCANOTA · 3,400 MSNM · • EN VIVO */}
         <div className="absolute top-3 left-3 right-3 z-20 flex items-center justify-between pointer-events-none">
           <div className="bg-[#132A1C]/85 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/15 text-[10px] font-bold text-white flex items-center gap-1 shadow-sm">
             <MapPin className="w-3 h-3 text-[#A3E635]" />
@@ -169,39 +169,54 @@ export default function ChacraTab({
 
         {/* Central Parcel Badge Tag */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
-          <div className="bg-[#84CC16]/90 backdrop-blur-md text-[#132A1C] font-black text-xs px-3.5 py-1.5 rounded-full shadow-lg border border-white/40 flex items-center gap-1.5">
+          <div className="bg-[#7BB63E] text-[#132A1C] font-black text-xs px-3.5 py-1.5 rounded-full shadow-lg border border-white/40 flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-[#132A1C]" />
             <span>{profile.previousCropName || 'Papa Huayro'}</span>
+          </div>
+        </div>
+
+        {/* Neighboring Andenes Visual Indicators */}
+        <div className="absolute top-[38%] left-[22%] z-15 pointer-events-none opacity-80">
+          <div className="bg-[#132A1C]/80 backdrop-blur-xs text-white/90 text-[9px] font-bold px-2 py-0.5 rounded-full border border-white/15 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span>Andén 02</span>
+          </div>
+        </div>
+
+        <div className="absolute top-[62%] right-[18%] z-15 pointer-events-none opacity-80">
+          <div className="bg-[#132A1C]/80 backdrop-blur-xs text-white/90 text-[9px] font-bold px-2 py-0.5 rounded-full border border-white/15 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-lime-400" />
+            <span>Andén 04</span>
           </div>
         </div>
 
         {/* Bottom Layer Tags on Map */}
         <div className="absolute bottom-3 left-3 z-20 flex items-center gap-1.5 pointer-events-none">
           {layerSmap && (
-            <span className="text-[9.5px] font-bold bg-[#132A1C]/80 backdrop-blur-md text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30">
+            <span className="text-[9.5px] font-bold bg-[#132A1C]/85 backdrop-blur-md text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
               • Humedad
             </span>
           )}
           {layerNdvi && (
-            <span className="text-[9.5px] font-bold bg-[#132A1C]/80 backdrop-blur-md text-lime-300 px-2 py-0.5 rounded-full border border-lime-500/30">
+            <span className="text-[9.5px] font-bold bg-[#132A1C]/85 backdrop-blur-md text-lime-300 px-2.5 py-0.5 rounded-full border border-lime-500/30">
               • NDVI
             </span>
           )}
           {layerDrought && (
-            <span className="text-[9.5px] font-bold bg-[#132A1C]/80 backdrop-blur-md text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">
+            <span className="text-[9.5px] font-bold bg-[#132A1C]/85 backdrop-blur-md text-amber-300 px-2.5 py-0.5 rounded-full border border-amber-500/30">
               • Sequía
             </span>
           )}
         </div>
 
-        {/* QGIS Drawing Tool toggle button top-right */}
+        {/* QGIS Drawing Tool toggle button bottom-right */}
         <button
           type="button"
           onClick={() => {
             playBubblePop();
             setShowQgisTools(!showQgisTools);
           }}
-          className="absolute bottom-3 right-3 z-20 bg-white/90 hover:bg-white text-[#132A1C] text-[10px] font-black px-2.5 py-1 rounded-xl shadow-md border border-zinc-200 flex items-center gap-1 cursor-pointer transition"
+          className="absolute bottom-3 right-3 z-20 bg-white/90 hover:bg-white text-[#132A1C] text-[10px] font-black px-2.5 py-1 rounded-xl shadow-md border border-zinc-200 flex items-center gap-1 cursor-pointer transition active:scale-95"
           title="Herramienta de polígono libre QGIS"
         >
           <PenTool className="w-3 h-3 text-emerald-800" />
@@ -226,7 +241,7 @@ export default function ChacraTab({
             step="0.5"
             value={currentArea}
             onChange={(e) => handleAreaChange(parseFloat(e.target.value))}
-            className="w-full accent-[#84CC16] bg-zinc-200 rounded-lg h-2 cursor-pointer"
+            className="w-full accent-[#7BB63E] bg-zinc-200 rounded-lg h-2 cursor-pointer"
           />
           <div className="flex justify-between text-[10px] text-zinc-500 font-mono">
             <span>0.5 ha</span>
@@ -236,73 +251,96 @@ export default function ChacraTab({
         </div>
       )}
 
-      {/* 3. LAYER TOGGLE PILLS UNDER MAP */}
-      <div className="flex flex-wrap items-center gap-2">
-        {/* Toggle 1: SMAP humedad */}
-        <button
-          type="button"
-          onClick={handleToggleSmap}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition cursor-pointer border ${
-            layerSmap
-              ? 'bg-emerald-50 text-emerald-900 border-emerald-300 shadow-2xs'
-              : 'bg-white text-zinc-600 border-[#E5ECE2] hover:bg-zinc-50'
-          }`}
-        >
-          <Droplets className={`w-3.5 h-3.5 ${layerSmap ? 'text-emerald-700' : 'text-zinc-400'}`} />
-          <span>SMAP humedad</span>
-          <span
-            className={`w-4 h-4 rounded-full flex items-center justify-center transition-colors ${
-              layerSmap ? 'bg-[#84CC16]' : 'bg-zinc-200'
+      {/* 3. LAYER TOGGLE SWITCHES UNDER MAP (Exact styling from Frame 003) */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          {/* Toggle 1: SMAP humedad */}
+          <button
+            type="button"
+            onClick={handleToggleSmap}
+            className={`flex-1 flex items-center justify-between px-3.5 py-2 rounded-full border text-xs font-bold transition cursor-pointer shadow-2xs ${
+              layerSmap
+                ? 'bg-emerald-50/70 border-emerald-300 text-[#132A1C]'
+                : 'bg-white border-[#E5ECE2] text-zinc-600 hover:bg-zinc-50'
             }`}
           >
-            {layerSmap && <Check className="w-2.5 h-2.5 text-[#132A1C] stroke-[3]" />}
-          </span>
-        </button>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Droplets className={`w-3.5 h-3.5 shrink-0 ${layerSmap ? 'text-emerald-700' : 'text-zinc-400'}`} />
+              <span className="truncate">SMAP humedad</span>
+            </div>
+            {/* iOS/Android style toggle slider */}
+            <div
+              className={`w-8 h-4.5 rounded-full transition-colors p-0.5 flex items-center shrink-0 ${
+                layerSmap ? 'bg-[#7BB63E]' : 'bg-zinc-200'
+              }`}
+            >
+              <div
+                className={`w-3.5 h-3.5 rounded-full bg-white shadow-xs transition-transform transform ${
+                  layerSmap ? 'translate-x-3.5' : 'translate-x-0'
+                }`}
+              />
+            </div>
+          </button>
 
-        {/* Toggle 2: NDVI vegetación */}
-        <button
-          type="button"
-          onClick={handleToggleNdvi}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition cursor-pointer border ${
-            layerNdvi
-              ? 'bg-emerald-50 text-emerald-900 border-emerald-300 shadow-2xs'
-              : 'bg-white text-zinc-600 border-[#E5ECE2] hover:bg-zinc-50'
-          }`}
-        >
-          <Leaf className={`w-3.5 h-3.5 ${layerNdvi ? 'text-emerald-700' : 'text-zinc-400'}`} />
-          <span>NDVI vegetación</span>
-          <span
-            className={`w-4 h-4 rounded-full flex items-center justify-center transition-colors ${
-              layerNdvi ? 'bg-[#84CC16]' : 'bg-zinc-200'
+          {/* Toggle 2: NDVI vegetación */}
+          <button
+            type="button"
+            onClick={handleToggleNdvi}
+            className={`flex-1 flex items-center justify-between px-3.5 py-2 rounded-full border text-xs font-bold transition cursor-pointer shadow-2xs ${
+              layerNdvi
+                ? 'bg-emerald-50/70 border-emerald-300 text-[#132A1C]'
+                : 'bg-white border-[#E5ECE2] text-zinc-600 hover:bg-zinc-50'
             }`}
           >
-            {layerNdvi && <Check className="w-2.5 h-2.5 text-[#132A1C] stroke-[3]" />}
-          </span>
-        </button>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Leaf className={`w-3.5 h-3.5 shrink-0 ${layerNdvi ? 'text-emerald-700' : 'text-zinc-400'}`} />
+              <span className="truncate">NDVI vegetación</span>
+            </div>
+            <div
+              className={`w-8 h-4.5 rounded-full transition-colors p-0.5 flex items-center shrink-0 ${
+                layerNdvi ? 'bg-[#7BB63E]' : 'bg-zinc-200'
+              }`}
+            >
+              <div
+                className={`w-3.5 h-3.5 rounded-full bg-white shadow-xs transition-transform transform ${
+                  layerNdvi ? 'translate-x-3.5' : 'translate-x-0'
+                }`}
+              />
+            </div>
+          </button>
+        </div>
 
         {/* Toggle 3: Calor y sequía */}
-        <button
-          type="button"
-          onClick={handleToggleDrought}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition cursor-pointer border ${
-            layerDrought
-              ? 'bg-amber-50 text-amber-900 border-amber-300 shadow-2xs'
-              : 'bg-white text-zinc-600 border-[#E5ECE2] hover:bg-zinc-50'
-          }`}
-        >
-          <AlertTriangle className={`w-3.5 h-3.5 ${layerDrought ? 'text-amber-600' : 'text-zinc-400'}`} />
-          <span>Calor y sequía</span>
-          <span
-            className={`w-4 h-4 rounded-full flex items-center justify-center transition-colors ${
-              layerDrought ? 'bg-amber-400' : 'bg-zinc-200'
+        <div className="flex items-center">
+          <button
+            type="button"
+            onClick={handleToggleDrought}
+            className={`w-1/2 flex items-center justify-between px-3.5 py-2 rounded-full border text-xs font-bold transition cursor-pointer shadow-2xs ${
+              layerDrought
+                ? 'bg-amber-50/70 border-amber-300 text-[#132A1C]'
+                : 'bg-white border-[#E5ECE2] text-zinc-600 hover:bg-zinc-50'
             }`}
           >
-            {layerDrought && <Check className="w-2.5 h-2.5 text-zinc-950 stroke-[3]" />}
-          </span>
-        </button>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Sun className={`w-3.5 h-3.5 shrink-0 ${layerDrought ? 'text-amber-600' : 'text-zinc-400'}`} />
+              <span className="truncate">Calor y sequía</span>
+            </div>
+            <div
+              className={`w-8 h-4.5 rounded-full transition-colors p-0.5 flex items-center shrink-0 ${
+                layerDrought ? 'bg-amber-400' : 'bg-zinc-200'
+              }`}
+            >
+              <div
+                className={`w-3.5 h-3.5 rounded-full bg-white shadow-xs transition-transform transform ${
+                  layerDrought ? 'translate-x-3.5' : 'translate-x-0'
+                }`}
+              />
+            </div>
+          </button>
+        </div>
       </div>
 
-      {/* 4. SELECTED PARCEL CARD (PARCELA SELECCIONADA · Andén 03) */}
+      {/* 4. SELECTED PARCEL CARD (PARCELA SELECCIONADA · Andén 03 - Frame 004) */}
       <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] space-y-4">
         {/* Header row: PARCELA SELECCIONADA + Name + Chevron button */}
         <div className="flex items-center justify-between">
@@ -328,21 +366,21 @@ export default function ChacraTab({
           </button>
         </div>
 
-        {/* 3 Summary Stats */}
-        <div className="grid grid-cols-3 gap-2 border-t border-b border-[#E5ECE2] py-3 text-center">
-          <div>
+        {/* 3 Summary Stats with vertical divider lines */}
+        <div className="grid grid-cols-3 divide-x divide-[#E5ECE2] border-t border-b border-[#E5ECE2] py-3 text-center">
+          <div className="px-1">
             <span className="text-[10px] font-semibold text-zinc-500 block">Área total</span>
             <span className="text-sm font-black text-[#132A1C] mt-0.5 block">
               {currentArea} ha
             </span>
           </div>
-          <div>
+          <div className="px-1">
             <span className="text-[10px] font-semibold text-zinc-500 block">Edad cultivo</span>
             <span className="text-sm font-black text-[#132A1C] mt-0.5 block">
               45 días
             </span>
           </div>
-          <div>
+          <div className="px-1">
             <span className="text-[10px] font-semibold text-zinc-500 block">Rendimiento est.</span>
             <span className="text-sm font-black text-[#132A1C] mt-0.5 block">
               {Math.max(4, Math.round(currentArea * 3.4))} t
@@ -353,51 +391,51 @@ export default function ChacraTab({
         {/* 2x2 Grid of 4 Metric Cards */}
         <div className="grid grid-cols-2 gap-3">
           {/* Metric 1: Humedad suelo */}
-          <div className="bg-[#F7F9F6] rounded-2xl p-3 border border-[#E5ECE2] space-y-1">
-            <div className="w-6 h-6 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800">
-              <Droplets className="w-3.5 h-3.5 text-emerald-700" />
+          <div className="bg-[#F7F9F6] rounded-2xl p-3.5 border border-[#E5ECE2] space-y-1">
+            <div className="w-7 h-7 rounded-lg bg-[#EAF3E3] flex items-center justify-center text-emerald-800">
+              <Droplets className="w-4 h-4 text-emerald-700" />
             </div>
             <span className="text-[10px] font-bold text-zinc-500 block">Humedad suelo</span>
-            <span className="text-base font-black text-[#132A1C] block">
+            <span className="text-xl font-black text-[#132A1C] block leading-none">
               35%
             </span>
-            <span className="text-[9px] text-zinc-400 block font-mono">SMAP</span>
+            <span className="text-[9.5px] text-zinc-400 block font-mono">SMAP</span>
           </div>
 
           {/* Metric 2: Salud planta */}
-          <div className="bg-[#F7F9F6] rounded-2xl p-3 border border-[#E5ECE2] space-y-1">
-            <div className="w-6 h-6 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800">
-              <Leaf className="w-3.5 h-3.5 text-emerald-700" />
+          <div className="bg-[#F7F9F6] rounded-2xl p-3.5 border border-[#E5ECE2] space-y-1">
+            <div className="w-7 h-7 rounded-lg bg-[#EAF3E3] flex items-center justify-center text-emerald-800">
+              <Leaf className="w-4 h-4 text-emerald-700" />
             </div>
             <span className="text-[10px] font-bold text-zinc-500 block">Salud planta</span>
-            <span className="text-base font-black text-[#132A1C] block">
+            <span className="text-xl font-black text-[#132A1C] block leading-none">
               78%
             </span>
-            <span className="text-[9px] text-zinc-400 block font-mono">NDVI</span>
+            <span className="text-[9.5px] text-zinc-400 block font-mono">NDVI</span>
           </div>
 
           {/* Metric 3: Calidad suelo */}
-          <div className="bg-[#F7F9F6] rounded-2xl p-3 border border-[#E5ECE2] space-y-1">
-            <div className="w-6 h-6 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800">
-              <Layers className="w-3.5 h-3.5 text-emerald-700" />
+          <div className="bg-[#F7F9F6] rounded-2xl p-3.5 border border-[#E5ECE2] space-y-1">
+            <div className="w-7 h-7 rounded-lg bg-[#EAF3E3] flex items-center justify-center text-emerald-800">
+              <Layers className="w-4 h-4 text-emerald-700" />
             </div>
             <span className="text-[10px] font-bold text-zinc-500 block">Calidad suelo</span>
-            <span className="text-base font-black text-[#132A1C] block">
+            <span className="text-xl font-black text-[#132A1C] block leading-none">
               75%
             </span>
-            <span className="text-[9px] text-zinc-400 block font-mono">Muestreo local</span>
+            <span className="text-[9.5px] text-zinc-400 block font-mono">Muestreo local</span>
           </div>
 
           {/* Metric 4: Riesgo erosión */}
-          <div className="bg-[#F7F9F6] rounded-2xl p-3 border border-[#E5ECE2] space-y-1">
-            <div className="w-6 h-6 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800">
-              <AlertTriangle className="w-3.5 h-3.5 text-emerald-700" />
+          <div className="bg-[#F7F9F6] rounded-2xl p-3.5 border border-[#E5ECE2] space-y-1">
+            <div className="w-7 h-7 rounded-lg bg-[#EAF3E3] flex items-center justify-center text-emerald-800">
+              <AlertTriangle className="w-4 h-4 text-emerald-700" />
             </div>
             <span className="text-[10px] font-bold text-zinc-500 block">Riesgo erosión</span>
-            <span className="text-base font-black text-[#132A1C] block">
+            <span className="text-xl font-black text-[#132A1C] block leading-none">
               15%
             </span>
-            <span className="text-[9px] text-zinc-400 block font-mono">Bajo</span>
+            <span className="text-[9.5px] text-zinc-400 block font-mono">Bajo</span>
           </div>
         </div>
 

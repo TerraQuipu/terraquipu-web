@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FarmerProfile, ClimaNasa } from '@/lib/types';
 import {
   Globe,
@@ -8,10 +8,7 @@ import {
   Sprout,
   ChevronRight,
   ArrowRight,
-  Radio,
   CheckCircle2,
-  Sparkles,
-  Info,
 } from 'lucide-react';
 import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
 
@@ -19,6 +16,7 @@ interface CopilotTabProps {
   profile: FarmerProfile;
   climaNasa?: ClimaNasa | null;
   smapPercent?: number;
+  initialVoice?: 'astro' | 'kipu';
   onOpenDiagnostic: () => void;
   onToast?: (msg: string) => void;
 }
@@ -27,10 +25,17 @@ export default function CopilotTab({
   profile,
   climaNasa,
   smapPercent = 16,
+  initialVoice = 'astro',
   onOpenDiagnostic,
   onToast,
 }: CopilotTabProps) {
-  const [activeVoice, setActiveVoice] = useState<'astro' | 'kipu'>('astro');
+  const [activeVoice, setActiveVoice] = useState<'astro' | 'kipu'>(initialVoice);
+
+  useEffect(() => {
+    if (initialVoice) {
+      setActiveVoice(initialVoice);
+    }
+  }, [initialVoice]);
 
   return (
     <div className="space-y-4 animate-in fade-in pb-16">
@@ -48,12 +53,12 @@ export default function CopilotTab({
           </h1>
         </div>
 
-        <div className="w-9 h-9 rounded-full bg-[#E5ECE2]/70 text-emerald-900 flex items-center justify-center border border-[#E5ECE2]">
+        <div className="w-10 h-10 rounded-2xl bg-[#EAF3E3] text-emerald-900 flex items-center justify-center border border-[#D5E5CD] shadow-2xs">
           <Globe className="w-5 h-5 text-emerald-800" />
         </div>
       </div>
 
-      {/* 2. Dual Character Selector Cards */}
+      {/* 2. Dual Character Selector Cards (Frame 013) */}
       <div className="grid grid-cols-2 gap-3">
         {/* Astro Card */}
         <div
@@ -70,8 +75,16 @@ export default function CopilotTab({
           }`}
         >
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center shrink-0 text-amber-700">
-              <Sun className="w-4 h-4" />
+            <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center shrink-0 text-amber-700 overflow-hidden border border-amber-200">
+              <img
+                src="/images/astro_satelin.png"
+                alt="Astro"
+                className="w-7 h-7 object-contain"
+                onError={(e) => {
+                  (e.currentTarget as HTMLElement).style.display = 'none';
+                }}
+              />
+              <Sun className="w-4 h-4 hidden" />
             </div>
             <div className="min-w-0">
               <h3 className="text-xs font-black text-[#132A1C] leading-none">Astro</h3>
@@ -98,8 +111,16 @@ export default function CopilotTab({
           }`}
         >
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0 text-emerald-800">
-              <Sprout className="w-4 h-4" />
+            <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0 text-emerald-800 overflow-hidden border border-emerald-200">
+              <img
+                src="/images/kipu_llama_happy.png"
+                alt="Kipu"
+                className="w-7 h-7 object-contain"
+                onError={(e) => {
+                  (e.currentTarget as HTMLElement).style.display = 'none';
+                }}
+              />
+              <Sprout className="w-4 h-4 hidden" />
             </div>
             <div className="min-w-0">
               <h3 className="text-xs font-black text-[#132A1C] leading-none">Kipu</h3>
@@ -112,25 +133,31 @@ export default function CopilotTab({
         </div>
       </div>
 
-      {/* 3. Reading Card (Dark Forest Green Block #1A3D24) */}
+      {/* 3. Reading Card (Dark Forest Green Block #1A3D24 - Frame 013) */}
       <div className="bg-[#1A3D24] rounded-3xl p-5 text-white shadow-md border border-emerald-900/60 space-y-4">
-        {/* Card Header */}
+        {/* Card Header with Radar Widget */}
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-black uppercase tracking-widest text-emerald-300">
             {activeVoice === 'astro'
               ? 'LECTURA SATELITAL · SMAP • GPM'
               : 'SABER ANCESTRAL · OBSERVACIÓN ANDINA'}
           </span>
-          <div className="w-7 h-7 rounded-full bg-emerald-950/70 border border-emerald-500/30 flex items-center justify-center text-emerald-300">
-            {activeVoice === 'astro' ? (
-              <Sun className="w-4 h-4 text-amber-300" />
-            ) : (
-              <Sprout className="w-4 h-4 text-[#A3E635]" />
-            )}
+
+          {/* Radar animation widget around icon */}
+          <div className="relative flex items-center justify-center w-8 h-8">
+            <span className="absolute w-8 h-8 rounded-full border border-emerald-400/30 animate-ping" />
+            <span className="absolute w-7 h-7 rounded-full border border-emerald-400/40" />
+            <div className="w-6 h-6 rounded-full bg-emerald-950/80 border border-emerald-400/50 flex items-center justify-center text-emerald-300 z-10">
+              {activeVoice === 'astro' ? (
+                <Sun className="w-3.5 h-3.5 text-amber-300" />
+              ) : (
+                <Sprout className="w-3.5 h-3.5 text-[#A3E635]" />
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Title */}
+        {/* Title (Editorial Serif Italic) */}
         <h2 className="text-xl font-black text-white leading-tight">
           {activeVoice === 'astro' ? (
             <>
@@ -176,7 +203,7 @@ export default function CopilotTab({
         </div>
       </div>
 
-      {/* 4. Section: UNA ACCIÓN PARA HOY */}
+      {/* 4. Section: UNA ACCIÓN PARA HOY (Frame 013) */}
       <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] space-y-3">
         <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
           UNA ACCIÓN PARA HOY
@@ -197,7 +224,7 @@ export default function CopilotTab({
             playSuccessFanfare();
             onOpenDiagnostic();
           }}
-          className="w-full py-3.5 rounded-full bg-[#84CC16] hover:bg-[#72b012] text-[#132A1C] font-black text-xs flex items-center justify-center gap-2 shadow-xs transition active:scale-98 cursor-pointer"
+          className="w-full py-3.5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-black text-xs flex items-center justify-center gap-2 shadow-xs transition active:scale-98 cursor-pointer"
         >
           <span>Evaluar suelo</span>
           <ArrowRight className="w-4 h-4" />

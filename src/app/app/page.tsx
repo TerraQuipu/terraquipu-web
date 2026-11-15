@@ -43,11 +43,12 @@ import KipuFullScreenWizard from '@/components/KipuFullScreenWizard';
 
 export default function MobileApp() {
   const [activeTab, setActiveTab] = useState<MainTab>('inicio');
+  const [previousTab, setPreviousTab] = useState<MainTab>('inicio');
+  const [copilotVoice, setCopilotVoice] = useState<'astro' | 'kipu'>('astro');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [hardwareId, setHardwareId] = useState('TQ-HW-C249');
   const [isNewsOpen, setIsNewsOpen] = useState(false);
-  const [isDiagnosticOpen, setIsDiagnosticOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Full-screen first-time setup / onboarding state
@@ -263,6 +264,15 @@ export default function MobileApp() {
     );
   }
 
+  const handleOpenDiagnostic = (fromTab?: MainTab) => {
+    setPreviousTab(fromTab || (activeTab === 'diagnostico' ? 'inicio' : activeTab));
+    setActiveTab('diagnostico');
+  };
+
+  const handleCloseDiagnostic = () => {
+    setActiveTab(previousTab === 'diagnostico' ? 'inicio' : previousTab);
+  };
+
   return (
     <div className="flex flex-col h-full min-h-screen bg-[#F7F9F6] text-[#132A1C] relative overflow-hidden font-sans selection:bg-[#84CC16] selection:text-[#132A1C]">
       {/* Toast Notification Pill */}
@@ -272,72 +282,90 @@ export default function MobileApp() {
         </div>
       )}
 
-      {/* TOP HEADER: Light Organic Design */}
-      <header className="bg-white/90 backdrop-blur-md border-b border-[#E5ECE2] px-3.5 py-2.5 sticky top-0 z-40 shadow-xs">
-        <div className="max-w-md mx-auto w-full flex items-center justify-between gap-2">
-          {/* Left: Logo + Parcel Switcher Badge */}
-          <div className="flex items-center gap-2 min-w-0 shrink">
-            <div className="w-8 h-8 rounded-xl bg-[#132A1C] flex items-center justify-center text-[#A3E635] font-black text-sm shadow-xs shrink-0">
-              🌱
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-sm text-[#132A1C] tracking-tight truncate">
-                  TerraQuipu
-                </span>
-                <span className="text-[8.5px] font-black uppercase px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
-                  Andes
-                </span>
+      {/* TOP HEADER: Light Organic Design (Hidden in Diagnóstico view to match Frame 006) */}
+      {activeTab !== 'diagnostico' && (
+        <header className="bg-white/90 backdrop-blur-md border-b border-[#E5ECE2] px-3.5 py-2.5 sticky top-0 z-40 shadow-xs">
+          <div className="max-w-md mx-auto w-full flex items-center justify-between gap-2">
+            {/* Left: Logo + Parcel Switcher Badge */}
+            <div className="flex items-center gap-2 min-w-0 shrink">
+              <div className="w-8 h-8 rounded-xl bg-[#132A1C] flex items-center justify-center text-[#A3E635] font-black text-sm shadow-xs shrink-0">
+                🌱
               </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-black text-sm text-[#132A1C] tracking-tight truncate">
+                    TerraQuipu
+                  </span>
+                  <span className="text-[8.5px] font-black uppercase px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
+                    Andes
+                  </span>
+                </div>
 
-              {/* Active Parcel Badge: Click opens Settings/Hardware Modal */}
+                {/* Active Parcel Badge: Click opens Settings/Hardware Modal */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    playBubblePop();
+                    setIsSettingsOpen(true);
+                  }}
+                  className="flex items-center gap-1 text-[10px] font-bold text-zinc-600 hover:text-emerald-800 transition cursor-pointer truncate max-w-[150px] sm:max-w-[200px]"
+                  title="Ver detalles de la chacra y hardware"
+                >
+                  <span className="truncate">
+                    {profile.parcelName} • {profile.distrito || 'Urubamba'}, {profile.altitude || 3380} msnm
+                  </span>
+                  <ChevronDown className="w-2.5 h-2.5 text-zinc-400 shrink-0" />
+                </button>
+              </div>
+            </div>
+
+            {/* Right: News + Refresh + Settings Trigger */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              {/* News / ENOS Bulletins Trigger */}
+              <button
+                type="button"
+                onClick={() => {
+                  playBubblePop();
+                  setIsNewsOpen(true);
+                }}
+                className="relative w-8 h-8 rounded-full border border-[#E5ECE2] bg-white text-zinc-700 hover:text-emerald-800 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-2xs"
+                title="Boletines Científicos y Alertas ENOS"
+              >
+                <span className="text-xs">📰</span>
+                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-amber-500 text-white font-black text-[8px] flex items-center justify-center">
+                  3
+                </span>
+              </button>
+
+              {/* Refresh Button */}
+              <button
+                type="button"
+                onClick={handleRefreshData}
+                disabled={isRefreshing}
+                className={`w-8 h-8 rounded-full border border-[#E5ECE2] bg-white text-zinc-700 hover:text-emerald-800 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-2xs ${
+                  isRefreshing ? 'border-emerald-500 text-emerald-700' : ''
+                }`}
+                title="Actualizar datos satelitales (Hora Perú)"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-700' : ''}`} />
+              </button>
+
+              {/* Settings & Hardware Trigger */}
               <button
                 type="button"
                 onClick={() => {
                   playBubblePop();
                   setIsSettingsOpen(true);
                 }}
-                className="flex items-center gap-1 text-[10px] font-bold text-zinc-600 hover:text-emerald-800 transition cursor-pointer truncate max-w-[150px] sm:max-w-[200px]"
-                title="Ver detalles de la chacra y hardware"
+                className="w-8 h-8 rounded-full border border-[#E5ECE2] bg-[#F7F9F6] text-[#132A1C] hover:bg-emerald-50 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-2xs"
+                title="Ajustes de Parcela y Hardware"
               >
-                <span className="truncate">
-                  {profile.parcelName} • {profile.distrito || 'Urubamba'}, {profile.altitude || 3380} msnm
-                </span>
-                <ChevronDown className="w-2.5 h-2.5 text-zinc-400 shrink-0" />
+                <Settings className="w-4 h-4 text-emerald-900" />
               </button>
             </div>
           </div>
-
-          {/* Right: Refresh button + Settings/Profile Modal Trigger */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            {/* Refresh Button */}
-            <button
-              type="button"
-              onClick={handleRefreshData}
-              disabled={isRefreshing}
-              className={`w-8 h-8 rounded-full border border-[#E5ECE2] bg-white text-zinc-700 hover:text-emerald-800 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-2xs ${
-                isRefreshing ? 'border-emerald-500 text-emerald-700' : ''
-              }`}
-              title="Actualizar datos satelitales (Hora Perú)"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-700' : ''}`} />
-            </button>
-
-            {/* Settings & Hardware Trigger */}
-            <button
-              type="button"
-              onClick={() => {
-                playBubblePop();
-                setIsSettingsOpen(true);
-              }}
-              className="w-8 h-8 rounded-full border border-[#E5ECE2] bg-[#F7F9F6] text-[#132A1C] hover:bg-emerald-50 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-2xs"
-              title="Ajustes de Parcela y Hardware"
-            >
-              <Settings className="w-4 h-4 text-emerald-900" />
-            </button>
-          </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* Main Tab Content (Scrollable, Light Organic #F7F9F6) */}
       <main className="flex-1 overflow-y-auto px-4 py-4 pb-28 space-y-4 max-w-md mx-auto w-full relative z-10">
@@ -348,7 +376,7 @@ export default function MobileApp() {
             climaNasa={climaNasa}
             smapPercent={smapPercent}
             hardwareId={hardwareId}
-            onOpenWizard={() => setIsDiagnosticOpen(true)}
+            onOpenWizard={() => handleOpenDiagnostic('inicio')}
             onNavigateToParcelas={() => setActiveTab('parcelas')}
             onNavigateToRotacion={() => setActiveTab('rotacion')}
             onNavigateToCopiloto={() => setActiveTab('copiloto')}
@@ -379,7 +407,23 @@ export default function MobileApp() {
             onUpdateArea={(newArea) => {
               handleUpdateProfile({ areaHa: newArea });
             }}
-            onOpenWizard={() => setIsDiagnosticOpen(true)}
+            onOpenWizard={() => handleOpenDiagnostic('parcelas')}
+          />
+        )}
+
+        {/* ================= TAB 3: DIAGNÓSTICO (CENTRAL FAB '+') ================= */}
+        {activeTab === 'diagnostico' && (
+          <SoilDiagnosticWizardModal
+            isInline={true}
+            isOpen={true}
+            onClose={handleCloseDiagnostic}
+            onCompleteToRotation={() => {
+              setActiveTab('rotacion');
+              triggerToast('🌱 Plan de rotación activado según resiliencia del suelo.');
+            }}
+            onSaveProfileData={(data) => {
+              triggerToast('✓ Diagnóstico edáfico registrado');
+            }}
           />
         )}
 
@@ -387,7 +431,10 @@ export default function MobileApp() {
         {activeTab === 'rotacion' && (
           <RotationTab
             profile={profile}
-            onNavigateToCopiloto={() => setActiveTab('copiloto')}
+            onNavigateToCopiloto={(voice) => {
+              setCopilotVoice(voice || 'kipu');
+              setActiveTab('copiloto');
+            }}
             onToast={triggerToast}
           />
         )}
@@ -398,48 +445,15 @@ export default function MobileApp() {
             profile={profile}
             climaNasa={climaNasa}
             smapPercent={smapPercent}
-            onOpenDiagnostic={() => setIsDiagnosticOpen(true)}
+            initialVoice={copilotVoice}
+            onOpenDiagnostic={() => handleOpenDiagnostic('copiloto')}
             onToast={triggerToast}
           />
         )}
       </main>
 
-      {/* Floating News Button Container */}
-      <div className="fixed bottom-24 inset-x-0 max-w-md mx-auto pointer-events-none z-30 px-4">
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={() => {
-              playBubblePop();
-              setIsNewsOpen(true);
-            }}
-            className="pointer-events-auto relative w-12 h-12 rounded-2xl bg-white hover:bg-zinc-50 border border-[#E5ECE2] text-[#132A1C] flex items-center justify-center shadow-md transition transform active:scale-95 cursor-pointer"
-            title="Abrir Boletines Científicos y Alertas ENOS"
-          >
-            <span className="text-xl">📰</span>
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 text-white font-black text-[9px] flex items-center justify-center shadow-xs">
-              3
-            </span>
-          </button>
-        </div>
-      </div>
-
       {/* Slide-Up Bottom Sheet for News & ENOS Bulletins */}
       <AgroClimaNewsFeed isOpen={isNewsOpen} onClose={() => setIsNewsOpen(false)} />
-
-      {/* Central Diagnostic Wizard Modal (Triggered by FAB '+' button or "Evaluar suelo") */}
-      <SoilDiagnosticWizardModal
-        isOpen={isDiagnosticOpen}
-        onClose={() => setIsDiagnosticOpen(false)}
-        onCompleteToRotation={() => {
-          setIsDiagnosticOpen(false);
-          setActiveTab('rotacion');
-          triggerToast('🌱 Plan de rotación activado según resiliencia del suelo.');
-        }}
-        onSaveProfileData={(data) => {
-          triggerToast('✓ Diagnóstico edáfico registrado');
-        }}
-      />
 
       {/* Settings & Hardware Modal (Triggered from Top Header) */}
       <SettingsModal
@@ -454,11 +468,17 @@ export default function MobileApp() {
         onUpdateProfile={handleUpdateProfile}
       />
 
-      {/* Bottom Mobile Navigation Bar */}
+      {/* Bottom Mobile Navigation Bar (Always visible matching Frames 001, 003, 006, 009, 013) */}
       <BottomNav
         activeTab={activeTab}
-        onSelectTab={setActiveTab}
-        onOpenDiagnostic={() => setIsDiagnosticOpen(true)}
+        onSelectTab={(tab) => {
+          if (tab === 'diagnostico') {
+            handleOpenDiagnostic();
+          } else {
+            setActiveTab(tab);
+          }
+        }}
+        onOpenDiagnostic={() => handleOpenDiagnostic()}
       />
     </div>
   );

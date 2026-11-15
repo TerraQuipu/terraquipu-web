@@ -140,7 +140,7 @@ export default function InicioTab({
               cx="40"
               cy="40"
               r={radius}
-              stroke="#84CC16"
+              stroke="#7BB63E"
               strokeWidth="6.5"
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
@@ -224,7 +224,7 @@ export default function InicioTab({
                 }}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition cursor-pointer shrink-0 ${
                   isSelected
-                    ? 'bg-[#84CC16] text-[#132A1C] shadow-xs'
+                    ? 'bg-[#7BB63E] text-white shadow-xs'
                     : 'bg-white text-zinc-700 border border-[#E5ECE2] hover:bg-zinc-50'
                 }`}
               >

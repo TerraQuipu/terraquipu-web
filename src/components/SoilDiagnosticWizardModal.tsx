@@ -10,12 +10,12 @@ import {
   Sun,
   X,
   HelpCircle,
-  ShieldCheck,
 } from 'lucide-react';
 import { playBubblePop, playSuccessFanfare, playWhoosh } from '@/lib/soundEffects';
 
 interface SoilDiagnosticWizardModalProps {
-  isOpen: boolean;
+  isOpen?: boolean;
+  isInline?: boolean;
   onClose: () => void;
   onCompleteToRotation: () => void;
   onSaveProfileData?: (data: {
@@ -28,7 +28,8 @@ interface SoilDiagnosticWizardModalProps {
 }
 
 export default function SoilDiagnosticWizardModal({
-  isOpen,
+  isOpen = true,
+  isInline = false,
   onClose,
   onCompleteToRotation,
   onSaveProfileData,
@@ -88,478 +89,485 @@ export default function SoilDiagnosticWizardModal({
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (88 / 100) * circumference;
 
-  return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 animate-in fade-in">
-      <div className="bg-[#F7F9F6] w-full max-w-md max-h-[92vh] overflow-y-auto rounded-3xl p-5 shadow-2xl border border-[#E5ECE2] text-zinc-900 relative space-y-4">
-        {/* Top Header Row */}
-        <div className="flex items-center justify-between pb-1 border-b border-[#E5ECE2]/70">
-          <button
-            type="button"
-            onClick={handleBack}
-            className="w-8 h-8 rounded-full bg-white border border-[#E5ECE2] flex items-center justify-center text-zinc-600 hover:text-zinc-900 cursor-pointer shadow-2xs"
-            title="Atrás"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </button>
+  const content = (
+    <div className="space-y-4 animate-in fade-in pb-16">
+      {/* 0. Top Header Navigation (Matching Frame 006) */}
+      <div className="flex items-center justify-between pb-1 pt-1">
+        <button
+          type="button"
+          onClick={handleBack}
+          className="w-9 h-9 rounded-full bg-white border border-[#E5ECE2] flex items-center justify-center text-zinc-600 hover:text-zinc-900 cursor-pointer shadow-2xs transition"
+          title="Atrás"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </button>
 
-          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/70">
-            DIAGNÓSTICO DE SUELO
-          </span>
+        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/80">
+          DIAGNÓSTICO DE SUELO
+        </span>
 
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={handleReset}
-              className="w-8 h-8 rounded-full bg-white border border-[#E5ECE2] flex items-center justify-center text-zinc-600 hover:text-zinc-900 cursor-pointer shadow-2xs"
-              title="Reiniciar cuestionario"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-8 h-8 rounded-full bg-white border border-[#E5ECE2] flex items-center justify-center text-zinc-600 hover:text-zinc-900 cursor-pointer shadow-2xs"
-              title="Cerrar"
-            >
-              <X className="w-4 h-4" />
-            </button>
+        <button
+          type="button"
+          onClick={handleReset}
+          className="w-9 h-9 rounded-full bg-white border border-[#E5ECE2] flex items-center justify-center text-zinc-600 hover:text-zinc-900 cursor-pointer shadow-2xs transition"
+          title="Reiniciar cuestionario"
+        >
+          <RotateCcw className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      {/* HERO TITLE (Matching Frame 006) */}
+      {step <= 5 && (
+        <div className="text-center space-y-2 pt-1">
+          <div className="inline-flex w-12 h-12 rounded-2xl bg-[#EAF3E3] items-center justify-center text-emerald-800 shadow-2xs">
+            <Sprout className="w-6 h-6 text-emerald-700" />
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
+              UNA MIRADA A TU CHACRA
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#132A1C] leading-tight">
+              Suelo fuerte,{' '}
+              <span className="font-serif italic text-emerald-800 font-normal">
+                cosecha segura.
+              </span>
+            </h1>
+            <p className="text-xs text-zinc-600">
+              Responde cinco preguntas. Te tomará menos de un minuto.
+            </p>
           </div>
         </div>
+      )}
 
-        {/* HERO TITLE (Matching Frame 006) */}
-        {step <= 5 && (
-          <div className="text-center space-y-2 pt-1">
-            <div className="inline-flex w-11 h-11 rounded-2xl bg-emerald-100 items-center justify-center text-emerald-800 shadow-2xs">
-              <Sprout className="w-6 h-6 text-emerald-700" />
+      {/* STEP 1 TO 5 CARD */}
+      {step <= 5 && (
+        <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] space-y-4">
+          {/* Progress Bar & Step Label */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-[11px] font-black text-emerald-900">
+              <span>PASO {step} / 5</span>
+              <span className="font-mono text-zinc-500">{progressPct}%</span>
             </div>
-
-            <div className="space-y-1">
-              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
-                UNA MIRADA A TU CHACRA
-              </span>
-              <h2 className="text-2xl font-black text-[#132A1C] leading-tight">
-                Suelo fuerte,{' '}
-                <span className="font-serif italic text-emerald-800 font-normal">
-                  cosecha segura.
-                </span>
-              </h2>
-              <p className="text-xs text-zinc-600">
-                Responde cinco preguntas. Te tomará menos de un minuto.
-              </p>
+            <div className="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
+              <div
+                className="bg-[#7BB63E] h-full rounded-full transition-all duration-300 ease-out"
+                style={{ width: `${progressPct}%` }}
+              />
             </div>
           </div>
-        )}
 
-        {/* STEP 1 TO 5 CARD */}
-        {step <= 5 && (
-          <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] space-y-4">
-            {/* Progress Bar & Step Label */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-[11px] font-black text-emerald-900">
-                <span>PASO {step} / 5</span>
-                <span className="font-mono text-zinc-500">{progressPct}%</span>
-              </div>
-              <div className="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
-                <div
-                  className="bg-[#84CC16] h-full rounded-full transition-all duration-300 ease-out"
-                  style={{ width: `${progressPct}%` }}
-                />
-              </div>
-            </div>
-
-            {/* STEP 1: Textura y humedad */}
-            {step === 1 && (
-              <div className="space-y-3">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
-                    PRUEBA DEL PUÑO
-                  </span>
-                  <h3 className="text-base font-black text-[#132A1C]">Textura y humedad</h3>
-                  <p className="text-xs text-zinc-500 mt-0.5">
-                    ¿Cómo se siente la tierra al apretarla con la mano?
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  {(['Seca y polvo', 'Húmeda y mullida', 'Barro'] as const).map((opt) => (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() => {
-                        playBubblePop();
-                        setStep1Val(opt);
-                      }}
-                      className={`w-full p-3 rounded-2xl border text-left flex items-center justify-between gap-2 transition cursor-pointer ${
-                        step1Val === opt
-                          ? 'bg-emerald-50/70 border-[#84CC16] ring-1 ring-[#84CC16] text-[#132A1C] font-black'
-                          : 'bg-white border-[#E5ECE2] text-zinc-700 hover:bg-zinc-50 font-medium'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span
-                          className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                            step1Val === opt
-                              ? 'border-[#84CC16] bg-[#84CC16]'
-                              : 'border-zinc-300'
-                          }`}
-                        >
-                          {step1Val === opt && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
-                        </span>
-                        <span className="text-xs">{opt}</span>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-zinc-400" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* STEP 2: Profundidad y pedregosidad */}
-            {step === 2 && (
-              <div className="space-y-3">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
-                    PROFUNDIDAD Y PEDREGOSIDAD
-                  </span>
-                  <h3 className="text-base font-black text-[#132A1C]">Profundidad del terreno</h3>
-                  <p className="text-xs text-zinc-500 mt-0.5">
-                    ¿Hasta dónde entra la lampa o barretón antes de topar roca?
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  {(['Profundo (más de 40 cm)', 'Algo de piedras (20 a 40 cm)', 'Muy pedregoso o superficial'] as const).map((opt) => (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() => {
-                        playBubblePop();
-                        setStep2Val(opt);
-                      }}
-                      className={`w-full p-3 rounded-2xl border text-left flex items-center justify-between gap-2 transition cursor-pointer ${
-                        step2Val === opt
-                          ? 'bg-emerald-50/70 border-[#84CC16] ring-1 ring-[#84CC16] text-[#132A1C] font-black'
-                          : 'bg-white border-[#E5ECE2] text-zinc-700 hover:bg-zinc-50 font-medium'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span
-                          className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                            step2Val === opt
-                              ? 'border-[#84CC16] bg-[#84CC16]'
-                              : 'border-zinc-300'
-                          }`}
-                        >
-                          {step2Val === opt && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
-                        </span>
-                        <span className="text-xs">{opt}</span>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-zinc-400" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* STEP 3: Cobertura del suelo */}
-            {step === 3 && (
-              <div className="space-y-3">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
-                    COBERTURA DEL SUELO
-                  </span>
-                  <h3 className="text-base font-black text-[#132A1C]">Cobertura del terreno</h3>
-                  <p className="text-xs text-zinc-500 mt-0.5">
-                    ¿Cómo está la superficie de tu parcela hoy?
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  {(['Cultivo verde o rastrojo abundante', 'Rastrojo disperso o restos secos', 'Tierra desnuda expuesta al sol'] as const).map((opt) => (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() => {
-                        playBubblePop();
-                        setStep3Val(opt);
-                      }}
-                      className={`w-full p-3 rounded-2xl border text-left flex items-center justify-between gap-2 transition cursor-pointer ${
-                        step3Val === opt
-                          ? 'bg-emerald-50/70 border-[#84CC16] ring-1 ring-[#84CC16] text-[#132A1C] font-black'
-                          : 'bg-white border-[#E5ECE2] text-zinc-700 hover:bg-zinc-50 font-medium'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span
-                          className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                            step3Val === opt
-                              ? 'border-[#84CC16] bg-[#84CC16]'
-                              : 'border-zinc-300'
-                          }`}
-                        >
-                          {step3Val === opt && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
-                        </span>
-                        <span className="text-xs">{opt}</span>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-zinc-400" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* STEP 4: Acceso al agua */}
-            {step === 4 && (
-              <div className="space-y-3">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
-                    DISPONIBILIDAD DE AGUA
-                  </span>
-                  <h3 className="text-base font-black text-[#132A1C]">Acceso al agua</h3>
-                  <p className="text-xs text-zinc-500 mt-0.5">
-                    ¿Con qué fuente de riego cuenta tu chacra?
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  {(['Secano (solo lluvia del cielo)', 'Riego de auxilio (turno ocasional)', 'Riego permanente o reservorio'] as const).map((opt) => (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() => {
-                        playBubblePop();
-                        setStep4Val(opt);
-                      }}
-                      className={`w-full p-3 rounded-2xl border text-left flex items-center justify-between gap-2 transition cursor-pointer ${
-                        step4Val === opt
-                          ? 'bg-emerald-50/70 border-[#84CC16] ring-1 ring-[#84CC16] text-[#132A1C] font-black'
-                          : 'bg-white border-[#E5ECE2] text-zinc-700 hover:bg-zinc-50 font-medium'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span
-                          className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                            step4Val === opt
-                              ? 'border-[#84CC16] bg-[#84CC16]'
-                              : 'border-zinc-300'
-                          }`}
-                        >
-                          {step4Val === opt && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
-                        </span>
-                        <span className="text-xs">{opt}</span>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-zinc-400" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* STEP 5: Sanidad y plagas */}
-            {step === 5 && (
-              <div className="space-y-3">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
-                    SANIDAD Y PLAGAS
-                  </span>
-                  <h3 className="text-base font-black text-[#132A1C]">Sanidad de la chacra</h3>
-                  <p className="text-xs text-zinc-500 mt-0.5">
-                    ¿Has detectado señales de plagas o enfermedades en la última campaña?
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  {(['Chacra sana y limpia', 'Presencia de gorgojo de los andes', 'Rancha o tizón tardío'] as const).map((opt) => (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() => {
-                        playBubblePop();
-                        setStep5Val(opt);
-                      }}
-                      className={`w-full p-3 rounded-2xl border text-left flex items-center justify-between gap-2 transition cursor-pointer ${
-                        step5Val === opt
-                          ? 'bg-emerald-50/70 border-[#84CC16] ring-1 ring-[#84CC16] text-[#132A1C] font-black'
-                          : 'bg-white border-[#E5ECE2] text-zinc-700 hover:bg-zinc-50 font-medium'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span
-                          className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                            step5Val === opt
-                              ? 'border-[#84CC16] bg-[#84CC16]'
-                              : 'border-zinc-300'
-                          }`}
-                        >
-                          {step5Val === opt && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
-                        </span>
-                        <span className="text-xs">{opt}</span>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-zinc-400" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Avatar Guiding Pill */}
-            <div className="bg-[#F7F9F6] rounded-2xl p-3 border border-[#E5ECE2] flex items-center gap-2.5 text-xs text-zinc-600">
-              <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                <img src="/images/kipu_llama.png" alt="Kipu" className="w-5 h-5 object-contain" />
-              </div>
-              <p className="text-[11px] leading-tight font-medium">
-                {step === 1 && 'Kipu: Aprieta la tierra a la altura de las raíces; si conserva la forma sin agrietarse, el suelo tiene buena estructura.'}
-                {step === 2 && 'Kipu: La profundidad efectiva del suelo determina cuánta agua y nutrientes pueden retener tus raíces.'}
-                {step === 3 && 'Astro: Sentinel-2 detecta reflectancia; el rastrojo reduce la evaporación solar directa hasta en un 40%.'}
-                {step === 4 && 'Astro: SMAP calcula la capacidad de campo para programar riegos oportunos y evitar saturación.'}
-                {step === 5 && 'Kipu: Romper el ciclo biológico del gorgojo mediante rotación con Tarwi elimina hasta el 84% de larvas.'}
-              </p>
-            </div>
-
-            {/* Nav Buttons */}
-            <div className="flex items-center justify-between pt-2">
-              <button
-                type="button"
-                onClick={handleBack}
-                className="text-xs font-bold text-zinc-600 hover:text-zinc-900 cursor-pointer px-3 py-2"
-              >
-                ‹ Atrás
-              </button>
-
-              <button
-                type="button"
-                onClick={handleNext}
-                className="px-6 py-2.5 rounded-full bg-[#84CC16] hover:bg-[#72b012] text-[#132A1C] font-black text-xs shadow-xs transition active:scale-95 cursor-pointer flex items-center gap-1.5"
-              >
-                <span>{step === 5 ? 'Ver resultados' : 'Continuar'}</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="text-center pt-1">
-              <span className="text-[10px] text-zinc-400 font-medium flex items-center justify-center gap-1">
-                <HelpCircle className="w-3 h-3" />
-                Elige lo que más se parece a tu parcela hoy.
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* STEP 6: CONCLUSION SCREEN (Matching end_007.jpg) */}
-        {step === 6 && (
-          <div className="space-y-4 animate-in fade-in">
-            {/* Top Circular Gauge 88/100 */}
-            <div className="flex flex-col items-center justify-center text-center space-y-2 pt-2">
-              <div className="relative flex items-center justify-center w-28 h-28">
-                <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 90 90">
-                  <circle
-                    cx="45"
-                    cy="45"
-                    r={radius}
-                    stroke="#E5ECE2"
-                    strokeWidth="8"
-                    fill="transparent"
-                  />
-                  <circle
-                    cx="45"
-                    cy="45"
-                    r={radius}
-                    stroke="#84CC16"
-                    strokeWidth="8"
-                    strokeDasharray={circumference}
-                    strokeDashoffset={strokeDashoffset}
-                    strokeLinecap="round"
-                    fill="transparent"
-                    className="transition-all duration-1000 ease-out"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                  <span className="text-3xl font-black text-[#132A1C] leading-none">
-                    88<span className="text-xs text-zinc-500 font-normal">/100</span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Badge: Resiliencia favorable */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300/60 text-xs font-black">
-                <Check className="w-3.5 h-3.5 text-emerald-800 stroke-[3]" />
-                <span>Resiliencia favorable</span>
-              </div>
-            </div>
-
-            {/* Editorial Header */}
-            <div className="text-center space-y-1">
-              <h2 className="text-2xl font-black text-[#132A1C] leading-tight">
-                Tu suelo tiene{' '}
-                <span className="font-serif italic text-emerald-800 font-normal">
-                  un buen punto de partida.
+          {/* STEP 1: Textura y humedad */}
+          {step === 1 && (
+            <div className="space-y-3">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
+                  PRUEBA DEL PUÑO
                 </span>
-              </h2>
-              <p className="text-xs text-zinc-600 max-w-xs mx-auto">
-                Con estas prácticas puedes aumentar su resiliencia antes de la siguiente campaña.
-              </p>
-            </div>
-
-            {/* TRES ACCIONES PARA TU CHACRA */}
-            <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] space-y-3">
-              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
-                TRES ACCIONES PARA TU CHACRA
-              </span>
-
-              {/* Action 01 */}
-              <div className="flex items-start justify-between gap-3 pb-3 border-b border-[#E5ECE2]">
-                <div className="flex items-start gap-3">
-                  <span className="text-xs font-black text-emerald-800 font-mono shrink-0 pt-0.5">
-                    01
-                  </span>
-                  <p className="text-xs font-medium text-zinc-800 leading-snug">
-                    Agrega compost maduro al surco para mejorar retención de agua.
-                  </p>
-                </div>
-                <Check className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+                <h3 className="text-base font-black text-[#132A1C]">Textura y humedad</h3>
+                <p className="text-xs text-zinc-500 mt-0.5">
+                  ¿Cómo se siente la tierra al apretarla con la mano?
+                </p>
               </div>
 
-              {/* Action 02 */}
-              <div className="flex items-start justify-between gap-3 pb-3 border-b border-[#E5ECE2]">
-                <div className="flex items-start gap-3">
-                  <span className="text-xs font-black text-emerald-800 font-mono shrink-0 pt-0.5">
-                    02
-                  </span>
-                  <p className="text-xs font-medium text-zinc-800 leading-snug">
-                    Cubre la tierra desnuda con rastrojo; evita quemarlo.
-                  </p>
-                </div>
-                <Check className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
-              </div>
-
-              {/* Action 03 */}
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3">
-                  <span className="text-xs font-black text-emerald-800 font-mono shrink-0 pt-0.5">
-                    03
-                  </span>
-                  <p className="text-xs font-medium text-zinc-800 leading-snug">
-                    Aprovecha el acceso a agua con riegos cortos al amanecer.
-                  </p>
-                </div>
-                <Check className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+              <div className="space-y-2">
+                {(['Seca y polvo', 'Húmeda y mullida', 'Barro'] as const).map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => {
+                      playBubblePop();
+                      setStep1Val(opt);
+                    }}
+                    className={`w-full p-3.5 rounded-2xl border text-left flex items-center justify-between gap-2 transition cursor-pointer ${
+                      step1Val === opt
+                        ? 'bg-[#F2F8ED] border-[#7BB63E] ring-1 ring-[#7BB63E] text-[#132A1C] font-black'
+                        : 'bg-white border-[#E5ECE2] text-zinc-700 hover:bg-zinc-50 font-medium'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                          step1Val === opt
+                            ? 'border-[#7BB63E] bg-[#7BB63E]'
+                            : 'border-zinc-300'
+                        }`}
+                      >
+                        {step1Val === opt && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      </span>
+                      <span className="text-xs">{opt}</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-zinc-400" />
+                  </button>
+                ))}
               </div>
             </div>
+          )}
 
-            {/* Ver Plan de Rotación Button */}
+          {/* STEP 2: Profundidad y pedregosidad */}
+          {step === 2 && (
+            <div className="space-y-3">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
+                  PROFUNDIDAD Y PEDREGOSIDAD
+                </span>
+                <h3 className="text-base font-black text-[#132A1C]">Profundidad del terreno</h3>
+                <p className="text-xs text-zinc-500 mt-0.5">
+                  ¿Hasta dónde entra la lampa o barretón antes de topar roca?
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                {(['Profundo (más de 40 cm)', 'Algo de piedras (20 a 40 cm)', 'Muy pedregoso o superficial'] as const).map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => {
+                      playBubblePop();
+                      setStep2Val(opt);
+                    }}
+                    className={`w-full p-3.5 rounded-2xl border text-left flex items-center justify-between gap-2 transition cursor-pointer ${
+                      step2Val === opt
+                        ? 'bg-[#F2F8ED] border-[#7BB63E] ring-1 ring-[#7BB63E] text-[#132A1C] font-black'
+                        : 'bg-white border-[#E5ECE2] text-zinc-700 hover:bg-zinc-50 font-medium'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                          step2Val === opt
+                            ? 'border-[#7BB63E] bg-[#7BB63E]'
+                            : 'border-zinc-300'
+                        }`}
+                      >
+                        {step2Val === opt && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      </span>
+                      <span className="text-xs">{opt}</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-zinc-400" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3: Cobertura del suelo */}
+          {step === 3 && (
+            <div className="space-y-3">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
+                  COBERTURA DEL SUELO
+                </span>
+                <h3 className="text-base font-black text-[#132A1C]">Cobertura del terreno</h3>
+                <p className="text-xs text-zinc-500 mt-0.5">
+                  ¿Cómo está la superficie de tu parcela hoy?
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                {(['Cultivo verde o rastrojo abundante', 'Rastrojo disperso o restos secos', 'Tierra desnuda expuesta al sol'] as const).map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => {
+                      playBubblePop();
+                      setStep3Val(opt);
+                    }}
+                    className={`w-full p-3.5 rounded-2xl border text-left flex items-center justify-between gap-2 transition cursor-pointer ${
+                      step3Val === opt
+                        ? 'bg-[#F2F8ED] border-[#7BB63E] ring-1 ring-[#7BB63E] text-[#132A1C] font-black'
+                        : 'bg-white border-[#E5ECE2] text-zinc-700 hover:bg-zinc-50 font-medium'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                          step3Val === opt
+                            ? 'border-[#7BB63E] bg-[#7BB63E]'
+                            : 'border-zinc-300'
+                        }`}
+                      >
+                        {step3Val === opt && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      </span>
+                      <span className="text-xs">{opt}</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-zinc-400" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* STEP 4: Acceso al agua */}
+          {step === 4 && (
+            <div className="space-y-3">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
+                  DISPONIBILIDAD DE AGUA
+                </span>
+                <h3 className="text-base font-black text-[#132A1C]">Acceso al agua</h3>
+                <p className="text-xs text-zinc-500 mt-0.5">
+                  ¿Con qué fuente de riego cuenta tu chacra?
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                {(['Secano (solo lluvia del cielo)', 'Riego de auxilio (turno ocasional)', 'Riego permanente o reservorio'] as const).map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => {
+                      playBubblePop();
+                      setStep4Val(opt);
+                    }}
+                    className={`w-full p-3.5 rounded-2xl border text-left flex items-center justify-between gap-2 transition cursor-pointer ${
+                      step4Val === opt
+                        ? 'bg-[#F2F8ED] border-[#7BB63E] ring-1 ring-[#7BB63E] text-[#132A1C] font-black'
+                        : 'bg-white border-[#E5ECE2] text-zinc-700 hover:bg-zinc-50 font-medium'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                          step4Val === opt
+                            ? 'border-[#7BB63E] bg-[#7BB63E]'
+                            : 'border-zinc-300'
+                        }`}
+                      >
+                        {step4Val === opt && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      </span>
+                      <span className="text-xs">{opt}</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-zinc-400" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* STEP 5: Sanidad y plagas */}
+          {step === 5 && (
+            <div className="space-y-3">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
+                  SANIDAD Y PLAGAS
+                </span>
+                <h3 className="text-base font-black text-[#132A1C]">Sanidad de la chacra</h3>
+                <p className="text-xs text-zinc-500 mt-0.5">
+                  ¿Has detectado señales de plagas o enfermedades en la última campaña?
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                {(['Chacra sana y limpia', 'Presencia de gorgojo de los andes', 'Rancha o tizón tardío'] as const).map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => {
+                      playBubblePop();
+                      setStep5Val(opt);
+                    }}
+                    className={`w-full p-3.5 rounded-2xl border text-left flex items-center justify-between gap-2 transition cursor-pointer ${
+                      step5Val === opt
+                        ? 'bg-[#F2F8ED] border-[#7BB63E] ring-1 ring-[#7BB63E] text-[#132A1C] font-black'
+                        : 'bg-white border-[#E5ECE2] text-zinc-700 hover:bg-zinc-50 font-medium'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                          step5Val === opt
+                            ? 'border-[#7BB63E] bg-[#7BB63E]'
+                            : 'border-zinc-300'
+                        }`}
+                      >
+                        {step5Val === opt && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      </span>
+                      <span className="text-xs">{opt}</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-zinc-400" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Nav Buttons (Frame 006 layout: < Atrás on left, Continuar -> on right) */}
+          <div className="flex items-center justify-between pt-2">
             <button
               type="button"
-              onClick={() => {
-                playSuccessFanfare();
-                onCompleteToRotation();
-              }}
-              className="w-full py-3.5 rounded-full bg-[#84CC16] hover:bg-[#72b012] text-[#132A1C] font-black text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-98 cursor-pointer"
+              onClick={handleBack}
+              className="text-xs font-bold text-zinc-600 hover:text-zinc-900 cursor-pointer px-3 py-2"
             >
-              <span>Ver plan de rotación</span>
+              ‹ Atrás
+            </button>
+
+            <button
+              type="button"
+              onClick={handleNext}
+              className="px-6 py-2.5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-black text-xs shadow-xs transition active:scale-95 cursor-pointer flex items-center gap-1.5"
+            >
+              <span>{step === 5 ? 'Ver resultados' : 'Continuar'}</span>
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
-        )}
+
+          <div className="text-center pt-0.5">
+            <span className="text-[10px] text-zinc-400 font-medium flex items-center justify-center gap-1">
+              <HelpCircle className="w-3 h-3" />
+              Elige lo que más se parece a tu parcela hoy.
+            </span>
+          </div>
+
+          {/* Avatar Guiding Pill with real 3D avatars */}
+          <div className="bg-[#F7F9F6] rounded-2xl p-3 border border-[#E5ECE2] flex items-center gap-3 text-xs text-zinc-600">
+            <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 overflow-hidden border border-emerald-300">
+              <img
+                src={step <= 2 || step === 5 ? '/images/kipu_llama_happy.png' : '/images/astro_satelin.png'}
+                alt={step <= 2 || step === 5 ? 'Kipu' : 'Astro'}
+                className="w-7 h-7 object-contain"
+                onError={(e) => {
+                  (e.currentTarget as HTMLElement).style.display = 'none';
+                }}
+              />
+            </div>
+            <p className="text-[11px] leading-tight font-medium">
+              {step === 1 && 'Kipu: Aprieta la tierra a la altura de las raíces; si conserva la forma sin agrietarse, el suelo tiene buena estructura.'}
+              {step === 2 && 'Kipu: La profundidad efectiva del suelo determina cuánta agua y nutrientes pueden retener tus raíces.'}
+              {step === 3 && 'Astro: Sentinel-2 detecta reflectancia; el rastrojo reduce la evaporación solar directa hasta en un 40%.'}
+              {step === 4 && 'Astro: SMAP calcula la capacidad de campo para programar riegos oportunos y evitar saturación.'}
+              {step === 5 && 'Kipu: Romper el ciclo biológico del gorgojo mediante rotación con Tarwi elimina hasta el 84% de larvas.'}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* STEP 6: CONCLUSION SCREEN (Matching end_007.jpg) */}
+      {step === 6 && (
+        <div className="space-y-4 animate-in fade-in">
+          {/* Top Circular Gauge 88/100 */}
+          <div className="flex flex-col items-center justify-center text-center space-y-2 pt-2">
+            <div className="relative flex items-center justify-center w-28 h-28">
+              <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 90 90">
+                <circle
+                  cx="45"
+                  cy="45"
+                  r={radius}
+                  stroke="#E5ECE2"
+                  strokeWidth="8"
+                  fill="transparent"
+                />
+                <circle
+                  cx="45"
+                  cy="45"
+                  r={radius}
+                  stroke="#7BB63E"
+                  strokeWidth="8"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={strokeDashoffset}
+                  strokeLinecap="round"
+                  fill="transparent"
+                  className="transition-all duration-1000 ease-out"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                <span className="text-3xl font-black text-[#132A1C] leading-none">
+                  88<span className="text-xs text-zinc-500 font-normal">/100</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Badge: Resiliencia favorable */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300/60 text-xs font-black">
+              <Check className="w-3.5 h-3.5 text-emerald-800 stroke-[3]" />
+              <span>Resiliencia favorable</span>
+            </div>
+          </div>
+
+          {/* Editorial Header */}
+          <div className="text-center space-y-1">
+            <h2 className="text-2xl font-black text-[#132A1C] leading-tight">
+              Tu suelo tiene{' '}
+              <span className="font-serif italic text-emerald-800 font-normal">
+                un buen punto de partida.
+              </span>
+            </h2>
+            <p className="text-xs text-zinc-600 max-w-xs mx-auto">
+              Con estas prácticas puedes aumentar su resiliencia antes de la siguiente campaña.
+            </p>
+          </div>
+
+          {/* TRES ACCIONES PARA TU CHACRA */}
+          <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] space-y-3">
+            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
+              TRES ACCIONES PARA TU CHACRA
+            </span>
+
+            {/* Action 01 */}
+            <div className="flex items-start justify-between gap-3 pb-3 border-b border-[#E5ECE2]">
+              <div className="flex items-start gap-3">
+                <span className="text-xs font-black text-emerald-800 font-mono shrink-0 pt-0.5">
+                  01
+                </span>
+                <p className="text-xs font-medium text-zinc-800 leading-snug">
+                  Agrega compost maduro al surco para mejorar retención de agua.
+                </p>
+              </div>
+              <Check className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+            </div>
+
+            {/* Action 02 */}
+            <div className="flex items-start justify-between gap-3 pb-3 border-b border-[#E5ECE2]">
+              <div className="flex items-start gap-3">
+                <span className="text-xs font-black text-emerald-800 font-mono shrink-0 pt-0.5">
+                  02
+                </span>
+                <p className="text-xs font-medium text-zinc-800 leading-snug">
+                  Cubre la tierra desnuda con rastrojo; evita quemarlo.
+                </p>
+              </div>
+              <Check className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+            </div>
+
+            {/* Action 03 */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <span className="text-xs font-black text-emerald-800 font-mono shrink-0 pt-0.5">
+                  03
+                </span>
+                <p className="text-xs font-medium text-zinc-800 leading-snug">
+                  Aprovecha el acceso a agua con riegos cortos al amanecer.
+                </p>
+              </div>
+              <Check className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+            </div>
+          </div>
+
+          {/* Ver Plan de Rotación Button */}
+          <button
+            type="button"
+            onClick={() => {
+              playSuccessFanfare();
+              onCompleteToRotation();
+            }}
+            className="w-full py-3.5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-black text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-98 cursor-pointer"
+          >
+            <span>Ver plan de rotación</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
+  if (isInline) {
+    return content;
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 animate-in fade-in">
+      <div className="bg-[#F7F9F6] w-full max-w-md max-h-[92vh] overflow-y-auto rounded-3xl p-5 shadow-2xl border border-[#E5ECE2] text-zinc-900 relative">
+        {content}
       </div>
     </div>
   );

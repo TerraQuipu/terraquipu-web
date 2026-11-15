@@ -696,7 +696,7 @@ export default function KipuFullScreenWizard({
   return createPortal(
     <div
       ref={scrollContainerRef}
-      className="fixed inset-0 z-50 bg-[#0A1A0F] text-slate-100 flex flex-col justify-between overflow-y-auto animate-in fade-in duration-200 selection:bg-emerald-500 selection:text-white"
+      className="fixed inset-0 z-50 bg-white text-slate-900 flex flex-col justify-between overflow-y-auto animate-in fade-in duration-200 selection:bg-sky-500 selection:text-white"
     >
       <WizardDialogHeader
         step={step}

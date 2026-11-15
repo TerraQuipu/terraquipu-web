@@ -17,6 +17,7 @@ interface ParcelMapProps {
   cropName?: string;
   onLocateGPS?: () => void;
   onUpdateArea?: (newAreaHa: number) => void;
+  isEditorialView?: boolean;
 }
 
 export default function ParcelMap({
@@ -30,6 +31,7 @@ export default function ParcelMap({
   cropName = 'Papa Nativa',
   onLocateGPS,
   onUpdateArea,
+  isEditorialView = false,
 }: ParcelMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -443,6 +445,81 @@ export default function ParcelMap({
       onUpdateArea(computedAreaHa);
     }
   };
+
+  // Map Zoom Helpers for Editorial View
+  const handleZoomIn = () => {
+    playBubblePop();
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.zoomIn();
+    }
+  };
+
+  const handleZoomOut = () => {
+    playBubblePop();
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.zoomOut();
+    }
+  };
+
+  if (isEditorialView) {
+    return (
+      <div className="relative w-full h-full min-h-[300px]">
+        <div ref={mapContainerRef} className="w-full h-full z-0" />
+
+        {/* Zoom Controls Overlay (Matching frame_003.jpg) */}
+        <div className="absolute top-12 right-3 z-20 flex flex-col bg-[#132A1C]/85 backdrop-blur-md rounded-xl border border-white/15 overflow-hidden shadow-md">
+          <button
+            type="button"
+            onClick={handleZoomIn}
+            className="w-8 h-8 flex items-center justify-center text-white hover:text-[#A3E635] border-b border-white/10 active:bg-white/10 cursor-pointer transition font-black text-base"
+            title="Acercar mapa"
+          >
+            +
+          </button>
+          <button
+            type="button"
+            onClick={handleZoomOut}
+            className="w-8 h-8 flex items-center justify-center text-white hover:text-[#A3E635] active:bg-white/10 cursor-pointer transition font-black text-base"
+            title="Alejar mapa"
+          >
+            −
+          </button>
+        </div>
+
+        {/* QGIS Drawing Controls if user started drawing */}
+        {isDrawing && (
+          <div className="absolute top-3 inset-x-3 z-30 pointer-events-auto p-2.5 rounded-2xl bg-[#132A1C]/90 border border-emerald-500/60 shadow-2xl backdrop-blur-md flex items-center justify-between text-xs animate-in fade-in">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-lime-400 animate-pulse" />
+              <span className="text-white font-bold">
+                Vértices: <strong className="text-lime-300">{drawPoints.length}</strong>
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              {drawPoints.length >= 3 && (
+                <button
+                  type="button"
+                  onClick={finishDrawingMode}
+                  className="px-3 py-1 rounded-xl bg-lime-400 hover:bg-lime-300 text-slate-950 font-black text-xs shadow-lg border border-lime-500 flex items-center gap-1 transition active:scale-95 cursor-pointer"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  <span>Guardar ({calculateParcelAreaHa(drawPoints)} ha)</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={cancelDrawingMode}
+                className="p-1 rounded-xl bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-500/40 shadow-lg transition active:scale-95 cursor-pointer backdrop-blur-md"
+                title="Cancelar trazado"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">

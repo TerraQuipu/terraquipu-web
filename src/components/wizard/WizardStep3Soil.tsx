@@ -36,10 +36,10 @@ export default function WizardStep3Soil({
   return (
     <div className="space-y-3 animate-in fade-in flex-1">
       <div>
-        <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+        <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
           1. ¿Cómo se siente tu tierra al apretarla húmeda?
         </h2>
-        <p className="text-xs text-emerald-400/80 mt-0.5">
+        <p className="text-xs text-slate-500 mt-0.5">
           Prueba del puño para corregir SoilGrids y medir infiltración:
         </p>
       </div>
@@ -54,18 +54,18 @@ export default function WizardStep3Soil({
               onClick={() => onSelect(opt.id)}
               className={`w-full p-4 rounded-2xl text-left transition-all flex items-center justify-between cursor-pointer ${
                 isSelected
-                  ? 'border-2 border-lime-400 bg-emerald-950/90 text-white shadow-xl shadow-emerald-950/50 ring-2 ring-lime-500/30'
-                  : 'border border-emerald-500/25 bg-[#132A1C]/70 hover:bg-[#183925]/90 hover:border-emerald-500/50 text-slate-200'
+                  ? 'border-2 border-emerald-600 bg-emerald-50/50 text-slate-900 shadow-sm ring-1 ring-emerald-400/30'
+                  : 'border border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70 text-slate-700 shadow-2xs'
               }`}
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{opt.emoji}</span>
                 <div>
-                  <div className="text-xs font-bold text-white">{opt.label}</div>
-                  <div className="text-[11px] text-emerald-300/80 mt-0.5 leading-snug">{opt.desc}</div>
+                  <div className="text-xs font-bold text-slate-900">{opt.label}</div>
+                  <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">{opt.desc}</div>
                 </div>
               </div>
-              {isSelected && <CheckCircle2 className="w-5 h-5 text-lime-400 flex-shrink-0" />}
+              {isSelected && <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />}
             </button>
           );
         })}
