@@ -601,7 +601,3 @@ export default function AgroenvironmentalAssistant({
     </div>
   );
 }
-      </div>
-    </div>
-  );
-}
