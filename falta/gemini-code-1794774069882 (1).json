@@ -1,0 +1,12 @@
+{
+  "incertidumbre_total_porcentaje": 45,
+  "desglose_penalizaciones": {
+    "clima_base": 20,
+    "geometria_espacial": 0,
+    "choque_macro_micro": 0,
+    "satelite_ciego": 20,
+    "resolucion_edafica": 5,
+    "historial_desconocido": 0
+  },
+  "nivel_confianza_ux": "Media (🟡)"
+}
