@@ -628,6 +628,7 @@ export default function MapViewer({
 
           {/* Polygon Drawing Tool */}
           <button
+            id="tour-tool-draw-polygon"
             onClick={() => {
               if (drawMode === 'polygon') {
                 handleCancelDrawing();
@@ -650,6 +651,7 @@ export default function MapViewer({
 
           {/* Quick 1-Click Point Area Tool */}
           <button
+            id="tour-tool-click-point"
             onClick={() => {
               if (drawMode === 'point') {
                 handleCancelDrawing();
@@ -673,38 +675,40 @@ export default function MapViewer({
           <span className="h-4 w-px bg-zinc-200 mx-0.5" />
 
           {/* Preset Andenes Pills */}
-          <button
-            onClick={() => handleSelectPreset('yanacona')}
-            className={`px-2 py-1 rounded-md text-xs font-medium transition ${
-              !activeParcel.isCustom && activeParcel.id === 'P-01'
-                ? 'bg-zinc-900 text-white'
-                : 'text-zinc-600 hover:bg-zinc-100'
-            }`}
-          >
-            Yanacona
-          </button>
+          <div id="tour-presets" className="flex items-center gap-1">
+            <button
+              onClick={() => handleSelectPreset('yanacona')}
+              className={`px-2 py-1 rounded-md text-xs font-medium transition ${
+                !activeParcel.isCustom && activeParcel.id === 'P-01'
+                  ? 'bg-zinc-900 text-white'
+                  : 'text-zinc-600 hover:bg-zinc-100'
+              }`}
+            >
+              Yanacona
+            </button>
 
-          <button
-            onClick={() => handleSelectPreset('taucca')}
-            className={`px-2 py-1 rounded-md text-xs font-medium transition ${
-              !activeParcel.isCustom && activeParcel.id === 'P-02'
-                ? 'bg-zinc-900 text-white'
-                : 'text-zinc-600 hover:bg-zinc-100'
-            }`}
-          >
-            Taucca
-          </button>
+            <button
+              onClick={() => handleSelectPreset('taucca')}
+              className={`px-2 py-1 rounded-md text-xs font-medium transition ${
+                !activeParcel.isCustom && activeParcel.id === 'P-02'
+                  ? 'bg-zinc-900 text-white'
+                  : 'text-zinc-600 hover:bg-zinc-100'
+              }`}
+            >
+              Taucca
+            </button>
 
-          <button
-            onClick={() => handleSelectPreset('cuper')}
-            className={`px-2 py-1 rounded-md text-xs font-medium transition ${
-              !activeParcel.isCustom && activeParcel.id === 'P-03'
-                ? 'bg-zinc-900 text-white'
-                : 'text-zinc-600 hover:bg-zinc-100'
-            }`}
-          >
-            Cuper
-          </button>
+            <button
+              onClick={() => handleSelectPreset('cuper')}
+              className={`px-2 py-1 rounded-md text-xs font-medium transition ${
+                !activeParcel.isCustom && activeParcel.id === 'P-03'
+                  ? 'bg-zinc-900 text-white'
+                  : 'text-zinc-600 hover:bg-zinc-100'
+              }`}
+            >
+              Cuper
+            </button>
+          </div>
         </div>
 
         {/* NASA Telemetry Sensor Switcher */}
@@ -712,6 +716,7 @@ export default function MapViewer({
           <span className="text-[10px] font-bold text-zinc-500 uppercase px-1.5">Sensor:</span>
 
           <button
+            id="tour-sensor-smap"
             onClick={() => handleNasaLayerChange('smap')}
             className={`px-2 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1 ${
               activeNasaLayer === 'smap'
@@ -724,6 +729,7 @@ export default function MapViewer({
           </button>
 
           <button
+            id="tour-sensor-ndvi"
             onClick={() => handleNasaLayerChange('ndvi')}
             className={`px-2 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1 ${
               activeNasaLayer === 'ndvi'
@@ -736,6 +742,7 @@ export default function MapViewer({
           </button>
 
           <button
+            id="tour-sensor-srtm"
             onClick={() => handleNasaLayerChange('srtm')}
             className={`px-2 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1 ${
               activeNasaLayer === 'srtm'
@@ -748,6 +755,7 @@ export default function MapViewer({
           </button>
 
           <button
+            id="tour-sensor-groundtruth"
             onClick={() => {
               const nextState = !showGroundTruth;
               setShowGroundTruth(nextState);
@@ -811,7 +819,7 @@ export default function MapViewer({
       <div ref={mapContainerRef} className="w-full h-full relative" />
 
       {/* Selected Parcel Floating HUD Card (Bottom-Left Float) */}
-      <div className="absolute bottom-3 left-3 z-30 bg-white/95 backdrop-blur-md p-3.5 rounded-xl border border-zinc-200 shadow-md max-w-sm pointer-events-auto">
+      <div id="tour-parcel-hud" className="absolute bottom-3 left-3 z-30 bg-white/95 backdrop-blur-md p-3.5 rounded-xl border border-zinc-200 shadow-md max-w-sm pointer-events-auto">
         <div className="flex items-center justify-between gap-2 border-b border-zinc-100 pb-2 mb-2">
           <div>
             <div className="flex items-center gap-1.5">
@@ -875,7 +883,7 @@ export default function MapViewer({
           <strong className="text-zinc-950 font-mono text-[11px]">{mouseCoords}</strong>
         </div>
 
-        <div className="bg-white/95 backdrop-blur-md p-1 rounded-md border border-zinc-200 shadow-sm flex text-xs font-semibold">
+        <div id="tour-map-layers" className="bg-white/95 backdrop-blur-md p-1 rounded-md border border-zinc-200 shadow-sm flex text-xs font-semibold">
           <button
             onClick={() => handleBaseLayerChange('osm')}
             className={`px-2 py-1 rounded transition ${

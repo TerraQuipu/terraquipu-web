@@ -8,13 +8,15 @@ interface TopHeaderProps {
   onSync: () => void;
   isSyncing: boolean;
   dbStatus: 'connected' | 'syncing' | 'offline';
+  onStartTour?: () => void;
 }
 
-export default function TopHeader({ onSync, isSyncing, dbStatus }: TopHeaderProps) {
+export default function TopHeader({ onSync, isSyncing, dbStatus, onStartTour }: TopHeaderProps) {
   return (
     <header className="h-14 bg-zinc-950 text-white px-4 sm:px-6 flex items-center justify-between border-b border-zinc-800 flex-shrink-0 z-40 shadow-xs">
       {/* Brand & Location (clickable back to landing page) */}
       <Link
+        id="tour-brand"
         href="/"
         className="flex items-center gap-3 hover:opacity-90 transition group"
         title="Volver a la página principal de Terraquipu"
@@ -55,6 +57,17 @@ export default function TopHeader({ onSync, isSyncing, dbStatus }: TopHeaderProp
           />
           <span className="font-mono text-[11px] text-zinc-300">PostGIS + NASA SMAP L4</span>
         </div>
+
+        {/* Farmer Tour Guide Button */}
+        <button
+          id="tour-start-btn"
+          onClick={onStartTour}
+          className="px-2.5 py-1.5 rounded-md bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 hover:text-white font-semibold text-xs border border-emerald-700/80 shadow-xs flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+          title="Iniciar paseo explicativo de las herramientas del visor para agricultores"
+        >
+          <span className="text-sm">🌾</span>
+          <span className="hidden sm:inline">Paseo Guiado</span>
+        </button>
 
         {/* Sync Supabase Button */}
         <button
