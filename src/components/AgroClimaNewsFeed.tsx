@@ -34,94 +34,94 @@ export interface Article {
 export const SCIENTIFIC_ARTICLES: Article[] = [
   {
     id: 'enfen-2026',
-    category: 'ALERTA OFICIAL ENOS',
+    category: 'OFFICIAL ENSO ADVISORY',
     overlayBadge: '+1.4°',
     overlayBadgeColor: 'amber',
-    title: 'Vigilancia de El Niño & Previsión de Déficit Hídrico en la Sierra Sur',
+    title: 'ENSO Surveillance & Precipitation Deficit Forecast in the Southern Andes',
     source: 'ENFEN / SENAMHI',
-    date: 'Octubre 2026',
-    readTime: '3 min de lectura',
+    date: 'October 2026',
+    readTime: '3 min read',
     heroImage: '/images/andes_poster.jpg',
     summary:
-      'Modelos acoplados océano-atmósfera confirman condiciones de El Niño débil a moderado, con anomalía térmica de +1.4°C y reducción del 24% en precipitaciones estacionales en valles del Cusco.',
+      'Coupled ocean-atmosphere models project weak-to-moderate El Niño conditions, with a +1.4°C SST thermal anomaly and a 24% reduction in seasonal precipitation across Cusco highland valleys.',
     keyTakeaway:
-      'Se recomienda retrasar la siembra de variedades de papa exigentes en agua y priorizar zanjas de infiltración y mulch orgánico para retener la humedad del rocío.',
-    tags: ['ENFEN', 'SENAMHI', 'Sequía -24%', 'Cusco'],
+      'Delay sowing water-intensive potato cultivars; prioritize contour infiltration trenches and organic mulch to retain morning dew and soil moisture.',
+    tags: ['ENFEN', 'SENAMHI', 'Drought -24%', 'Cusco Highlands'],
     colorScheme: 'amber',
     officialDocUrl: 'https://enfen.gob.pe',
     fullBody: [
-      'El Comité Multisectorial Encargado del Estudio Nacional del Fenómeno El Niño (ENFEN) mantiene el estado de Alerta para la región andina centro-sur.',
-      'Los análisis de temperatura superficial del mar (TSM) en la región Niño 1+2 y Niño 3.4 evidencian un calentamiento anómalo persistente que inhibe el flujo de vientos alisios húmedos desde la cuenca amazónica hacia la cordillera oriental.',
-      'Impacto para el agricultor de Cusco: Las lluvias de inicio de campaña (octubre-noviembre) presentarán retrasos y lluvias dispersas de corta duración. Es mandatorio no quemar rastrojos de cosechas anteriores, ya que la materia orgánica sobre el suelo actúa como una esponja térmica reduciendo la evaporación diurna hasta en 40%.',
+      'The Multisectoral Committee for the National Study of the El Niño Phenomenon (ENFEN) maintains Alert status for the south-central Andean region.',
+      'Sea surface temperature (SST) anomalies across Niño 1+2 and Niño 3.4 regions confirm persistent warming, inhibiting easterly moisture trade winds from the Amazon basin into the eastern Andean cordillera.',
+      'Field management protocol for Andean farmers: Early-season rains (October-November) will exhibit delays and short-duration scattered convective showers. Crop residue burning is strictly prohibited, as organic surface mulch functions as a thermal cushion reducing daytime evapotranspiration by up to 40%.',
     ],
   },
   {
     id: 'inia-tarwi',
-    category: 'ENSAYO CIENTÍFICO INIA',
+    category: 'INIA AGRONOMIC TRIAL',
     overlayBadge: '+95 N',
     overlayBadgeColor: 'emerald',
-    title: 'Rotación con Tarwi / Chocho y Fijación Biológica de Nitrógeno en Altiplano',
-    source: 'INIA Estación Illpa',
-    date: 'Agosto 2026',
-    readTime: '4 min de lectura',
+    title: 'Tarwi / Andean Lupin Rotation and Biological Nitrogen Fixation in Highland Soils',
+    source: 'INIA Illpa Experimental Station',
+    date: 'August 2026',
+    readTime: '4 min read',
     heroImage: '/images/tarwi_chocho.jpg',
     summary:
-      'Ensayos multianuales en valles andinos demuestran que el Tarwi desarrolla raíces pivotantes profundas, sobreviviendo con 320 mm de lluvia mientras fija +95 kg de N₂ natural por hectárea.',
+      'Multi-year agronomic field trials demonstrate that Tarwi develops deep taproots, surviving with only 320 mm seasonal precipitation while fixing +95 kg biological N₂ per hectare.',
     keyTakeaway:
-      'Cultivo de contingencia número 1: si no hay agua para papa o maíz, sembrar Tarwi garantiza cosecha comercial y enriquece biológicamente el suelo.',
-    tags: ['INIA Cusco', 'Lupinus mutabilis', '+95 kg N₂/ha', 'Rusticidad'],
+      'Primary contingency crop: when irrigation is unavailable for potato or corn, sowing Tarwi secures commercial yield and biologically enriches the edaphic profile.',
+    tags: ['INIA Cusco', 'Lupinus mutabilis', '+95 kg N₂/ha', 'Drought Hardiness'],
     colorScheme: 'emerald',
     officialDocUrl: 'https://www.gob.pe/inia',
     fullBody: [
-      'Investigadores del Programa Nacional de Granos Andinos del INIA Cusco evaluaron la tolerancia a la sequía inducida en 12 ecotipos de Tarwi en parcelas demostrativas a 3,380 msnm.',
-      'Los resultados demostraron que gracias a sus raíces pivotantes de anclaje profundo, el cultivo accede a napas freáticas inaccesibles para los tubérculos comunes.',
-      'Simultáneamente, la simbiosis con bacterias del género Bradyrhizobium nodula intensamente incluso en suelos pedregosos, inyectando un promedio de 95 kg de nitrógeno puro por hectárea, ahorrando al agricultor el equivalente a 4 sacos de urea comercial por campaña.',
+      'Agronomic researchers from the National Andean Grains Program at INIA evaluated drought tolerance in 12 Tarwi ecotypes at 3,380 m a.s.l.',
+      'Results confirmed that deep-rooting architectures tap deep moisture reserves inaccessible to shallow-rooted tuber crops.',
+      'Concurrently, symbiosis with Bradyrhizobium strains nodules vigorously in stony highland soils, injecting ~95 kg pure bioavailable nitrogen per hectare—saving farmers the equivalent of 4 commercial urea sacks per campaign.',
     ],
   },
   {
     id: 'nasa-smap-calib',
-    category: 'REPORTE NASA SMAP / CIP',
+    category: 'NASA SMAP / CIP DOSSIER',
     overlayBadge: '38%',
     overlayBadgeColor: 'sky',
-    title: 'Balance Hídrico Superficial y Ventana Óptima de Aporque',
+    title: 'Root-Zone Hydric Balance and Optimal Hilling Window via L-Band Radiometry',
     source: 'NASA SMAP / CIP',
-    date: 'Julio 2026',
-    readTime: '2 min de lectura',
+    date: 'July 2026',
+    readTime: '2 min read',
     heroImage: '/images/nasa_orbit_poster.jpg',
     summary:
-      'El radiómetro satelital SMAP en banda L (1.4 GHz) mide la constante dieléctrica del suelo superficial. La validación en terreno con agricultores permite estimar la ventana de aporque óptima.',
+      'NASA SMAP L-band (1.4 GHz) microwave radiometer measures surface soil dielectric constant. Ground-truth validation with smallholders calibrates the optimal hilling window.',
     keyTakeaway:
-      'Tus reportes en la app validan los satélites de la NASA desde el espacio, asegurando alertas precisas de sequía para toda la cuenca.',
-    tags: ['NASA SMAP', 'Banda L', 'Validación Satélite', 'Capacidad de Campo'],
+      'In-situ farmer field reports calibrate NASA orbital radar from space, delivering reliable drought warning telemetry across the watershed.',
+    tags: ['NASA SMAP', 'L-Band Radiometer', 'Ground-Truth Calibration', 'Field Capacity'],
     colorScheme: 'sky',
     officialDocUrl: 'https://smap.jpl.nasa.gov',
     fullBody: [
-      'El satélite Soil Moisture Active Passive (SMAP) de la NASA orbita a 685 km de altura escaneando la humedad de la biósfera cada 2 a 3 días con un radiómetro de microondas en banda L.',
-      'En terrenos de montaña con pendientes pronunciadas (como los Andes peruanos), la orografía dispersa la señal. Al combinar la lectura del satélite con la validación táctil del agricultor (prueba del puño), el algoritmo de TerraQuipu calibra la capacidad de campo con exactitud milimétrica.',
-      'Esto permite emitir avisos tempranos de siembra hasta 14 días antes de que los cultivos muestren síntomas visibles de marchitez por estrés hídrico.',
+      'The NASA Soil Moisture Active Passive (SMAP) observatory orbits at 685 km altitude, mapping global soil moisture every 2 to 3 days via an L-band microwave radiometer.',
+      'In steep Andean terrain, rugged topography scatters orbital microwave backscatter. Cross-referencing orbital radiometry with in-situ tactile field tests (hand-squeeze test) enables TerraQuipu algorithms to calibrate field capacity with high fidelity.',
+      'This unlocks early warning alerts up to 14 days before crops exhibit irreversible vegetative wilting from moisture deficit.',
     ],
   },
   {
     id: 'cip-gorgojo-plaga',
-    category: 'SANIDAD VEGETAL CIP / FAO',
+    category: 'CIP / FAO PHYTOSANITARY BULLETIN',
     overlayBadge: '🪲 Bio',
     overlayBadgeColor: 'purple',
-    title: 'Control Agroecológico del Gorgojo Andino ante Inviernos Cálidos',
-    source: 'Centro Internacional de la Papa (CIP)',
-    date: 'Septiembre 2026',
-    readTime: '3 min de lectura',
+    title: 'Agroecological Disruption of the Andean Potato Weevil under Warm Winter Anomalies',
+    source: 'International Potato Center (CIP)',
+    date: 'September 2026',
+    readTime: '3 min read',
     heroImage: '/images/papa_nativa.jpg',
     summary:
-      'Temperaturas medias elevadas aceleran el ciclo del gorgojo andino (Premnotrypes spp.). La rotación con leguminosas y bio-repelentes de muña reducen la infestación en un 84% sin agrotóxicos.',
+      'Warmer mean temperatures accelerate the life cycle of the Andean potato weevil (Premnotrypes spp.). Legume crop rotation and muña repellent barriers reduce larval infestation by 84% without synthetic pesticides.',
     keyTakeaway:
-      'Rompe el ciclo del gorgojo: no siembres tubérculos sobre tubérculos. La rotación con haba o tarwi deja sin alimento a las larvas y sanea la parcela.',
-    tags: ['CIP', 'Gorgojo Andino', 'Bio-Control', 'Sanidad de Suelo'],
+      'Disrupt the weevil cycle: avoid planting tubers sequentially after tubers. Rotation with faba beans or Tarwi deprives larvae of host tubers and sanitizes the soil.',
+    tags: ['CIP', 'Premnotrypes spp.', 'Biocontrol', 'Soil Health'],
     colorScheme: 'purple',
     officialDocUrl: 'https://cipotato.org',
     fullBody: [
-      'Estudios entomológicos del CIP confirman que la falta de heladas nocturnas severas en invierno permite que las larvas del gorgojo andino sobrevivan en el suelo.',
-      'Al intercalar barreras perimetrales de muña silvestre (rica en pulegona) y sustituir la papa por leguminosas en la siguiente campaña, la tasa de supervivencia de las larvas cae al 16%.',
-      'Esta práctica ancestral recomendada por Kipu protege la economía del productor y evita el envenenamiento del suelo con pesticidas sintéticos.',
+      'Entomological trials conducted by CIP confirm that absence of severe nocturnal winter frosts enables overwintering larvae of Premnotrypes spp. to survive in topsoil.',
+      'Intercropping perimeter barriers of wild muña (Minthostachys mollis, rich in pulegone) and substituting potato with legumes in the subsequent campaign drops larval survival to 16%.',
+      'This indigenous agroecological practice recommended by Kipu shelters farm revenues and halts toxic soil contamination from synthetic organophosphates.',
     ],
   },
 ];
@@ -238,22 +238,22 @@ export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeed
               </span>
               <div>
                 <h3 className="font-extrabold text-base text-slate-950 tracking-tight leading-snug">
-                  Boletines Científicos &amp; Alertas ENOS
+                  Scientific Bulletins &amp; ENSO Advisories
                 </h3>
                 <p className="text-[11px] text-slate-500 font-medium leading-tight">
-                  Evidencia oficial respaldada por ENFEN, INIA, CIP, SENAMHI y NASA
+                  Official peer-reviewed telemetry supported by ENFEN, INIA, CIP, SENAMHI and NASA
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
               <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-900 border border-amber-300">
-                Con Fuentes
+                Verified Sources
               </span>
               <button
                 type="button"
                 onClick={handleStartClose}
                 className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm transition active:scale-95 cursor-pointer"
-                title="Cerrar boletines"
+                title="Close bulletins"
               >
                 ✕
               </button>
@@ -268,13 +268,13 @@ export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeed
               className="flex items-center gap-1 text-xs font-bold text-slate-700 hover:text-slate-950 bg-slate-100 px-3 py-1.5 rounded-xl transition cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Volver a Boletines</span>
+              <span>Back to Bulletins</span>
             </button>
             <button
               type="button"
               onClick={handleStartClose}
               className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm transition active:scale-95 cursor-pointer"
-              title="Cerrar"
+              title="Close"
             >
               ✕
             </button>
@@ -428,10 +428,10 @@ export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeed
 
                       <div className="mt-2 flex items-center justify-between text-xs pt-1 border-t border-slate-100">
                         <span className="text-[10px] font-medium text-slate-500 truncate max-w-[170px] sm:max-w-[210px]">
-                          Fuente: {article.source}
+                          Source: {article.source}
                         </span>
                         <span className="text-xs font-black text-emerald-800 flex items-center gap-0.5 shrink-0">
-                          <span>Leer</span>
+                          <span>Read</span>
                           <span className="text-[11px]">&gt;</span>
                         </span>
                       </div>
@@ -473,7 +473,7 @@ export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeed
 
               {/* Source & Date Meta */}
               <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium px-1">
-                <span>Fuente: {selectedArticle.source}</span>
+                <span>Source: {selectedArticle.source}</span>
                 <span>{selectedArticle.date}</span>
               </div>
 
@@ -486,7 +486,7 @@ export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeed
               <div className="p-3.5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 text-xs text-emerald-950 space-y-1">
                 <div className="flex items-center gap-1.5 font-extrabold text-emerald-900">
                   <Sparkles className="w-4 h-4 text-emerald-700" />
-                  <span>Recomendación Práctica para tu Chacra:</span>
+                  <span>Actionable Field Recommendation:</span>
                 </div>
                 <p className="leading-relaxed font-sans font-medium">
                   {selectedArticle.keyTakeaway}
@@ -523,7 +523,7 @@ export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeed
                     className="text-xs font-bold text-sky-700 hover:text-sky-900 flex items-center gap-1"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
-                    <span>Ver Portal Oficial</span>
+                    <span>Official Scientific Portal</span>
                   </a>
 
                   <button
@@ -531,7 +531,7 @@ export default function AgroClimaNewsFeed({ isOpen, onClose }: AgroClimaNewsFeed
                     onClick={handleBackToList}
                     className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs cursor-pointer active:scale-95 transition"
                   >
-                    Volver a Boletines
+                    Back to Bulletins
                   </button>
                 </div>
               </div>

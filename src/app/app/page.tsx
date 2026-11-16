@@ -65,7 +65,7 @@ export default function MobileApp() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [hardwareId, setHardwareId] = useState('TQ-HW-C249');
-  const [appLang, setAppLang] = useState<SupportedLanguage>('es');
+  const [appLang, setAppLang] = useState<SupportedLanguage>('en');
 
   useEffect(() => {
     setAppLang(getStoredLanguage() as SupportedLanguage);

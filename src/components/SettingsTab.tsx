@@ -110,7 +110,7 @@ export default function SettingsTab({
 
   const kipuIntroText = language === 'qu'
     ? `¡Chajra allichasqa! Kay dispositivoqa ${profile.distrito} (${profile.altitude} msnm) nisqawan watasqa. NASA SMAP radar yupaykunawan allpapa kawsayninwan tupasqa.`
-    : `¡Chacra calibrada! Dispositivo vinculado a ${profile.distrito} (${profile.altitude} msnm). Telemetría satelital NASA SMAP y parámetros edáficos sincronizados.`;
+    : `Field parcel calibrated! Device paired with ${profile.distrito} (${profile.altitude} m a.s.l.). NASA SMAP orbital telemetry and edaphic parameters synchronized.`;
 
   return (
     <div className="space-y-4 animate-in fade-in pb-16 pt-1">
@@ -131,7 +131,7 @@ export default function SettingsTab({
 
           <div className="flex items-center justify-between gap-1 mb-1.5">
             <span className="font-black text-xs text-emerald-400 uppercase tracking-wide flex items-center gap-1.5">
-              <span>{language === 'qu' ? 'KIPU ALLICHAYKUNA' : 'KIPU AJUSTES'}</span>
+              <span>{language === 'qu' ? 'KIPU ALLICHAYKUNA' : 'KIPU SETTINGS'}</span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
             </span>
             <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-300 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-md">
@@ -207,7 +207,7 @@ export default function SettingsTab({
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
             <Cpu className="w-4 h-4 text-emerald-400" />
-            <span>{language === 'qu' ? 'Dispositivo Yupay (Hardware ID)' : 'Identificador Físico de Dispositivo'}</span>
+            <span>{language === 'qu' ? 'Dispositivo Yupay (Hardware ID)' : 'Physical Device Identifier'}</span>
           </span>
           <span className="text-[11px] font-mono font-bold bg-emerald-950/80 text-emerald-300 px-2.5 py-0.5 rounded-lg border border-emerald-500/40">
             {hardwareId}
@@ -215,11 +215,11 @@ export default function SettingsTab({
         </div>
         <div className="text-[11px] text-slate-300 grid grid-cols-2 gap-2 pt-1 font-mono border-t border-emerald-500/20">
           <div>
-            <span className="text-emerald-400/80 block text-[10px]">{language === 'qu' ? 'Qhawana Pantalla:' : 'Pantalla:'}</span>
+            <span className="text-emerald-400/80 block text-[10px]">{language === 'qu' ? 'Qhawana Pantalla:' : 'Display:'}</span>
             <span>{typeof window !== 'undefined' ? `${window.screen.width}x${window.screen.height}` : 'Mobile'}</span>
           </div>
           <div>
-            <span className="text-emerald-400/80 block text-[10px]">{language === 'qu' ? 'Pacha Suyu:' : 'Zona Horaria:'}</span>
+            <span className="text-emerald-400/80 block text-[10px]">{language === 'qu' ? 'Pacha Suyu:' : 'Timezone:'}</span>
             <span>America/Lima</span>
           </div>
         </div>
@@ -231,11 +231,11 @@ export default function SettingsTab({
           <div className="flex items-center gap-2">
             <MapPin className="w-4 h-4 text-emerald-400" />
             <h4 className="font-black text-sm text-white">
-              {language === 'qu' ? 'Chajrapa Tupunkuna' : 'Parámetros de la Parcela'}
+              {language === 'qu' ? 'Chajrapa Tupunkuna' : 'Field Parcel Parameters'}
             </h4>
           </div>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-            {language === 'qu' ? 'Tupasqa' : 'Sincronizado'}
+            {language === 'qu' ? 'Tupasqa' : 'Synchronized'}
           </span>
         </div>
 
@@ -246,7 +246,7 @@ export default function SettingsTab({
           </div>
           <div>
             <span className="text-[11px] text-emerald-400/80 font-medium block">
-              {language === 'qu' ? 'Suyu / Ayllu' : 'Ubicación'}
+              {language === 'qu' ? 'Suyu / Ayllu' : 'Location'}
             </span>
             <span className="font-bold text-white block truncate">
               {profile.distrito}, {profile.provincia}
@@ -254,19 +254,19 @@ export default function SettingsTab({
           </div>
           <div>
             <span className="text-[11px] text-emerald-400/80 font-medium block">
-              {language === 'qu' ? 'Hanan Kay (Altitud)' : 'Altitud Oficial'}
+              {language === 'qu' ? 'Hanan Kay (Altitud)' : 'Elevation'}
             </span>
-            <span className="font-bold text-white block">{profile.altitude} msnm</span>
+            <span className="font-bold text-white block">{profile.altitude} m a.s.l.</span>
           </div>
           <div>
-            <span className="text-[11px] text-emerald-400/80 font-medium block">Coordenadas</span>
+            <span className="text-[11px] text-emerald-400/80 font-medium block">Coordinates</span>
             <span className="font-bold text-slate-200 block font-mono text-[11px]">
               {profile.lat.toFixed(3)}, {profile.lon.toFixed(3)}
             </span>
           </div>
           <div>
             <span className="text-[11px] text-emerald-400/80 font-medium block">
-              {language === 'qu' ? 'Chajrapa Hatun Kaynin' : 'Área de Parcela'}
+              {language === 'qu' ? 'Chajrapa Hatun Kaynin' : 'Parcel Area'}
             </span>
             <span className="font-bold text-lime-300 block font-mono">
               {area} ha ({topos} topos)
@@ -274,13 +274,13 @@ export default function SettingsTab({
           </div>
           <div>
             <span className="text-[11px] text-emerald-400/80 font-medium block">
-              {language === 'qu' ? 'Ñawpa Tarpusqa' : 'Cosecha Previa'}
+              {language === 'qu' ? 'Ñawpa Tarpusqa' : 'Previous Harvest'}
             </span>
             <span className="font-bold text-white block">{profile.previousCropName}</span>
           </div>
           <div className="col-span-2 pt-2 border-t border-emerald-500/20 flex items-center justify-between">
             <span className="text-[11px] text-emerald-400/80 font-medium">
-              {language === 'qu' ? 'Tarpuy Paqtay:' : 'Prioridad de Campaña:'}
+              {language === 'qu' ? 'Tarpuy Paqtay:' : 'Campaign Priority:'}
             </span>
             <span className="font-black text-slate-950 text-xs bg-lime-400 px-2.5 py-0.5 rounded-lg border border-lime-500">
               {profile.priorityName}
@@ -293,7 +293,7 @@ export default function SettingsTab({
       <div className="glass-panel p-4 space-y-3">
         <h4 className="font-black text-sm text-white flex items-center gap-2">
           <Sliders className="w-4 h-4 text-emerald-400" />
-          <span>{language === 'qu' ? 'Allichay Llamk\'anakuna' : 'Acciones de Calibración'}</span>
+          <span>{language === 'qu' ? 'Allichay Llamk\'anakuna' : 'Calibration Actions'}</span>
         </h4>
 
         {/* Ver Pantalla de Bienvenida */}
@@ -304,7 +304,7 @@ export default function SettingsTab({
             className="w-full py-2.5 px-4 rounded-2xl bg-[#132A1C]/90 hover:bg-[#183925] text-emerald-300 hover:text-white font-bold text-xs flex items-center justify-center gap-2 border border-emerald-500/30 transition cursor-pointer shadow-sm"
           >
             <span>🌱</span>
-            <span>{language === 'qu' ? 'Qallariy Qhawana Rikuy' : 'Ver Pantalla de Bienvenida'}</span>
+            <span>{language === 'qu' ? 'Qallariy Qhawana Rikuy' : 'View Welcome Screen'}</span>
           </button>
         )}
 
@@ -328,7 +328,7 @@ export default function SettingsTab({
           <Navigation className={`w-4 h-4 text-cyan-400 ${gpsTesting ? 'animate-spin' : ''}`} />
           <span>
             {gpsTesting
-              ? (language === 'qu' ? 'GPS Satélitewan tupuchkan...' : 'Comprobando Satélites GPS...')
+              ? (language === 'qu' ? 'GPS Satélitewan tupuchkan...' : 'Checking GPS Satellites...')
               : t.checkGps}
           </span>
         </button>
@@ -354,7 +354,7 @@ export default function SettingsTab({
       <div className="glass-panel p-4 space-y-2.5 text-xs">
         <h4 className="font-black text-sm text-white flex items-center gap-2">
           <Database className="w-4 h-4 text-emerald-400" />
-          <span>{language === 'qu' ? 'Llikawan Tupanachiy' : 'Conectividad de Base de Datos & APIs'}</span>
+          <span>{language === 'qu' ? 'Llikawan Tupanachiy' : 'Database & API Connectivity'}</span>
         </h4>
 
         <div className="space-y-2 pt-1">
@@ -369,20 +369,20 @@ export default function SettingsTab({
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#0A1A0F]/60 border border-emerald-500/20">
             <span className="font-bold text-slate-200 flex items-center gap-1.5">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>NASA SMAP L4 ({language === 'qu' ? 'Allpa Chiri-poqo' : 'Humedad Suelo'})</span>
+              <span>NASA SMAP L4 ({language === 'qu' ? 'Allpa Chiri-poqo' : 'Soil Moisture'})</span>
             </span>
             <span className="font-mono text-[10px] text-emerald-300 font-bold bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30">
-              {language === 'qu' ? 'KAWSACHKAN' : 'ACTIVO'}
+              {language === 'qu' ? 'KAWSACHKAN' : 'ACTIVE'}
             </span>
           </div>
 
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#0A1A0F]/60 border border-emerald-500/20">
             <span className="font-bold text-slate-200 flex items-center gap-1.5">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>ESRI World Imagery & QGIS OSM</span>
+              <span>ESRI World Imagery &amp; QGIS OSM</span>
             </span>
             <span className="font-mono text-[10px] text-emerald-300 font-bold bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30">
-              {language === 'qu' ? 'TUPASQA' : 'CONECTADO'}
+              {language === 'qu' ? 'TUPASQA' : 'CONNECTED'}
             </span>
           </div>
         </div>

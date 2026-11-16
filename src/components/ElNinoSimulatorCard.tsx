@@ -41,7 +41,7 @@ export default function ElNinoSimulatorCard({
     setTimeout(() => {
       playQuestionChime();
     }, 120);
-    onToast(nextVal ? '⚠️ Modo Sequía El Niño activado' : '☀️ Modo Año Normal activado');
+    onToast(nextVal ? '⚠️ ENSO Drought Mode active' : '☀️ Baseline Season Mode active');
   };
 
   return (
@@ -56,15 +56,15 @@ export default function ElNinoSimulatorCard({
               </span>
               <div>
                 <h3 className="font-extrabold text-base text-slate-950">
-                  Simulador El Niño / Sequía Andina
+                  ENSO Drought &amp; Highland Anomaly Simulator
                 </h3>
                 <span className="text-[11px] text-slate-500 font-medium">
-                  Modelado ENOS + Sensores NASA SMAP L4
+                  ENSO Modeling + NASA SMAP L4 Radiometer Telemetry
                 </span>
               </div>
             </div>
             <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-              Evalúa el estrés hídrico y la respuesta de tus parcelas ante un déficit severo de lluvias.
+              Evaluate root-zone hydric stress and parcel vulnerability under severe precipitation deficit.
             </p>
           </div>
 
@@ -80,12 +80,12 @@ export default function ElNinoSimulatorCard({
             {isElNino ? (
               <>
                 <Flame className="w-4 h-4 text-amber-200" />
-                <span className="contrast-bold-white">Sequía Activa</span>
+                <span className="contrast-bold-white">Drought Active</span>
               </>
             ) : (
               <>
                 <Sun className="w-4 h-4 text-amber-600" />
-                <span className="font-bold">Simular Sequía</span>
+                <span className="font-bold">Simulate Drought</span>
               </>
             )}
           </button>
@@ -104,7 +104,7 @@ export default function ElNinoSimulatorCard({
             <div className="flex items-center justify-between text-[11px] font-bold text-slate-600">
               <span className="flex items-center gap-1">
                 <CloudRain className="w-3.5 h-3.5 text-blue-600" />
-                <span>Precipitación</span>
+                <span>Precipitation</span>
               </span>
               <span className="text-[10px] font-mono font-bold text-slate-500">
                 {isElNino ? '-24%' : 'Normal'}
@@ -114,7 +114,7 @@ export default function ElNinoSimulatorCard({
               {isElNino ? '510 mm' : '680 mm'}
             </div>
             <div className="text-[10px] text-slate-500 mt-0.5">
-              {isElNino ? 'Déficit crítico -170 mm' : 'Lluvia estacional óptima'}
+              {isElNino ? 'Critical deficit -170 mm' : 'Optimal seasonal rainfall'}
             </div>
           </div>
 
@@ -129,7 +129,7 @@ export default function ElNinoSimulatorCard({
             <div className="flex items-center justify-between text-[11px] font-bold text-slate-600">
               <span className="flex items-center gap-1">
                 <Thermometer className="w-3.5 h-3.5 text-red-600" />
-                <span>Anomalía Térmica</span>
+                <span>Thermal Anomaly</span>
               </span>
               <span className="text-[10px] font-mono font-bold text-amber-800">
                 {isElNino ? '+1.8°C' : '±0.0°C'}
@@ -139,7 +139,7 @@ export default function ElNinoSimulatorCard({
               {isElNino ? '14.4 °C' : '12.6 °C'}
             </div>
             <div className="text-[10px] text-slate-500 mt-0.5">
-              {isElNino ? 'Bochorno diurno acelerado' : 'Promedio térmico valle'}
+              {isElNino ? 'Accelerated heat accumulation' : 'Valley thermal baseline'}
             </div>
           </div>
 
@@ -154,7 +154,7 @@ export default function ElNinoSimulatorCard({
             <div className="flex items-center justify-between text-[11px] font-bold text-slate-600">
               <span className="flex items-center gap-1">
                 <Gauge className="w-3.5 h-3.5 text-cyan-600" />
-                <span>Humedad SMAP</span>
+                <span>SMAP Moisture</span>
               </span>
               <span className="text-[10px] font-mono font-bold text-blue-700">NASA L4</span>
             </div>
@@ -162,7 +162,7 @@ export default function ElNinoSimulatorCard({
               {isElNino ? '11.8%' : '35.4%'}
             </div>
             <div className="text-[10px] text-slate-500 mt-0.5">
-              {isElNino ? 'Suelo seco en tuberización' : 'Humedad edáfica estable'}
+              {isElNino ? 'Desiccated root zone during bulking' : 'Stable edaphic moisture profile'}
             </div>
           </div>
 
@@ -171,7 +171,7 @@ export default function ElNinoSimulatorCard({
             <div className="flex items-center justify-between text-[11px] font-bold text-slate-600">
               <span className="flex items-center gap-1">
                 <Zap className="w-3.5 h-3.5 text-amber-500" />
-                <span>Radiación Solar</span>
+                <span>Solar Radiation</span>
               </span>
               <span className="text-[10px] font-mono font-bold text-slate-500">MJ/m²</span>
             </div>
@@ -179,7 +179,7 @@ export default function ElNinoSimulatorCard({
               {isElNino ? '24.8' : '19.2'}
             </div>
             <div className="text-[10px] text-slate-500 mt-0.5">
-              {isElNino ? 'Alta evapotranspiración' : 'Índice solar moderado'}
+              {isElNino ? 'High evapotranspirative loss' : 'Moderate solar irradiance'}
             </div>
           </div>
         </div>
@@ -189,25 +189,25 @@ export default function ElNinoSimulatorCard({
           <div className="p-3.5 rounded-xl bg-amber-50 border-2 border-amber-300 text-xs space-y-2">
             <div className="flex items-center gap-2 font-bold text-amber-950">
               <ShieldAlert className="w-4 h-4 text-amber-700" />
-              <span>Estrategia de Salvación Agronómica INIA:</span>
+              <span>INIA Agronomic Contingency Strategy:</span>
             </div>
             <p className="text-slate-800 leading-relaxed text-[11px]">
-              La sequía reduce el rendimiento de la papa nativa hasta en <strong>60%</strong> si no cuenta con riego por aspersión.
-              La recomendación determinista inmediata es sembrar <strong>Tarwi (Lupinus mutabilis)</strong> o <strong>Quinua Pasankalla</strong>, cuyas raíces pivotantes extraen humedad hasta 1.8 metros de profundidad con tan solo 320 mm de lluvia.
+              Severe drought reduces Native Potato tuber yield by up to <strong>60%</strong> in rainfed systems lacking micro-sprinklers.
+              The immediate deterministic strategy is planting <strong>Tarwi (Lupinus mutabilis)</strong> or <strong>Pasankalla Quinoa</strong>, whose deep taproots extract subsoil moisture down to 1.8 m with only 320 mm seasonal rain.
             </p>
             <div className="grid grid-cols-2 gap-2 pt-1 text-[10px]">
               <div className="p-2 bg-white rounded-lg border border-amber-200 flex items-center gap-2">
                 <Sprout className="w-4 h-4 text-emerald-700 flex-shrink-0" />
                 <div>
                   <strong className="block text-slate-900">Tarwi Altiplano</strong>
-                  <span className="text-slate-500">Fija +95 kg N₂ / 350 mm</span>
+                  <span className="text-slate-500">Fixes +95 kg N₂ / 350 mm</span>
                 </div>
               </div>
               <div className="p-2 bg-white rounded-lg border border-amber-200 flex items-center gap-2">
                 <Waves className="w-4 h-4 text-blue-700 flex-shrink-0" />
                 <div>
-                  <strong className="block text-slate-900">Quinua Negra</strong>
-                  <span className="text-slate-500">Resistente a salinidad</span>
+                  <strong className="block text-slate-900">Black Quinoa</strong>
+                  <span className="text-slate-500">High salinity &amp; drought resilience</span>
                 </div>
               </div>
             </div>
@@ -215,7 +215,7 @@ export default function ElNinoSimulatorCard({
         ) : (
           <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-xs flex items-center gap-2 text-emerald-950">
             <CheckCircle2 className="w-4 h-4 text-emerald-700 flex-shrink-0" />
-            <span>Condiciones normales: Rotación balanceada de Papa Nativa con leguminosas andinas.</span>
+            <span>Optimal baseline conditions: Balanced crop rotation of Native Potato with symbiotic Andean legumes.</span>
           </div>
         )}
       </div>
@@ -226,11 +226,11 @@ export default function ElNinoSimulatorCard({
           <div className="flex items-center gap-2">
             <Bug className="w-4 h-4 text-red-600" />
             <h3 className="font-bold text-sm text-slate-950">
-              Semáforo de Plagas Andinas
+              Andean Phytosanitary Pest Hazard Index
             </h3>
           </div>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 uppercase">
-            Modelado INIA Cusco
+            INIA Cusco Agroecology Models
           </span>
         </div>
 
@@ -240,22 +240,22 @@ export default function ElNinoSimulatorCard({
             <div className="flex items-center gap-2 font-bold text-red-950">
               <span className="p-1 bg-red-100 rounded text-red-700">🪲</span>
               <div>
-                <span className="text-sm font-bold block leading-tight">Gorgojo de los Andes</span>
+                <span className="text-sm font-bold block leading-tight">Andean Potato Weevil</span>
                 <span className="text-[10px] italic text-red-700 font-normal">(Premnotrypes vorax / suturicallus)</span>
               </div>
             </div>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-700 text-white">
-              {isElNino ? 'RIESGO CRÍTICO' : 'RIESGO ALTO'}
+              {isElNino ? 'CRITICAL HAZARD' : 'HIGH HAZARD'}
             </span>
           </div>
           <p className="text-red-950 text-[11px] leading-relaxed">
             {isElNino
-              ? 'Con suelo seco y temperaturas mayores a 15°C, las larvas eclosionan 20 días antes. Sembrar papa continua causará pérdidas de hasta 75% en tubérculos.'
-              : 'El gorgojo sobrevive en rastrojos de campañas pasadas. Es mandatorio cortar el ciclo sembrando leguminosas.'}
+              ? 'In warm desiccated soils (>15°C), weevil larvae hatch 20 days earlier. Monoculture potato planting precipitates up to 75% tuber loss.'
+              : 'The weevil overwinters in crop residue from previous seasons. Rotating with non-host legumes is mandatory to break the reproductive cycle.'}
           </p>
           <div className="p-2 bg-white/90 rounded-lg border border-red-200 flex items-center gap-2 text-[11px] text-emerald-900 font-medium">
             <ShieldCheck className="w-4 h-4 text-emerald-700 flex-shrink-0" />
-            <span>Solución: Rotar con Tarwi (reduce 84% de adultos) + zanjas trampa con ceniza y muña.</span>
+            <span>Prescription: Rotate with Tarwi (cuts adult population by 84%) + perimeter trap furrows with wood ash and muña.</span>
           </div>
         </div>
 
@@ -265,20 +265,20 @@ export default function ElNinoSimulatorCard({
             <div className="flex items-center gap-2 font-bold text-amber-950">
               <span className="p-1 bg-amber-100 rounded text-amber-800">🍂</span>
               <div>
-                <span className="text-sm font-bold block leading-tight">Rancha / Tizón Tardío</span>
+                <span className="text-sm font-bold block leading-tight">Late Blight / Rancha</span>
                 <span className="text-[10px] italic text-amber-800 font-normal">(Phytophthora infestans)</span>
               </div>
             </div>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-600 text-white">
-              {isElNino ? 'RIESGO MODERADO' : 'RIESGO ELEVADO'}
+              {isElNino ? 'MODERATE HAZARD' : 'ELEVATED HAZARD'}
             </span>
           </div>
           <p className="text-amber-950 text-[11px] leading-relaxed">
-            Hongo agresivo detonado por humedad &gt;85% y rocío prolongado. En El Niño, las lloviznas cortas con bochorno provocan focos repentinos en quebradas.
+            Aggressive oomycete triggered by RH &gt;85% and prolonged dew. In ENSO events, brief convective showers with daytime heat spark localized microclimatic outbreaks in ravines.
           </p>
           <div className="p-2 bg-white/90 rounded-lg border border-amber-200 flex items-center gap-2 text-[11px] text-slate-800 font-medium">
             <ShieldCheck className="w-4 h-4 text-emerald-700 flex-shrink-0" />
-            <span>Manejo: Aporque alto + variedades nativas tolerantes (Amarilis, Huayro, Peruanita).</span>
+            <span>Management: High contour hilling + resilient native cultivars (Amarilis, Huayro, Peruanita).</span>
           </div>
         </div>
       </div>

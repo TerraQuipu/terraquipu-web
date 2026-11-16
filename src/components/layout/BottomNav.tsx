@@ -23,7 +23,7 @@ export default function BottomNav({
   onOpenQgisDrawer,
   lang: propLang,
 }: BottomNavProps) {
-  const [currentLang, setCurrentLang] = useState<SupportedLanguage>(propLang || 'es');
+  const [currentLang, setCurrentLang] = useState<SupportedLanguage>(propLang || 'en');
 
   useEffect(() => {
     if (propLang) {

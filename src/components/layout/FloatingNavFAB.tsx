@@ -52,44 +52,44 @@ export default function FloatingNavFAB({
   const navItems = [
     {
       id: 'inicio' as AppScreen,
-      label: 'Inicio',
-      description: 'Reporte de campo y clima',
+      label: 'Dashboard',
+      description: 'In-situ telemetry & agroclimate',
       icon: <Home className="w-5 h-5" />,
       color: 'text-emerald-700 bg-emerald-50 border-emerald-200',
     },
     {
       id: 'parcelas' as AppScreen,
-      label: 'Mis Parcelas',
-      description: 'Visor satelital y polígono QGIS',
+      label: 'Field Parcels',
+      description: 'Satellite visor & GeoJSON perimeter',
       icon: <Map className="w-5 h-5" />,
       color: 'text-emerald-700 bg-emerald-50 border-emerald-200',
     },
     {
       id: 'diagnostico' as AppScreen,
-      label: 'Diagnóstico de Suelo',
-      description: 'Prueba rápida de humedad y textura',
+      label: 'Soil Diagnostic',
+      description: 'In-situ moisture & texture calibration',
       icon: <Plus className="w-5 h-5 text-white" />,
       color: 'text-white bg-[#7BB63E] border-lime-500 shadow-sm',
       isPrimary: true,
     },
     {
       id: 'rotacion' as AppScreen,
-      label: 'Cronograma y ahorro',
-      description: 'Plan de 3 campañas y nitrógeno',
+      label: 'Crop Rotation & Savings',
+      description: 'Tri-seasonal BNF & nitrogen balance',
       icon: <RefreshCw className="w-5 h-5" />,
       color: 'text-emerald-700 bg-emerald-50 border-emerald-200',
     },
     {
       id: 'copiloto' as AppScreen,
-      label: 'Copiloto Andino',
-      description: 'Diálogo con Astro y Kipu',
+      label: 'Andean Copilot',
+      description: 'Agronomic dialogue with Astro & Kipu',
       icon: <Sparkles className="w-5 h-5" />,
       color: 'text-amber-700 bg-amber-50 border-amber-200',
     },
     {
       id: 'ajustes' as AppScreen,
-      label: 'Ajustes y Hardware',
-      description: 'Telemetría TQ-HW-C249 y GPS',
+      label: 'Hardware & Settings',
+      description: 'TQ-HW-C249 telemetry & GNSS positioning',
       icon: <SlidersHorizontal className="w-5 h-5" />,
       color: 'text-zinc-700 bg-zinc-100 border-zinc-200',
     },
@@ -112,7 +112,7 @@ export default function FloatingNavFAB({
         <div className="absolute bottom-16 right-0 mb-2 w-72 bg-white/95 backdrop-blur-md rounded-3xl p-3 shadow-2xl border border-[#E5ECE2] animate-in fade-in zoom-in-95 duration-150">
           <div className="px-3 py-2 border-b border-[#E5ECE2] flex items-center justify-between">
             <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/70">
-              Navegación TerraQuipu
+              TerraQuipu Navigation
             </span>
             <span className="text-[9px] font-bold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-full">
               Andes 2026
@@ -170,8 +170,8 @@ export default function FloatingNavFAB({
             ? 'bg-[#132A1C] text-white border-emerald-600 rotate-90'
             : 'bg-[#1B3B22] hover:bg-[#132A1C] text-white border-emerald-500/40'
         }`}
-        title={isOpen ? 'Cerrar menú' : 'Abrir navegación rápida'}
-        aria-label="Abrir navegación rápida"
+        title={isOpen ? 'Close menu' : 'Open quick navigation'}
+        aria-label="Open quick navigation"
       >
         {isOpen ? (
           <X className="w-6 h-6 text-white" />

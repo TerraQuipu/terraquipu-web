@@ -57,28 +57,28 @@ export default function WeatherForecastCard({
   const fallbackDays: DailyForecastItem[] = [
     {
       date: new Date().toISOString().split('T')[0],
-      dayLabel: 'Hoy',
-      dayOfWeek: 'HOY',
+      dayLabel: 'Today',
+      dayOfWeek: 'TODAY',
       tempMax: Math.round(tempMaxBase),
       tempMin: Math.round(tempMinBase),
       rainMm: isElNino ? 0.0 : clima?.precipitacion_mm || 1.8,
       frostAlert: tempMinBase <= 2.0,
       et0Mm: 3.5,
       advice: tempMinBase <= 2.0
-        ? '⚠️ Noche fría: proteger almácigos con paja seca.'
-        : 'Día propicio para labores culturales y aporque.',
+        ? '⚠️ Cold night: protect seedbeds and young shoots with dry straw mulch.'
+        : 'Favorable conditions for cultural practices and contour hilling.',
       emoji: isElNino ? '☀️' : '⛅',
     },
     {
       date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
-      dayLabel: 'Mañana',
-      dayOfWeek: 'MAÑ',
+      dayLabel: 'Tomorrow',
+      dayOfWeek: 'TOM',
       tempMax: Math.round(tempMaxBase - 1),
       tempMin: Math.round(tempMinBase + 1),
       rainMm: isElNino ? 0.0 : 3.5,
       frostAlert: false,
       et0Mm: 3.8,
-      advice: isElNino ? 'Insolación alta: conservar humedad con mulching.' : 'Llovizna ligera: humedad ambiental benéfica.',
+      advice: isElNino ? 'High insolation: conserve topsoil moisture with organic mulch.' : 'Light rain shower: beneficial atmospheric moisture for green canopies.',
       emoji: isElNino ? '☀️' : '🌧️',
     },
   ];
@@ -93,7 +93,7 @@ export default function WeatherForecastCard({
           <span className="p-2 rounded-2xl bg-sky-100 text-sky-800 text-xl shadow-2xs">🛰️</span>
           <div>
             <h3 className="font-extrabold text-base text-slate-950">
-              Pronóstico Agroclimático Satelital
+              Orbital Agroclimatic Weather Forecast
             </h3>
             <p className="text-[11px] text-slate-500">
               {cuencaName} • {dataSource}
@@ -102,7 +102,7 @@ export default function WeatherForecastCard({
         </div>
         <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center gap-1">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
-          100% En Vivo
+          100% Live Feed
         </span>
       </div>
 
@@ -110,7 +110,7 @@ export default function WeatherForecastCard({
         <div className="p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 flex items-start gap-2.5 text-xs text-amber-950">
           <span className="text-xl shrink-0 mt-0.5">⚠️</span>
           <div>
-            <span className="font-extrabold block">Alerta de Helada Agronómica para {activeDay.dayLabel}:</span>
+            <span className="font-extrabold block">Agronomic Frost Hazard Alert for {activeDay.dayLabel}:</span>
             <p className="mt-0.5 leading-snug">{activeDay.advice}</p>
           </div>
         </div>
@@ -160,9 +160,9 @@ export default function WeatherForecastCard({
         <Sparkles className="w-4 h-4 text-sky-700 flex-shrink-0 mt-0.5" />
         <div className="text-slate-800 flex-1">
           <div className="flex justify-between items-center">
-            <span className="font-extrabold text-sky-950 block">Recomendación para {activeDay.dayLabel}:</span>
+            <span className="font-extrabold text-sky-950 block">Agronomic Guidance for {activeDay.dayLabel}:</span>
             <span className="text-[10px] font-mono text-sky-700 bg-sky-100 px-2 py-0.5 rounded-full">
-              ET₀: {activeDay.et0Mm} mm/día
+              ET₀: {activeDay.et0Mm} mm/day
             </span>
           </div>
           <p className="mt-1 leading-relaxed font-sans font-medium">{activeDay.advice}</p>

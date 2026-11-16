@@ -93,7 +93,7 @@ export default function ClimaCarouselBanner({
           <div className="w-28 sm:w-32 h-36 sm:h-40 flex-shrink-0 relative flex items-center justify-center">
             <img
               src="/images/kipu_llama.png"
-              alt="Kipu Clima"
+              alt="Kipu Agrometeorologist"
               className="w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.6)]"
             />
           </div>
@@ -103,7 +103,7 @@ export default function ClimaCarouselBanner({
 
             <div className="flex items-center justify-between gap-1 mb-1">
               <span className="font-extrabold text-xs text-emerald-400 uppercase tracking-wide flex items-center gap-1.5">
-                <span>KIPU METEORÓLOGO</span>
+                <span>KIPU • AGROMETEOROLOGIST</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
               </span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/30">
@@ -116,8 +116,8 @@ export default function ClimaCarouselBanner({
                 key={`clima-${profile.distrito}-${temp}-${isElNino}`}
                 text={
                   isElNino
-                    ? `¡Allillanchu! Feedback actual: Se detecta déficit hídrico por veranillo en ${profile.distrito}. Recomendación: Aplica mulch protector en raíz y activa riego de auxilio nocturno.`
-                    : `¡Allillanchu! Feedback actual: Condiciones térmicas y edáficas favorables en ${profile.distrito}. Recomendación: Ventana óptima para labores de aporque y fertilización orgánica.`
+                    ? `Allillanchu! Live advisory: Mid-season hydric deficit detected in ${profile.distrito}. Recommendation: Apply protective root mulch and activate nocturnal supplemental irrigation.`
+                    : `Allillanchu! Live advisory: Favorable thermal and edaphic conditions in ${profile.distrito}. Recommendation: Optimal window for contour hilling and organic soil amendment.`
                 }
                 speed={16}
               />
@@ -131,7 +131,7 @@ export default function ClimaCarouselBanner({
         <div className="relative rounded-3xl overflow-hidden border-2 border-sky-600 border-b-4 border-b-sky-800 shadow-md animate-in fade-in duration-300 min-h-[160px] flex flex-col justify-end p-4 text-white">
           <img
             src="/images/andes_poster.jpg"
-            alt="Helada en los Andes"
+            alt="Frost in the Andes"
             className="absolute inset-0 w-full h-full object-cover filter brightness-[0.4]"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent" />
@@ -139,7 +139,7 @@ export default function ClimaCarouselBanner({
           <div className="relative z-10 space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-sky-600 text-white tracking-wider flex items-center gap-1 shadow-xs">
-                <span>❄️ Alerta de Helada Agronómica</span>
+                <span>❄️ Agronomic Frost Hazard Alert</span>
               </span>
               <span className="text-[11px] font-mono font-bold text-sky-200">
                 03:00 - 06:00 AM
@@ -147,16 +147,16 @@ export default function ClimaCarouselBanner({
             </div>
 
             <h3 className="font-black text-base sm:text-lg text-white tracking-tight leading-tight contrast-bold-white drop-shadow-sm">
-              Descenso Térmico Nocturno en {profile.distrito}
+              Nocturnal Radiative Cooling in {profile.distrito}
             </h3>
 
             <p className="text-xs text-sky-100 font-sans leading-snug drop-shadow-xs line-clamp-2">
-              Cielo despejado favorece helada por irradiación. Aplica riego por aspersión nocturno o quemas controladas de rastrojo húmedo en cabeceras de andén.
+              Clear skies accelerate radiative heat loss. Apply nocturnal micro-sprinkler irrigation or controlled damp mulch smudge barriers at upper terrace borders.
             </p>
 
             <div className="pt-1 flex items-center justify-between text-xs">
               <span className="text-[10px] font-bold text-amber-300">
-                🛡️ Defensa: Riego de auxilio + ceniza
+                🛡️ Defense: Emergency irrigation + wood ash
               </span>
               {onOpenForecast && (
                 <button
@@ -167,7 +167,7 @@ export default function ClimaCarouselBanner({
                   }}
                   className="text-[10px] font-extrabold text-sky-200 hover:text-white bg-white/20 hover:bg-white/30 px-2.5 py-0.5 rounded-lg flex items-center gap-1 transition cursor-pointer"
                 >
-                  <span>Ver Pronóstico →</span>
+                  <span>View Forecast →</span>
                 </button>
               )}
             </div>
@@ -180,7 +180,7 @@ export default function ClimaCarouselBanner({
         <div className="relative rounded-3xl overflow-hidden border-2 border-amber-600 border-b-4 border-b-amber-800 shadow-md animate-in fade-in duration-300 min-h-[160px] flex flex-col justify-end p-4 text-white">
           <img
             src="/images/nasa_satellite.jpg"
-            alt="Vigilancia El Niño"
+            alt="ENSO Surveillance"
             className="absolute inset-0 w-full h-full object-cover filter brightness-[0.38]"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-amber-950 via-amber-950/70 to-transparent" />
@@ -188,27 +188,27 @@ export default function ClimaCarouselBanner({
           <div className="relative z-10 space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-amber-600 text-white tracking-wider flex items-center gap-1 shadow-xs">
-                <span>⚠️ Vigilancia ENOS • ENFEN &amp; NOAA</span>
+                <span>⚠️ ENSO Surveillance • ENFEN &amp; NOAA</span>
               </span>
               <span className="text-[11px] font-bold text-amber-200">
-                Sierra Sur
+                Southern Andes
               </span>
             </div>
 
             <h3 className="font-black text-base sm:text-lg text-white tracking-tight leading-tight contrast-bold-white drop-shadow-sm">
-              Alerta de Compresión de Lluvias
+              Compressed Rainfall Anomaly Alert
             </h3>
 
             <p className="text-xs text-amber-100 font-sans leading-snug drop-shadow-xs line-clamp-2">
-              Modelos oceanográficos prevén veranillos prolongados. Conserva la humedad aplicando mulch orgánico y prepara zanjas de infiltración en ladera.
+              Oceanographic models forecast prolonged mid-season dry spells. Retain moisture with organic residue mulch and prepare contour infiltration trenches.
             </p>
 
             <div className="pt-1 flex items-center justify-between text-xs">
               <span className="text-[10px] font-bold text-amber-300">
-                🌱 Cultivos rústicos: Tarwi, Quinua, Cebada
+                🌱 Hardy crops: Tarwi, Quinoa, Barley
               </span>
               <span className="text-[10px] font-bold text-emerald-200">
-                Resistencia Hídrica
+                Hydric Hardiness
               </span>
             </div>
           </div>
@@ -220,7 +220,7 @@ export default function ClimaCarouselBanner({
         <div className="relative rounded-3xl overflow-hidden border-2 border-purple-600 border-b-4 border-b-purple-800 shadow-md animate-in fade-in duration-300 min-h-[160px] flex flex-col justify-end p-4 text-white">
           <img
             src="/images/cultivos_poster.jpg"
-            alt="Calendario Lunar Andino"
+            alt="Andean Lunar Calendar"
             className="absolute inset-0 w-full h-full object-cover filter brightness-[0.4]"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-purple-950 via-purple-950/70 to-transparent" />
@@ -229,27 +229,27 @@ export default function ClimaCarouselBanner({
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-purple-600 text-white tracking-wider flex items-center gap-1 shadow-xs">
                 <Moon className="w-3 h-3 text-amber-200" />
-                <span>Killa • Sabiduría Lunar</span>
+                <span>Killa • Lunar Phenology Wisdom</span>
               </span>
               <span className="text-[11px] font-bold text-purple-200">
-                Cuarto Creciente
+                Waxing Crescent
               </span>
             </div>
 
             <h3 className="font-black text-base sm:text-lg text-white tracking-tight leading-tight contrast-bold-white drop-shadow-sm">
-              Fase Óptima para Tubérculos &amp; Biol Foliar
+              Optimal Phase for Root Aeration &amp; Foliar Bio-Fertilization
             </h3>
 
             <p className="text-xs text-purple-100 font-sans leading-snug drop-shadow-xs line-clamp-2">
-              En cuarto creciente la savia asciende con fuerza. Es el momento propicio para fertilización foliar biológica y aporque de papas nativas.
+              During waxing crescent sap ascends actively. Favorable timing for biological foliar fertilization and high hilling of Native Potato tubers.
             </p>
 
             <div className="pt-1 flex items-center justify-between text-xs">
               <span className="text-[10px] font-bold text-purple-200">
-                🧪 Biol enriquecido + ceniza de fogón
+                🧪 Enriched bio-fertilizer + hearth ash
               </span>
               <span className="text-[10px] font-bold text-amber-300">
-                Cero Químicos
+                Zero Agrochemicals
               </span>
             </div>
           </div>
@@ -262,7 +262,7 @@ export default function ClimaCarouselBanner({
           type="button"
           onClick={handlePrev}
           className="p-1 rounded-full bg-slate-200/80 hover:bg-slate-300 text-slate-700 transition active:scale-95 cursor-pointer"
-          title="Banner anterior"
+          title="Previous slide"
         >
           <ChevronLeft className="w-3.5 h-3.5" />
         </button>
@@ -285,7 +285,7 @@ export default function ClimaCarouselBanner({
           type="button"
           onClick={handleNext}
           className="p-1 rounded-full bg-slate-200/80 hover:bg-slate-300 text-slate-700 transition active:scale-95 cursor-pointer"
-          title="Siguiente banner"
+          title="Next slide"
         >
           <ChevronRight className="w-3.5 h-3.5" />
         </button>

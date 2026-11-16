@@ -14,7 +14,7 @@ interface TopHeaderProps {
 }
 
 export default function TopHeader({ onSync, isSyncing, dbStatus, onStartTour }: TopHeaderProps) {
-  const [lang, setLang] = useState<SupportedLanguage>('es');
+  const [lang, setLang] = useState<SupportedLanguage>('en');
 
   useEffect(() => {
     setLang(getStoredLanguage() as SupportedLanguage);
@@ -24,7 +24,8 @@ export default function TopHeader({ onSync, isSyncing, dbStatus, onStartTour }: 
   }, []);
 
   const toggleLanguage = () => {
-    const nextLang: SupportedLanguage = lang === 'es' ? 'qu' : 'es';
+    const nextLang: SupportedLanguage =
+      lang === 'en' ? 'es' : lang === 'es' ? 'qu' : 'en';
     saveStoredLanguage(nextLang);
     setLang(nextLang);
   };
@@ -38,7 +39,7 @@ export default function TopHeader({ onSync, isSyncing, dbStatus, onStartTour }: 
         id="tour-brand"
         href="/"
         className="flex items-center gap-3 hover:opacity-90 transition group"
-        title="Volver a la página principal de Terraquipu"
+        title="Return to Terraquipu landing page"
       >
         <div className="w-8 h-8 rounded-md bg-zinc-900 border border-zinc-700 text-white flex items-center justify-center font-bold text-xs tracking-tight shadow-xs brand-logo group-hover:border-zinc-500 transition">
           TQ
@@ -81,10 +82,22 @@ export default function TopHeader({ onSync, isSyncing, dbStatus, onStartTour }: 
         <button
           onClick={toggleLanguage}
           className="px-2.5 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-zinc-200 hover:text-white font-semibold text-xs border border-zinc-700 shadow-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
-          title={lang === 'qu' ? 'Castellano simiman tikray' : 'Cambiar a Runasimi (Quechua)'}
+          title={
+            lang === 'en'
+              ? 'Switch to Spanish (Castellano)'
+              : lang === 'es'
+              ? 'Tikray Runasimi simiman (Quechua)'
+              : 'Switch to Technical English'
+          }
         >
           <Globe className="w-3.5 h-3.5 text-emerald-400" />
-          <span className="font-bold text-[11px]">{lang === 'qu' ? 'Runasimi (QU)' : 'Castellano (ES)'}</span>
+          <span className="font-bold text-[11px]">
+            {lang === 'en'
+              ? 'English (EN)'
+              : lang === 'es'
+              ? 'Castellano (ES)'
+              : 'Runasimi (QU)'}
+          </span>
         </button>
 
         {/* Farmer Tour Guide Button */}
@@ -92,7 +105,7 @@ export default function TopHeader({ onSync, isSyncing, dbStatus, onStartTour }: 
           id="tour-start-btn"
           onClick={onStartTour}
           className="px-2.5 py-1.5 rounded-md bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 hover:text-white font-semibold text-xs border border-emerald-700/80 shadow-xs flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
-          title={lang === 'qu' ? 'Visor yanapaq puriyta qallariy' : 'Iniciar paseo explicativo de las herramientas del visor'}
+          title={lang === 'qu' ? 'Visor yanapaq puriyta qallariy' : lang === 'es' ? 'Iniciar paseo explicativo del visor' : 'Start interactive visor guided tour'}
         >
           <span className="text-sm">🌾</span>
           <span className="hidden sm:inline">{t.guidedTour}</span>
@@ -105,7 +118,7 @@ export default function TopHeader({ onSync, isSyncing, dbStatus, onStartTour }: 
           className="px-3 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-zinc-200 hover:text-white font-semibold text-xs border border-zinc-700 shadow-xs flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-amber-400' : ''}`} />
-          <span className="hidden sm:inline">{lang === 'qu' ? 'Sincronizay' : 'Sincronizar'}</span>
+          <span className="hidden sm:inline">{lang === 'qu' ? 'Sincronizay' : lang === 'es' ? 'Sincronizar' : 'Sync Telemetry'}</span>
         </button>
 
         {/* Link back to Main Web */}
@@ -115,7 +128,7 @@ export default function TopHeader({ onSync, isSyncing, dbStatus, onStartTour }: 
           title="Return to Main Web (terraquipu.com)"
         >
           <ArrowLeft className="w-3.5 h-3.5 text-zinc-400" />
-          <span className="hidden sm:inline">{lang === 'qu' ? 'Web Qallariy' : 'Web Principal'}</span>
+          <span className="hidden sm:inline">{lang === 'qu' ? 'Web Qallariy' : lang === 'es' ? 'Web Principal' : 'Main Hub'}</span>
         </Link>
       </div>
     </header>

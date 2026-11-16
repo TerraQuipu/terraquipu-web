@@ -211,7 +211,7 @@ export default function SuperpowerTerraquipuLanding() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [activeRotacionTab, setActiveRotacionTab] = useState(0);
   const [expandedRotacionFaq, setExpandedRotacionFaq] = useState<number | null>(null);
-  const [lang, setLang] = useState<SupportedLanguage>('es');
+  const [lang, setLang] = useState<SupportedLanguage>('en');
 
   useEffect(() => {
     setLang(getStoredLanguage() as SupportedLanguage);
@@ -221,7 +221,8 @@ export default function SuperpowerTerraquipuLanding() {
   }, []);
 
   const toggleLanguage = () => {
-    const nextLang: SupportedLanguage = lang === 'es' ? 'qu' : 'es';
+    const nextLang: SupportedLanguage =
+      lang === 'en' ? 'es' : lang === 'es' ? 'qu' : 'en';
     saveStoredLanguage(nextLang);
     setLang(nextLang);
   };
@@ -265,16 +266,16 @@ export default function SuperpowerTerraquipuLanding() {
           {/* Left Navigation Links */}
           <nav className="hidden lg:flex items-center gap-7 text-[13px] font-semibold text-white/90">
             <a href="#como-funciona" className="hover:text-white transition">
-              {lang === 'qu' ? 'Imaynatam Llamk\'an' : 'Cómo Funciona'}
+              {lang === 'qu' ? "Imaynatam Llamk'an" : lang === 'es' ? 'Cómo Funciona' : 'How It Works'}
             </a>
             <a href="#diagnostico" className="hover:text-white transition">
-              {lang === 'qu' ? '30m Allpa Qhaway' : 'Diagnóstico 30m'}
+              {lang === 'qu' ? '30m Allpa Qhaway' : lang === 'es' ? 'Diagnóstico 30m' : '30m Diagnostic'}
             </a>
             <a href="#quipu" className="hover:text-white transition">
-              {lang === 'qu' ? 'Khipu Tarpuy' : 'Plan Quipu'}
+              {lang === 'qu' ? 'Khipu Tarpuy' : lang === 'es' ? 'Plan Quipu' : 'Quipu Plan'}
             </a>
             <a href="#comunidad" className="hover:text-white transition">
-              {lang === 'qu' ? 'Ayllukuna' : 'Comunidad'}
+              {lang === 'qu' ? 'Ayllukuna' : lang === 'es' ? 'Comunidad' : 'Community'}
             </a>
           </nav>
 
@@ -292,10 +293,22 @@ export default function SuperpowerTerraquipuLanding() {
               type="button"
               onClick={toggleLanguage}
               className="px-3 py-1.5 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
-              title={lang === 'qu' ? 'Castellano simiman tikray' : 'Cambiar a Runasimi (Quechua)'}
+              title={
+                lang === 'en'
+                  ? 'Switch to Spanish (Castellano)'
+                  : lang === 'es'
+                  ? 'Tikray Runasimi simiman (Quechua)'
+                  : 'Switch to Technical English'
+              }
             >
               <Globe className="w-3.5 h-3.5 text-emerald-400" />
-              <span>{lang === 'qu' ? 'Runasimi (QU)' : 'Castellano (ES)'}</span>
+              <span>
+                {lang === 'en'
+                  ? 'English (EN)'
+                  : lang === 'es'
+                  ? 'Castellano (ES)'
+                  : 'Runasimi (QU)'}
+              </span>
             </button>
 
             <a 
@@ -361,7 +374,13 @@ export default function SuperpowerTerraquipuLanding() {
               className="py-2.5 px-4 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-95"
             >
               <Globe className="w-4 h-4 text-emerald-400" />
-              <span>{lang === 'qu' ? 'Runasimi (QU) -> Castellano (ES)' : 'Castellano (ES) -> Runasimi (QU)'}</span>
+              <span>
+                {lang === 'en'
+                  ? 'English (EN) → Castellano (ES)'
+                  : lang === 'es'
+                  ? 'Castellano (ES) → Runasimi (QU)'
+                  : 'Runasimi (QU) → English (EN)'}
+              </span>
             </button>
             <Link 
               href="/app" 
@@ -380,16 +399,16 @@ export default function SuperpowerTerraquipuLanding() {
               <span>{t.nav.visorLink}</span>
             </Link>
             <a href="#como-funciona" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">
-              {lang === 'qu' ? 'Imaynatam Llamk\'an' : 'Cómo Funciona'}
+              {lang === 'qu' ? "Imaynatam Llamk'an" : lang === 'es' ? 'Cómo Funciona' : 'How It Works'}
             </a>
             <a href="#diagnostico" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">
-              {lang === 'qu' ? '30m Allpa Qhaway' : 'Diagnóstico 30m'}
+              {lang === 'qu' ? '30m Allpa Qhaway' : lang === 'es' ? 'Diagnóstico 30m' : '30m Diagnostic'}
             </a>
             <a href="#quipu" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">
-              {lang === 'qu' ? 'Khipu Tarpuy' : 'Plan Quipu'}
+              {lang === 'qu' ? 'Khipu Tarpuy' : lang === 'es' ? 'Plan Quipu' : 'Quipu Plan'}
             </a>
             <a href="#comunidad" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">
-              {lang === 'qu' ? 'Ayllukuna' : 'Comunidad'}
+              {lang === 'qu' ? 'Ayllukuna' : lang === 'es' ? 'Comunidad' : 'Community'}
             </a>
             <a href="https://github.com/TerraQuipu" target="_blank" rel="noreferrer" className="hover:text-amber-400 py-1.5 flex items-center justify-between">
               <span>GitHub Repository</span>
@@ -466,7 +485,7 @@ export default function SuperpowerTerraquipuLanding() {
                 href="#como-funciona" 
                 className="px-6 py-3.5 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-md text-white border border-white/15 font-semibold text-sm transition text-center hover:scale-[1.01] active:scale-[0.99]"
               >
-                {lang === 'qu' ? 'Imaynatam llamk\'an ↓' : 'Cómo Funciona ↓'}
+                {lang === 'qu' ? "Imaynatam llamk'an ↓" : lang === 'es' ? 'Cómo Funciona ↓' : 'How It Works ↓'}
               </a>
             </div>
 
@@ -499,13 +518,13 @@ export default function SuperpowerTerraquipuLanding() {
           
           <div className="text-center max-w-3xl mx-auto space-y-4">
             <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold">
-              {lang === 'qu' ? 'TERRAQUIPUPA TUPUYNINKUNA' : 'METODOLOGÍA TERRAQUIPU'}
+              {lang === 'qu' ? 'TERRAQUIPUPA TUPUYNINKUNA' : lang === 'es' ? 'METODOLOGÍA TERRAQUIPU' : 'TERRAQUIPU METHODOLOGY'}
             </span>
             <h2 className="hero-headline text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-950 tracking-tight leading-tight">
-              {lang === 'qu' ? 'Allpapa kawsayninqa hatun amachaqmi Hatun Paranpaq.' : 'La salud del suelo es el escudo más poderoso frente a El Niño.'}
+              {lang === 'qu' ? 'Allpapa kawsayninqa hatun amachaqmi Hatun Paranpaq.' : lang === 'es' ? 'La salud del suelo es el escudo más poderoso frente a El Niño.' : 'Soil health is the most powerful shield against El Niño.'}
             </h2>
             <p className="text-sm sm:text-base text-zinc-600 leading-relaxed max-w-2xl mx-auto font-sans">
-              {lang === 'qu' ? 'Tawa taqapi churasqa llamkay, hanaq pacha yachaywan allpata kawsarichinapaq.' : 'Un sistema integral de cuatro fases que transforma telemetría espacial en decisiones agrícolas que salvan cosechas.'}
+              {lang === 'qu' ? 'Tawa taqapi churasqa llamkay, hanaq pacha yachaywan allpata kawsarichinapaq.' : lang === 'es' ? 'Un sistema integral de cuatro fases que transforma telemetría espacial en decisiones agrícolas que salvan cosechas.' : 'A four-phase operational workflow transforming satellite telemetry into ground-truth agricultural decisions that protect harvests.'}
             </p>
           </div>
 
@@ -607,12 +626,14 @@ export default function SuperpowerTerraquipuLanding() {
               {/* Text Information Below Card */}
               <div className="pt-4 space-y-1.5 font-sans">
                 <h3 className="hero-headline text-lg font-bold text-zinc-950 tracking-tight">
-                  {lang === 'qu' ? '30m Allpa Tupuy' : 'Perfil Edáfico 30m'}
+                  {lang === 'qu' ? '30m Allpa Tupuy' : lang === 'es' ? 'Perfil Edáfico 30m' : '30m Edaphic Profile'}
                 </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
                   {lang === 'qu'
                     ? 'SoilGrids v2 nisqawan Copernicus DEM nisqawan allpa turpukunata, urqukunata qhawarispa allin chakichata allichanchik.'
-                    : 'Modelado edáfico 30m con SoilGrids e inclinación topográfica para mapear retención hídrica en laderas andinas.'}
+                    : lang === 'es'
+                    ? 'Modelado edáfico 30m con SoilGrids e inclinación topográfica para mapear retención hídrica en laderas andinas.'
+                    : 'High-resolution 30m edaphic modeling integrating SoilGrids v2 and SRTM topography to map root water retention across Andean slopes.'}
                 </p>
               </div>
             </div>
@@ -706,11 +727,11 @@ export default function SuperpowerTerraquipuLanding() {
                   <div className="pt-1.5 border-t border-white/20 grid grid-cols-2 gap-2 text-center font-mono">
                     <div>
                       <div className="text-2xl font-bold text-emerald-400 tracking-tight">+34%</div>
-                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">{lang === 'qu' ? 'Aymoray' : 'Rendimiento'}</div>
+                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">{lang === 'qu' ? 'Aymoray' : lang === 'es' ? 'Rendimiento' : 'Yield Potential'}</div>
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-amber-300 tracking-tight">-75%</div>
-                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">{lang === 'qu' ? 'Kurukuna' : 'Plaga Gorgojo'}</div>
+                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">{lang === 'qu' ? 'Kurukuna' : lang === 'es' ? 'Plaga Gorgojo' : 'Andean Weevil'}</div>
                     </div>
                   </div>
                 </div>
@@ -835,14 +856,16 @@ export default function SuperpowerTerraquipuLanding() {
           
           <div className="text-center space-y-3">
             <span className="text-xs font-mono uppercase tracking-widest text-amber-400 font-semibold">
-              {lang === 'qu' ? 'LLAPAN AYLLUKUNAPAQ LLAMK\'AY' : 'OPEN COMMUNITY ACCESS'}
+              {lang === 'qu' ? "LLAPAN AYLLUKUNAPAQ LLAMK'AY" : lang === 'es' ? 'ACCESO COMUNITARIO ABIERTO' : 'OPEN COMMUNITY ACCESS'}
             </span>
             <h2 className="text-3xl sm:text-5xl font-serif font-light text-white">
-              {lang === 'qu' ? 'Terraquipu llamk\'aypiqa tukuy imapunim kachkan.' : 'Everything included in the Terraquipu program.'}
+              {lang === 'qu' ? "Terraquipu llamk'aypiqa tukuy imapunim kachkan." : lang === 'es' ? 'Todo incluido en el programa Terraquipu.' : 'Everything included in the Terraquipu program.'}
             </h2>
             <p className="text-sm text-zinc-400 max-w-xl mx-auto">
               {lang === 'qu' 
                 ? 'Hanaq pacha yachay ayllukunapaq, chakra kamayoqkunapaq, mana qolqellapaq mana sasachakuspa.' 
+                : lang === 'es'
+                ? 'Tecnología espacial abierta para pequeños agricultores, agrónomos e investigadores sin costos de licencia ni barreras comerciales.'
                 : 'Open space technology for smallholders, agronomists, and researchers with zero license fees or commercial barriers.'}
             </p>
           </div>
@@ -853,15 +876,15 @@ export default function SuperpowerTerraquipuLanding() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="text-2xl font-serif text-white">
-                  {lang === 'qu' ? 'Ayllu Chajra Huñunakuy' : 'Open Micro-Watershed Membership'}
+                  {lang === 'qu' ? 'Ayllu Chajra Huñunakuy' : lang === 'es' ? 'Membresía Abierta de Microcuenca' : 'Open Micro-Watershed Membership'}
                 </h3>
                 <p className="text-xs text-zinc-400 mt-1">
-                  {lang === 'qu' ? 'Ayllukunapaq, yachaqkunapaq, llamk\'aqkunapaqpas' : 'For farming communities, researchers, and developers'}
+                  {lang === 'qu' ? "Ayllukunapaq, yachaqkunapaq, llamk'aqkunapaqpas" : lang === 'es' ? 'Para comunidades agrícolas, investigadores y desarrolladores' : 'For farming communities, researchers, and developers'}
                 </p>
               </div>
               <div className="text-left sm:text-right">
                 <span className="text-xs sm:text-sm text-emerald-400 font-mono font-medium">
-                  {lang === 'qu' ? '100% Llapa Runapaq (MIT Licencia)' : '100% Open Source (MIT License)'}
+                  {lang === 'qu' ? '100% Llapa Runapaq (MIT Licencia)' : lang === 'es' ? '100% Código Abierto (Licencia MIT)' : '100% Open Source (MIT License)'}
                 </span>
               </div>
             </div>
@@ -870,47 +893,47 @@ export default function SuperpowerTerraquipuLanding() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div className="flex items-center gap-2.5 text-zinc-300">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>{lang === 'qu' ? 'Sapa p\'unchaw satélite qhaway (NASA POWER & SMAP)' : 'Continuous satellite monitoring (NASA POWER & SMAP)'}</span>
+                <span>{lang === 'qu' ? "Sapa p'unchaw satélite qhaway (NASA POWER & SMAP)" : lang === 'es' ? 'Monitoreo satelital continuo (NASA POWER & SMAP)' : 'Continuous satellite monitoring (NASA POWER & SMAP)'}</span>
               </div>
               <div className="flex items-center gap-2.5 text-zinc-300">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>{lang === 'qu' ? 'Hatun Para sasachakuy ñawpaq willakuy' : 'Early stress alerts for El Nino anomalies'}</span>
+                <span>{lang === 'qu' ? 'Hatun Para sasachakuy ñawpaq willakuy' : lang === 'es' ? 'Alertas tempranas de estrés por anomalías de El Niño' : 'Early stress alerts for El Niño anomalies'}</span>
               </div>
               <div className="flex items-center gap-2.5 text-zinc-300">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>{lang === 'qu' ? 'Kimsa wata kawsay muyuy tarpuy (Khipu)' : '3-campaign multi-year succession (Quipu)'}</span>
+                <span>{lang === 'qu' ? 'Kimsa wata kawsay muyuy tarpuy (Khipu)' : lang === 'es' ? 'Sucesión multianual de 3 campañas (Quipu)' : '3-campaign multi-year succession (Quipu)'}</span>
               </div>
               <div className="flex items-center gap-2.5 text-zinc-300">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>{lang === 'qu' ? 'INIA Peru kamachiywan allichasqa' : 'Technical justification cited from INIA Peru'}</span>
+                <span>{lang === 'qu' ? 'INIA Peru kamachiywan allichasqa' : lang === 'es' ? 'Justificación técnica citada del INIA Perú' : 'Technical justification cited from INIA Peru'}</span>
               </div>
               <div className="flex items-center gap-2.5 text-zinc-300">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>{lang === 'qu' ? 'Llapa tarpuykunapa yachaynin (crop_matrix.json)' : 'Open agronomic crop matrix (crop_matrix.json)'}</span>
+                <span>{lang === 'qu' ? 'Llapa tarpuykunapa yachaynin (crop_matrix.json)' : lang === 'es' ? 'Matriz agronómica abierta de cultivos (crop_matrix.json)' : 'Open agronomic crop matrix (crop_matrix.json)'}</span>
               </div>
               <div className="flex items-center gap-2.5 text-zinc-300">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>{lang === 'qu' ? 'Utqaylla REST API FastAPI nisqawan' : 'High-performance REST API built with FastAPI'}</span>
+                <span>{lang === 'qu' ? 'Utqaylla REST API FastAPI nisqawan' : lang === 'es' ? 'API REST de alto rendimiento construida con FastAPI' : 'High-performance REST API built with FastAPI'}</span>
               </div>
               <div className="flex items-center gap-2.5 text-zinc-300">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>{lang === 'qu' ? 'Arduino chajra tupuchiq llamk\'ana' : 'Arduino field telemetry hardware emulator'}</span>
+                <span>{lang === 'qu' ? "Arduino chajra tupuchiq llamk'ana" : lang === 'es' ? 'Emulador de hardware de telemetría de campo Arduino' : 'Arduino field telemetry hardware emulator'}</span>
               </div>
               <div className="flex items-center gap-2.5 text-zinc-300">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>{lang === 'qu' ? 'Leaflet GIS visor qhawaq mana qolqellapaq' : 'Interactive Leaflet GIS visor with zero server cost'}</span>
+                <span>{lang === 'qu' ? 'Leaflet GIS visor qhawaq mana qolqellapaq' : lang === 'es' ? 'Visor GIS interactivo Leaflet con costo cero de servidor' : 'Interactive Leaflet GIS visor with zero server cost'}</span>
               </div>
             </div>
 
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-xs text-zinc-400 font-mono">
-                {lang === 'qu' ? 'Qosqo, Valle Sagrado, hatun mayukunapaq 2026-2027.' : 'Deployed for Cusco, Sacred Valley, and expanding watersheds 2026-2027.'}
+                {lang === 'qu' ? 'Qosqo, Valle Sagrado, hatun mayukunapaq 2026-2027.' : lang === 'es' ? 'Desplegado para Cusco, Valle Sagrado y cuencas en expansión 2026-2027.' : 'Deployed for Cusco, Sacred Valley, and expanding watersheds 2026-2027.'}
               </div>
               <a 
                 href="#quipu" 
                 className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-wider hover:bg-zinc-200 transition shadow-lg text-center"
               >
-                {lang === 'qu' ? 'Khipu Tarpuyta Qhaway ↓' : 'Explore Quipu Rotation Plan ↓'}
+                {lang === 'qu' ? 'Khipu Tarpuyta Qhaway ↓' : lang === 'es' ? 'Explorar Plan de Rotación Quipu ↓' : 'Explore Quipu Rotation Plan ↓'}
               </a>
             </div>
 
@@ -951,7 +974,7 @@ export default function SuperpowerTerraquipuLanding() {
               <div className="space-y-4">
                 <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                  {lang === 'qu' ? 'KHIPU TARPUY ALLICHAY' : 'AGROECOLOGICAL ACTION PLAN'}
+                  {lang === 'qu' ? 'KHIPU TARPUY ALLICHAY' : lang === 'es' ? 'PLAN DE ACCIÓN AGROECOLÓGICO' : 'AGROECOLOGICAL ACTION PLAN'}
                 </span>
                 <h2 className="hero-headline text-3xl sm:text-4xl lg:text-[40px] font-bold text-zinc-950 leading-[1.12] tracking-tight transition-all duration-300">
                   {rotacionTabs[activeRotacionTab].title}
@@ -1238,16 +1261,18 @@ export default function SuperpowerTerraquipuLanding() {
 
         <div className="max-w-3xl mx-auto space-y-6 relative z-10">
           <span className="text-xs font-mono uppercase tracking-widest text-amber-300 font-semibold">
-            {lang === 'qu' ? 'TERRAQUIPU • ALLPAPA KAWSAYNIN' : 'TERRAQUIPU • THE POWER OF SOIL'}
+            {lang === 'qu' ? 'TERRAQUIPU • ALLPAPA KAWSAYNIN' : lang === 'es' ? 'TERRAQUIPU • EL PODER DEL SUELO' : 'TERRAQUIPU • THE POWER OF SOIL'}
           </span>
 
           <h2 className="text-4xl sm:text-6xl font-serif font-light text-white leading-tight">
-            {lang === 'qu' ? 'Allpan Andeskunapi aswan hatun kallpa.' : 'Soil is the greatest force in the Andes.'}
+            {lang === 'qu' ? 'Allpan Andeskunapi aswan hatun kallpa.' : lang === 'es' ? 'El suelo es la mayor fuerza de los Andes.' : 'Soil is the greatest force in the Andes.'}
           </h2>
 
           <p className="text-sm sm:text-base text-zinc-300 max-w-lg mx-auto font-normal">
             {lang === 'qu'
               ? 'Ayllu chajrakamayoc, yachaqkunawan huñunakuy allpa mikuyta amachanapaq.'
+              : lang === 'es'
+              ? 'Únete a la red global de agricultores, agrónomos e investigadores que protegen la soberanía alimentaria.'
               : 'Join the global network of smallholder farmers, agronomists, and developers protecting food sovereignty against climate change.'}
           </p>
 
@@ -1291,6 +1316,8 @@ export default function SuperpowerTerraquipuLanding() {
             <p className="text-xs text-zinc-600 max-w-sm">
               {lang === 'qu'
                 ? 'Allpa kawsay yachay Andeskunapi. NASA open datawan kallpachasqa NASA Space Apps Challenge 2026 nisqapaq.'
+                : lang === 'es'
+                ? 'Sistema de inteligencia territorial y regeneración edáfica en los Andes. Desarrollado con datos abiertos de la NASA para el NASA Space Apps Challenge 2026.'
                 : 'Territorial intelligence and edaphic regeneration system in the Andes. Powered by NASA open data for the NASA Space Apps Challenge 2026.'}
             </p>
             <div className="text-[11px] font-mono text-zinc-400">
@@ -1300,7 +1327,7 @@ export default function SuperpowerTerraquipuLanding() {
 
           <div className="space-y-2">
             <div className="font-mono text-[11px] uppercase tracking-wider font-bold text-zinc-900">
-              {lang === 'qu' ? 'Llamk\'ana' : 'Platform'}
+              {lang === 'qu' ? "Llamk'ana" : lang === 'es' ? 'Plataforma' : 'Platform'}
             </div>
             <ul className="space-y-1.5 text-xs">
               <li>
@@ -1315,15 +1342,15 @@ export default function SuperpowerTerraquipuLanding() {
                   <span>{t.nav.visorLink} (/visor)</span>
                 </Link>
               </li>
-              <li><a href="#como-funciona" className="hover:text-black transition">{lang === 'qu' ? 'Imaynatam Llamk\'an' : 'How It Works'}</a></li>
-              <li><a href="#diagnostico" className="hover:text-black transition">{lang === 'qu' ? '30m Allpa Qhaway' : '30m Diagnostic'}</a></li>
-              <li><a href="#quipu" className="hover:text-black transition">{lang === 'qu' ? 'Khipu Tarpuy' : 'Quipu Rotation Plan'}</a></li>
+              <li><a href="#como-funciona" className="hover:text-black transition">{lang === 'qu' ? "Imaynatam Llamk'an" : lang === 'es' ? 'Cómo Funciona' : 'How It Works'}</a></li>
+              <li><a href="#diagnostico" className="hover:text-black transition">{lang === 'qu' ? '30m Allpa Qhaway' : lang === 'es' ? 'Diagnóstico 30m' : '30m Diagnostic'}</a></li>
+              <li><a href="#quipu" className="hover:text-black transition">{lang === 'qu' ? 'Khipu Tarpuy' : lang === 'es' ? 'Plan Quipu' : 'Quipu Rotation Plan'}</a></li>
             </ul>
           </div>
 
           <div className="space-y-2">
             <div className="font-mono text-[11px] uppercase tracking-wider font-bold text-zinc-900">
-              {lang === 'qu' ? 'Waqaychanakuna' : 'Repositories'}
+              {lang === 'qu' ? 'Waqaychanakuna' : lang === 'es' ? 'Repositorios' : 'Repositories'}
             </div>
             <ul className="space-y-1.5 text-xs font-mono">
               <li><a href="https://github.com/TerraQuipu/terraquipu-web" target="_blank" className="hover:text-black transition">terraquipu-web</a></li>
@@ -1335,7 +1362,7 @@ export default function SuperpowerTerraquipuLanding() {
 
           <div className="space-y-2">
             <div className="font-mono text-[11px] uppercase tracking-wider font-bold text-zinc-900">
-              {lang === 'qu' ? 'Llapa Runapa Yachaynin' : 'Open Science'}
+              {lang === 'qu' ? 'Llapa Runapa Yachaynin' : lang === 'es' ? 'Ciencia Abierta' : 'Open Science'}
             </div>
             <ul className="space-y-1.5 text-xs">
               <li><a href="https://power.larc.nasa.gov/" target="_blank" className="hover:text-black transition">NASA POWER</a></li>

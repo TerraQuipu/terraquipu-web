@@ -51,8 +51,8 @@ export default function WelcomeSplash({
             <Leaf className="w-3.5 h-3.5 text-[#A3E635]" />
           </div>
           <div>
-            <div className="text-[10px] text-zinc-300 font-medium">Vigor vegetal Sentinel-2</div>
-            <div className="text-xs font-bold text-[#A3E635]">82% Buen Estado</div>
+            <div className="text-[10px] text-zinc-300 font-medium">Sentinel-2 NDVI Vegetative Vigor</div>
+            <div className="text-xs font-bold text-[#A3E635]">82% Vigorous Canopy</div>
           </div>
         </div>
 
@@ -61,8 +61,8 @@ export default function WelcomeSplash({
             <Droplets className="w-3.5 h-3.5 text-cyan-300" />
           </div>
           <div>
-            <div className="text-[10px] text-zinc-300 font-medium">Humedad de suelo NASA SMAP</div>
-            <div className="text-xs font-bold text-cyan-300">18% en Rango Óptimo</div>
+            <div className="text-[10px] text-zinc-300 font-medium">NASA SMAP Soil Moisture</div>
+            <div className="text-xs font-bold text-cyan-300">18% Root-Zone Optimal</div>
           </div>
         </div>
       </div>
@@ -71,15 +71,15 @@ export default function WelcomeSplash({
       <div className="relative z-10 px-6 pb-10 space-y-5 max-w-md mx-auto w-full">
         <div className="space-y-2 text-left">
           <span className="text-[11px] font-semibold tracking-wider text-[#A3E635] uppercase block">
-            Plataforma Agroclimática Andina
+            Andean Agroclimatic Platform
           </span>
           <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white leading-tight font-sans">
-            LA NUEVA ERA DE LA
+            THE SCIENTIFIC FRONTIER OF
             <br />
-            <span className="text-[#A3E635]">AGRICULTURA ANDINA</span>
+            <span className="text-[#A3E635]">ANDEAN AGROECOLOGY</span>
           </h1>
           <p className="text-xs sm:text-sm text-zinc-300 font-normal leading-relaxed font-sans">
-            Inteligencia satelital NASA y saberes ancestrales para tu chacra. Monitorea humedad, heladas y rotación de cultivos en tiempo real.
+            NASA Earth orbital telemetry and indigenous agronomic wisdom for your parcels. Monitor root moisture, frost hazards, and biological crop rotation in real time.
           </p>
         </div>
 
@@ -91,7 +91,7 @@ export default function WelcomeSplash({
             className="w-full py-3.5 px-5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-semibold text-sm shadow-2xl shadow-lime-600/40 transition active:scale-95 cursor-pointer flex items-center justify-between group"
           >
             <span className="text-sm font-bold text-[#132A1C]">
-              Empezar Ahora
+              Launch Platform
             </span>
             <div className="w-8 h-8 rounded-full bg-[#132A1C] text-white flex items-center justify-center shadow-md group-hover:translate-x-0.5 transition">
               <ArrowRight className="w-4 h-4 text-[#A3E635]" />

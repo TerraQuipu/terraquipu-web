@@ -30,7 +30,7 @@ const FarmerTourGuide = forwardRef<FarmerTourGuideRef, FarmerTourGuideProps>(
         onSetDecisionStep,
         onComplete: () => {
           if (onShowToast) {
-            onShowToast('Paseo completado: ¡Ahora estás listo para planificar tu parcela!');
+            onShowToast('Walkthrough completed: You are now equipped to model and optimize your parcel!');
           }
         },
       });

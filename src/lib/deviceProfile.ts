@@ -266,17 +266,18 @@ export function resetDeviceProfile(): void {
 
 export const APP_LANGUAGE_KEY = 'terraquipu_app_language';
 
-export function getStoredLanguage(): 'es' | 'qu' {
-  if (typeof window === 'undefined') return 'es';
+export function getStoredLanguage(): 'en' | 'es' | 'qu' {
+  if (typeof window === 'undefined') return 'en';
   try {
     const lang = localStorage.getItem(APP_LANGUAGE_KEY);
-    return lang === 'qu' ? 'qu' : 'es';
+    if (lang === 'es' || lang === 'qu' || lang === 'en') return lang;
+    return 'en';
   } catch (e) {
-    return 'es';
+    return 'en';
   }
 }
 
-export function saveStoredLanguage(lang: 'es' | 'qu'): void {
+export function saveStoredLanguage(lang: 'en' | 'es' | 'qu'): void {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(APP_LANGUAGE_KEY, lang);

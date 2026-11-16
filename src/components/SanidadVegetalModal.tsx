@@ -18,36 +18,36 @@ export default function SanidadVegetalModal({
 
   const practices = [
     {
-      title: 'Barrera Viva de Tarwi / Chocho',
-      tag: 'Corta Gorgojo (-84%)',
+      title: 'Live Tarwi / Lupin Bio-Repellent Barrier',
+      tag: 'Disrupts Weevil (-84%)',
       tagColor: 'bg-emerald-100 text-emerald-900 border-emerald-300',
-      desc: 'Sembrar 3 a 4 surcos de Tarwi en el perímetro del lote. Los alcaloides naturales (esparteína y lupanina) actúan como repelente biológico contra el Premnotrypes vorax (gorgojo de los Andes).',
+      desc: 'Plant 3 to 4 perimeter rows of Tarwi. Natural alkaloids (sparteine and lupanine) act as an organic biological repellent against Premnotrypes vorax (Andean potato weevil).',
       icon: '🌿',
-      tiempo: 'En siembra perimetral',
+      tiempo: 'Perimeter sowing stage',
     },
     {
-      title: 'Zanjas Trampa con Plástico & Ceniza',
-      tag: 'Trampa Física',
+      title: 'Trench Traps with Plastic & Wood Ash',
+      tag: 'Physical Barrier',
       tagColor: 'bg-amber-100 text-amber-900 border-amber-300',
-      desc: 'Cavar zanjas de 30 cm de profundidad en bordes del andén cubiertas con plástico y espolvoreadas con ceniza de leña. Los adultos del gorgojo caen y no pueden trepar por la pared resbaladiza.',
+      desc: 'Excavate 30 cm perimeter trenches along terrace edges lined with plastic and dusted with wood ash. Adult weevils tumble in and cannot climb the slick walls.',
       icon: '🪤',
-      tiempo: 'Antes de emergencia',
+      tiempo: 'Pre-emergence stage',
     },
     {
-      title: 'Bio-Inoculación con Beauveria bassiana',
-      tag: 'Control Biológico INIA',
+      title: 'Bio-Inoculation with Beauveria bassiana',
+      tag: 'INIA Biological Control',
       tagColor: 'bg-sky-100 text-sky-900 border-sky-300',
-      desc: 'Hongo benéfico entomopatógeno que parasita larvas en el suelo sin dejar residuos tóxicos. Aplicación al cuello de la planta con el primer aporque.',
+      desc: 'Beneficial entomopathogenic fungus that parasitizes soil larvae without toxic synthetic residues. Apply around root crown during first contour hilling.',
       icon: '🍄',
-      tiempo: 'Primer aporque',
+      tiempo: 'First contour hilling',
     },
     {
-      title: 'Acolchado de Paja & Rastrojo (Mulch)',
-      tag: 'Protege Humedad (+45%)',
+      title: 'Straw & Crop Residue Mulching',
+      tag: 'Moisture Retention (+45%)',
       tagColor: 'bg-purple-100 text-purple-900 border-purple-300',
-      desc: 'Capa protectora de 5 cm de rastrojo sobre camellones. Evita evaporación rápida por radiación solar andina y desorienta la polilla de la papa.',
+      desc: 'Apply a 5 to 8 cm residue mulch layer across ridges. Suppresses evaporative loss under intense Andean UV radiation and deters potato tuber moth oviposition.',
       icon: '🌾',
-      tiempo: 'Post-siembra inmediata',
+      tiempo: 'Immediate post-sowing',
     },
   ];
 
@@ -61,10 +61,10 @@ export default function SanidadVegetalModal({
               <span className="p-2 rounded-2xl bg-white/20 text-xl">🛡️</span>
               <div>
                 <h2 className="text-base font-extrabold tracking-tight">
-                  Sanidad Vegetal &amp; Biocontrol
+                  Plant Health &amp; Agroecological Biocontrol
                 </h2>
                 <p className="text-xs text-emerald-200">
-                  Protocolo agroecológico respaldado por INIA y saberes andinos
+                  Agroecological protocol validated by INIA and ancestral Andean science
                 </p>
               </div>
             </div>
@@ -86,7 +86,7 @@ export default function SanidadVegetalModal({
           <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-2.5">
             <ShieldCheck className="w-5 h-5 text-emerald-700 flex-shrink-0" />
             <span className="text-[11px] text-emerald-950 font-medium">
-              Estrategia <strong>Cero Químicos</strong>: sustituye insecticidas sintéticos costosos por barreras biológicas andinas.
+              <strong>Zero-Agrochemicals Strategy:</strong> Replaces hazardous synthetic pesticides with native Andean biological barriers.
             </span>
           </div>
 
@@ -109,7 +109,7 @@ export default function SanidadVegetalModal({
                   {p.desc}
                 </p>
                 <div className="text-[10px] text-slate-400 font-mono font-medium flex items-center gap-1">
-                  <span>⏱️ Momento de labor:</span>
+                  <span>⏱️ Operational window:</span>
                   <span className="text-slate-700 font-bold">{p.tiempo}</span>
                 </div>
               </div>
@@ -120,7 +120,7 @@ export default function SanidadVegetalModal({
         {/* Footer */}
         <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-shrink-0">
           <span className="text-[10px] text-slate-500 font-mono">
-            Validado por INIA Andenes Cusco
+            Validated by INIA Andean Terracing Station (Cusco)
           </span>
           <button
             type="button"
@@ -130,7 +130,7 @@ export default function SanidadVegetalModal({
             }}
             className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs transition active:scale-95 cursor-pointer"
           >
-            Entendido
+            Understood
           </button>
         </div>
       </div>

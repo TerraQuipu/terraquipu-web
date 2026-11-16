@@ -1,4 +1,4 @@
-export type SupportedLanguage = 'es' | 'qu';
+export type SupportedLanguage = 'en' | 'es' | 'qu';
 
 export interface TranslationDictionary {
   meta: {
@@ -93,6 +93,7 @@ export interface TranslationDictionary {
     nitrogenBalance: string;
     cycleBreak: string;
     language: string;
+    langEnglish: string;
     langSpanish: string;
     langQuechua: string;
     reconfigChacra: string;
@@ -127,6 +128,143 @@ export interface TranslationDictionary {
 }
 
 export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
+  en: {
+    meta: {
+      name: 'English',
+      code: 'en',
+      label: 'Technical English',
+    },
+    nav: {
+      brandSubtitle: 'NASA Space Apps',
+      visorLink: 'Satellite GIS Visor',
+      appLink: 'Mobile Field App',
+      diagnosticLink: 'In-Situ Diagnostic',
+      adminLink: 'QGIS Admin',
+      startApp: 'Launch App',
+      openVisor: 'Open Visor',
+      langToggle: 'Language',
+    },
+    hero: {
+      badge: 'Synchronized with NASA SMAP Satellite & Andean Ecological Science',
+      titleMain: 'Satellite Telemetry & Ancestral Wisdom',
+      titleHighlight: 'for High-Andean Agronomy',
+      subtitle:
+        'TerraQuipu fuses NASA radar soil moisture telemetry, open agroclimatic models, and the millenary quipu to compute deterministic regenerative crop rotations against El Niño-driven droughts.',
+      exploreVisor: 'Explore Territorial Visor',
+      openFarmerApp: 'Launch Mobile App',
+      inSituDiagnostic: 'Field Parcel Diagnostic',
+      nasaTelemetry: 'Active Satellite Telemetry',
+      livePill: 'Live • Cusco & Sacred Valley Watersheds',
+    },
+    pillars: {
+      sectionTag: 'The 4 Pillars of TerraQuipu',
+      title: 'Aerospace Remote Sensing & Millenary Agronomy',
+      subtitle:
+        'An integrated decision-support system empowering high-altitude communities to anticipate droughts, regenerate arable soil, and maximize net yield.',
+      p1Title: 'NASA Satellite Telemetry',
+      p1Desc:
+        '30m root-zone soil moisture calibrated via NASA SMAP L4 radar and NASA DEM topographic models.',
+      p2Title: 'Regenerative Quipu Succession',
+      p2Desc:
+        'Deterministic agroecological sequence interleaving legumes (Tarwi/Fava) for biological nitrogen fixation.',
+      p3Title: 'El Niño Early Warning',
+      p3Desc:
+        'Predictive forecasting of drought stress and precipitation deficits 3 to 6 months in advance.',
+      p4Title: 'Offline-First Field Architecture',
+      p4Desc:
+        '100% operational in remote Andean ravines and high plateaus without cellular connectivity.',
+    },
+    metrics: {
+      savingsValue: '+420 S/',
+      savingsLabel: 'Input Savings per Hectare',
+      savingsSub: 'In synthetic nitrogen chemical fertilizers',
+      nitrogenValue: '+95 kg',
+      nitrogenLabel: 'Biological Nitrogen (N/ha)',
+      nitrogenSub: 'Fixed per cycle via Tarwi/Legume rotation',
+      resolutionValue: '30m',
+      resolutionLabel: 'Satellite Resolution',
+      resolutionSub: 'Field-level precision for smallholder parcels',
+      offlineValue: '100%',
+      offlineLabel: 'Offline Capability',
+      offlineSub: 'Installable PWA with asynchronous synchronization',
+    },
+    tabsDiagnostico: {
+      heading: 'Integrated Decision Architecture',
+      subheading:
+        'Four interconnected modules designed to maximize climatic resilience for every crop cycle.',
+      tab1: 'In-Situ Diagnostic',
+      tab1Title: 'Every parcel begins with 100+ agroclimatic indicators.',
+      tab1Sub:
+        '30-meter resolution edaphic diagnostic with real-time satellite telemetry to anticipate droughts, optimize nitrogen, and protect crops against El Niño.',
+      tab2: 'Agroclimatic History',
+      tab2Title: 'Two decades of satellite memory for your watershed.',
+      tab2Sub:
+        '20-year agroclimatic modeling with NASA POWER to anticipate rainfall anomalies and calculate evapotranspiration curves with scientific rigor.',
+      tab3: 'Quipu Rotation',
+      tab3Title: 'A regenerative multi-year plan for your soil.',
+      tab3Sub:
+        'Deterministic sequence audited by INIA: Tarwi for biological nitrogen fixation (+95 kg N/ha), resilient Quinoa, and tolerant Native Andean Potato.',
+      tab4: 'El Niño Early Warning',
+      tab4Title: 'Predictive alerts months before drought strikes.',
+      tab4Sub:
+        'NASA SMAP radar telemetry to calibrate root-zone soil moisture and trigger water contingency plans months before sowing.',
+    },
+    app: {
+      dashboard: 'Dashboard',
+      parcels: 'My Parcels',
+      addParcel: 'New Parcel',
+      rotation: 'Schedule & Savings',
+      copilot: 'AI Copilot',
+      settings: 'Settings',
+      news: 'Bulletins',
+      visorGis: 'GIS Visor',
+      greeting: 'Welcome back, field agronomist',
+      kipuOnline: 'Kipu Engine Online',
+      projectedSavings: 'Projected Fertilizer Savings',
+      soilMoisture: 'Soil Moisture (SMAP)',
+      frostRisk: 'Frost Risk Index',
+      frostSafe: 'No Frost Risk Detected',
+      frostAlert: 'Frost Warning Alert',
+      recommendedToday: 'Recommended Succession for Today',
+      viewFullPlan: 'View Full Crop Plan',
+      quickDiagnostic: 'Quick Soil Diagnostic',
+      listenVoice: 'Play Voice Audio',
+      nitrogenBalance: 'Nitrogen Balance (N/ha)',
+      cycleBreak: 'Disrupts Pest Lifecycle',
+      language: 'Interface Language',
+      langEnglish: 'English (Technical)',
+      langSpanish: 'Spanish (Castellano)',
+      langQuechua: 'Quechua (Runasimi)',
+      reconfigChacra: 'Recalibrate Parcel with Kipu',
+      checkGps: 'Verify Satellite GPS Signal',
+      disconnectChacra: 'Unlink Parcel from this Device',
+      copilotPlaceholder: 'Ask Kipu about sowing dates, climate risks, or pests...',
+      soilHealth: 'Soil Health & Resilience',
+      myParcelsTitle: 'Registered Field Parcels',
+      addChacraBtn: 'Register New Parcel',
+    },
+    visor: {
+      title: 'Territorial Agroclimatic Visor',
+      subtitle: 'Chinchero, Urubamba • 3,754 m a.s.l.',
+      normalMode: 'Normal Season',
+      ninoMode: 'El Niño Mode',
+      guidedTour: 'Guided Tour',
+      activeParcelTitle: 'Active Field Parcel',
+      prevCrop: 'Previous Crop',
+      priorityTitle: 'Agronomic Priority',
+      priorityFood: 'Soil & Food Security',
+      priorityMarket: 'Market & Yield',
+      prioritySoil: 'Total Soil Regeneration',
+      optimalSuccession: 'Optimal Botanical Succession',
+      estimatedSavings: 'Estimated Urea Savings',
+      rootMoisture: 'Root-Zone Moisture',
+      droughtRisk: 'Drought Vulnerability',
+      exportQgis: 'Export QGIS Layer (GeoJSON)',
+      exportWord: 'Export Agronomic Report',
+      calibrateGroundTruth: 'Calibrate Ground-Truth In Situ',
+      assistantTitle: 'Kipu Assistant',
+    },
+  },
   es: {
     meta: {
       name: 'Español',
@@ -231,6 +369,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
       nitrogenBalance: 'Balance de Nitrógeno',
       cycleBreak: 'Rompe ciclo de plagas',
       language: 'Idioma de la Chacra',
+      langEnglish: 'Inglés Técnico (English)',
       langSpanish: 'Castellano (Español)',
       langQuechua: 'Runasimi (Quechua)',
       reconfigChacra: 'Reconfigurar Chacra con Kipu',
@@ -367,6 +506,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
       nitrogenBalance: 'Allpapi Wanu Tupuy',
       cycleBreak: 'Kuru kawsayta chinkachiq',
       language: 'Chajrapa Simin (Idioma)',
+      langEnglish: 'English (Inlés)',
       langSpanish: 'Castellano (Español)',
       langQuechua: 'Runasimi (Quechua)',
       reconfigChacra: 'Chajrata Kaqmanta Allichay',
@@ -402,5 +542,5 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
 };
 
 export function getTranslation(lang: SupportedLanguage): TranslationDictionary {
-  return TRANSLATIONS[lang] || TRANSLATIONS.es;
+  return TRANSLATIONS[lang] || TRANSLATIONS.en || TRANSLATIONS.es;
 }

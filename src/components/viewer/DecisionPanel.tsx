@@ -88,7 +88,7 @@ export default function DecisionPanel({
   const [isSavedModalOpen, setIsSavedModalOpen] = useState(false);
   const [isGroundTruthModalOpen, setIsGroundTruthModalOpen] = useState(false);
   const [hardwareId, setHardwareId] = useState<string>('TQ-TECH-PRO');
-  const [lang, setLang] = useState<SupportedLanguage>('es');
+  const [lang, setLang] = useState<SupportedLanguage>('en');
 
   React.useEffect(() => {
     setLang(getStoredLanguage() as SupportedLanguage);
@@ -115,22 +115,26 @@ export default function DecisionPanel({
       ? (climateMode === 'nino'
           ? `Kay ${activeParcel.areaHa.toFixed(2)} ha chajraykipaqqa, Hatun Para pacha ch'aki kasqanrayku, Kipu yachayqa ${campaigns[0].title} tarpuytan kamachin. Kaywanqa ${campaigns[0].totalNitrogenKg} kg kawsachkan wanuta allpaman churapunki, ${campaigns[0].savingsSoles} soles qolqetan waqaychanki.`
           : `Kay ${activeParcel.areaHa.toFixed(2)} ha chajraykipaqqa, ${previousCrop} tarpusqayki qepaman, ${campaigns[0].title} tarpuytan kamachiyku. Allpaman ${campaigns[0].nitrogenBalance} wanutan qonqa, ${campaigns[0].savingsSoles} soles qolqetan waqaychanki.`)
-      : (climateMode === 'nino'
+      : lang === 'es'
+      ? (climateMode === 'nino'
           ? `Para tu parcela de ${activeParcel.areaHa.toFixed(2)} ha en ${activeParcel.name}, bajo déficit hídrico por El Niño (-24% de lluvia), el motor científico prioriza ${campaigns[0].title}. Fija ${campaigns[0].totalNitrogenKg} kg de nitrógeno orgánico con un ahorro estimado de S/. ${campaigns[0].savingsSoles} y corta el ciclo del gorgojo andino.`
-          : `Para tu área de ${activeParcel.areaHa.toFixed(2)} ha con pendiente de ${activeParcel.slopePct}%, tras cosechar ${previousCrop}, recomendamos sembrar ${campaigns[0].title}. Aportará ${campaigns[0].nitrogenBalance} con un ahorro de S/. ${campaigns[0].savingsSoles} en fertilizantes sintéticos.`);
+          : `Para tu área de ${activeParcel.areaHa.toFixed(2)} ha con pendiente de ${activeParcel.slopePct}%, tras cosechar ${previousCrop}, recomendamos sembrar ${campaigns[0].title}. Aportará ${campaigns[0].nitrogenBalance} con un ahorro de S/. ${campaigns[0].savingsSoles} en fertilizantes sintéticos.`)
+      : (climateMode === 'nino'
+          ? `For your ${activeParcel.areaHa.toFixed(2)} ha parcel in ${activeParcel.name}, under El Niño water deficit (-24% precipitation), the scientific engine prioritizes ${campaigns[0].title}. It bio-fixes ${campaigns[0].totalNitrogenKg} kg of organic nitrogen with an estimated savings of S/. ${campaigns[0].savingsSoles} while disrupting the Andean potato weevil (Premnotrypes spp.) life cycle.`
+          : `For your ${activeParcel.areaHa.toFixed(2)} ha parcel with a slope of ${activeParcel.slopePct}%, following ${previousCrop}, we recommend planting ${campaigns[0].title}. It will deliver ${campaigns[0].nitrogenBalance} with an estimated synthetic fertilizer savings of S/. ${campaigns[0].savingsSoles}.`);
 
   const handleSpeak = () => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       setIsSpeaking(true);
       const utterance = new SpeechSynthesisUtterance(scientificSummary);
-      utterance.lang = 'es-PE';
+      utterance.lang = lang === 'es' ? 'es-PE' : 'en-US';
       utterance.rate = 0.95;
       utterance.onend = () => setIsSpeaking(false);
       utterance.onerror = () => setIsSpeaking(false);
       window.speechSynthesis.speak(utterance);
     } else {
-      onShowToast('Reproduciendo audio explicativo');
+      onShowToast(lang === 'es' ? 'Reproduciendo audio explicativo' : 'Synthesizing agronomic audio guidance...');
     }
   };
 
@@ -143,7 +147,7 @@ export default function DecisionPanel({
     });
     const filename = `parcela_${activeParcel.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}.geojson`;
     downloadGeoJsonFile(filename, geojson);
-    onShowToast(`Archivo GeoJSON descargado para QGIS 3.x`);
+    onShowToast(`GeoJSON file exported for QGIS 3.x`);
   };
 
   return (
@@ -155,7 +159,9 @@ export default function DecisionPanel({
             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">
               Agronomic Decision Workflow
             </span>
-            <h2 className="text-sm font-bold text-zinc-950">Planificador Territorial</h2>
+            <h2 className="text-sm font-bold text-zinc-950">
+              {lang === 'qu' ? 'Chajra Yachay' : lang === 'es' ? 'Planificador Territorial' : 'Territorial Planner'}
+            </h2>
           </div>
           <span className="text-[10px] font-mono font-semibold bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
             NASA + INIA
@@ -175,7 +181,7 @@ export default function DecisionPanel({
             <span className="w-3.5 h-3.5 rounded-full bg-zinc-700 text-white flex items-center justify-center text-[9px]">
               1
             </span>
-            <span className="truncate text-[11px]">{lang === 'qu' ? 'Chajra' : 'Parcela'}</span>
+            <span className="truncate text-[11px]">{lang === 'qu' ? 'Chajra' : lang === 'es' ? 'Parcela' : 'Parcel'}</span>
           </button>
 
           <button
@@ -189,7 +195,7 @@ export default function DecisionPanel({
             <span className="w-3.5 h-3.5 rounded-full bg-zinc-700 text-white flex items-center justify-center text-[9px]">
               2
             </span>
-            <span className="truncate text-[11px]">{lang === 'qu' ? 'Hanaq Pacha' : 'Satélite'}</span>
+            <span className="truncate text-[11px]">{lang === 'qu' ? 'Hanaq Pacha' : lang === 'es' ? 'Satélite' : 'Satellite'}</span>
           </button>
 
           <button
@@ -203,7 +209,7 @@ export default function DecisionPanel({
             <span className="w-3.5 h-3.5 rounded-full bg-zinc-700 text-white flex items-center justify-center text-[9px]">
               3
             </span>
-            <span className="truncate text-[11px]">{lang === 'qu' ? 'Khipu Plan' : 'Plan Quipu'}</span>
+            <span className="truncate text-[11px]">{lang === 'qu' ? 'Khipu Plan' : lang === 'es' ? 'Plan Quipu' : 'Quipu Plan'}</span>
           </button>
 
           <button
@@ -217,7 +223,7 @@ export default function DecisionPanel({
             <span className="w-3.5 h-3.5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[9px]">
               4
             </span>
-            <span className="truncate text-[11px]">{lang === 'qu' ? 'Yanapaq' : 'Asistente'}</span>
+            <span className="truncate text-[11px]">{lang === 'qu' ? 'Yanapaq' : lang === 'es' ? 'Asistente' : 'Assistant'}</span>
           </button>
         </div>
       </div>
@@ -244,7 +250,7 @@ export default function DecisionPanel({
                   {activeParcel.name}
                 </h3>
                 <p className="text-[10px] text-zinc-300 font-mono mt-0.5">
-                  Centroide: {activeParcel.center[0].toFixed(4)}°, {activeParcel.center[1].toFixed(4)}°
+                  Centroid: {activeParcel.center[0].toFixed(4)}°, {activeParcel.center[1].toFixed(4)}°
                 </p>
               </div>
             </div>
@@ -254,7 +260,7 @@ export default function DecisionPanel({
               <div className="flex items-start justify-between gap-2 border-b border-zinc-100 pb-3">
                 <div className="flex-1">
                   <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">
-                    Parcela Activa en Mapa
+                    Active Map Parcel
                   </span>
                   {isEditingName ? (
                     <div className="flex items-center gap-2 mt-1">
@@ -269,7 +275,7 @@ export default function DecisionPanel({
                         onClick={() => {
                           setIsEditingName(false);
                           if (onUpdateParcelName) onUpdateParcelName(customName);
-                          onShowToast(`Nombre actualizado: ${customName}`);
+                          onShowToast(`Name updated: ${customName}`);
                         }}
                         className="bg-zinc-900 text-white px-2 py-1 rounded text-xs font-semibold"
                       >
@@ -285,7 +291,7 @@ export default function DecisionPanel({
                         onClick={() => setIsEditingName(true)}
                         className="text-[10px] text-zinc-400 hover:text-zinc-700 underline"
                       >
-                        Editar
+                        Edit
                       </button>
                     </div>
                   )}
@@ -302,7 +308,7 @@ export default function DecisionPanel({
               {/* Spatial Metrics Grid (Real-time dynamic calculations) */}
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200">
-                  <span className="text-[10px] text-zinc-500 font-medium block">Superficie Total</span>
+                  <span className="text-[10px] text-zinc-500 font-medium block">Total Surface Area</span>
                   <span className="font-bold text-zinc-950 text-sm font-mono block">
                     {activeParcel.areaHa.toFixed(2)} ha
                   </span>
@@ -312,16 +318,16 @@ export default function DecisionPanel({
                 </div>
 
                 <div className="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200">
-                  <span className="text-[10px] text-zinc-500 font-medium block">Pendiente del Terreno</span>
+                  <span className="text-[10px] text-zinc-500 font-medium block">Topographic Slope</span>
                   <span className="font-bold text-zinc-950 text-sm font-mono block">
                     {activeParcel.slopePct}%
                   </span>
                   <span className="text-[10px] text-zinc-500">
                     {activeParcel.slopePct > 18
-                      ? 'Ladera Pronunciada (L3)'
+                      ? 'Steep Hillslope (L3)'
                       : activeParcel.slopePct > 10
-                      ? 'Ladera Media (L2)'
-                      : 'Ladera Suave (L1)'}
+                      ? 'Moderate Slope (L2)'
+                      : 'Gentle Slope (L1)'}
                   </span>
                 </div>
 
@@ -334,7 +340,7 @@ export default function DecisionPanel({
                     </span>
                   </div>
                   <span className="font-bold text-zinc-950 text-sm font-mono block">
-                    {activeParcel.elevationMsnm} m s.n.m.
+                    {activeParcel.elevationMsnm} m a.s.l.
                   </span>
                   <span className={`text-[10px] font-semibold block truncate ${
                     activeParcel.elevationMsnm <= 0 ? 'text-sky-700' : 'text-zinc-600'
@@ -344,11 +350,11 @@ export default function DecisionPanel({
                 </div>
 
                 <div className="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200">
-                  <span className="text-[10px] text-zinc-500 font-medium block">Humedad SMAP L4</span>
+                  <span className="text-[10px] text-zinc-500 font-medium block">NASA SMAP L4 Moisture</span>
                   <span className="font-bold text-blue-700 text-sm font-mono block">
                     {activeParcel.smapMoisturePct}%
                   </span>
-                  <span className="text-[10px] text-zinc-500">Radar Satelital</span>
+                  <span className="text-[10px] text-zinc-500">Orbital Radiometer</span>
                 </div>
               </div>
 
@@ -361,7 +367,7 @@ export default function DecisionPanel({
                       Maritime Coordinate (Pacific Ocean)
                     </strong>
                     <p className="text-[11px] text-sky-900 leading-tight mt-0.5">
-                      Altitud: 0 m s.n.m. Esta coordenada se ubica en el mar. Para calibrar cultivos agrícolas o validar andenería, ubica la parcela sobre suelo continental.
+                      Elevation: 0 m a.s.l. This coordinate is situated in the Pacific Ocean. To calibrate agricultural crops and terraces, reposition parcel onto continental soils.
                     </p>
                   </div>
                 </div>
@@ -374,7 +380,7 @@ export default function DecisionPanel({
                   Would you like to select another area?
                 </span>
                 <p className="text-[11px] text-blue-800 leading-relaxed font-sans">
-                  Haz clic en <strong>&ldquo;Trazar Parcela&rdquo;</strong> sobre el mapa para marcar vértices exactos o <strong>&ldquo;Clic en Terreno&rdquo;</strong> para colocar una parcela automática donde toques.
+                  Click <strong>&ldquo;Trace Parcel&rdquo;</strong> on the map to mark boundary vertices, or <strong>&ldquo;Click on Ground&rdquo;</strong> to place an automated parcel at your selected coordinate.
                 </p>
               </div>
 
@@ -383,7 +389,7 @@ export default function DecisionPanel({
                 <div className="relative h-20 overflow-hidden group">
                   <img
                     src="/images/cosecha_poster.jpg"
-                    alt="Ground-Truth en campo"
+                    alt="In-situ ground-truth field calibration"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/90 via-emerald-950/50 to-transparent flex items-end p-2.5 justify-between">
@@ -392,16 +398,16 @@ export default function DecisionPanel({
                         In-Situ Ground-Truth Calibration
                       </span>
                       <h4 className="text-xs font-bold text-white leading-tight">
-                        Ground-Truth 5+1 en Campo
+                        In-Situ Ground-Truth 5+1
                       </h4>
                     </div>
                     {activeParcel.groundTruthCalibrated ? (
                       <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-emerald-500 text-white shadow-xs">
-                        ✓ Calibrada ({activeParcel.groundTruthData?.soilHealthIndex}/100)
+                        ✓ Calibrated ({activeParcel.groundTruthData?.soilHealthIndex}/100)
                       </span>
                     ) : (
                       <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-amber-400 text-amber-950 shadow-xs">
-                        Pendiente
+                        Pending
                       </span>
                     )}
                   </div>
@@ -415,13 +421,13 @@ export default function DecisionPanel({
                         <span className="font-mono font-bold">{activeParcel.groundTruthData.soilHealthIndex}/100</span>
                       </div>
                       <div className="text-[10px] text-zinc-600 flex justify-between">
-                        <span>Textura: <strong className="capitalize">{activeParcel.groundTruthData.soilTexture}</strong></span>
-                        <span>Cobertura: <strong className="capitalize">{activeParcel.groundTruthData.cropCoverNdvi.replace('_', ' ')}</strong></span>
+                        <span>Texture: <strong className="capitalize">{activeParcel.groundTruthData.soilTexture}</strong></span>
+                        <span>Cover: <strong className="capitalize">{activeParcel.groundTruthData.cropCoverNdvi.replace('_', ' ')}</strong></span>
                       </div>
                     </div>
                   ) : (
                     <p className="text-[11px] text-zinc-600 leading-snug">
-                      Responde las 5 preguntas agronómicas guiadas por <strong>Kipu y Astro</strong> para calibrar los sensores satelitales SMAP y Sentinel-2.
+                      Answer the 5 agronomic diagnostic prompts guided by <strong>Kipu and Astro</strong> to calibrate NASA SMAP and Sentinel-2 telemetry.
                     </p>
                   )}
 
@@ -431,7 +437,7 @@ export default function DecisionPanel({
                     className="w-full py-2 px-3 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
-                    <span>{activeParcel.groundTruthCalibrated ? 'Re-calibrar Preguntas de Campo' : 'Calibrar con Preguntas de Campo (5+1)'}</span>
+                    <span>{activeParcel.groundTruthCalibrated ? 'Recalibrate In-Situ Field Data' : 'Calibrate In-Situ Field Data (5+1)'}</span>
                   </button>
                 </div>
               </div>
@@ -442,7 +448,7 @@ export default function DecisionPanel({
                 className="w-full py-2.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold transition flex items-center justify-center gap-2 shadow-xs"
               >
                 <Download className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Exportar Parcela a QGIS (.geojson)</span>
+                <span>Export Parcel Boundary to QGIS (.geojson)</span>
               </button>
             </div>
 
@@ -528,7 +534,7 @@ export default function DecisionPanel({
                     <span>Drought Alert: -24% Precipitation Deficit</span>
                   </div>
                   <p className="text-[11px] text-amber-800 leading-relaxed font-sans">
-                    Déficit hídrico en etapa de floración. Se activan cultivos andinos rústicos de alta tolerancia (Tarwi / Quinua).
+                    Hydrological deficit during vegetative flowering. Prioritizing resilient Andean crops (Tarwi / Quinua).
                   </p>
                 </div>
               )}
@@ -545,7 +551,7 @@ export default function DecisionPanel({
                 <div className="flex justify-between items-center text-xs">
                   <span className="font-bold text-zinc-900 flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-sky-500" />
-                    Humedad Radicular SMAP L4:
+                    Root-Zone Soil Moisture (SMAP L4):
                   </span>
                   <span className="font-mono font-bold text-sm text-zinc-950">
                     {climateMode === 'nino'
@@ -578,7 +584,7 @@ export default function DecisionPanel({
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200">
                   <span className="text-[10px] text-zinc-500 font-medium flex items-center gap-1">
-                    <CloudRain className="w-3 h-3 text-blue-500" /> Lluvia Radar GPM
+                    <CloudRain className="w-3 h-3 text-blue-500" /> Precipitation (GPM)
                   </span>
                   <span className="font-bold text-zinc-950 text-sm font-mono block mt-0.5">
                     {(() => {
@@ -601,13 +607,13 @@ export default function DecisionPanel({
 
                 <div className="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200">
                   <span className="text-[10px] text-zinc-500 font-medium flex items-center gap-1">
-                    <Sprout className="w-3 h-3 text-emerald-500" /> Vigor NDVI
+                    <Sprout className="w-3 h-3 text-emerald-500" /> Vegetative Vigor (NDVI)
                   </span>
                   <span className="font-bold text-emerald-700 text-sm font-mono block mt-0.5">
                     {activeParcel.ndvi.toFixed(2)}
                   </span>
                   <span className="text-[10px] text-zinc-500">
-                    {activeParcel.groundTruthCalibrated ? '✓ Calibrado en campo' : 'Telemetría orbital'}
+                    {activeParcel.groundTruthCalibrated ? '✓ In-situ Calibrated' : 'Orbital Telemetry'}
                   </span>
                 </div>
               </div>
@@ -617,9 +623,9 @@ export default function DecisionPanel({
                 <div className="flex items-center gap-2">
                   <Thermometer className="w-4 h-4 text-amber-600" />
                   <div>
-                    <span className="font-bold text-zinc-900 block leading-tight">Alerta de Helada</span>
+                    <span className="font-bold text-zinc-900 block leading-tight">Frost Hazard Alert</span>
                     <span className="text-[10px] text-zinc-500">
-                      Temperatura de suelo: {activeParcel.soilTempC !== undefined
+                      Surface Soil Temperature: {activeParcel.soilTempC !== undefined
                         ? `${activeParcel.soilTempC.toFixed(1)}°C`
                         : climaNasa?.temp_min_c !== undefined
                         ? `${climaNasa.temp_min_c.toFixed(1)}°C`
@@ -633,8 +639,8 @@ export default function DecisionPanel({
                     : 'bg-emerald-100 text-emerald-900'
                 }`}>
                   {(activeParcel.soilTempC !== undefined && activeParcel.soilTempC <= 2) || (climaNasa?.alerta_helada ?? false)
-                    ? 'Alerta Helada'
-                    : 'Normal'}
+                    ? 'Frost Warning'
+                    : 'Optimal'}
                 </span>
               </div>
 
@@ -647,8 +653,8 @@ export default function DecisionPanel({
                   </span>
                   <span className="text-[10px] text-zinc-600 block mt-0.5">
                     {activeParcel.groundTruthCalibrated
-                      ? `Calibrado con agricultor • Índice edáfico ${activeParcel.groundTruthData?.soilHealthIndex}/100`
-                      : 'Telemetría orbital en bruto (pendiente validación con agricultor)'}
+                      ? `Calibrated with ground truth • Edaphic Index ${activeParcel.groundTruthData?.soilHealthIndex}/100`
+                      : 'Raw orbital telemetry (pending ground-truth validation)'}
                   </span>
                 </div>
                 <button
@@ -656,7 +662,7 @@ export default function DecisionPanel({
                   onClick={() => setIsGroundTruthModalOpen(true)}
                   className="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-[11px] font-bold transition flex items-center gap-1 shadow-xs cursor-pointer"
                 >
-                  <span>{activeParcel.groundTruthCalibrated ? 'Re-calibrar' : 'Calibrar'}</span>
+                  <span>{activeParcel.groundTruthCalibrated ? 'Recalibrate' : 'Calibrate'}</span>
                 </button>
               </div>
             </div>
@@ -667,7 +673,7 @@ export default function DecisionPanel({
                 onClick={() => setActiveStep('parcel')}
                 className="py-2 px-3 bg-zinc-200 hover:bg-zinc-300 text-zinc-800 rounded-xl text-xs font-semibold transition"
               >
-                ← Volver a Parcela
+                ← Return to Parcel
               </button>
               <button
                 onClick={() => setActiveStep('rotation')}
@@ -689,7 +695,7 @@ export default function DecisionPanel({
             <div className="relative h-28 rounded-xl overflow-hidden border border-zinc-200 shadow-xs group">
               <img
                 src="/images/quipu_plan.jpg"
-                alt="Agricultores andinos cosechando"
+                alt="Andean farmers in harvest field"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent flex flex-col justify-end p-3">
@@ -700,7 +706,7 @@ export default function DecisionPanel({
                   Quipu Scientific Crop Rotation Plan
                 </h3>
                 <p className="text-[10px] text-zinc-300 font-mono mt-0.5">
-                  Calibrado para {activeParcel.areaHa.toFixed(2)} ha • Pendiente {activeParcel.slopePct}%
+                  Calibrated for {activeParcel.areaHa.toFixed(2)} ha • Slope {activeParcel.slopePct}%
                 </p>
               </div>
             </div>
@@ -714,16 +720,16 @@ export default function DecisionPanel({
                 </label>
                 <div className="grid grid-cols-2 gap-1.5 text-xs">
                   {[
-                    { id: 'papa', label: 'Papa Nativa', img: '/images/papa_nativa.jpg' },
-                    { id: 'quinua', label: 'Quinua Real', img: '/images/quinua_real.jpg' },
-                    { id: 'tarwi', label: 'Tarwi Chocho', img: '/images/tarwi_chocho.jpg' },
-                    { id: 'haba', label: 'Haba Verde', img: '/images/haba_verde.jpg' },
+                    { id: 'papa', label: 'Papa Nativa (Native Potato)', img: '/images/papa_nativa.jpg' },
+                    { id: 'quinua', label: 'Quinua Real (Royal Quinoa)', img: '/images/quinua_real.jpg' },
+                    { id: 'tarwi', label: 'Tarwi Chocho (Andean Lupin)', img: '/images/tarwi_chocho.jpg' },
+                    { id: 'haba', label: 'Haba Verde (Faba Bean)', img: '/images/haba_verde.jpg' },
                   ].map((c) => (
                     <button
                       key={c.id}
                       onClick={() => {
                         onSetPreviousCrop(c.id);
-                        onShowToast(`Cultivo previo: ${c.label}`);
+                        onShowToast(`Previous crop: ${c.label}`);
                       }}
                       className={`p-1.5 rounded-lg border text-left font-semibold transition flex items-center gap-2 ${
                         previousCrop === c.id
@@ -749,9 +755,9 @@ export default function DecisionPanel({
                 </label>
                 <div className="grid grid-cols-3 gap-1.5 text-xs">
                   {[
-                    { id: 'alimento', label: 'Alimento', icon: Home },
-                    { id: 'venta', label: 'Venta', icon: DollarSign },
-                    { id: 'suelo', label: 'Curar Suelo', icon: Leaf },
+                    { id: 'alimento', label: 'Food Security', icon: Home },
+                    { id: 'venta', label: 'Market Sale', icon: DollarSign },
+                    { id: 'suelo', label: 'Soil Health', icon: Leaf },
                   ].map((p) => {
                     const Icon = p.icon;
                     return (
@@ -759,7 +765,7 @@ export default function DecisionPanel({
                         key={p.id}
                         onClick={() => {
                           onSetPriority(p.id);
-                          onShowToast(`Prioridad: ${p.label}`);
+                          onShowToast(`Priority: ${p.label}`);
                         }}
                         className={`py-2 px-1 rounded-lg border text-xs font-semibold flex flex-col items-center justify-center gap-1 transition ${
                           priority === p.id
@@ -789,7 +795,7 @@ export default function DecisionPanel({
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider block">
-                      Recomendado • Inmediato
+                      Recommended • Primary Cycle
                     </span>
                     <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-800 text-emerald-100 border border-emerald-700 font-mono">
                       {campaigns[0].suitabilityScore}% Optimal Match
@@ -808,9 +814,9 @@ export default function DecisionPanel({
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="bg-emerald-950/70 p-2.5 rounded-lg border border-emerald-800/80">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-emerald-300 block">Soil Nitrogen Balance:</span>
+                    <span className="text-[10px] text-emerald-300 block">Biological N₂ Balance:</span>
                     <span className="text-[9px] text-emerald-400 font-mono">
-                      {campaigns[0].cropKey === 'tarwi' ? 'Tasa +95 kg/ha' : campaigns[0].cropKey === 'haba' ? 'Tasa +65 kg/ha' : 'Tasa -45 kg/ha'}
+                      {campaigns[0].cropKey === 'tarwi' ? 'Rate: +95 kg/ha' : campaigns[0].cropKey === 'haba' ? 'Rate: +65 kg/ha' : 'Rate: -45 kg/ha'}
                     </span>
                   </div>
                   <span className="font-bold text-white text-xs font-mono block mt-0.5">
@@ -818,15 +824,15 @@ export default function DecisionPanel({
                   </span>
                   <span className="text-[9px] text-emerald-300/80 block mt-0.5">
                     {campaigns[0].totalNitrogenKg > 0
-                      ? `≈ ${Math.max(1, Math.round(campaigns[0].totalNitrogenKg / 23))} sacos úrea ahorrados`
-                      : `Aprovecha abono anterior`}
+                      ? `≈ ${Math.max(1, Math.round(campaigns[0].totalNitrogenKg / 23))} urea bags saved`
+                      : `Residual fertilization leverage`}
                   </span>
                 </div>
 
                 <div className="bg-emerald-950/70 p-2.5 rounded-lg border border-emerald-800/80">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-emerald-300 block">Ahorro Fertilizante:</span>
-                    <span className="text-[9px] text-emerald-400 font-mono">en {activeParcel.areaHa.toFixed(2)} ha</span>
+                    <span className="text-[10px] text-emerald-300 block">Fertilizer Savings:</span>
+                    <span className="text-[9px] text-emerald-400 font-mono">over {activeParcel.areaHa.toFixed(2)} ha</span>
                   </div>
                   <span className="font-bold text-emerald-300 text-xs font-mono block mt-0.5">
                     S/. {campaigns[0].savingsSoles}
@@ -837,22 +843,22 @@ export default function DecisionPanel({
                 </div>
 
                 <div className="bg-emerald-950/70 p-2 rounded-lg border border-emerald-800/80">
-                  <span className="text-[10px] text-emerald-300 block">Control Sanitario:</span>
+                  <span className="text-[10px] text-emerald-300 block">Pest Management:</span>
                   <span className="font-bold text-white text-xs truncate block mt-0.5">
                     {campaigns[0].pestStatus}
                   </span>
                   <span className="text-[9px] text-emerald-300/80 block">
-                    Corta ciclo del gorgojo
+                    Disrupts Andean weevil cycle
                   </span>
                 </div>
 
                 <div className="bg-emerald-950/70 p-2 rounded-lg border border-emerald-800/80">
-                  <span className="text-[10px] text-emerald-300 block">Demanda de Agua:</span>
+                  <span className="text-[10px] text-emerald-300 block">Hydric Demand:</span>
                   <span className="font-bold text-white text-xs font-mono block mt-0.5">
                     {campaigns[0].waterDemand}
                   </span>
                   <span className="text-[9px] text-emerald-300/80 block">
-                    Volumen: {campaigns[0].totalWaterM3.toLocaleString()} m³
+                    Volume: {campaigns[0].totalWaterM3.toLocaleString()} m³
                   </span>
                 </div>
               </div>
@@ -860,14 +866,14 @@ export default function DecisionPanel({
               {/* Scientific Explanation + Voice Playback */}
               <div className="pt-2 border-t border-emerald-800/80 flex items-center justify-between">
                 <span className="text-[11px] text-emerald-200">
-                  Validado por INIA &amp; SENAMHI
+                  Validated by INIA &amp; SENAMHI Agroecology Models
                 </span>
                 <button
                   onClick={handleSpeak}
                   className="px-2.5 py-1 bg-emerald-800 hover:bg-emerald-700 text-white rounded-md text-[11px] font-semibold flex items-center gap-1.5 transition"
                 >
                   <Volume2 className="w-3.5 h-3.5" />
-                  <span>{isSpeaking ? 'Hablando...' : 'Escuchar Audio'}</span>
+                  <span>{isSpeaking ? 'Playing...' : 'Audio Synthesis'}</span>
                 </button>
               </div>
             </div>
@@ -882,7 +888,7 @@ export default function DecisionPanel({
                   onClick={() => setShowAllCampaigns(!showAllCampaigns)}
                   className="text-xs font-semibold text-zinc-600 hover:text-zinc-950 flex items-center gap-0.5"
                 >
-                  <span>{showAllCampaigns ? 'Ocultar' : 'Ver Todas'}</span>
+                  <span>{showAllCampaigns ? 'Collapse' : 'View All'}</span>
                   <ChevronRight
                     className={`w-3.5 h-3.5 transform transition ${
                       showAllCampaigns ? 'rotate-90' : ''
@@ -938,13 +944,13 @@ export default function DecisionPanel({
                 onClick={() => {
                   setIsSavedModalOpen(true);
                   onShowToast(
-                    `Plan guardado en la nube territorial para ${activeParcel.name} (${activeParcel.areaHa.toFixed(2)} ha)`
+                    `Plan synchronized to territorial cloud for ${activeParcel.name} (${activeParcel.areaHa.toFixed(2)} ha)`
                   );
                 }}
                 className="flex-1 py-2.5 px-4 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs active:scale-95"
               >
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>Guardar Plan en la Nube</span>
+                <span>Sync Plan to Cloud</span>
               </button>
             </div>
           </div>
@@ -977,7 +983,7 @@ export default function DecisionPanel({
                     Synchronization Complete
                   </span>
                   <h3 className="font-bold text-zinc-950 text-base leading-tight">
-                    Plan Guardado en la Nube
+                    Plan Synchronized to Cloud
                   </h3>
                 </div>
               </div>
@@ -992,21 +998,21 @@ export default function DecisionPanel({
             {/* Summary card */}
             <div className="bg-zinc-50 rounded-xl p-3 border border-zinc-200 space-y-2 text-xs">
               <div className="flex justify-between items-center">
-                <span className="text-zinc-500 font-medium">Parcela:</span>
+                <span className="text-zinc-500 font-medium">Parcel:</span>
                 <span className="font-bold text-zinc-950">{activeParcel.name}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-zinc-500 font-medium">Superficie:</span>
+                <span className="text-zinc-500 font-medium">Surface Area:</span>
                 <span className="font-mono font-bold text-zinc-950">
                   {activeParcel.areaHa.toFixed(2)} ha ({Math.round(activeParcel.areaHa * 10000).toLocaleString()} m²)
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-zinc-500 font-medium">Cultivo Recomendado:</span>
+                <span className="text-zinc-500 font-medium">Recommended Crop:</span>
                 <span className="font-bold text-emerald-700">{campaigns[0].title}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-zinc-500 font-medium">Aporte N₂ / Ahorro:</span>
+                <span className="text-zinc-500 font-medium">BNF N₂ Balance / Savings:</span>
                 <span className="font-mono font-bold text-zinc-950">
                   {campaigns[0].nitrogenBalance} • S/. {campaigns[0].savingsSoles}
                 </span>
@@ -1014,7 +1020,7 @@ export default function DecisionPanel({
               <div className="flex justify-between items-center text-[11px] bg-zinc-50 p-2 rounded border border-zinc-200">
                 <span className="text-zinc-600 font-medium">Deterministic Calculation:</span>
                 <span className="font-mono font-bold text-emerald-800">
-                  {activeParcel.areaHa.toFixed(2)} ha × Tasa = {campaigns[0].totalNitrogenKg > 0 ? `+${campaigns[0].totalNitrogenKg}` : campaigns[0].totalNitrogenKg} kg N
+                  {activeParcel.areaHa.toFixed(2)} ha × Rate = {campaigns[0].totalNitrogenKg > 0 ? `+${campaigns[0].totalNitrogenKg}` : campaigns[0].totalNitrogenKg} kg N
                 </span>
               </div>
               <div className="flex justify-between items-center pt-1.5 border-t border-zinc-200 text-[11px]">
@@ -1040,13 +1046,13 @@ export default function DecisionPanel({
                     climateMode,
                     hardwareId,
                   });
-                  onShowToast('Descargando informe formal en Word (.doc)...');
+                  onShowToast('Generating formal Word agronomic report (.doc)...');
                 }}
                 className="w-full py-2.5 px-3 bg-blue-700 hover:bg-blue-600 text-white rounded-xl text-xs font-bold transition flex items-center justify-between shadow-xs active:scale-95"
               >
                 <div className="flex items-center gap-2">
                   <span className="text-base">📄</span>
-                  <span>Descargar Informe para Word (.doc)</span>
+                  <span>Download Word Report (.doc)</span>
                 </div>
                 <Download className="w-4 h-4 text-blue-200" />
               </button>
@@ -1093,7 +1099,7 @@ export default function DecisionPanel({
               onClick={() => setIsSavedModalOpen(false)}
               className="w-full py-1.5 text-zinc-500 hover:text-zinc-800 text-xs font-medium text-center transition"
             >
-              Cerrar ventana
+              Close Window
             </button>
           </div>
         </div>
