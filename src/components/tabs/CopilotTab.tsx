@@ -18,7 +18,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
-import { getActiveParcel, getStoredParcels, setActiveParcelId } from '@/lib/deviceProfile';
+import { getActiveParcel, getStoredParcels, setActiveParcelId, getActiveParcelId } from '@/lib/deviceProfile';
 
 interface Message {
   id: string;
@@ -36,6 +36,9 @@ interface CopilotTabProps {
   initialVoice?: 'astro' | 'kipu';
   onOpenDiagnostic: () => void;
   onToast?: (msg: string) => void;
+  activeParcelId?: string;
+  parcels?: ParcelItem[];
+  onSelectParcel?: (parcelId: string) => void;
 }
 
 interface CropKnowledge {
@@ -184,6 +187,9 @@ export default function CopilotTab({
   initialVoice = 'kipu',
   onOpenDiagnostic,
   onToast,
+  activeParcelId: propActiveParcelId,
+  parcels: propParcels,
+  onSelectParcel,
 }: CopilotTabProps) {
   const [activeVoice, setActiveVoice] = useState<'astro' | 'kipu'>(initialVoice);
   const [parcels, setParcels] = useState<ParcelItem[]>([]);
@@ -197,19 +203,33 @@ export default function CopilotTab({
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Load real parcels on mount
+  // Load real parcels on mount and keep synced with props
   useEffect(() => {
-    const list = getStoredParcels();
-    setParcels(list);
-    const active = getActiveParcel();
-    setActiveParcel(active || (list.length > 0 ? list[0] : null));
-  }, []);
+    if (propParcels && propParcels.length > 0) {
+      setParcels(propParcels);
+    } else {
+      const list = getStoredParcels();
+      setParcels(list);
+    }
+  }, [propParcels]);
+
+  useEffect(() => {
+    const list = propParcels && propParcels.length > 0 ? propParcels : getStoredParcels();
+    const targetId = propActiveParcelId || getActiveParcelId();
+    const found = list.find((p) => p.id === targetId) || (list.length > 0 ? list[0] : null);
+    if (found) {
+      setActiveParcel(found);
+    }
+  }, [propActiveParcelId, propParcels]);
 
   const handleSelectParcel = (p: ParcelItem) => {
     playBubblePop();
     setActiveParcel(p);
     setActiveParcelId(p.id);
-    if (onToast) onToast(`Copiloto enfocado en ${p.name}`);
+    if (onSelectParcel) {
+      onSelectParcel(p.id);
+    }
+    if (onToast) onToast(`Copiloto y reporte enfocados en ${p.name.split('•')[0].trim()}`);
   };
 
   const parcelName = activeParcel?.name || profile.parcelName || 'Chacra principal';
@@ -621,25 +641,80 @@ export default function CopilotTab({
       </div>
 
       {/* 7. Quick Action: Diagnostic Evaluation */}
-      <div className="bg-white rounded-3xl p-4 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3">
-        <div>
-          <h4 className="text-xs font-bold text-zinc-800">
-            ¿Deseas registrar un reporte de campo hoy?
-          </h4>
-          <p className="text-[11px] text-zinc-500 mt-0.5">
-            Compara la señal satelital con la textura y humedad de tu suelo.
-          </p>
+      <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] space-y-3.5">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <span className="text-[10px] font-semibold text-emerald-800 uppercase tracking-wider block">
+              REPORTE DE CAMPO
+            </span>
+            <h4 className="text-sm font-bold text-zinc-800 leading-tight">
+              ¿Deseas registrar un reporte de campo hoy?
+            </h4>
+            <p className="text-[11px] text-zinc-500 mt-0.5 font-normal">
+              Compara la señal satelital con la textura y humedad in situ de tu parcela.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              playSuccessFanfare();
+              onOpenDiagnostic();
+            }}
+            className="px-4 py-2.5 rounded-full bg-[#132A1C] hover:bg-emerald-950 text-white font-semibold text-xs shrink-0 cursor-pointer shadow-xs transition active:scale-95 flex items-center gap-1.5"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-[#A3E635]" />
+            <span>Evaluar suelo</span>
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            playSuccessFanfare();
-            onOpenDiagnostic();
-          }}
-          className="px-3.5 py-2 rounded-full bg-[#132A1C] text-white font-semibold text-xs shrink-0 cursor-pointer hover:bg-emerald-950 transition"
-        >
-          Evaluar suelo
-        </button>
+
+        {/* Selected Parcel Badge for the Report */}
+        <div className="flex items-center gap-2.5 px-3 py-2 rounded-2xl bg-emerald-50/80 border border-emerald-200/70 text-emerald-950">
+          <div className="w-6 h-6 rounded-full bg-emerald-200/80 flex items-center justify-center text-emerald-900 shrink-0">
+            <MapPin className="w-3.5 h-3.5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <span className="text-[9.5px] font-bold uppercase tracking-wider text-emerald-800 block">
+              Parcela que está dando el dato:
+            </span>
+            <span className="text-xs font-bold text-zinc-900 truncate block">
+              {activeParcel
+                ? `${activeParcel.name} • ${activeParcel.cropCategory || activeParcel.cropName} (${activeParcel.areaHa} ha)`
+                : profile.parcelName || 'Chacra principal'}
+            </span>
+          </div>
+        </div>
+
+        {/* Interactive Chip Selector for Field Report */}
+        {parcels.length > 0 && (
+          <div className="space-y-1.5 pt-0.5">
+            <span className="text-[9.5px] font-semibold text-zinc-500 uppercase tracking-wider block">
+              Elegir parcela para este reporte:
+            </span>
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+              {parcels.map((p) => {
+                const isSel = activeParcel?.id === p.id;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => handleSelectParcel(p)}
+                    className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer shrink-0 flex items-center gap-1.5 ${
+                      isSel
+                        ? 'bg-[#132A1C] text-white font-semibold shadow-xs'
+                        : 'bg-white text-zinc-700 border border-[#E5ECE2] hover:bg-zinc-50'
+                    }`}
+                  >
+                    <MapPin className={`w-3 h-3 ${isSel ? 'text-[#A3E635]' : 'text-zinc-400'}`} />
+                    <span>{p.name.split('•')[0].trim()}</span>
+                    <span className={`text-[10px] ${isSel ? 'text-zinc-300' : 'text-zinc-400'}`}>
+                      ({p.cropCategory || p.cropName})
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -74,7 +74,7 @@ export default function FloatingNavFAB({
     },
     {
       id: 'rotacion' as AppScreen,
-      label: 'Rotación de Cultivos',
+      label: 'Cronograma y ahorro',
       description: 'Plan de 3 campañas y nitrógeno',
       icon: <RefreshCw className="w-5 h-5" />,
       color: 'text-emerald-700 bg-emerald-50 border-emerald-200',

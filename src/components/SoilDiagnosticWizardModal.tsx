@@ -10,8 +10,11 @@ import {
   Sun,
   X,
   HelpCircle,
+  MapPin,
 } from 'lucide-react';
 import { playBubblePop, playSuccessFanfare, playWhoosh } from '@/lib/soundEffects';
+import { ParcelItem } from '@/lib/types';
+import { getActiveParcel, updateParcel } from '@/lib/deviceProfile';
 
 interface SoilDiagnosticWizardModalProps {
   isOpen?: boolean;
@@ -25,7 +28,11 @@ interface SoilDiagnosticWizardModalProps {
     waterSource: string;
     pestStatus: string;
     healthScore?: number;
+    parcelId?: string;
   }) => void;
+  activeParcel?: ParcelItem | null;
+  parcels?: ParcelItem[];
+  onSelectParcel?: (parcelId: string) => void;
 }
 
 export default function SoilDiagnosticWizardModal({
@@ -34,6 +41,9 @@ export default function SoilDiagnosticWizardModal({
   onClose,
   onCompleteToRotation,
   onSaveProfileData,
+  activeParcel,
+  parcels,
+  onSelectParcel,
 }: SoilDiagnosticWizardModalProps) {
   const [step, setStep] = useState(1);
   const [step1Val, setStep1Val] = useState<'Seca y polvo' | 'Húmeda y mullida' | 'Barro'>('Húmeda y mullida');
@@ -41,6 +51,21 @@ export default function SoilDiagnosticWizardModal({
   const [step3Val, setStep3Val] = useState<'Cultivo verde o rastrojo abundante' | 'Rastrojo disperso o restos secos' | 'Tierra desnuda expuesta al sol'>('Cultivo verde o rastrojo abundante');
   const [step4Val, setStep4Val] = useState<'Secano (solo lluvia del cielo)' | 'Riego de auxilio (turno ocasional)' | 'Riego permanente o reservorio'>('Riego de auxilio (turno ocasional)');
   const [step5Val, setStep5Val] = useState<'Chacra sana y limpia' | 'Presencia de gorgojo de los andes' | 'Rancha o tizón tardío'>('Chacra sana y limpia');
+
+  const [selectedParcelId, setSelectedParcelId] = useState<string>(activeParcel?.id || '');
+
+  React.useEffect(() => {
+    if (activeParcel?.id) {
+      setSelectedParcelId(activeParcel.id);
+    }
+  }, [activeParcel?.id]);
+
+  const targetParcel =
+    (parcels && parcels.find((p) => p.id === selectedParcelId)) ||
+    activeParcel ||
+    (typeof window !== 'undefined' ? getActiveParcel() : null);
+  const parcelName = targetParcel?.name || 'Chacra principal';
+  const parcelDetails = targetParcel ? `${targetParcel.cropCategory || targetParcel.cropName} • ${targetParcel.areaHa} ha` : null;
 
   if (!isOpen) return null;
 
@@ -52,6 +77,11 @@ export default function SoilDiagnosticWizardModal({
       // Completed, go to conclusion screen (step 6)
       playSuccessFanfare();
       setStep(6);
+      if (targetParcel) {
+        updateParcel(targetParcel.id, {
+          healthScore: calculatedHealthScore,
+        });
+      }
       if (onSaveProfileData) {
         onSaveProfileData({
           soilMoisture: step1Val,
@@ -60,6 +90,7 @@ export default function SoilDiagnosticWizardModal({
           waterSource: step4Val,
           pestStatus: step5Val,
           healthScore: calculatedHealthScore,
+          parcelId: targetParcel?.id,
         });
       }
     }
@@ -168,6 +199,56 @@ export default function SoilDiagnosticWizardModal({
           <RotateCcw className="w-3.5 h-3.5" />
         </button>
       </div>
+
+      {/* Active Parcel Evaluation Header */}
+      <div className="flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl bg-emerald-50/90 border border-emerald-200/80 text-emerald-950 shadow-2xs">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-6 h-6 rounded-full bg-emerald-200/80 flex items-center justify-center text-emerald-900 shrink-0">
+            <MapPin className="w-3.5 h-3.5" />
+          </div>
+          <div className="min-w-0">
+            <span className="text-[9.5px] font-bold uppercase tracking-wider text-emerald-800 block">
+              Evaluando Parcela:
+            </span>
+            <span className="text-xs font-bold text-zinc-900 truncate block">
+              {parcelName}
+            </span>
+          </div>
+        </div>
+        {parcelDetails && (
+          <span className="text-[10px] font-semibold bg-white/90 border border-emerald-300/60 px-2 py-0.5 rounded-full text-emerald-900 shrink-0">
+            {parcelDetails}
+          </span>
+        )}
+      </div>
+
+      {/* Quick parcel switcher chips if multiple parcels exist */}
+      {parcels && parcels.length > 1 && step <= 5 && (
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          {parcels.map((p) => {
+            const isSel = targetParcel?.id === p.id;
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => {
+                  playBubblePop();
+                  setSelectedParcelId(p.id);
+                  if (onSelectParcel) onSelectParcel(p.id);
+                }}
+                className={`px-3 py-1 rounded-full text-xs transition cursor-pointer shrink-0 flex items-center gap-1.5 ${
+                  isSel
+                    ? 'bg-[#132A1C] text-white font-semibold shadow-xs'
+                    : 'bg-white text-zinc-700 border border-[#E5ECE2] hover:bg-zinc-50'
+                }`}
+              >
+                <MapPin className={`w-3 h-3 ${isSel ? 'text-[#A3E635]' : 'text-zinc-400'}`} />
+                <span>{p.name.split('•')[0].trim()}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* HERO TITLE (Matching Frame 006) */}
       {step <= 5 && (
@@ -547,6 +628,14 @@ export default function SoilDiagnosticWizardModal({
                   : 'Atención requerida'}
               </span>
             </div>
+
+            {/* Confirmation of Parcel Diagnosed */}
+            <div className="pt-1">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-900 border border-emerald-200/80">
+                <MapPin className="w-3 h-3 text-emerald-700" />
+                <span>Diagnóstico guardado en: <strong>{parcelName}</strong></span>
+              </span>
+            </div>
           </div>
 
           {/* Editorial Header */}
@@ -625,6 +714,7 @@ export default function SoilDiagnosticWizardModal({
                   waterSource: step4Val,
                   pestStatus: step5Val,
                   healthScore: calculatedHealthScore,
+                  parcelId: targetParcel?.id,
                 });
               }
               onCompleteToRotation();

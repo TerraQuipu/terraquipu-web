@@ -88,7 +88,7 @@ export default function BottomNav({
           </button>
         </div>
 
-        {/* Tab 4: Rotación */}
+        {/* Tab 4: Cronograma y ahorro */}
         <button
           type="button"
           onClick={() => {
@@ -100,10 +100,10 @@ export default function BottomNav({
               ? 'text-[#A3E635] font-semibold'
               : 'text-zinc-400 hover:text-zinc-200 font-normal'
           }`}
-          aria-label="Pestaña Rotación"
+          aria-label="Pestaña Cronograma y ahorro"
         >
           <RotateCw className="w-5 h-5 mb-0.5" />
-          <span className="text-[10px] tracking-tight">Rotación</span>
+          <span className="text-[9.5px] tracking-tight text-center leading-tight">Cronograma y ahorro</span>
           {activeTab === 'rotacion' && (
             <span className="w-1 h-1 rounded-full bg-[#A3E635] mt-0.5 shadow-sm shadow-[#A3E635]" />
           )}

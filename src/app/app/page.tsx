@@ -15,6 +15,7 @@ import {
   Cultivo,
   ClimaNasa,
   FarmerProfile,
+  ParcelItem,
 } from '@/lib/types';
 import {
   generateHardwareProfile,
@@ -23,6 +24,9 @@ import {
   resetDeviceProfile,
   updateParcel,
   getActiveParcelId,
+  getActiveParcel,
+  getStoredParcels,
+  setActiveParcelId,
 } from '@/lib/deviceProfile';
 import {
   getMicrocuencas,
@@ -92,6 +96,85 @@ export default function MobileApp() {
     slope: 12,
     areaHa: 0,
   });
+
+  // Real parcels and synchronized active parcel state
+  const [parcels, setParcels] = useState<ParcelItem[]>([]);
+  const [activeParcelId, setActiveParcelIdState] = useState<string>('');
+
+  const refreshParcels = React.useCallback(() => {
+    const stored = getStoredParcels();
+    setParcels(stored);
+    const currentActiveId = getActiveParcelId();
+    let effectiveId = '';
+    if (currentActiveId && stored.some((p) => p.id === currentActiveId)) {
+      effectiveId = currentActiveId;
+      setActiveParcelIdState(currentActiveId);
+    } else if (stored.length > 0) {
+      effectiveId = stored[0].id;
+      setActiveParcelIdState(stored[0].id);
+      setActiveParcelId(stored[0].id);
+    } else {
+      setActiveParcelIdState('');
+    }
+
+    if (effectiveId) {
+      const found = stored.find((p) => p.id === effectiveId);
+      if (found) {
+        setProfile((prev) => {
+          if (!prev.parcelName || prev.parcelName !== found.name) {
+            return {
+              ...prev,
+              parcelName: found.name,
+              areaHa: found.areaHa,
+              lat: found.lat,
+              lon: found.lon,
+              altitude: found.altitudeMsnm,
+              cuencaName: found.microcuenca || prev.cuencaName,
+              distrito: found.microcuenca.split('-')[1]?.trim() || prev.distrito,
+              healthScore: found.healthScore ?? prev.healthScore,
+              previousCropName: found.cropName,
+              previousCropId: found.cropId,
+            };
+          }
+          return prev;
+        });
+      }
+    }
+  }, []);
+
+  const handleSelectParcel = (id: string) => {
+    setActiveParcelId(id);
+    setActiveParcelIdState(id);
+    const found = parcels.find((p) => p.id === id);
+    if (found) {
+      setProfile((prev) => ({
+        ...prev,
+        parcelName: found.name,
+        areaHa: found.areaHa,
+        lat: found.lat,
+        lon: found.lon,
+        altitude: found.altitudeMsnm,
+        cuencaName: found.microcuenca || prev.cuencaName,
+        distrito: found.microcuenca.split('-')[1]?.trim() || prev.distrito,
+        healthScore: found.healthScore ?? prev.healthScore,
+        previousCropName: found.cropName,
+        previousCropId: found.cropId,
+      }));
+    }
+  };
+
+  useEffect(() => {
+    refreshParcels();
+    const handleStorage = () => refreshParcels();
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('parcelChange', handleStorage);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('parcelChange', handleStorage);
+    };
+  }, [refreshParcels]);
+
+  const activeParcel = parcels.find((p) => p.id === activeParcelId) || parcels[0] || null;
 
   // Check online status and detect hardware profile
   useEffect(() => {
@@ -353,6 +436,8 @@ export default function MobileApp() {
           setProfile(updatedProfile);
           setOnboardingPhase('none');
           setSelectedParcelForDetail(newParcel.id);
+          refreshParcels();
+          handleSelectParcel(newParcel.id);
           triggerToast(`¡Bienvenido ${updatedProfile.farmerName}! Tu chacra "${newParcel.name}" ha sido guardada y calibrada in situ.`);
           navigateTo('parcelas');
         }}
@@ -426,6 +511,8 @@ export default function MobileApp() {
             previousCropId: newParcel.cropId,
           });
           setSelectedParcelForDetail(newParcel.id);
+          refreshParcels();
+          handleSelectParcel(newParcel.id);
           triggerToast(`Parcela "${newParcel.name}" guardada y calibrada con éxito`);
           navigateTo('parcelas');
         }}
@@ -463,7 +550,7 @@ export default function MobileApp() {
 
             <span className="text-xs font-semibold text-zinc-800 capitalize">
               {currentScreen === 'parcelas' && 'Mis Parcelas'}
-              {currentScreen === 'rotacion' && 'Rotación de Cultivos'}
+              {currentScreen === 'rotacion' && 'Cronograma y ahorro'}
               {currentScreen === 'copiloto' && 'Copiloto Andino'}
             </span>
 
@@ -490,8 +577,12 @@ export default function MobileApp() {
             liveAgrometeo={liveAgrometeo}
             smapPercent={smapPercent}
             hardwareId={hardwareId}
+            activeParcelId={activeParcelId}
+            parcels={parcels}
+            onSelectParcel={handleSelectParcel}
             onOpenWizard={() => navigateTo('diagnostico')}
             onNavigateToParcelas={(parcelId?: string) => {
+              if (parcelId) handleSelectParcel(parcelId);
               setSelectedParcelForDetail(parcelId || null);
               navigateTo('parcelas');
             }}
@@ -538,6 +629,9 @@ export default function MobileApp() {
           <SoilDiagnosticWizardModal
             isInline={true}
             isOpen={true}
+            activeParcel={activeParcel}
+            parcels={parcels}
+            onSelectParcel={handleSelectParcel}
             onClose={() => navigateTo(previousScreen === 'diagnostico' ? 'inicio' : previousScreen)}
             onCompleteToRotation={() => {
               navigateTo('rotacion');
@@ -551,10 +645,13 @@ export default function MobileApp() {
                 pest: data.pestStatus.includes('sana') ? 'sano' : data.pestStatus.includes('gorgojo') ? 'gorgojo' : 'rancha',
                 soilStoniness: data.soilDepth.includes('Profundo') ? 'profundo' : 'pedregoso',
               });
-              const activeId = getActiveParcelId();
-              updateParcel(activeId, {
-                healthScore: data.healthScore,
-              });
+              const targetId = data.parcelId || activeParcel?.id || getActiveParcelId();
+              if (targetId) {
+                updateParcel(targetId, {
+                  healthScore: data.healthScore,
+                });
+              }
+              refreshParcels();
               triggerToast(`Diagnóstico edáfico registrado: ${data.healthScore || 80}/100`);
             }}
           />
@@ -565,6 +662,9 @@ export default function MobileApp() {
           <RotationTab
             profile={profile}
             cultivos={cultivos}
+            activeParcelId={activeParcelId}
+            parcels={parcels}
+            onSelectParcel={handleSelectParcel}
             onNavigateToCopiloto={(voice) => {
               setCopilotVoice(voice || 'kipu');
               navigateTo('copiloto');
@@ -583,6 +683,9 @@ export default function MobileApp() {
             cultivos={cultivos}
             smapPercent={smapPercent}
             initialVoice={copilotVoice}
+            activeParcelId={activeParcelId}
+            parcels={parcels}
+            onSelectParcel={handleSelectParcel}
             onOpenDiagnostic={() => navigateTo('diagnostico')}
             onToast={triggerToast}
           />

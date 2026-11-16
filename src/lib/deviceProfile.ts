@@ -140,6 +140,7 @@ export function saveParcel(parcel: ParcelItem): ParcelItem[] {
     const updated = [parcel, ...current.filter((p) => p.id !== parcel.id)];
     localStorage.setItem(PARCELS_STORAGE_KEY, JSON.stringify(updated));
     localStorage.setItem(ACTIVE_PARCEL_KEY, parcel.id);
+    window.dispatchEvent(new Event('parcelChange'));
     return updated;
   } catch (e) {
     return [parcel];
@@ -152,6 +153,7 @@ export function updateParcel(id: string, updates: Partial<ParcelItem>): ParcelIt
     const current = getStoredParcels();
     const updated = current.map((p) => (p.id === id ? { ...p, ...updates } : p));
     localStorage.setItem(PARCELS_STORAGE_KEY, JSON.stringify(updated));
+    window.dispatchEvent(new Event('parcelChange'));
     return updated;
   } catch (e) {
     return [];
@@ -183,6 +185,7 @@ export function deleteParcel(id: string): ParcelItem[] {
         localStorage.removeItem(ACTIVE_PARCEL_KEY);
       }
     }
+    window.dispatchEvent(new Event('parcelChange'));
     return updated;
   } catch (e) {
     return [];
@@ -205,6 +208,7 @@ export function setActiveParcelId(id: string): void {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(ACTIVE_PARCEL_KEY, id);
+    window.dispatchEvent(new Event('parcelChange'));
   } catch (e) {
     // ignore
   }

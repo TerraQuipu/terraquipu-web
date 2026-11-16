@@ -15,9 +15,13 @@ import {
   Layers,
   MapPin,
   Plus,
+  Edit3,
+  Check,
+  RotateCcw,
 } from 'lucide-react';
-import { playBubblePop } from '@/lib/soundEffects';
-import { getStoredParcels, getActiveParcel, setActiveParcelId } from '@/lib/deviceProfile';
+import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
+import { getStoredParcels, getActiveParcel, setActiveParcelId, getActiveParcelId } from '@/lib/deviceProfile';
+import { calculateNitrogenSavings, getFertilizerPriceForParcel } from '@/lib/agronomicPricing';
 
 interface RotationTabProps {
   profile: FarmerProfile;
@@ -25,6 +29,9 @@ interface RotationTabProps {
   onNavigateToCopiloto?: (voice?: 'astro' | 'kipu') => void;
   onToast?: (msg: string) => void;
   onOpenQgisDrawer?: () => void;
+  activeParcelId?: string;
+  parcels?: ParcelItem[];
+  onSelectParcel?: (parcelId: string) => void;
 }
 
 interface MonthInfo {
@@ -210,6 +217,9 @@ export default function RotationTab({
   onNavigateToCopiloto,
   onToast,
   onOpenQgisDrawer,
+  activeParcelId: propActiveParcelId,
+  parcels: propParcels,
+  onSelectParcel,
 }: RotationTabProps) {
   const [activeSeasonTab, setActiveSeasonTab] = useState<'inmediato' | 'seca'>('inmediato');
   const [parcels, setParcels] = useState<ParcelItem[]>([]);
@@ -217,28 +227,48 @@ export default function RotationTab({
   const [rotateAreaHa, setRotateAreaHa] = useState<number>(profile.areaHa || 1.73);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
+  // Custom urea sack price states
+  const [customSackPrice, setCustomSackPrice] = useState<number | undefined>(undefined);
+  const [isEditingPrice, setIsEditingPrice] = useState<boolean>(false);
+  const [priceInputText, setPriceInputText] = useState<string>('');
+
   useEffect(() => {
     setCurrentDate(new Date());
-    const list = getStoredParcels();
-    setParcels(list);
-    const active = getActiveParcel();
-    setActiveParcel(active || (list.length > 0 ? list[0] : null));
-    if (active) {
-      setRotateAreaHa(active.areaHa);
-    }
   }, []);
+
+  // Sync parcels from props or storage
+  useEffect(() => {
+    if (propParcels && propParcels.length > 0) {
+      setParcels(propParcels);
+    } else {
+      const list = getStoredParcels();
+      setParcels(list);
+    }
+  }, [propParcels]);
+
+  // Sync active parcel from props or storage
+  useEffect(() => {
+    const list = propParcels && propParcels.length > 0 ? propParcels : getStoredParcels();
+    const targetId = propActiveParcelId || getActiveParcelId();
+    const found = list.find((p) => p.id === targetId) || (list.length > 0 ? list[0] : null);
+    if (found) {
+      setActiveParcel(found);
+      setRotateAreaHa(found.areaHa);
+    }
+  }, [propActiveParcelId, propParcels]);
 
   const handleSelectParcel = (p: ParcelItem) => {
     playBubblePop();
     setActiveParcel(p);
     setActiveParcelId(p.id);
     setRotateAreaHa(p.areaHa);
-    if (onToast) onToast(`Plan adaptado a ${p.name}`);
+    setCustomSackPrice(undefined);
+    setIsEditingPrice(false);
+    if (onSelectParcel) {
+      onSelectParcel(p.id);
+    }
+    if (onToast) onToast(`Plan adaptado a ${p.name.split('•')[0].trim()}`);
   };
-
-  // Reference savings: S/ 286 per hectare (INIA Cusco validated)
-  const savingsPerHa = 286;
-  const calculatedSavings = Math.round(rotateAreaHa * savingsPerHa);
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
@@ -251,6 +281,31 @@ export default function RotationTab({
 
   // Agronomic data for the active parcel from Supabase matriz_cultivos
   const activeCropAgro = useMemo(() => getCropAgronomics(activeParcel, cultivos), [activeParcel, cultivos]);
+
+  // Legume nitrogen fixation: if successor fixes N, use it; default 75 kg N/ha
+  const legumeNitrogenKgHa =
+    activeCropAgro.successor?.balanceN && activeCropAgro.successor.balanceN > 0
+      ? activeCropAgro.successor.balanceN
+      : 75;
+
+  // Dynamic nitrogen savings calculated with regional fertilizer pricing matrix
+  const savingsCalc = useMemo(() => {
+    return calculateNitrogenSavings(
+      rotateAreaHa,
+      legumeNitrogenKgHa,
+      customSackPrice,
+      activeParcel?.microcuenca || profile.cuencaName,
+      profile.distrito || profile.provincia
+    );
+  }, [
+    rotateAreaHa,
+    legumeNitrogenKgHa,
+    customSackPrice,
+    activeParcel?.microcuenca,
+    profile.cuencaName,
+    profile.distrito,
+    profile.provincia,
+  ]);
 
   // Dynamic campaign year string
   const campaignYear = currentDate.getFullYear();
@@ -396,10 +451,7 @@ export default function RotationTab({
             PLAN DE CAMPAÑA · {campaignYear} / {nextYear}
           </span>
           <h1 className="text-xl sm:text-2xl font-semibold text-[#132A1C] leading-tight">
-            Rotar hoy,{' '}
-            <span className="italic text-emerald-800 font-normal">
-              cuidar mañana.
-            </span>
+            Cronograma y ahorro
           </h1>
         </div>
 
@@ -714,8 +766,161 @@ export default function RotationTab({
             </span>
           </h3>
           <p className="text-xs text-zinc-300 leading-relaxed">
-            Estima el ahorro en fertilizantes con una rotación de leguminosas.
+            Estima el ahorro en fertilizantes con una rotación de leguminosas según los precios de tu microcuenca.
           </p>
+        </div>
+
+        {/* Selector de parcelas para ver el precio de cada una allí */}
+        {parcels.length > 1 && (
+          <div className="space-y-1.5 pt-1">
+            <span className="text-[10px] font-semibold text-[#A3E635] uppercase tracking-wider block">
+              Elegir parcela para ver precio local:
+            </span>
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+              {parcels.map((p) => {
+                const isSel = activeParcel?.id === p.id;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => handleSelectParcel(p)}
+                    className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer shrink-0 flex items-center gap-1.5 ${
+                      isSel
+                        ? 'bg-[#A3E635] text-[#132A1C] font-bold shadow-xs'
+                        : 'bg-emerald-950/80 text-zinc-200 border border-emerald-700/50 hover:bg-emerald-900'
+                    }`}
+                  >
+                    <MapPin className={`w-3.5 h-3.5 ${isSel ? 'text-[#132A1C]' : 'text-[#A3E635]'}`} />
+                    <span>{p.name.split('•')[0].trim()}</span>
+                    <span className={`text-[10px] ${isSel ? 'text-emerald-950 font-semibold' : 'text-zinc-400'}`}>
+                      ({p.cropCategory || p.cropName})
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Microcuenca Location & Fertilizer Price Banner */}
+        <div className="bg-[#132A1C]/90 rounded-2xl p-3.5 border border-emerald-800/40 space-y-2.5">
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center gap-1.5 text-zinc-300 min-w-0">
+              <MapPin className="w-3.5 h-3.5 text-[#A3E635] shrink-0" />
+              <span className="font-semibold text-white truncate">
+                {activeParcel ? activeParcel.name.split('•')[0].trim() : profile.parcelName}
+              </span>
+            </div>
+            <span className="text-[10px] font-mono text-emerald-300 shrink-0 ml-2">
+              {activeParcel?.microcuenca || profile.cuencaName || 'Cusco Sierra'}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between pt-1 border-t border-emerald-800/30">
+            <div>
+              <span className="text-[9.5px] uppercase tracking-wider text-zinc-400 block">
+                Precio de Urea (50 kg)
+              </span>
+              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                <span className="text-base font-bold text-[#A3E635] font-mono">
+                  S/ {savingsCalc.pricePerSack}
+                </span>
+                <span className="text-[10px] text-zinc-300 font-normal">
+                  / saco
+                </span>
+                <span className={`text-[9px] px-2 py-0.5 rounded-full border ${
+                  savingsCalc.isCustomPrice
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                    : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                }`}>
+                  {savingsCalc.fuente}
+                </span>
+              </div>
+            </div>
+
+            {!isEditingPrice && (
+              <button
+                type="button"
+                onClick={() => {
+                  playBubblePop();
+                  setPriceInputText(String(savingsCalc.pricePerSack));
+                  setIsEditingPrice(true);
+                }}
+                className="px-2.5 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/30 text-[11px] text-[#A3E635] flex items-center gap-1 transition cursor-pointer shrink-0"
+                title="Editar precio del saco si compraste a otro valor"
+              >
+                <Edit3 className="w-3 h-3" />
+                <span>Modificar</span>
+              </button>
+            )}
+          </div>
+
+          {/* Inline Edit Form */}
+          {isEditingPrice && (
+            <div className="pt-2 border-t border-emerald-800/30 space-y-2">
+              <label className="text-[10px] text-zinc-300 block">
+                Ingresa el precio pagado en tu feria local (S/ por saco de 50 kg):
+              </label>
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400">
+                    S/
+                  </span>
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="40"
+                    max="200"
+                    value={priceInputText}
+                    onChange={(e) => setPriceInputText(e.target.value)}
+                    className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-emerald-950 text-white font-mono text-sm border border-[#7BB63E] focus:outline-hidden"
+                    autoFocus
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const val = parseFloat(priceInputText);
+                    if (!isNaN(val) && val > 0) {
+                      playSuccessFanfare();
+                      setCustomSackPrice(val);
+                      setIsEditingPrice(false);
+                      if (onToast) onToast(`Precio de urea ajustado a S/ ${val}`);
+                    }
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-[#7BB63E] text-[#132A1C] font-bold text-xs hover:bg-[#8CD045] transition cursor-pointer flex items-center gap-1"
+                >
+                  <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  <span>Listo</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditingPrice(false)}
+                  className="px-2.5 py-1.5 rounded-xl bg-emerald-950 text-zinc-400 text-xs hover:text-white transition cursor-pointer"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Reset button if custom price is active */}
+          {savingsCalc.isCustomPrice && !isEditingPrice && (
+            <div className="pt-1 flex justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  playBubblePop();
+                  setCustomSackPrice(undefined);
+                  if (onToast) onToast('Restablecido a precio oficial MIDAGRI SISAP');
+                }}
+                className="text-[10px] text-zinc-400 hover:text-emerald-300 underline flex items-center gap-1 cursor-pointer transition"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Restablecer a precio oficial MIDAGRI</span>
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="space-y-2 pt-1">
@@ -745,18 +950,21 @@ export default function RotationTab({
 
         {/* Big Savings Metric */}
         <div className="bg-[#132A1C]/90 rounded-2xl p-4 border border-emerald-800/40 flex items-center justify-between">
-          <div>
+          <div className="space-y-0.5">
             <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-300 block">
               AHORRO ESTIMADO EN ABONOS
             </span>
-            <span className="text-2xl font-bold text-[#A3E635] font-mono block mt-0.5">
-              S/ {calculatedSavings.toLocaleString('es-PE')}
+            <span className="text-2xl font-bold text-[#A3E635] font-mono block">
+              S/ {savingsCalc.totalSavings.toLocaleString('es-PE')}
             </span>
-            <span className="text-[9.5px] text-zinc-400 block mt-0.5">
-              Cálculo para {rotateAreaHa.toFixed(1)} ha rotadas con leguminosas
+            <span className="text-[10px] text-zinc-300 block">
+              Ahorro de ~{savingsCalc.totalSacksAvoided} sacos de urea (S/ {savingsCalc.pricePerSack}/saco) en {rotateAreaHa.toFixed(1)} ha
+            </span>
+            <span className="text-[9px] text-zinc-400 block">
+              Equivale a ~{savingsCalc.sacksAvoidedPerHa} sacos evitados por cada ha de leguminosa
             </span>
           </div>
-          <div className="w-10 h-10 rounded-2xl bg-emerald-900/60 border border-emerald-500/30 flex items-center justify-center text-[#A3E635]">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-900/60 border border-emerald-500/30 flex items-center justify-center text-[#A3E635] shrink-0">
             <Sparkles className="w-5 h-5" />
           </div>
         </div>

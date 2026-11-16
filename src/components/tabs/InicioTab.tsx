@@ -18,9 +18,10 @@ import {
   Sprout,
   ShieldCheck,
   X,
+  Sparkles,
 } from 'lucide-react';
 import { playBubblePop } from '@/lib/soundEffects';
-import { getStoredParcels, setActiveParcelId } from '@/lib/deviceProfile';
+import { getStoredParcels, setActiveParcelId, getActiveParcelId } from '@/lib/deviceProfile';
 import { calculateDynamicSoilHealthIndex } from '@/lib/geoUtils';
 
 interface InicioTabProps {
@@ -36,6 +37,9 @@ interface InicioTabProps {
   onNavigateToCopiloto?: () => void;
   onOpenNews?: () => void;
   onOpenSettings?: () => void;
+  activeParcelId?: string;
+  parcels?: ParcelItem[];
+  onSelectParcel?: (parcelId: string) => void;
 }
 
 export default function InicioTab({
@@ -51,12 +55,47 @@ export default function InicioTab({
   onNavigateToCopiloto,
   onOpenNews,
   onOpenSettings,
+  activeParcelId: propActiveParcelId,
+  parcels: propParcels,
+  onSelectParcel,
 }: InicioTabProps) {
   const [currentTime, setCurrentTime] = useState<string>('');
   const [isBannerDismissed, setIsBannerDismissed] = useState(false);
   const [selectedCropFilter, setSelectedCropFilter] = useState<string>('Todos');
   const [activeConsejoVoice, setActiveConsejoVoice] = useState<'astro' | 'kipu'>('astro');
   const [parcels, setParcels] = useState<ParcelItem[]>([]);
+  const [localActiveParcelId, setLocalActiveParcelId] = useState<string>(() => {
+    return propActiveParcelId || (typeof window !== 'undefined' ? getActiveParcelId() : '');
+  });
+
+  // Keep local active parcel in sync with prop if changed from parent
+  useEffect(() => {
+    if (propActiveParcelId) {
+      setLocalActiveParcelId(propActiveParcelId);
+    }
+  }, [propActiveParcelId]);
+
+  // Read stored or prop parcels
+  useEffect(() => {
+    if (propParcels && propParcels.length > 0) {
+      setParcels(propParcels);
+    } else {
+      const stored = getStoredParcels();
+      setParcels(stored);
+    }
+  }, [propParcels]);
+
+  const handleSelectParcel = (parcelId: string) => {
+    playBubblePop();
+    setLocalActiveParcelId(parcelId);
+    setActiveParcelId(parcelId);
+    if (onSelectParcel) {
+      onSelectParcel(parcelId);
+    }
+  };
+
+  const effectiveActiveParcelId = propActiveParcelId || localActiveParcelId;
+  const activeParcel = parcels.find((p) => p.id === effectiveActiveParcelId) || parcels[0] || null;
 
   // Live dynamic local time formatting (e.g. 15:55)
   useEffect(() => {
@@ -74,11 +113,16 @@ export default function InicioTab({
     return () => clearInterval(timer);
   }, []);
 
-  // Read real stored parcels
-  useEffect(() => {
-    const stored = getStoredParcels();
-    setParcels(stored);
-  }, []);
+  // Circular gauge calculations and dynamic smooth animation
+  const dynamicHealthScore = React.useMemo(() => {
+    if (activeParcel?.healthScore !== undefined) return activeParcel.healthScore;
+    if (profile.healthScore !== undefined) return profile.healthScore;
+    // Derive dynamic soil health from live SMAP moisture and parcel metrics
+    return calculateDynamicSoilHealthIndex({
+      smapHumidity: activeParcel?.smapHumidity ?? smapPercent,
+      ndvi: activeParcel?.ndviScore,
+    });
+  }, [activeParcel?.healthScore, activeParcel?.smapHumidity, activeParcel?.ndviScore, profile.healthScore, smapPercent]);
 
   // Dynamic filter pills derived from real parcels
   const availableFilters = React.useMemo(() => {
@@ -100,18 +144,6 @@ export default function InicioTab({
           p.cropCategory === selectedCropFilter ||
           p.cropName === selectedCropFilter
       );
-
-  // Circular gauge calculations and dynamic smooth animation
-  const activeParcel = parcels[0];
-  const dynamicHealthScore = React.useMemo(() => {
-    if (profile.healthScore !== undefined) return profile.healthScore;
-    if (activeParcel?.healthScore !== undefined) return activeParcel.healthScore;
-    // Derive dynamic soil health from live SMAP moisture and parcel metrics
-    return calculateDynamicSoilHealthIndex({
-      smapHumidity: smapPercent,
-      ndvi: activeParcel?.ndviScore,
-    });
-  }, [profile.healthScore, activeParcel?.healthScore, activeParcel?.ndviScore, smapPercent]);
 
   const healthScore = dynamicHealthScore;
   const [animatedScore, setAnimatedScore] = useState(0);
@@ -387,68 +419,136 @@ export default function InicioTab({
          ========================================================================= */}
       <div className="px-4 space-y-4 max-w-md mx-auto">
         {/* 1. SECCIÓN SALUD DEL SUELO */}
-        <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-4">
-          <div className="space-y-1.5 flex-1 min-w-0">
+        <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] space-y-3.5">
+          {/* Active Parcel Header & Chip Selector */}
+          {parcels.length > 0 && (
+            <div className="space-y-2 pb-2 border-b border-[#F0F4ED]">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-800/80 block">
+                  SALUD DEL SUELO
+                </span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/60 truncate max-w-[220px]">
+                  📍 {activeParcel?.name || 'Chacra principal'}
+                </span>
+              </div>
+
+              {/* Parcel Chips Selector */}
+              {parcels.length > 1 && (
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                  {parcels.map((p) => {
+                    const isSel = activeParcel?.id === p.id;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => handleSelectParcel(p.id)}
+                        className={`px-3 py-1 rounded-full text-xs transition cursor-pointer shrink-0 flex items-center gap-1.5 ${
+                          isSel
+                            ? 'bg-[#132A1C] text-white font-semibold shadow-xs'
+                            : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200/80'
+                        }`}
+                      >
+                        <MapPin className={`w-3 h-3 ${isSel ? 'text-[#A3E635]' : 'text-zinc-400'}`} />
+                        <span>{p.name.split('•')[0].trim()}</span>
+                        <span className={`text-[10px] ${isSel ? 'text-zinc-300' : 'text-zinc-400'}`}>
+                          ({p.cropCategory || p.cropName})
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {parcels.length === 0 && (
             <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-800/80 block">
               SALUD DEL SUELO
             </span>
-            <h1 className="text-xl sm:text-2xl font-bold text-zinc-800 leading-tight">
-              {parcels.length === 0 ? (
-                <>
-                  Listo para{' '}
-                  <span className="italic text-emerald-800 font-normal">
-                    calibrar tu chacra.
-                  </span>
-                </>
-              ) : (
-                <>
-                  Tu suelo está{' '}
-                  <span className="italic text-emerald-800 font-normal">
-                    {healthScore >= 75 ? 'respondiendo bien.' : healthScore >= 50 ? 'en recuperación.' : 'bajo estrés hídrico.'}
-                  </span>
-                </>
-              )}
-            </h1>
-            <p className="text-xs text-zinc-600 leading-relaxed font-normal">
-              {parcels.length === 0
-                ? 'Delimita tu parcela para monitorear humedad de suelo y vigor con satélites.'
-                : 'Pequeñas prácticas de hoy protegen la cosecha de mañana.'}
-            </p>
-          </div>
+          )}
 
-          {/* Circular Gauge */}
-          <div className="relative shrink-0 flex flex-col items-center justify-center w-20 h-20">
-            <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 80 80" width={80} height={80}>
-              <circle
-                cx="40"
-                cy="40"
-                r={radius}
-                stroke="#E5ECE2"
-                strokeWidth="6"
-                fill="transparent"
-              />
-              <circle
-                cx="40"
-                cy="40"
-                r={radius}
-                stroke={scoreColor}
-                strokeWidth="6"
-                strokeDasharray={circumference}
-                strokeDashoffset={strokeDashoffset}
-                strokeLinecap="round"
-                fill="transparent"
-                className="transition-all duration-1000 ease-out"
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-              <span className="text-lg font-bold text-zinc-800 leading-none">
-                {healthScore}<span className="text-[10px] text-zinc-500 font-normal">/100</span>
-              </span>
-              <span className="text-[7.5px] font-semibold text-emerald-800 uppercase tracking-tight mt-0.5">
-                {scoreStatus}
-              </span>
+          <div className="flex items-center justify-between gap-4">
+            <div className="space-y-1.5 flex-1 min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold text-zinc-800 leading-tight">
+                {parcels.length === 0 ? (
+                  <>
+                    Listo para{' '}
+                    <span className="italic text-emerald-800 font-normal">
+                      calibrar tu chacra.
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    Tu suelo está{' '}
+                    <span className="italic text-emerald-800 font-normal">
+                      {healthScore >= 75 ? 'respondiendo bien.' : healthScore >= 50 ? 'en recuperación.' : 'bajo estrés hídrico.'}
+                    </span>
+                  </>
+                )}
+              </h1>
+              <p className="text-xs text-zinc-600 leading-relaxed font-normal">
+                {parcels.length === 0
+                  ? 'Delimita tu parcela para monitorear humedad de suelo y vigor con satélites.'
+                  : activeParcel
+                  ? `Evaluando ${activeParcel.name.split('•')[0].trim()} (${activeParcel.areaHa} ha). Pequeñas prácticas protegen la cosecha.`
+                  : 'Pequeñas prácticas de hoy protegen la cosecha de mañana.'}
+              </p>
+            </div>
+
+            {/* Circular Gauge */}
+            <div className="relative shrink-0 flex flex-col items-center justify-center w-20 h-20">
+              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 80 80" width={80} height={80}>
+                <circle
+                  cx="40"
+                  cy="40"
+                  r={radius}
+                  stroke="#E5ECE2"
+                  strokeWidth="6"
+                  fill="transparent"
+                />
+                <circle
+                  cx="40"
+                  cy="40"
+                  r={radius}
+                  stroke={scoreColor}
+                  strokeWidth="6"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={strokeDashoffset}
+                  strokeLinecap="round"
+                  fill="transparent"
+                  className="transition-all duration-1000 ease-out"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                <span className="text-lg font-bold text-zinc-800 leading-none">
+                  {healthScore}<span className="text-[10px] text-zinc-500 font-normal">/100</span>
+                </span>
+                <span className="text-[7.5px] font-semibold text-emerald-800 uppercase tracking-tight mt-0.5">
+                  {scoreStatus}
+                </span>
+              </div>
             </div>
           </div>
+
+          {/* Action button to evaluate this parcel with the wizard */}
+          {onOpenWizard && (
+            <div className="pt-2 border-t border-[#F0F4ED] flex items-center justify-between gap-2">
+              <span className="text-[11px] text-zinc-500 font-normal truncate">
+                {activeParcel ? `Diagnóstico de ${activeParcel.name.split('•')[0].trim()}` : 'Registrar reporte de campo'}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  playBubblePop();
+                  onOpenWizard();
+                }}
+                className="px-3.5 py-1.5 rounded-full bg-[#132A1C] hover:bg-emerald-950 text-white font-semibold text-xs transition cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5 shrink-0"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#A3E635]" />
+                <span>Evaluar suelo</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* 2. ALERTA DINÁMICA MOMENTÁNEA / DESCARTABLE */}
@@ -553,8 +653,7 @@ export default function InicioTab({
                   <div
                     key={parcel.id}
                     onClick={() => {
-                      playBubblePop();
-                      setActiveParcelId(parcel.id);
+                      handleSelectParcel(parcel.id);
                       if (onNavigateToParcelas) onNavigateToParcelas(parcel.id);
                     }}
                     className="relative overflow-hidden rounded-3xl bg-[#132A1C] text-white shadow-sm border border-emerald-900/40 flex flex-col justify-between min-h-[220px] p-3.5 cursor-pointer group hover:shadow-md transition"
