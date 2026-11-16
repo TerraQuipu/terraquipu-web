@@ -6,21 +6,14 @@ import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
 
 interface WelcomeSplashProps {
   onStartWizard: () => void;
-  onEnterDirect: () => void;
 }
 
 export default function WelcomeSplash({
   onStartWizard,
-  onEnterDirect,
 }: WelcomeSplashProps) {
   const handleStart = () => {
     playSuccessFanfare();
     onStartWizard();
-  };
-
-  const handleDirect = () => {
-    playBubblePop();
-    onEnterDirect();
   };
 
   return (
@@ -49,14 +42,6 @@ export default function WelcomeSplash({
             terraquipu
           </span>
         </div>
-
-        <button
-          type="button"
-          onClick={handleDirect}
-          className="text-xs font-medium text-zinc-300 hover:text-white transition px-3.5 py-1.5 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/15 cursor-pointer shadow-xs active:scale-95"
-        >
-          Omitir
-        </button>
       </div>
 
       {/* 3. Píldoras Flotantes de Telemetría Real (Adaptadas de Imagen 4) */}
@@ -112,17 +97,6 @@ export default function WelcomeSplash({
               <ArrowRight className="w-4 h-4 text-[#A3E635]" />
             </div>
           </button>
-
-          {/* Enlace Secundario: Omitir */}
-          <div className="text-center pt-1">
-            <button
-              type="button"
-              onClick={handleDirect}
-              className="text-xs font-normal text-zinc-400 hover:text-white transition cursor-pointer"
-            >
-              Omitir y explorar primero
-            </button>
-          </div>
         </div>
       </div>
     </div>

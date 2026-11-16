@@ -512,3 +512,85 @@ export function downloadGeoJsonFile(filename: string, content: string) {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+
+export interface DynamicSoilHealthInput {
+  ndvi?: number;
+  smapHumidity?: number;
+  profundidad?: 'profundo' | 'medio' | 'poco_profundo' | 'muy_pedregoso' | string;
+  pedregosidad?: 'sin_piedras' | 'pocas_piedras' | 'pedregoso' | 'muy_pedregoso' | string;
+  obras?: 'buen_estado' | 'mal_estado' | 'ninguna' | string;
+  cobertura?: 'cultivo' | 'rastrojo' | 'suelo_desnudo' | 'pasto' | string;
+}
+
+/**
+ * Dynamic agronomic soil health index calculation (0-100).
+ * Eliminates arbitrary hardcoded scores (e.g. 78) by combining:
+ * 1. NASA SMAP soil moisture relative to root zone field capacity
+ * 2. Sentinel-2 NDVI vegetative vigor
+ * 3. Effective soil depth and stoniness (pedregosidad)
+ * 4. Soil conservation works (andenes, terrazas, zanjas)
+ * 5. Ground cover / mulch management
+ */
+export function calculateDynamicSoilHealthIndex(input: DynamicSoilHealthInput = {}): number {
+  let score = 64; // Baseline score for Andean agroclimatic soils
+
+  // 1. SMAP Moisture evaluation (ideal field capacity range: 18% - 32%)
+  const smap = input.smapHumidity ?? 20;
+  if (smap >= 18 && smap <= 32) {
+    score += 12; // Optimal moisture
+  } else if (smap >= 14 && smap < 18) {
+    score += 4; // Slight water deficit
+  } else if (smap < 14) {
+    score -= 16; // Severe drought stress
+  } else if (smap > 40) {
+    score -= 8; // Waterlogging risk
+  }
+
+  // 2. Vegetative vigor / NDVI
+  const ndvi = input.ndvi ?? 0.65;
+  if (ndvi >= 0.65) {
+    score += 12; // Strong biomass / active vegetative canopy
+  } else if (ndvi >= 0.45) {
+    score += 6; // Moderate vigor
+  } else if (ndvi < 0.3) {
+    score -= 10; // Sparse cover or degraded terrain
+  }
+
+  // 3. Effective depth
+  if (input.profundidad === 'profundo') {
+    score += 8;
+  } else if (input.profundidad === 'medio') {
+    score += 3;
+  } else if (input.profundidad === 'poco_profundo') {
+    score -= 8;
+  } else if (input.profundidad === 'muy_pedregoso') {
+    score -= 12;
+  }
+
+  // 4. Stoniness / Pedregosidad
+  if (input.pedregosidad === 'sin_piedras' || input.pedregosidad === 'sin_o_pocas') {
+    score += 5;
+  } else if (input.pedregosidad === 'muy_pedregoso') {
+    score -= 8;
+  }
+
+  // 5. Conservation works
+  if (input.obras === 'buen_estado') {
+    score += 9;
+  } else if (input.obras === 'mal_estado') {
+    score -= 4;
+  } else if (input.obras === 'ninguna') {
+    score -= 6;
+  }
+
+  // 6. Ground cover
+  if (input.cobertura === 'cultivo' || input.cobertura === 'rastrojo') {
+    score += 6;
+  } else if (input.cobertura === 'suelo_desnudo') {
+    score -= 12;
+  }
+
+  // Clamp within realistic agronomic bounds [20, 96]
+  return Math.max(20, Math.min(96, Math.round(score)));
+}
+

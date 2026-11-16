@@ -162,5 +162,6 @@ export interface ParcelItem {
   rotacionA13?: RotacionA13Resultado;
   fechaCalibracion?: string;
   vulnerabilidad?: 'Baja' | 'Media' | 'Alta';
+  calendarioPreventivo?: any[];
 }
 

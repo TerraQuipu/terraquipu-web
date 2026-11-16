@@ -23,6 +23,7 @@ import {
   Sparkles,
   RefreshCw,
   ShieldCheck,
+  Sprout,
 } from 'lucide-react';
 import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
 import ParcelMap from '@/components/ParcelMap';
@@ -226,31 +227,59 @@ export default function ChacraTab({
         </div>
 
         {/* Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-          {['Todos', 'Papa nativa', 'Maíz', 'Quinua', 'Cebada', 'Habas'].map((filter) => {
-            const isSelected = selectedCropFilter === filter;
-            return (
-              <button
-                key={filter}
-                type="button"
-                onClick={() => {
-                  playBubblePop();
-                  setSelectedCropFilter(filter);
-                }}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition cursor-pointer shrink-0 ${
-                  isSelected
-                    ? 'bg-[#7BB63E] text-white shadow-xs font-semibold'
-                    : 'bg-white text-zinc-700 border border-[#E5ECE2] hover:bg-zinc-50'
-                }`}
-              >
-                {filter}
-              </button>
-            );
-          })}
-        </div>
+        {parcels.length > 0 && (
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {['Todos', 'Papa nativa', 'Maíz', 'Quinua', 'Cebada', 'Habas'].map((filter) => {
+              const isSelected = selectedCropFilter === filter;
+              return (
+                <button
+                  key={filter}
+                  type="button"
+                  onClick={() => {
+                    playBubblePop();
+                    setSelectedCropFilter(filter);
+                  }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition cursor-pointer shrink-0 ${
+                    isSelected
+                      ? 'bg-[#7BB63E] text-white shadow-xs font-semibold'
+                      : 'bg-white text-zinc-700 border border-[#E5ECE2] hover:bg-zinc-50'
+                  }`}
+                >
+                  {filter}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
-        {/* Cards Grid */}
-        {filteredParcels.length === 0 ? (
+        {/* Cards Grid or Cordial Empty State */}
+        {parcels.length === 0 ? (
+          <div className="bg-white rounded-3xl p-8 border border-[#E5ECE2] text-center space-y-3.5 shadow-xs">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center mx-auto text-emerald-800 shadow-xs">
+              <Sprout className="w-7 h-7 text-emerald-800" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-base font-bold text-zinc-800">
+                Aún no has delimitado tus parcelas
+              </h3>
+              <p className="text-xs text-zinc-600 max-w-xs mx-auto leading-relaxed">
+                Dibuja el contorno de tu primera chacra en el mapa satelital para calibrar la humedad NASA y el calendario preventivo.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                playBubblePop();
+                if (onOpenQgisDrawer) onOpenQgisDrawer();
+                else if (onOpenWizard) onOpenWizard();
+              }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-semibold text-xs shadow-md transition active:scale-95 cursor-pointer"
+            >
+              <span>Delimitar mi primera parcela</span>
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+            </button>
+          </div>
+        ) : filteredParcels.length === 0 ? (
           <div className="bg-white rounded-3xl p-8 border border-[#E5ECE2] text-center space-y-3">
             <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto text-emerald-800">
               <MapPin className="w-6 h-6" />

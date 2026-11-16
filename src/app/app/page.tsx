@@ -278,7 +278,7 @@ export default function MobileApp() {
   // ONBOARDING WORKFLOW (NUEVO DISPOSITIVO: BIENVENIDA -> KIPU PERFIL -> DELIMITAR PARCELA)
   // =========================================================================
 
-  // Paso 1 de Onboarding: Welcome Splash (Adaptado de Imagen 4)
+  // Paso 1 de Onboarding: Welcome Splash (Adaptado de Imagen 4) - Sin botón omitir
   if (onboardingPhase === 'welcome') {
     return (
       <div className="flex flex-col h-full min-h-screen bg-[#0A1A0F]">
@@ -287,42 +287,35 @@ export default function MobileApp() {
             playBubblePop();
             setOnboardingPhase('kipu_name');
           }}
-          onEnterDirect={() => {
-            playBubblePop();
-            const configured = saveDeviceProfile({
-              ...profile,
-              farmerName: profile.farmerName || 'Miguel',
-            });
-            setProfile(configured);
-            setOnboardingPhase('none');
-          }}
         />
       </div>
     );
   }
 
-  // Paso 2 de Onboarding: Kipu Copiloto pregunta Nombre
+  // Paso 2 de Onboarding: Kipu Copiloto pregunta Nombre y Comunidad Obligatorios
   if (onboardingPhase === 'kipu_name') {
     return (
       <div className="flex flex-col h-full min-h-screen bg-[#0A1A0F]">
         <KipuFarmerWelcomeView
           initialName={profile.farmerName || ''}
+          initialCommunity={profile.distrito || ''}
           onBack={() => setOnboardingPhase('welcome')}
-          onContinue={(farmerName) => {
+          onContinue={(farmerName, community, regionData) => {
             setProfile((prev) => ({
               ...prev,
               farmerName,
               parcelName: `Chacra de ${farmerName}`,
+              distrito: community,
+              ...(regionData
+                ? {
+                    lat: regionData.lat,
+                    lon: regionData.lon,
+                    altitude: regionData.altitude,
+                    cuencaName: regionData.cuencaName,
+                  }
+                : {}),
             }));
             setOnboardingPhase('parcel_setup');
-          }}
-          onSkip={() => {
-            const configured = saveDeviceProfile({
-              ...profile,
-              farmerName: profile.farmerName || 'Miguel',
-            });
-            setProfile(configured);
-            setOnboardingPhase('none');
           }}
         />
       </div>
@@ -343,7 +336,7 @@ export default function MobileApp() {
         onParcelCreated={(newParcel) => {
           const updatedProfile: FarmerProfile = {
             ...profile,
-            farmerName: profile.farmerName || 'Miguel',
+            farmerName: profile.farmerName || 'Agricultor Andino',
             parcelName: newParcel.name,
             areaHa: newParcel.areaHa,
             lat: newParcel.lat,
@@ -353,6 +346,7 @@ export default function MobileApp() {
             distrito: newParcel.microcuenca.split('-')[1]?.trim() || profile.distrito,
             previousCropName: newParcel.cropName,
             previousCropId: newParcel.cropId,
+            healthScore: newParcel.healthScore,
           };
           saveDeviceProfile(updatedProfile);
           setProfile(updatedProfile);

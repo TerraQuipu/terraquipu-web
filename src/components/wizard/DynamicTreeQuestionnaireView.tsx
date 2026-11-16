@@ -40,10 +40,105 @@ import {
 import {
   ejecutar_A13,
   clasificarVulnerabilidad,
+  generarCalendarioPreventivo,
+  PrediccionZonaV2,
+  EstadoClimaticoV3,
+  DatosVisorParcela,
+  AccionRecomendadaItem,
   ClaseTextura,
   CuestionarioAgricultor,
 } from '@/lib/agroenvironmentalEngine';
 import { calibrateParcel } from '@/lib/deviceProfile';
+import { calculateDynamicSoilHealthIndex } from '@/lib/geoUtils';
+
+function resolveCropFromAnswers(respuestas: Record<string, string>): {
+  cropId: string;
+  cropName: string;
+  cropCategory: string;
+  photoUrl: string;
+} {
+  const isGrowing = respuestas['1'] === 'cultivo_creciendo';
+  const cropKey = isGrowing ? respuestas['1a'] : respuestas['2b'];
+
+  if (cropKey === 'papa') {
+    return {
+      cropId: 'papa_nativa',
+      cropName: 'Papa Nativa Andina',
+      cropCategory: 'Papa nativa',
+      photoUrl: '/images/papa_nativa.jpg',
+    };
+  }
+  if (cropKey === 'tarwi') {
+    return {
+      cropId: 'tarwi',
+      cropName: 'Tarwi / Chocho',
+      cropCategory: 'Habas',
+      photoUrl: '/images/tarwi_chocho.jpg',
+    };
+  }
+  if (cropKey === 'quinua') {
+    return {
+      cropId: 'quinua_real',
+      cropName: 'Quinua Real del Altiplano',
+      cropCategory: 'Quinua',
+      photoUrl: '/images/quinua_real.jpg',
+    };
+  }
+  if (cropKey === 'haba') {
+    return {
+      cropId: 'habas_verdes',
+      cropName: 'Habas Verdes',
+      cropCategory: 'Habas',
+      photoUrl: '/images/haba_verde.jpg',
+    };
+  }
+  if (cropKey === 'maiz') {
+    return {
+      cropId: 'maiz_blanco',
+      cropName: 'Maíz Blanco Gigante',
+      cropCategory: 'Maíz',
+      photoUrl: '/images/maiz_blanco.jpg',
+    };
+  }
+  if (cropKey === 'cebada') {
+    return {
+      cropId: 'cebada_grano',
+      cropName: 'Cebada Grano',
+      cropCategory: 'Cebada',
+      photoUrl: '/images/trigo_viento_poster.jpg',
+    };
+  }
+  if (cropKey === 'olluco') {
+    return {
+      cropId: 'olluco',
+      cropName: 'Olluco Andino',
+      cropCategory: 'Hortalizas',
+      photoUrl: '/images/cultivos_poster.jpg',
+    };
+  }
+  if (cropKey === 'oca') {
+    return {
+      cropId: 'oca',
+      cropName: 'Oca Tradicional',
+      cropCategory: 'Hortalizas',
+      photoUrl: '/images/cultivos_poster.jpg',
+    };
+  }
+  if (respuestas['2'] === 'descansar') {
+    return {
+      cropId: 'descanso',
+      cropName: 'Chacra en Descanso / Purun',
+      cropCategory: 'Descanso',
+      photoUrl: '/images/andes_bright.jpg',
+    };
+  }
+  return {
+    cropId: 'cultivo_andino',
+    cropName: 'Cultivo Tradicional',
+    cropCategory: 'Cultivo Andino',
+    photoUrl: '/images/cultivos_poster.jpg',
+  };
+}
 
 interface DynamicTreeQuestionnaireViewProps {
   parcel: ParcelItem;
@@ -61,31 +156,15 @@ export default function DynamicTreeQuestionnaireView({
     return parcel.cuestionarioRespuestas ? { ...parcel.cuestionarioRespuestas } : {};
   });
 
-  // Flow phase: 'context' (crop contextualizer) | 'questions' (tree questions) | 'summary' (Kipu diagnosis)
-  const [phase, setPhase] = useState<'context' | 'questions' | 'summary'>(() => {
-    // If it already has calibration, show summary immediately with option to modify
+  // Flow phase: 'questions' (tree questions directo sin fase intermedia) | 'summary' (Kipu diagnosis)
+  const [phase, setPhase] = useState<'questions' | 'summary'>(() => {
     return parcel.fechaCalibracion && parcel.diagnosticoIncertidumbre
       ? 'summary'
-      : parcel.cuestionarioRespuestas && Object.keys(parcel.cuestionarioRespuestas).length > 3
-      ? 'questions'
-      : 'context';
+      : 'questions';
   });
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showBreakdown, setShowBreakdown] = useState(false);
-
-  // Identify matching crop key from parcel
-  const matchedCropKey = useMemo(() => {
-    const text = `${parcel.cropName} ${parcel.cropId} ${parcel.cropCategory}`.toLowerCase();
-    if (text.includes('papa')) return 'papa';
-    if (text.includes('olluco') || text.includes('oyuco')) return 'olluco';
-    if (text.includes('quinua') || text.includes('quinoa')) return 'quinua';
-    if (text.includes('oca')) return 'oca';
-    if (text.includes('tarwi') || text.includes('chocho')) return 'tarwi';
-    if (text.includes('haba')) return 'haba';
-    if (text.includes('maiz') || text.includes('maíz') || text.includes('cebada')) return 'otro';
-    return 'otro';
-  }, [parcel]);
 
   // Compute active sequence of questions dynamically
   const activeQuestions = useMemo(() => {
@@ -101,14 +180,13 @@ export default function DynamicTreeQuestionnaireView({
     Math.round(((currentQuestionIndex + 1) / totalQuestionsEstimate) * 100)
   );
 
-  // Compute live parameters and uncertainty calculation
+  // Compute live parameters, uncertainty, rotation and preventive calendar
   const calculatedData = useMemo(() => {
     if (Object.keys(respuestas).length < 2) return null;
 
     const parametros = construir_parametros(respuestas);
 
     // Discrepancy checks (farmer ground truth vs satellite baseline)
-    // Both ground-truth cobertura and agua are reconciled against satellite SMAP/NDVI
     const delAgricultor = {
       ...parametros.esenciales,
       agua: parametros.complementarias.agua,
@@ -159,59 +237,43 @@ export default function DynamicTreeQuestionnaireView({
       ndvi: parcel.ndviScore,
     });
 
+    // Calendario Preventivo Oficial (A1 - A13)
+    const v2: PrediccionZonaV2 = {
+      escenario: 'deficit_lluvias',
+      T0: '2026-11-20',
+      fuente_institucional: 'ENFEN / SENAMHI',
+      confianza: 'alta',
+    };
+    const v3: EstadoClimaticoV3 = {
+      precipitacion_reciente_mm: 1.2,
+      humedad_suelo_pct: parcel.smapHumidity,
+      temp_aire_c: 16,
+      temp_min_c: 4,
+      alerta_helada: false,
+      fuente: 'NASA SMAP + Sentinel-2',
+    };
+    const datosVisorParcela: DatosVisorParcela = {
+      parcel_id: parcel.id,
+      nombre: parcel.name,
+      coordenadas: [parcel.lat, parcel.lon],
+      areaHa: parcel.areaHa,
+      pendientePct: 12,
+      altitudMsnm: parcel.altitudeMsnm,
+      smapMoisturePct: parcel.smapHumidity,
+      ndvi: parcel.ndviScore,
+      microcuenca: parcel.microcuenca,
+    };
+
+    const calendario = generarCalendarioPreventivo(cuestionarioCompleto, v2, v3, datosVisorParcela);
+
     return {
       parametros,
       incertidumbre,
       rotacionA13,
       vulnerabilidad,
+      calendario,
     };
   }, [respuestas, parcel]);
-
-  // Context Step Handlers
-  const handleContextOption = (type: 'growing' | 'soon' | 'other') => {
-    playBubblePop();
-    const nextAnswers = { ...respuestas };
-
-    if (type === 'growing') {
-      nextAnswers['1'] = 'cultivo_creciendo';
-      nextAnswers['1a'] = matchedCropKey;
-      if (matchedCropKey === 'otro') {
-        const text = `${parcel.cropName} ${parcel.cropCategory}`.toLowerCase();
-        nextAnswers['1a_tipo'] =
-          text.includes('maiz') || text.includes('cebada')
-            ? 'cereal_grano'
-            : text.includes('tarwi') || text.includes('haba')
-            ? 'leguminosa'
-            : 'tuberculo_raiz';
-      }
-      setRespuestas(nextAnswers);
-      const active = obtenerPreguntasActivas(nextAnswers);
-      const p3Idx = active.findIndex((q) => q.id === '3');
-      setCurrentQuestionIndex(p3Idx >= 0 ? p3Idx : 1);
-      setPhase('questions');
-    } else if (type === 'soon') {
-      nextAnswers['1'] = 'rastrojo';
-      nextAnswers['2b'] = matchedCropKey;
-      if (matchedCropKey === 'otro') {
-        const text = `${parcel.cropName} ${parcel.cropCategory}`.toLowerCase();
-        nextAnswers['2b_tipo'] =
-          text.includes('maiz') || text.includes('cebada')
-            ? 'cereal_grano'
-            : text.includes('tarwi') || text.includes('haba')
-            ? 'leguminosa'
-            : 'tuberculo_raiz';
-      }
-      setRespuestas(nextAnswers);
-      const active = obtenerPreguntasActivas(nextAnswers);
-      const p2Idx = active.findIndex((q) => q.id === '2');
-      setCurrentQuestionIndex(p2Idx >= 0 ? p2Idx : 0);
-      setPhase('questions');
-    } else {
-      // Standard flow starting at P1
-      setPhase('questions');
-      setCurrentQuestionIndex(0);
-    }
-  };
 
   // Option selection in standard tree
   const handleSelectOption = (opcionClave: string) => {
@@ -260,15 +322,6 @@ export default function DynamicTreeQuestionnaireView({
     // Compute next active list with updated answers
     const nextActive = obtenerPreguntasActivas(nextAnswers);
 
-    // If we just answered P2 and 2b is already auto-completed from contextualizer, advance straight to P3
-    if (currentPregunta.id === '2' && opcionClave !== 'descansar' && nextAnswers['2b']) {
-      const p3Index = nextActive.findIndex((q) => q.id === '3');
-      if (p3Index >= 0) {
-        setCurrentQuestionIndex(p3Index);
-        return;
-      }
-    }
-
     // Find the current question's position in the newly generated list
     const currentIndexInNew = nextActive.findIndex((q) => q.id === currentPregunta.id);
 
@@ -288,7 +341,8 @@ export default function DynamicTreeQuestionnaireView({
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex((prev) => prev - 1);
     } else {
-      setPhase('context');
+      // Si está en la primera pregunta, vuelve al visor de parcela
+      onCancel();
     }
   };
 
@@ -311,12 +365,34 @@ export default function DynamicTreeQuestionnaireView({
       motivo: calculatedData.rotacionA13.motivo,
     };
 
+    const resolvedCrop = resolveCropFromAnswers(respuestas);
+
+    const dynamicHealthScore = calculateDynamicSoilHealthIndex({
+      ndvi: parcel.ndviScore,
+      smapHumidity: parcel.smapHumidity,
+      profundidad: calculatedData.parametros.complementarias.profundidad,
+      pedregosidad:
+        respuestas['5'] === 'muchas_piedras'
+          ? 'muy_pedregoso'
+          : respuestas['5'] === 'sin_piedras'
+          ? 'sin_piedras'
+          : 'pocas_piedras',
+      obras: calculatedData.parametros.complementarias.obras,
+      cobertura: calculatedData.parametros.esenciales.cobertura,
+    });
+
     const updatedParcel = calibrateParcel(parcel.id, {
       cuestionarioRespuestas: respuestas,
       cuestionarioParametros: calculatedData.parametros,
       diagnosticoIncertidumbre: diagIncertidumbre,
       rotacionA13: rotacion,
       vulnerabilidad: calculatedData.vulnerabilidad.nivel,
+      cropId: resolvedCrop.cropId,
+      cropName: resolvedCrop.cropName,
+      cropCategory: resolvedCrop.cropCategory,
+      photoUrl: resolvedCrop.photoUrl,
+      healthScore: dynamicHealthScore,
+      calendarioPreventivo: calculatedData.calendario,
     });
 
     if (updatedParcel) {
@@ -329,6 +405,12 @@ export default function DynamicTreeQuestionnaireView({
         diagnosticoIncertidumbre: diagIncertidumbre,
         rotacionA13: rotacion,
         vulnerabilidad: calculatedData.vulnerabilidad.nivel,
+        cropId: resolvedCrop.cropId,
+        cropName: resolvedCrop.cropName,
+        cropCategory: resolvedCrop.cropCategory,
+        photoUrl: resolvedCrop.photoUrl,
+        healthScore: dynamicHealthScore,
+        calendarioPreventivo: calculatedData.calendario,
         fechaCalibracion: new Date().toISOString(),
       });
     }
@@ -345,7 +427,7 @@ export default function DynamicTreeQuestionnaireView({
             type="button"
             onClick={onCancel}
             className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-zinc-300 hover:text-white transition cursor-pointer"
-            title="Cancelar calibración"
+            title="Volver"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
@@ -362,10 +444,12 @@ export default function DynamicTreeQuestionnaireView({
           </div>
         </div>
 
-        {/* Current Crop Pill */}
+        {/* Current Question or Calibrated Badge */}
         <div className="flex items-center gap-1.5 bg-emerald-950/80 px-2.5 py-1 rounded-full border border-emerald-800/80 text-[11px] font-medium text-emerald-300">
           <Sprout className="w-3.5 h-3.5 text-[#A3E635]" />
-          <span className="font-semibold text-white">{parcel.cropName}</span>
+          <span className="font-semibold text-white">
+            {phase === 'summary' ? 'Diagnóstico Listo' : `Pregunta ${currentQuestionIndex + 1} de ${activeQuestions.length}`}
+          </span>
         </div>
       </div>
 
@@ -383,160 +467,51 @@ export default function DynamicTreeQuestionnaireView({
           MAIN CONTENT AREA
          ========================================================================= */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 max-w-lg mx-auto w-full flex flex-col justify-between">
-        {/* ================= PHASE 1: CROP CONTEXTUALIZATION ================= */}
-        {phase === 'context' && (
-          <div className="space-y-4 my-auto animate-in fade-in slide-in-from-bottom-2 duration-300">
-            {/* Kipu Andean Copilot Greeting Box */}
-            <div className="bg-gradient-to-br from-emerald-900/60 to-emerald-950/90 rounded-3xl p-4 border border-emerald-700/50 space-y-2.5 shadow-xl">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-[#7BB63E] text-[#132A1C] flex items-center justify-center font-bold text-sm shadow-md shadow-lime-500/20">
-                  <Sparkles className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-white">Kipu Copiloto Andino</h3>
-                  <p className="text-[10px] text-emerald-300">
-                    Adaptación bioclimática para {parcel.microcuenca}
-                  </p>
-                </div>
-              </div>
-
-              <p className="text-xs text-zinc-200 leading-relaxed">
-                Detectamos que elegiste <strong className="text-[#A3E635]">{parcel.cropName}</strong> ({parcel.areaHa} ha). Para ajustar las recomendaciones de siembra, heladas y nutrición, dinos cuál es la situación en el terreno:
-              </p>
-            </div>
-
-            {/* 3 Quick Action Context Cards */}
-            <div className="space-y-2.5">
-              {/* Option A: Already growing */}
-              <button
-                type="button"
-                onClick={() => handleContextOption('growing')}
-                className="w-full text-left p-3.5 rounded-2xl bg-emerald-950/70 hover:bg-emerald-900/80 border border-emerald-700/50 hover:border-[#A3E635] transition flex items-start gap-3 group cursor-pointer shadow-md"
-              >
-                <div className="w-9 h-9 rounded-xl bg-emerald-800/80 group-hover:bg-[#7BB63E] text-white group-hover:text-[#132A1C] flex items-center justify-center shrink-0 transition text-base">
-                  🌱
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-[#A3E635] transition">
-                      Ya está creciendo hoy en la chacra
-                    </h4>
-                    <span className="text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-700/50 font-mono">
-                      1 toque
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-zinc-300 mt-0.5 leading-snug">
-                    El cultivo ya germinó o se encuentra en desarrollo en los surcos.
-                  </p>
-                </div>
-              </button>
-
-              {/* Option B: Planting soon */}
-              <button
-                type="button"
-                onClick={() => handleContextOption('soon')}
-                className="w-full text-left p-3.5 rounded-2xl bg-emerald-950/70 hover:bg-emerald-900/80 border border-emerald-700/50 hover:border-[#A3E635] transition flex items-start gap-3 group cursor-pointer shadow-md"
-              >
-                <div className="w-9 h-9 rounded-xl bg-emerald-800/80 group-hover:bg-[#7BB63E] text-white group-hover:text-[#132A1C] flex items-center justify-center shrink-0 transition text-base">
-                  ⏳
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-[#A3E635] transition">
-                      Lo sembraré próximamente
-                    </h4>
-                    <span className="text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-700/50 font-mono">
-                      Planificación
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-zinc-300 mt-0.5 leading-snug">
-                    Tengo la semilla lista y estoy preparando la tierra o esperando la fecha propicia.
-                  </p>
-                </div>
-              </button>
-
-              {/* Option C: Other state */}
-              <button
-                type="button"
-                onClick={() => handleContextOption('other')}
-                className="w-full text-left p-3.5 rounded-2xl bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-800/40 hover:border-white/40 transition flex items-start gap-3 group cursor-pointer"
-              >
-                <div className="w-9 h-9 rounded-xl bg-zinc-800 text-zinc-300 group-hover:text-white flex items-center justify-center shrink-0 transition text-base">
-                  🌾
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-xs sm:text-sm font-bold text-zinc-200 group-hover:text-white transition">
-                    El suelo tiene otro estado (Pasto / Descanso / Tierra desnuda)
-                  </h4>
-                  <p className="text-[11px] text-zinc-400 mt-0.5 leading-snug">
-                    Responder el árbol completo paso a paso desde el estado del suelo.
-                  </p>
-                </div>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ================= PHASE 2: DYNAMIC QUESTION TREE ================= */}
+        {/* ================= PHASE 1: DIRECT DYNAMIC QUESTIONS ================= */}
         {phase === 'questions' && currentPregunta && (
-          <div className="space-y-4 my-auto animate-in fade-in slide-in-from-right-3 duration-250">
-            {/* Question Header & Andean Block Badge */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[9.5px] uppercase font-bold text-[#A3E635] tracking-wider bg-emerald-950 px-2 py-0.5 rounded-md border border-emerald-800/60 font-mono">
-                  BLOQUE {currentPregunta.bloque.toUpperCase()} · PREGUNTA {currentPregunta.id}
-                </span>
-                <span className="text-[10px] text-zinc-400">
-                  {currentQuestionIndex + 1} de {activeQuestions.length}
-                </span>
+          <div className="space-y-4 my-auto animate-in fade-in slide-in-from-right duration-250">
+            {/* Question Header Card */}
+            <div className="bg-emerald-950/70 rounded-3xl p-4 border border-emerald-800/60 space-y-2 shadow-lg">
+              <div className="flex items-center justify-between text-[10px] text-zinc-400 font-mono">
+                <span>PREGUNTA {currentPregunta.id}</span>
+                <span className="text-[#A3E635] font-semibold">{progressPct}% completado</span>
               </div>
               <h3 className="text-base sm:text-lg font-bold text-white leading-snug">
                 {currentPregunta.texto}
               </h3>
               {currentPregunta.subtexto && (
-                <p className="text-xs text-zinc-300 mt-1 leading-normal font-light">
+                <p className="text-xs text-zinc-300 leading-relaxed font-normal">
                   {currentPregunta.subtexto}
                 </p>
               )}
             </div>
 
-            {/* Special Visual Render for P6b (Prueba del Puñado Ilustrada) */}
+            {/* Special Handler for Illustrated "Prueba del Puñado" (P6b) */}
             {currentPregunta.id === '6b' ? (
               <div className="space-y-2.5 pt-1">
-                <div className="bg-emerald-950/90 rounded-2xl p-3 border border-emerald-700/60 flex items-center gap-2.5 text-xs text-emerald-200">
-                  <div className="w-8 h-8 rounded-xl bg-[#7BB63E] text-[#132A1C] flex items-center justify-center font-bold text-base shrink-0">
-                    ✋
-                  </div>
-                  <p className="text-[11px] leading-snug">
-                    Toma un puñado de tierra húmeda de los primeros 15 cm, apriétalo con fuerza y observa qué sucede al abrir la palma:
-                  </p>
-                </div>
-
                 {currentPregunta.opciones.map((opcion) => {
-                  const isSelected = respuestas[currentPregunta.id] === opcion.clave;
+                  const isSelected = respuestas['6b'] === opcion.clave;
                   return (
                     <div
                       key={opcion.clave}
                       onClick={() => handleSelectOption(opcion.clave)}
-                      className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 shadow-md ${
+                      className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
                         isSelected
-                          ? 'bg-emerald-900 border-[#A3E635] ring-2 ring-[#A3E635]/50'
-                          : 'bg-emerald-950/70 border-emerald-800/80 hover:bg-emerald-900/60 hover:border-emerald-700'
+                          ? 'bg-emerald-900 border-[#A3E635] ring-2 ring-[#A3E635]/40 shadow-md'
+                          : 'bg-emerald-950/60 border-emerald-800/60 hover:bg-emerald-900/60 hover:border-emerald-700'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-11 h-11 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-center text-xl shrink-0">
-                          {opcion.icono || '🌱'}
+                        <div className="w-12 h-12 rounded-xl bg-black/40 border border-white/15 flex items-center justify-center text-2xl shrink-0">
+                          {opcion.icono || '🌰'}
                         </div>
-                        <div>
-                          <h4 className="text-xs sm:text-sm font-bold text-white">
+                        <div className="min-w-0">
+                          <h4 className="text-xs sm:text-sm font-bold text-white truncate">
                             {opcion.texto}
                           </h4>
-                          {opcion.subtexto && (
-                            <p className="text-[10.5px] text-zinc-300 mt-0.5 leading-tight">
-                              {opcion.subtexto}
-                            </p>
-                          )}
+                          <p className="text-[11px] text-zinc-300 leading-snug mt-0.5 font-normal">
+                            {opcion.subtexto}
+                          </p>
                         </div>
                       </div>
 
@@ -637,9 +612,9 @@ export default function DynamicTreeQuestionnaireView({
           </div>
         )}
 
-        {/* ================= PHASE 3: CONCLUSION & COMPREHENSIVE KIPU DIAGNOSIS ================= */}
+        {/* ================= PHASE 2: CONCLUSION & COMPREHENSIVE KIPU DIAGNOSIS ================= */}
         {phase === 'summary' && calculatedData && (
-          <div className="space-y-4 my-auto animate-in fade-in zoom-in-95 duration-300">
+          <div className="space-y-4 my-auto animate-in fade-in zoom-in-95 duration-300 pb-6">
             {/* Header: Diagnóstico Listo */}
             <div className="text-center space-y-1">
               <span className="text-[10px] font-bold uppercase tracking-widest text-[#A3E635] bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-800/80 font-mono">
@@ -695,7 +670,7 @@ export default function DynamicTreeQuestionnaireView({
                 <button
                   type="button"
                   onClick={() => setShowBreakdown((prev) => !prev)}
-                  className="w-full flex items-center justify-between text-[11px] text-emerald-300 font-semibold hover:text-white transition"
+                  className="w-full flex items-center justify-between text-[11px] text-emerald-300 font-semibold hover:text-white transition cursor-pointer"
                 >
                   <span>Ver desglose técnico de 6 penalizaciones</span>
                   <ChevronRight
@@ -817,6 +792,60 @@ export default function DynamicTreeQuestionnaireView({
               <p className="text-xs text-zinc-200 leading-snug">
                 {calculatedData.rotacionA13.motivo}
               </p>
+            </div>
+
+            {/* CARD 4: Calendario Preventivo y Táctico (Acciones Oficiales A1 a A13) */}
+            <div className="bg-emerald-950/80 rounded-3xl p-4 border border-emerald-800/80 space-y-3 shadow-xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold text-[#A3E635] uppercase tracking-wider block">
+                    CALENDARIO PREVENTIVO Y TÁCTICO
+                  </span>
+                  <h4 className="text-sm font-bold text-white flex items-center gap-1.5 mt-0.5">
+                    <Calendar className="w-4 h-4 text-[#A3E635]" />
+                    <span>Catálogo de Acciones A1 - A13 para tu Chacra</span>
+                  </h4>
+                </div>
+                <span className="text-[9.5px] bg-emerald-900 text-[#A3E635] px-2 py-0.5 rounded-full border border-emerald-700/60 font-mono">
+                  {calculatedData.calendario.length} medidas
+                </span>
+              </div>
+
+              <div className="space-y-2.5">
+                {calculatedData.calendario.map((item, idx) => (
+                  <div
+                    key={`${item.accionCodigo}-${idx}`}
+                    className="p-3 rounded-2xl bg-black/40 border border-emerald-700/40 space-y-1.5"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded-md bg-[#7BB63E] text-[#132A1C] text-[10px] font-black font-mono">
+                          {item.accionCodigo}
+                        </span>
+                        <h5 className="text-xs font-bold text-white">
+                          {item.accionNombre}
+                        </h5>
+                      </div>
+                      <span className="text-[9.5px] text-zinc-400 font-mono shrink-0">
+                        {item.fechaTexto}
+                      </span>
+                    </div>
+
+                    <p className="text-[11px] text-zinc-200 leading-snug">
+                      {item.motivo}
+                    </p>
+
+                    <div className="flex items-center justify-between text-[9.5px] text-zinc-400 pt-0.5">
+                      <span className="text-emerald-300">
+                        {item.bloque}
+                      </span>
+                      <span className="capitalize">
+                        {item.fuente} · {item.confianza}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Bottom Actions: Save & Apply */}

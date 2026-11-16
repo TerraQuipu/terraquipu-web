@@ -1,4 +1,5 @@
 import { FarmerProfile, ParcelItem, DiagnosticoIncertidumbre, RotacionA13Resultado } from './types';
+import { calculateDynamicSoilHealthIndex } from './geoUtils';
 
 /**
  * Deterministic hardware hash function based on non-volatile hardware telemetry.
@@ -44,6 +45,9 @@ const STORAGE_KEY = 'terraquipu_hardware_farmer_profile';
 const PARCELS_STORAGE_KEY = 'terraquipu_user_parcels';
 const ACTIVE_PARCEL_KEY = 'terraquipu_active_parcel_id';
 
+/**
+ * Catálogo de parcelas andinas de referencia (usado sólo si se solicita explícitamente en demos)
+ */
 export const DEFAULT_PARCELS: ParcelItem[] = [
   {
     id: 'parcel-maras-01',
@@ -59,7 +63,7 @@ export const DEFAULT_PARCELS: ParcelItem[] = [
     microcuenca: 'Microcuenca Vilcanota - Cusco',
     plantAgeDays: 45,
     estimatedYieldTons: 6,
-    healthScore: 78,
+    healthScore: calculateDynamicSoilHealthIndex({ ndvi: 0.68, smapHumidity: 16, cobertura: 'rastrojo' }),
     smapHumidity: 16,
     ndviScore: 0.68,
     photoUrl: '/images/andes_bright.jpg',
@@ -80,7 +84,7 @@ export const DEFAULT_PARCELS: ParcelItem[] = [
     microcuenca: 'Microcuenca Huaypo - Anta',
     plantAgeDays: 30,
     estimatedYieldTons: 4,
-    healthScore: 84,
+    healthScore: calculateDynamicSoilHealthIndex({ ndvi: 0.74, smapHumidity: 22, obras: 'buen_estado' }),
     smapHumidity: 22,
     ndviScore: 0.74,
     photoUrl: '/images/andes_satellite_hero.jpg',
@@ -101,7 +105,7 @@ export const DEFAULT_PARCELS: ParcelItem[] = [
     microcuenca: 'Microcuenca Anta - Cusco',
     plantAgeDays: 60,
     estimatedYieldTons: 8.5,
-    healthScore: 75,
+    healthScore: calculateDynamicSoilHealthIndex({ ndvi: 0.62, smapHumidity: 18, cobertura: 'cultivo' }),
     smapHumidity: 18,
     ndviScore: 0.62,
     photoUrl: '/images/andes_bright.jpg',
@@ -110,18 +114,22 @@ export const DEFAULT_PARCELS: ParcelItem[] = [
   },
 ];
 
+/**
+ * Obtiene las parcelas almacenadas por el usuario.
+ * Un dispositivo nuevo inicia con 0 parcelas (cero parcelas fantasma).
+ */
 export function getStoredParcels(): ParcelItem[] {
-  if (typeof window === 'undefined') return DEFAULT_PARCELS;
+  if (typeof window === 'undefined') return [];
   try {
     const raw = localStorage.getItem(PARCELS_STORAGE_KEY);
     if (raw === null) {
-      localStorage.setItem(PARCELS_STORAGE_KEY, JSON.stringify(DEFAULT_PARCELS));
-      return DEFAULT_PARCELS;
+      // Dispositivo nuevo: lista limpia sin parcelas precargadas
+      return [];
     }
     const parcels = JSON.parse(raw);
-    return Array.isArray(parcels) ? parcels : DEFAULT_PARCELS;
+    return Array.isArray(parcels) ? parcels : [];
   } catch (e) {
-    return DEFAULT_PARCELS;
+    return [];
   }
 }
 
@@ -152,13 +160,7 @@ export function updateParcel(id: string, updates: Partial<ParcelItem>): ParcelIt
 
 export function calibrateParcel(
   id: string,
-  calibration: {
-    cuestionarioRespuestas: Record<string, string>;
-    cuestionarioParametros: Record<string, any>;
-    diagnosticoIncertidumbre: DiagnosticoIncertidumbre;
-    rotacionA13?: RotacionA13Resultado;
-    vulnerabilidad?: 'Baja' | 'Media' | 'Alta';
-  }
+  calibration: Partial<ParcelItem>
 ): ParcelItem | null {
   const updates: Partial<ParcelItem> = {
     ...calibration,
@@ -188,14 +190,14 @@ export function deleteParcel(id: string): ParcelItem[] {
 }
 
 export function getActiveParcelId(): string {
-  if (typeof window === 'undefined') return DEFAULT_PARCELS[0].id;
+  if (typeof window === 'undefined') return '';
   try {
     const stored = localStorage.getItem(ACTIVE_PARCEL_KEY);
     if (stored) return stored;
     const parcels = getStoredParcels();
-    return parcels.length > 0 ? parcels[0].id : DEFAULT_PARCELS[0].id;
+    return parcels.length > 0 ? parcels[0].id : '';
   } catch (e) {
-    return DEFAULT_PARCELS[0].id;
+    return '';
   }
 }
 
@@ -208,11 +210,11 @@ export function setActiveParcelId(id: string): void {
   }
 }
 
-export function getActiveParcel(): ParcelItem {
+export function getActiveParcel(): ParcelItem | null {
   const parcels = getStoredParcels();
   const activeId = getActiveParcelId();
   const found = parcels.find((p) => p.id === activeId);
-  return found || parcels[0] || DEFAULT_PARCELS[0];
+  return found || parcels[0] || null;
 }
 
 export function getStoredDeviceProfile(): (FarmerProfile & { deviceId: string; isConfigured: boolean }) | null {

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { playBubblePop } from '@/lib/soundEffects';
 import { getStoredParcels, setActiveParcelId } from '@/lib/deviceProfile';
+import { calculateDynamicSoilHealthIndex } from '@/lib/geoUtils';
 
 interface InicioTabProps {
   profile: FarmerProfile;
@@ -106,15 +107,10 @@ export default function InicioTab({
     if (profile.healthScore !== undefined) return profile.healthScore;
     if (activeParcel?.healthScore !== undefined) return activeParcel.healthScore;
     // Derive dynamic soil health from live SMAP moisture and parcel metrics
-    let score = 70;
-    if (smapPercent >= 20 && smapPercent <= 50) score += 12;
-    else if (smapPercent < 15) score -= 18;
-    else if (smapPercent > 65) score -= 8;
-
-    if (activeParcel?.ndviScore !== undefined) {
-      score += Math.round((activeParcel.ndviScore - 0.5) * 20);
-    }
-    return Math.max(30, Math.min(95, score));
+    return calculateDynamicSoilHealthIndex({
+      smapHumidity: smapPercent,
+      ndvi: activeParcel?.ndviScore,
+    });
   }, [profile.healthScore, activeParcel?.healthScore, activeParcel?.ndviScore, smapPercent]);
 
   const healthScore = dynamicHealthScore;
@@ -397,13 +393,26 @@ export default function InicioTab({
               SALUD DEL SUELO
             </span>
             <h1 className="text-xl sm:text-2xl font-bold text-zinc-800 leading-tight">
-              Tu suelo está{' '}
-              <span className="italic text-emerald-800 font-normal">
-                respondiendo bien.
-              </span>
+              {parcels.length === 0 ? (
+                <>
+                  Listo para{' '}
+                  <span className="italic text-emerald-800 font-normal">
+                    calibrar tu chacra.
+                  </span>
+                </>
+              ) : (
+                <>
+                  Tu suelo está{' '}
+                  <span className="italic text-emerald-800 font-normal">
+                    {healthScore >= 75 ? 'respondiendo bien.' : healthScore >= 50 ? 'en recuperación.' : 'bajo estrés hídrico.'}
+                  </span>
+                </>
+              )}
             </h1>
             <p className="text-xs text-zinc-600 leading-relaxed font-normal">
-              Pequeñas prácticas de hoy protegen la cosecha de mañana.
+              {parcels.length === 0
+                ? 'Delimita tu parcela para monitorear humedad de suelo y vigor con satélites.'
+                : 'Pequeñas prácticas de hoy protegen la cosecha de mañana.'}
             </p>
           </div>
 

@@ -19,6 +19,7 @@ import {
   TrendingUp,
   Leaf,
   Plus,
+  AlertTriangle,
 } from 'lucide-react';
 import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
 import { Cultivo, ParcelItem } from '@/lib/types';
@@ -29,6 +30,7 @@ import {
   calculateParcelCentroid,
   estimateTerrainMetrics,
   fetchRealTerrainMetrics,
+  calculateDynamicSoilHealthIndex,
 } from '@/lib/geoUtils';
 import { getCultivos } from '@/lib/supabaseClient';
 
@@ -199,8 +201,8 @@ export default function ParcelDrawerFullScreenView({
   farmerName = '',
   initialCommunityName = '',
 }: ParcelDrawerFullScreenViewProps) {
-  // Wizard Step: 1 = Delimitar en mapa, 2 = Confirmar telemetría, 3 = Nombre de chacra, 4 = Seleccionar cultivo real
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
+  // Wizard Step: 1 = Delimitar en mapa, 2 = Confirmar telemetría, 3 = Nombre de chacra y calibrar
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
   const [calibratingParcel, setCalibratingParcel] = useState<ParcelItem | null>(null);
 
   // Drawing Mode: 'freehand' (clics para vértices libres) vs 'box' (chacra rápida 1 clic + slider)
@@ -696,37 +698,28 @@ export default function ParcelDrawerFullScreenView({
     setCurrentStep(3);
   };
 
-  // Move from Step 3 to Step 4: Real Crops from DB
-  const handleGoToStep4 = () => {
+  // Guardar Parcela e Iniciar Calibración In Situ Directa (Eliminado Paso 4 redundante de cultivo)
+  const handleSaveParcelAndCalibrate = () => {
     if (!parcelName.trim()) return;
-    playBubblePop();
-    setCurrentStep(4);
-  };
-
-  // Step 5: Save Parcel to Local Storage & Finish
-  const handleSaveParcel = () => {
-    if (!selectedCrop) return;
     playSuccessFanfare();
 
     const activeRegion = PRESET_REGIONS.find((r) => r.id === activeRegionId) || PRESET_REGIONS[0];
     const centroid = calculateParcelCentroid(polygonCoords);
 
+    // Salud del suelo calculada dinámicamente según telemetría SMAP y NDVI (cero valores fijos de 78)
+    const dynamicHealth = calculateDynamicSoilHealthIndex({
+      ndvi: 0.68,
+      smapHumidity: Math.round(smapMoisturePct),
+      profundidad: 'medio',
+      pedregosidad: 'pocas_piedras',
+    });
+
     const newParcel: ParcelItem = {
       id: `parcel-${Date.now()}`,
       name: parcelName.trim() || 'Mi Chacra Andina',
-      cropId: selectedCrop.crop_id,
-      cropName: selectedCrop.nombre_comun,
-      cropCategory: selectedCrop.nombre_comun.includes('Papa')
-        ? 'Papa nativa'
-        : selectedCrop.nombre_comun.includes('Maíz') || selectedCrop.nombre_comun.includes('Maiz')
-        ? 'Maíz'
-        : selectedCrop.nombre_comun.includes('Quinua')
-        ? 'Quinua'
-        : selectedCrop.nombre_comun.includes('Cebada')
-        ? 'Cebada'
-        : selectedCrop.nombre_comun.includes('Haba') || selectedCrop.nombre_comun.includes('Tarwi')
-        ? 'Habas'
-        : 'Hortalizas',
+      cropId: 'por_calibrar',
+      cropName: 'Por calibrar en terreno',
+      cropCategory: 'Por calibrar',
       areaHa: areaHa,
       areaTopos: Number((areaHa * 3.3).toFixed(1)),
       lat: centroid[0],
@@ -734,12 +727,12 @@ export default function ParcelDrawerFullScreenView({
       altitudeMsnm: altitudeMsnm,
       microcuenca: activeRegion.fullName,
       polygonCoords: polygonCoords,
-      plantAgeDays: 45,
+      plantAgeDays: 0,
       estimatedYieldTons: Number((areaHa * 4.2).toFixed(1)),
-      healthScore: 78,
+      healthScore: dynamicHealth,
       smapHumidity: Math.round(smapMoisturePct),
       ndviScore: 0.68,
-      photoUrl: getCropImage(selectedCrop.crop_id, selectedCrop.nombre_comun),
+      photoUrl: '/images/andes_bright.jpg',
       notes: notes.trim(),
       createdAt: new Date().toISOString(),
     };
@@ -747,12 +740,6 @@ export default function ParcelDrawerFullScreenView({
     saveParcel(newParcel);
     setCalibratingParcel(newParcel);
   };
-
-  const filteredCrops = dbCrops.filter(
-    (c) =>
-      c.nombre_comun.toLowerCase().includes(cropFilter.toLowerCase()) ||
-      c.nombre_cientifico.toLowerCase().includes(cropFilter.toLowerCase())
-  );
 
   if (calibratingParcel) {
     return (
@@ -967,16 +954,28 @@ export default function ParcelDrawerFullScreenView({
                 <input
                   type="range"
                   min={0.25}
-                  max={10.0}
+                  max={60.0}
                   step={0.25}
                   value={areaHa}
                   onChange={(e) => handleAreaSlider(parseFloat(e.target.value))}
                   className="w-full accent-[#7BB63E] cursor-pointer"
                 />
-                <div className="flex justify-between text-[9px] text-zinc-400">
+                <div className="flex justify-between text-[9px] text-zinc-400 font-mono">
                   <span>0.25 ha</span>
-                  <span>5.0 ha</span>
-                  <span>10.0 ha</span>
+                  <span>15 ha</span>
+                  <span>30 ha</span>
+                  <span>60 ha</span>
+                </div>
+              </div>
+            )}
+
+            {/* Alerta de Resolución Espacial para parcelas > 30 ha */}
+            {areaHa > 30 && (
+              <div className="bg-amber-950/90 border border-amber-500/70 rounded-2xl p-3 flex items-start gap-2.5 text-amber-200 shadow-xl backdrop-blur-md animate-in fade-in">
+                <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                <div className="text-xs leading-relaxed">
+                  <strong className="text-amber-300 block font-semibold">Aviso de Resolución Espacial:</strong>
+                  Para parcelas mayores a 30 hectáreas, las estimaciones satelitales tendrán menor precisión debido a la heterogeneidad del relieve y mezcla de pendientes.
                 </div>
               </div>
             )}
@@ -1017,6 +1016,16 @@ export default function ParcelDrawerFullScreenView({
                 {currentLat.toFixed(4)}, {currentLon.toFixed(4)}
               </span>
             </div>
+
+            {/* Alerta de Resolución Espacial para parcelas > 30 ha */}
+            {areaHa > 30 && (
+              <div className="bg-amber-950/90 border border-amber-500/70 rounded-2xl p-2.5 flex items-start gap-2 text-amber-200 text-xs">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <span>
+                  <strong>Aviso de Resolución Espacial:</strong> Para parcelas mayores a 30 hectáreas, las estimaciones satelitales tendrán menor precisión debido a la heterogeneidad del relieve y mezcla de pendientes.
+                </span>
+              </div>
+            )}
 
             {/* 4 Real Telemetry Metrics Grid */}
             <div className="grid grid-cols-2 gap-2">
@@ -1068,7 +1077,7 @@ export default function ParcelDrawerFullScreenView({
                   playBubblePop();
                   setCurrentStep(1);
                 }}
-                className="flex-1 py-3 rounded-full border border-white/20 text-zinc-300 hover:text-white font-semibold text-xs"
+                className="flex-1 py-3 rounded-full border border-white/20 text-zinc-300 hover:text-white font-semibold text-xs transition cursor-pointer"
               >
                 Retocar Trazado
               </button>
@@ -1076,7 +1085,7 @@ export default function ParcelDrawerFullScreenView({
               <button
                 type="button"
                 onClick={handleGoToStep3}
-                className="flex-1 py-3 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-semibold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-lime-600/30"
+                className="flex-1 py-3 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-semibold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-lime-600/30 transition cursor-pointer"
               >
                 <span>Siguiente: Nombre</span>
                 <ChevronRight className="w-4 h-4 stroke-[2.5]" />
@@ -1085,12 +1094,12 @@ export default function ParcelDrawerFullScreenView({
           </div>
         )}
 
-        {/* ================= PASO 3: ASIGNAR NOMBRE ================= */}
+        {/* ================= PASO 3: ASIGNAR NOMBRE Y PASAR A CALIBRACIÓN IN SITU ================= */}
         {currentStep === 3 && (
           <div className="space-y-3 animate-in fade-in">
             <div>
               <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider block">
-                PASO 2 DE 3 · IDENTIFICACIÓN
+                PASO 3 DE 3 · FINALIZAR IDENTIFICACIÓN
               </span>
               <h3 className="text-base font-bold text-white">¿Cómo se llama tu parcela?</h3>
             </div>
@@ -1127,7 +1136,7 @@ export default function ParcelDrawerFullScreenView({
                   playBubblePop();
                   setCurrentStep(2);
                 }}
-                className="flex-1 py-3 rounded-full border border-white/20 text-zinc-300 hover:text-white font-semibold text-xs"
+                className="flex-1 py-3 rounded-full border border-white/20 text-zinc-300 hover:text-white font-semibold text-xs transition cursor-pointer"
               >
                 Volver
               </button>
@@ -1135,132 +1144,11 @@ export default function ParcelDrawerFullScreenView({
               <button
                 type="button"
                 disabled={!parcelName.trim()}
-                onClick={handleGoToStep4}
-                className="flex-1 py-3 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] disabled:opacity-40 text-[#132A1C] font-semibold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-lime-600/30"
-              >
-                <span>Siguiente: Cultivo</span>
-                <ChevronRight className="w-4 h-4 stroke-[2.5]" />
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ================= PASO 4: SELECCIONAR CULTIVO REAL DE LA BASE DE DATOS (CON IMÁGENES) ================= */}
-        {currentStep === 4 && (
-          <div className="space-y-3 animate-in fade-in">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider block">
-                  PASO 3 DE 3 · BASE DE DATOS SUPABASE
-                </span>
-                <h3 className="text-base font-bold text-white">Selecciona el cultivo principal</h3>
-              </div>
-              <span className="text-[10px] font-mono text-[#A3E635] bg-emerald-950 px-2 py-0.5 rounded-md border border-emerald-800/60">
-                {filteredCrops.length} cultivos reales
-              </span>
-            </div>
-
-            {/* Quick search filter for crops */}
-            <div className="relative">
-              <input
-                type="text"
-                value={cropFilter}
-                onChange={(e) => setCropFilter(e.target.value)}
-                placeholder="Buscar cultivo (papa, tarwi, maíz, quinua, habas...)"
-                className="w-full h-8 pl-8 pr-3 rounded-xl bg-emerald-950/80 border border-emerald-800/60 text-white placeholder-zinc-500 text-[11px] focus:outline-hidden focus:border-[#A3E635]"
-              />
-              <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-            </div>
-
-            {/* Crop Cards with Real Photographic Thumbnails */}
-            <div className="max-h-56 overflow-y-auto space-y-2 pr-1 scrollbar-thin">
-              {filteredCrops.map((crop) => {
-                const isSelected = selectedCrop?.crop_id === crop.crop_id;
-                const cropImg = getCropImage(crop.crop_id, crop.nombre_comun);
-
-                return (
-                  <div
-                    key={crop.crop_id}
-                    onClick={() => {
-                      playBubblePop();
-                      setSelectedCrop(crop);
-                    }}
-                    className={`p-2.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
-                      isSelected
-                        ? 'bg-emerald-950 border-[#A3E635] ring-2 ring-[#A3E635]/40 shadow-md'
-                        : 'bg-emerald-950/40 border-emerald-900/60 hover:bg-emerald-950/70'
-                    }`}
-                  >
-                    {/* Left: Real Photographic Image Thumbnail */}
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-black/60 shrink-0 border border-white/15 relative">
-                        <img
-                          src={cropImg}
-                          alt={crop.nombre_comun}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.currentTarget as HTMLElement).style.display = 'none';
-                          }}
-                        />
-                      </div>
-
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <h4 className="text-xs font-bold text-white truncate">
-                            {crop.nombre_comun}
-                          </h4>
-                        </div>
-                        <span className="text-[10px] text-zinc-400 italic block truncate">
-                          {crop.nombre_cientifico}
-                        </span>
-                        <div className="flex items-center gap-2 mt-0.5 text-[9.5px]">
-                          <span className="text-emerald-300 font-mono">
-                            {crop.balance_nitrogeno_kg_ha > 0 ? `+${crop.balance_nitrogeno_kg_ha}` : crop.balance_nitrogeno_kg_ha} kg N/ha
-                          </span>
-                          <span className="text-zinc-400">·</span>
-                          <span className="text-zinc-300">
-                            {crop.altitud_min_msnm}-{crop.altitud_max_msnm} msnm
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Right: Checkmark radio */}
-                    <div
-                      className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border ${
-                        isSelected
-                          ? 'bg-[#7BB63E] border-[#A3E635] text-[#132A1C]'
-                          : 'border-white/20'
-                      }`}
-                    >
-                      {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Actions: Save Parcel Button */}
-            <div className="flex items-center gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => {
-                  playBubblePop();
-                  setCurrentStep(3);
-                }}
-                className="flex-1 py-3 rounded-full border border-white/20 text-zinc-300 hover:text-white font-semibold text-xs"
-              >
-                Volver
-              </button>
-
-              <button
-                type="button"
-                disabled={!selectedCrop}
-                onClick={handleSaveParcel}
-                className="flex-2 py-3 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] disabled:opacity-40 text-[#132A1C] font-semibold text-xs flex items-center justify-center gap-2 shadow-lg shadow-lime-600/30"
+                onClick={handleSaveParcelAndCalibrate}
+                className="flex-2 py-3 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] disabled:opacity-40 text-[#132A1C] font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-lime-600/30 transition cursor-pointer"
               >
                 <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
-                <span>Continuar a Calibración In Situ</span>
+                <span>Guardar y Calibrar en Terreno</span>
               </button>
             </div>
           </div>
