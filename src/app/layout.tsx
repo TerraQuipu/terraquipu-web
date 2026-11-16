@@ -46,7 +46,7 @@ export const metadata: Metadata = {
         url: 'https://terraquipu.com/images/crops_banner.jpg',
         width: 1200,
         height: 630,
-        alt: 'TerraQuipu — Inteligencia Satelital y Agroecología Andina',
+        alt: 'TerraQuipu: Inteligencia Satelital y Agroecología Andina',
       },
     ],
   },

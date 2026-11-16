@@ -20,9 +20,13 @@ import {
   CheckCircle2,
   X,
   Compass,
+  Sparkles,
+  RefreshCw,
+  ShieldCheck,
 } from 'lucide-react';
 import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
 import ParcelMap from '@/components/ParcelMap';
+import DynamicTreeQuestionnaireView from '@/components/wizard/DynamicTreeQuestionnaireView';
 import {
   getStoredParcels,
   saveParcel,
@@ -69,6 +73,7 @@ export default function ChacraTab({
   const [parcels, setParcels] = useState<ParcelItem[]>([]);
   const [selectedCropFilter, setSelectedCropFilter] = useState<string>('Todos');
   const [selectedParcel, setSelectedParcel] = useState<ParcelItem | null>(null);
+  const [calibratingParcel, setCalibratingParcel] = useState<ParcelItem | null>(null);
 
   // Edit and Delete Modals
   const [editingParcel, setEditingParcel] = useState<ParcelItem | null>(null);
@@ -172,6 +177,25 @@ export default function ChacraTab({
     : parcels.filter((p) => p.cropCategory === selectedCropFilter || p.cropName.includes(selectedCropFilter));
 
   // =========================================================================
+  // VISTA CALIBRACIÓN DINÁMICA POR PARCELA
+  // =========================================================================
+  if (calibratingParcel) {
+    return (
+      <DynamicTreeQuestionnaireView
+        parcel={calibratingParcel}
+        onComplete={(calibrated) => {
+          const refreshed = getStoredParcels();
+          setParcels(refreshed);
+          setSelectedParcel(calibrated);
+          setCalibratingParcel(null);
+          onToast(`¡Calibración guardada exitosamente para "${calibrated.name}"!`);
+        }}
+        onCancel={() => setCalibratingParcel(null)}
+      />
+    );
+  }
+
+  // =========================================================================
   // VISTA 1: MIS PARCELAS (CARDS VIEW)
   // =========================================================================
   if (!selectedParcel) {
@@ -262,13 +286,24 @@ export default function ChacraTab({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#132A1C] via-[#132A1C]/70 to-transparent" />
 
-                {/* Top Row: Crop Tag & Checkmark */}
+                {/* Top Row: Crop Tag & Status Badge */}
                 <div className="relative z-10 flex items-center justify-between">
                   <span className="text-[10px] font-semibold text-white/95 bg-[#132A1C]/80 px-2.5 py-1 rounded-full border border-white/15 backdrop-blur-xs">
                     {parcel.cropCategory || parcel.cropName}
                   </span>
-                  <div className="w-6 h-6 rounded-full bg-black/40 border border-white/20 flex items-center justify-center text-white/80">
-                    <CheckCircle2 className="w-4 h-4 text-[#A3E635]" />
+                  <div
+                    className={`px-2.5 py-0.5 rounded-full text-[9.5px] font-bold border backdrop-blur-xs flex items-center gap-1.5 ${
+                      parcel.fechaCalibracion
+                        ? 'bg-emerald-950/85 border-[#A3E635] text-[#A3E635]'
+                        : 'bg-black/60 border-amber-500/60 text-amber-300'
+                    }`}
+                  >
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        parcel.fechaCalibracion ? 'bg-[#A3E635]' : 'bg-amber-400 animate-pulse'
+                      }`}
+                    />
+                    <span>{parcel.fechaCalibracion ? 'Calibrada 🟢' : 'Pendiente 🟡'}</span>
                   </div>
                 </div>
 
@@ -632,6 +667,102 @@ export default function ChacraTab({
           <div className="bg-emerald-50/50 rounded-2xl p-3 border border-emerald-200/60 text-xs text-emerald-950">
             <span className="font-semibold text-[10px] uppercase block text-emerald-800">Notas de campo:</span>
             <p className="mt-0.5">{selectedParcel.notes}</p>
+          </div>
+        )}
+      </div>
+
+      {/* 5. CALIBRACIÓN AGROAMBIENTAL IN SITU (Acceso Técnico Posterior por Parcela) */}
+      <div className="bg-gradient-to-br from-[#132A1C] to-emerald-950 text-white rounded-3xl p-5 shadow-sm border border-emerald-800/80 space-y-3.5">
+        <div className="flex items-start justify-between gap-2">
+          <div className="space-y-0.5">
+            <span className="text-[10px] font-bold text-[#A3E635] tracking-widest uppercase block font-mono">
+              FICHA TÉCNICA · RECOMENDACIÓN A13
+            </span>
+            <h3 className="text-base font-bold text-white">
+              Calibración Agroambiental In Situ
+            </h3>
+          </div>
+
+          <span
+            className={`px-3 py-1 rounded-full text-[10.5px] font-bold border flex items-center gap-1.5 shrink-0 ${
+              selectedParcel.fechaCalibracion
+                ? 'bg-emerald-900/90 border-[#A3E635] text-[#A3E635]'
+                : 'bg-amber-950/80 border-amber-600/80 text-amber-300'
+            }`}
+          >
+            <span
+              className={`w-2 h-2 rounded-full ${
+                selectedParcel.fechaCalibracion ? 'bg-[#A3E635]' : 'bg-amber-400 animate-pulse'
+              }`}
+            />
+            <span>
+              {selectedParcel.fechaCalibracion ? 'Calibrada 🟢' : 'Pendiente de Calibración 🟡'}
+            </span>
+          </span>
+        </div>
+
+        {selectedParcel.fechaCalibracion ? (
+          <div className="space-y-3 pt-1">
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="bg-black/40 rounded-2xl p-2.5 border border-white/10 space-y-0.5">
+                <span className="text-[10px] text-zinc-400 block">Fiabilidad Semáforo</span>
+                <span className="text-sm font-bold text-[#A3E635] flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>{selectedParcel.diagnosticoIncertidumbre?.nivel || 'Alta (🟢)'}</span>
+                </span>
+                <span className="text-[9.5px] text-zinc-400 block font-mono">
+                  {selectedParcel.diagnosticoIncertidumbre?.fiabilidad ?? 80}% fiabilidad global
+                </span>
+              </div>
+
+              <div className="bg-black/40 rounded-2xl p-2.5 border border-white/10 space-y-0.5">
+                <span className="text-[10px] text-zinc-400 block">Rotación Sugerida A13</span>
+                <span className="text-sm font-bold text-white truncate block">
+                  {selectedParcel.rotacionA13?.cultivo_sugerido || 'Papa / Quinua'}
+                </span>
+                {selectedParcel.rotacionA13?.alternativa && (
+                  <span className="text-[9.5px] text-emerald-300 block truncate">
+                    Alt: {selectedParcel.rotacionA13.alternativa}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {selectedParcel.rotacionA13?.motivo && (
+              <p className="text-[11px] text-zinc-200 leading-snug bg-black/20 p-2.5 rounded-xl border border-white/10">
+                {selectedParcel.rotacionA13.motivo}
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={() => {
+                playBubblePop();
+                setCalibratingParcel(selectedParcel);
+              }}
+              className="w-full py-2.5 rounded-full bg-emerald-800/80 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer border border-emerald-600/60 shadow-xs"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Ver Diagnóstico o Recalibrar Parcela</span>
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3 pt-1">
+            <p className="text-xs text-zinc-300 leading-snug">
+              Esta parcela aún no cuenta con calibración de suelo in situ. Responde el árbol de preguntas de Kipu para calcular el semáforo de incertidumbre y rotación biológica específica.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                playBubblePop();
+                setCalibratingParcel(selectedParcel);
+              }}
+              className="w-full py-3 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer shadow-md shadow-lime-600/30"
+            >
+              <Sparkles className="w-4 h-4 stroke-[2.5]" />
+              <span>Iniciar Calibración Agroambiental In Situ</span>
+            </button>
           </div>
         )}
       </div>

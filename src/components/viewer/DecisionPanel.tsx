@@ -22,7 +22,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { ActiveParcel, generateQgisGeoJson, downloadGeoJsonFile, getAltitudinalFloor } from '@/lib/geoUtils';
-import { RotationEngineResult, ReporteAgricultor } from '@/types';
+import { RotationEngineResult, ReporteAgricultor, MicrocuencaRecord } from '@/types';
+import { ClimaNasa } from '@/lib/types';
 import { downloadWordReportFile, downloadJsonPlanFile } from '@/lib/planExport';
 import { generateHardwareProfile } from '@/lib/deviceProfile';
 import GroundTruthInteractiveWizard from './GroundTruthInteractiveWizard';
@@ -38,6 +39,8 @@ interface DecisionPanelProps {
   priority: string;
   onSetPriority: (priority: string) => void;
   rotationResult: RotationEngineResult;
+  climaNasa?: ClimaNasa | null;
+  microcuencas?: MicrocuencaRecord[];
   onShowToast: (msg: string) => void;
   onCalibrationComplete?: (calibratedParcel: ActiveParcel, newReport?: ReporteAgricultor) => void;
 }
@@ -59,6 +62,8 @@ export default function DecisionPanel({
   priority,
   onSetPriority,
   rotationResult,
+  climaNasa,
+  microcuencas,
   onShowToast,
   onCalibrationComplete,
 }: DecisionPanelProps) {
@@ -550,10 +555,21 @@ export default function DecisionPanel({
                     <CloudRain className="w-3 h-3 text-blue-500" /> Lluvia Radar GPM
                   </span>
                   <span className="font-bold text-zinc-950 text-sm font-mono block mt-0.5">
-                    {climateMode === 'nino' ? '517 mm' : '680 mm'}
+                    {(() => {
+                      const precip = activeParcel.precipitationTodayMm !== undefined
+                        ? activeParcel.precipitationTodayMm
+                        : climaNasa?.precipitacion_mm !== undefined
+                        ? climaNasa.precipitacion_mm
+                        : 0.0;
+                      return climateMode === 'nino'
+                        ? `${(precip * 0.76).toFixed(1)} mm`
+                        : `${precip.toFixed(1)} mm`;
+                    })()}
                   </span>
                   <span className="text-[10px] text-zinc-500 font-mono">
-                    {climateMode === 'nino' ? '-24% déficit ENOS' : 'Línea base histórica'}
+                    {climateMode === 'nino'
+                      ? `${climaNasa?.anomalia_precipitacion_pct ?? -24}% déficit ENOS`
+                      : 'Línea base GPM / Supabase'}
                   </span>
                 </div>
 
@@ -576,11 +592,23 @@ export default function DecisionPanel({
                   <Thermometer className="w-4 h-4 text-amber-600" />
                   <div>
                     <span className="font-bold text-zinc-900 block leading-tight">Alerta de Helada</span>
-                    <span className="text-[10px] text-zinc-500">Mínima nocturna: 2°C (Hora Perú)</span>
+                    <span className="text-[10px] text-zinc-500">
+                      Temperatura de suelo: {activeParcel.soilTempC !== undefined
+                        ? `${activeParcel.soilTempC.toFixed(1)}°C`
+                        : climaNasa?.temp_min_c !== undefined
+                        ? `${climaNasa.temp_min_c.toFixed(1)}°C`
+                        : '14.0°C'}
+                    </span>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900">
-                  Riesgo Leve
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                  (activeParcel.soilTempC !== undefined && activeParcel.soilTempC <= 2) || (climaNasa?.alerta_helada ?? false)
+                    ? 'bg-red-100 text-red-900'
+                    : 'bg-emerald-100 text-emerald-900'
+                }`}>
+                  {(activeParcel.soilTempC !== undefined && activeParcel.soilTempC <= 2) || (climaNasa?.alerta_helada ?? false)
+                    ? 'Alerta Helada'
+                    : 'Normal'}
                 </span>
               </div>
 
@@ -901,6 +929,7 @@ export default function DecisionPanel({
         {activeStep === 'assistant' && (
           <AgroenvironmentalAssistant
             activeParcel={activeParcel}
+            climaNasa={climaNasa}
             onShowToast={onShowToast}
           />
         )}

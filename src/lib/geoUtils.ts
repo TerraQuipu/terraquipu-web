@@ -14,6 +14,9 @@ export interface ActiveParcel {
   center: [number, number]; // [lat, lng]
   bounds: [number, number][]; // [[lat, lng], ...]
   isCustom?: boolean;
+  precipitationTodayMm?: number;
+  soilTempC?: number;
+  evapotranspirationMm?: number;
   groundTruthCalibrated?: boolean;
   groundTruthData?: {
     soilTexture: 'arena' | 'franca' | 'arcilla';

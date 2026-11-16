@@ -33,6 +33,9 @@ export interface LiveAgrometeoData {
   precipitationTodayMm: number;
   relativeHumidityPct: number;
   temperatureNowC: number;
+  windSpeedKmH: number;
+  weatherCode: number;
+  conditionLabel: string;
   forecastDays: DailyForecastItem[];
   source: string;
 }
@@ -65,7 +68,7 @@ export async function fetchLiveAgrometeo(
       6
     )}&longitude=${lon.toFixed(
       6
-    )}&current=temperature_2m,relative_humidity_2m,precipitation,soil_moisture_0_to_1cm,soil_moisture_1_to_3cm,soil_moisture_3_to_9cm,soil_temperature_0_to_7cm&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,et0_fao_evapotranspiration&timezone=America%2FLima`;
+    )}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code,soil_moisture_0_to_1cm,soil_moisture_1_to_3cm,soil_moisture_3_to_9cm,soil_temperature_0_to_7cm&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,et0_fao_evapotranspiration&timezone=America%2FLima`;
 
     const [elevRes, forecastRes] = await Promise.all([
       fetch(elevUrl).then((r) => (r.ok ? r.json() : null)).catch(() => null),
@@ -103,6 +106,19 @@ export async function fetchLiveAgrometeo(
     const precipitationTodayMm = current.precipitation ?? 0.0;
     const relativeHumidityPct = current.relative_humidity_2m ?? 45;
     const temperatureNowC = current.temperature_2m ?? 17.5;
+    const windSpeedKmH = current.wind_speed_10m !== undefined ? Math.round(current.wind_speed_10m) : 12;
+    const weatherCode = current.weather_code ?? 0;
+
+    let conditionLabel = 'SOLEADO';
+    if (precipitationTodayMm >= 3.0 || [61, 63, 65, 80, 81, 82].includes(weatherCode)) {
+      conditionLabel = 'LLUVIOSO';
+    } else if (precipitationTodayMm > 0.1 || [51, 53, 55].includes(weatherCode)) {
+      conditionLabel = 'LLOVIZNA';
+    } else if ([1, 2, 3].includes(weatherCode)) {
+      conditionLabel = 'PARCIAL';
+    } else if (weatherCode >= 71 && weatherCode <= 75) {
+      conditionLabel = 'HELADA';
+    }
 
     // Procesamiento del pronóstico a 4-7 días
     const daily = forecastRes?.daily || {};
@@ -180,6 +196,9 @@ export async function fetchLiveAgrometeo(
       precipitationTodayMm,
       relativeHumidityPct,
       temperatureNowC,
+      windSpeedKmH,
+      weatherCode,
+      conditionLabel,
       forecastDays,
       source: 'Copernicus DEM 30m & NASA SMAP / Open-Meteo API en Vivo',
     };
@@ -200,6 +219,9 @@ export async function fetchLiveAgrometeo(
       precipitationTodayMm: 1.2,
       relativeHumidityPct: 50,
       temperatureNowC: 17.0,
+      windSpeedKmH: 12,
+      weatherCode: 1,
+      conditionLabel: 'SOLEADO',
       forecastDays: [
         {
           date: new Date().toISOString().split('T')[0],

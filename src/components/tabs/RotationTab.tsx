@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { FarmerProfile, ParcelItem } from '@/lib/types';
+import { FarmerProfile, ParcelItem, Cultivo } from '@/lib/types';
 import {
   Tractor,
   Sprout,
@@ -21,6 +21,7 @@ import { getStoredParcels, getActiveParcel, setActiveParcelId } from '@/lib/devi
 
 interface RotationTabProps {
   profile: FarmerProfile;
+  cultivos?: Cultivo[];
   onNavigateToCopiloto?: (voice?: 'astro' | 'kipu') => void;
   onToast?: (msg: string) => void;
   onOpenQgisDrawer?: () => void;
@@ -157,9 +158,44 @@ const AGRONOMIC_MAP: Record<string, AgronomicCropData> = {
   },
 };
 
-function getCropAgronomics(parcel: ParcelItem | null): AgronomicCropData {
+function getCropAgronomics(parcel: ParcelItem | null, dbCrops?: Cultivo[]): AgronomicCropData {
   if (!parcel) return AGRONOMIC_MAP.papa;
   const raw = `${parcel.cropId || ''} ${parcel.cropName || ''} ${parcel.cropCategory || ''}`.toLowerCase();
+
+  // If real Supabase crops are loaded, leverage them
+  if (dbCrops && dbCrops.length > 0) {
+    const found = dbCrops.find((c) => {
+      const cid = c.crop_id.toLowerCase();
+      const cname = c.nombre_comun.toLowerCase();
+      return raw.includes(cid) || raw.includes(cname);
+    });
+
+    if (found) {
+      const succId = found.sucesores_favorables?.[0] || 'tarwi';
+      const succCrop = dbCrops.find((c) => c.crop_id.toLowerCase().includes(succId.toLowerCase()));
+      const succBal = succCrop?.balance_nitrogeno_kg_ha ?? 95;
+      const succName = succCrop?.nombre_comun || 'Tarwi Chocho';
+
+      return {
+        id: found.crop_id,
+        name: found.nombre_comun,
+        balanceN: found.balance_nitrogeno_kg_ha,
+        balanceLabel: found.balance_nitrogeno_kg_ha > 0 ? `+${found.balance_nitrogeno_kg_ha}` : `${found.balance_nitrogeno_kg_ha}`,
+        isPositive: found.balance_nitrogeno_kg_ha > 0,
+        description: found.rompe_plaga_gorgojo
+          ? 'Rompe el ciclo del gorgojo andino y enriquece la microbiología del suelo.'
+          : 'Demanda nutrientes del suelo preparado; requiere rotación con leguminosas.',
+        successor: {
+          name: succName,
+          balanceN: succBal,
+          balanceLabel: succBal > 0 ? `+${succBal}` : `${succBal}`,
+          isPositive: succBal > 0,
+          description: `Sucesor agroecológico favorable según matriz INIA con balance de ${succBal > 0 ? '+' : ''}${succBal} kg N/ha.`,
+        },
+      };
+    }
+  }
+
   if (raw.includes('tarwi') || raw.includes('chocho')) return AGRONOMIC_MAP.tarwi;
   if (raw.includes('haba')) return AGRONOMIC_MAP.habas;
   if (raw.includes('maiz') || raw.includes('maíz')) return AGRONOMIC_MAP.maiz;
@@ -170,6 +206,7 @@ function getCropAgronomics(parcel: ParcelItem | null): AgronomicCropData {
 
 export default function RotationTab({
   profile,
+  cultivos = [],
   onNavigateToCopiloto,
   onToast,
   onOpenQgisDrawer,
@@ -212,8 +249,8 @@ export default function RotationTab({
   const immediateMonths = useMemo(() => getUpcomingMonths(currentDate, 4, 0), [currentDate]);
   const secondaryMonths = useMemo(() => getUpcomingMonths(currentDate, 3, 4), [currentDate]);
 
-  // Agronomic data for the active parcel
-  const activeCropAgro = useMemo(() => getCropAgronomics(activeParcel), [activeParcel]);
+  // Agronomic data for the active parcel from Supabase matriz_cultivos
+  const activeCropAgro = useMemo(() => getCropAgronomics(activeParcel, cultivos), [activeParcel, cultivos]);
 
   // Dynamic campaign year string
   const campaignYear = currentDate.getFullYear();

@@ -21,6 +21,8 @@ import {
   getStoredDeviceProfile,
   saveDeviceProfile,
   resetDeviceProfile,
+  updateParcel,
+  getActiveParcelId,
 } from '@/lib/deviceProfile';
 import {
   getMicrocuencas,
@@ -28,6 +30,7 @@ import {
   getClimaNasa,
   submitReportToCloud,
 } from '@/lib/supabaseClient';
+import { fetchLiveAgrometeo, type LiveAgrometeoData } from '@/lib/agrometeoClient';
 import { playBubblePop } from '@/lib/soundEffects';
 
 // Modular Screen & View Components
@@ -66,6 +69,7 @@ export default function MobileApp() {
   const [microcuencas, setMicrocuencas] = useState<Microcuenca[]>([]);
   const [cultivos, setCultivos] = useState<Cultivo[]>([]);
   const [climaNasa, setClimaNasa] = useState<ClimaNasa | null>(null);
+  const [liveAgrometeo, setLiveAgrometeo] = useState<LiveAgrometeoData | null>(null);
 
   // Farmer Profile
   const [profile, setProfile] = useState<FarmerProfile>({
@@ -138,15 +142,25 @@ export default function MobileApp() {
     }
   }, []);
 
-  // Fetch live Supabase data on mount and whenever cuencaId changes
+  // Fetch live Supabase data and live agrometeo on mount and whenever cuencaId changes
   useEffect(() => {
     async function loadData() {
-      const [cuencasData, cultivosData] = await Promise.all([
+      const [cuencasData, cultivosData, liveMeteo] = await Promise.all([
         getMicrocuencas(),
         getCultivos(),
+        fetchLiveAgrometeo(profile.lat || -13.332, profile.lon || -72.158).catch(() => null),
       ]);
       setMicrocuencas(cuencasData);
       setCultivos(cultivosData);
+
+      if (liveMeteo) {
+        setLiveAgrometeo(liveMeteo);
+        setProfile((prev) => ({
+          ...prev,
+          altitude: liveMeteo.elevationMsnm || prev.altitude,
+          slope: liveMeteo.slopePct || prev.slope,
+        }));
+      }
 
       const activeCuenca = cuencasData.find((c) => c.id === profile.cuencaId) || cuencasData[0];
       if (activeCuenca) {
@@ -178,13 +192,23 @@ export default function MobileApp() {
     triggerToast('Conectando con Supabase y NASA SMAP...');
 
     try {
-      const [cuencasData, cultivosData] = await Promise.all([
+      const [cuencasData, cultivosData, liveMeteo] = await Promise.all([
         getMicrocuencas(),
         getCultivos(),
+        fetchLiveAgrometeo(profile.lat || -13.332, profile.lon || -72.158).catch(() => null),
       ]);
 
       if (cuencasData.length > 0) setMicrocuencas(cuencasData);
       if (cultivosData.length > 0) setCultivos(cultivosData);
+
+      if (liveMeteo) {
+        setLiveAgrometeo(liveMeteo);
+        setProfile((prev) => ({
+          ...prev,
+          altitude: liveMeteo.elevationMsnm || prev.altitude,
+          slope: liveMeteo.slopePct || prev.slope,
+        }));
+      }
 
       const activeCuenca = cuencasData.find((c) => c.id === profile.cuencaId) || cuencasData[0];
       if (activeCuenca) {
@@ -243,10 +267,12 @@ export default function MobileApp() {
     });
   };
 
-  // Live SMAP calculation
-  const smapPercent = climaNasa?.humedad_suelo_smap_m3m3
+  // Live SMAP calculation from Live Agrometeo or Supabase climaNasa
+  const smapPercent = liveAgrometeo?.smapMoisturePct !== undefined
+    ? Math.round(liveAgrometeo.smapMoisturePct)
+    : climaNasa?.humedad_suelo_smap_m3m3
     ? Math.round(climaNasa.humedad_suelo_smap_m3m3 * 100)
-    : 16;
+    : 18;
 
   // =========================================================================
   // ONBOARDING WORKFLOW (NUEVO DISPOSITIVO: BIENVENIDA -> KIPU PERFIL -> DELIMITAR PARCELA)
@@ -331,8 +357,9 @@ export default function MobileApp() {
           saveDeviceProfile(updatedProfile);
           setProfile(updatedProfile);
           setOnboardingPhase('none');
-          triggerToast(`¡Bienvenido ${updatedProfile.farmerName}! Tu chacra "${newParcel.name}" ha sido guardada.`);
-          navigateTo('inicio');
+          setSelectedParcelForDetail(newParcel.id);
+          triggerToast(`¡Bienvenido ${updatedProfile.farmerName}! Tu chacra "${newParcel.name}" ha sido guardada y calibrada in situ.`);
+          navigateTo('parcelas');
         }}
       />
     );
@@ -403,7 +430,8 @@ export default function MobileApp() {
             previousCropName: newParcel.cropName,
             previousCropId: newParcel.cropId,
           });
-          triggerToast(`Parcela "${newParcel.name}" guardada con éxito`);
+          setSelectedParcelForDetail(newParcel.id);
+          triggerToast(`Parcela "${newParcel.name}" guardada y calibrada con éxito`);
           navigateTo('parcelas');
         }}
         initialLat={profile.lat}
@@ -464,6 +492,7 @@ export default function MobileApp() {
           <InicioTab
             profile={profile}
             climaNasa={climaNasa}
+            liveAgrometeo={liveAgrometeo}
             smapPercent={smapPercent}
             hardwareId={hardwareId}
             onOpenWizard={() => navigateTo('diagnostico')}
@@ -519,8 +548,19 @@ export default function MobileApp() {
               navigateTo('rotacion');
               triggerToast('Plan de rotación activado según resiliencia del suelo.');
             }}
-            onSaveProfileData={() => {
-              triggerToast('Diagnóstico edáfico registrado');
+            onSaveProfileData={(data) => {
+              handleUpdateProfile({
+                healthScore: data.healthScore,
+                moisture: data.soilMoisture.includes('Seca') ? 'SECO' : data.soilMoisture.includes('Barro') ? 'SATURADO' : 'HUMEDAD_MEDIA',
+                moistureLabel: data.soilMoisture,
+                pest: data.pestStatus.includes('sana') ? 'sano' : data.pestStatus.includes('gorgojo') ? 'gorgojo' : 'rancha',
+                soilStoniness: data.soilDepth.includes('Profundo') ? 'profundo' : 'pedregoso',
+              });
+              const activeId = getActiveParcelId();
+              updateParcel(activeId, {
+                healthScore: data.healthScore,
+              });
+              triggerToast(`Diagnóstico edáfico registrado: ${data.healthScore || 80}/100`);
             }}
           />
         )}
@@ -529,6 +569,7 @@ export default function MobileApp() {
         {currentScreen === 'rotacion' && (
           <RotationTab
             profile={profile}
+            cultivos={cultivos}
             onNavigateToCopiloto={(voice) => {
               setCopilotVoice(voice || 'kipu');
               navigateTo('copiloto');
@@ -543,6 +584,8 @@ export default function MobileApp() {
           <CopilotTab
             profile={profile}
             climaNasa={climaNasa}
+            liveAgrometeo={liveAgrometeo}
+            cultivos={cultivos}
             smapPercent={smapPercent}
             initialVoice={copilotVoice}
             onOpenDiagnostic={() => navigateTo('diagnostico')}

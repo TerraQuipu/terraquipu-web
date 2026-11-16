@@ -188,6 +188,36 @@ export async function fetchFarmerReports(): Promise<{
   }
 }
 
+export async function fetchClimaNasa(cuencaId?: string): Promise<{
+  data: any | null;
+  error: string | null;
+}> {
+  try {
+    let query = supabase
+      .from('clima_nasa_diario')
+      .select('*')
+      .order('fecha', { ascending: false })
+      .limit(1);
+
+    if (cuencaId) {
+      query = query.eq('cuenca_id', cuencaId);
+    }
+
+    const { data, error } = await query;
+    if (error || !data || data.length === 0) {
+      const fallback = await supabase
+        .from('clima_nasa_diario')
+        .select('*')
+        .order('fecha', { ascending: false })
+        .limit(1);
+      return { data: fallback.data?.[0] || null, error: error?.message || null };
+    }
+    return { data: data[0], error: null };
+  } catch (err: any) {
+    return { data: null, error: err.message };
+  }
+}
+
 export async function submitFarmerReport(report: {
   dispositivo_id: string;
   latitud: number;

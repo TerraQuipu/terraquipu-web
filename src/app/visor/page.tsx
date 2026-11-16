@@ -11,9 +11,12 @@ import { calculateRotationSequence } from '@/lib/rotationAlgorithm';
 import {
   fetchCropMatrix,
   fetchFarmerReports,
+  fetchMicrocuencas,
+  fetchClimaNasa,
   DEFAULT_CROPS,
 } from '@/lib/supabase';
-import { CropRecord, ReporteAgricultor } from '@/types';
+import { CropRecord, MicrocuencaRecord, ReporteAgricultor } from '@/types';
+import { ClimaNasa } from '@/lib/types';
 import { ActiveParcel, fetchRealTerrainMetrics } from '@/lib/geoUtils';
 
 const DEFAULT_PARCEL: ActiveParcel = {
@@ -44,6 +47,8 @@ export default function TerraQuipuSuitePage() {
   // Supabase states
   const [crops, setCrops] = useState<CropRecord[]>(DEFAULT_CROPS);
   const [farmerReports, setFarmerReports] = useState<ReporteAgricultor[]>([]);
+  const [microcuencas, setMicrocuencas] = useState<MicrocuencaRecord[]>([]);
+  const [climaNasa, setClimaNasa] = useState<ClimaNasa | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [dbStatus, setDbStatus] = useState<'connected' | 'syncing' | 'offline'>('connected');
 
@@ -65,10 +70,12 @@ export default function TerraQuipuSuitePage() {
       setIsSyncing(true);
       setDbStatus('syncing');
 
-      const [cropsRes, reportsRes, terrainRes] = await Promise.all([
+      const [cropsRes, reportsRes, terrainRes, cuencasRes, climaRes] = await Promise.all([
         fetchCropMatrix(),
         fetchFarmerReports(),
         fetchRealTerrainMetrics(DEFAULT_PARCEL.center, DEFAULT_PARCEL.areaHa).catch(() => null),
+        fetchMicrocuencas(),
+        fetchClimaNasa('29699448-afa8-4fb4-b502-24e3e577ef90'),
       ]);
 
       if (cropsRes.data && cropsRes.data.length > 0) {
@@ -77,6 +84,12 @@ export default function TerraQuipuSuitePage() {
       if (reportsRes.data && reportsRes.data.length > 0) {
         setFarmerReports(reportsRes.data);
       }
+      if (cuencasRes.data && cuencasRes.data.length > 0) {
+        setMicrocuencas(cuencasRes.data);
+      }
+      if (climaRes.data) {
+        setClimaNasa(climaRes.data);
+      }
       if (terrainRes) {
         setActiveParcel((prev) => ({
           ...prev,
@@ -84,6 +97,9 @@ export default function TerraQuipuSuitePage() {
           slopePct: terrainRes.slopePct,
           smapMoisturePct: terrainRes.smapMoisturePct,
           ndvi: terrainRes.ndvi,
+          precipitationTodayMm: terrainRes.precipitationTodayMm,
+          soilTempC: terrainRes.soilTempC,
+          evapotranspirationMm: terrainRes.evapotranspirationMm,
         }));
       }
 
@@ -100,9 +116,11 @@ export default function TerraQuipuSuitePage() {
     setDbStatus('syncing');
     showToast('Sincronizando con Supabase en tiempo real...');
 
-    const [cropsRes, reportsRes] = await Promise.all([
+    const [cropsRes, reportsRes, cuencasRes, climaRes] = await Promise.all([
       fetchCropMatrix(),
       fetchFarmerReports(),
+      fetchMicrocuencas(),
+      fetchClimaNasa('29699448-afa8-4fb4-b502-24e3e577ef90'),
     ]);
 
     if (cropsRes.data && cropsRes.data.length > 0) {
@@ -110,6 +128,12 @@ export default function TerraQuipuSuitePage() {
     }
     if (reportsRes.data && reportsRes.data.length > 0) {
       setFarmerReports(reportsRes.data);
+    }
+    if (cuencasRes.data && cuencasRes.data.length > 0) {
+      setMicrocuencas(cuencasRes.data);
+    }
+    if (climaRes.data) {
+      setClimaNasa(climaRes.data);
     }
 
     setIsSyncing(false);
@@ -171,6 +195,8 @@ export default function TerraQuipuSuitePage() {
           priority={priority}
           onSetPriority={setPriority}
           rotationResult={rotationResult}
+          climaNasa={climaNasa}
+          microcuencas={microcuencas}
           onShowToast={showToast}
           onCalibrationComplete={handleCalibrationComplete}
         />

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { FarmerProfile, ClimaNasa, ParcelItem } from '@/lib/types';
+import { FarmerProfile, ClimaNasa, ParcelItem, Cultivo } from '@/lib/types';
+import type { LiveAgrometeoData } from '@/lib/agrometeoClient';
 import {
   Sun,
   Sprout,
@@ -29,6 +30,8 @@ interface Message {
 interface CopilotTabProps {
   profile: FarmerProfile;
   climaNasa?: ClimaNasa | null;
+  liveAgrometeo?: LiveAgrometeoData | null;
+  cultivos?: Cultivo[];
   smapPercent?: number;
   initialVoice?: 'astro' | 'kipu';
   onOpenDiagnostic: () => void;
@@ -137,8 +140,33 @@ const CROP_DATABASE: Record<string, CropKnowledge> = {
   },
 };
 
-function resolveCropKnowledge(cropStr: string): CropKnowledge {
+function resolveCropKnowledge(cropStr: string, dbCrops?: Cultivo[]): CropKnowledge {
   const lower = cropStr.toLowerCase();
+
+  if (dbCrops && dbCrops.length > 0) {
+    const found = dbCrops.find(
+      (c) =>
+        lower.includes(c.crop_id.toLowerCase()) ||
+        lower.includes(c.nombre_comun.toLowerCase())
+    );
+    if (found) {
+      return {
+        name: found.nombre_comun,
+        family: found.familia_botanica || 'Andina',
+        waterDemandMinMm: found.demanda_hidrica_min_mm,
+        waterDemandOptMm: found.demanda_hidrica_optima_mm,
+        altitudeMinMsnm: found.altitud_min_msnm,
+        altitudeMaxMsnm: found.altitud_max_msnm,
+        phMin: found.ph_suelo_min,
+        phMax: found.ph_suelo_max,
+        nitrogenKgHa: found.balance_nitrogeno_kg_ha,
+        breaksWeevilPest: found.rompe_plaga_gorgojo,
+        frostToleranceC: found.tolerancia_helada_c,
+        favSuccessors: found.sucesores_favorables || ['Tarwi', 'Habas'],
+      };
+    }
+  }
+
   if (lower.includes('tarwi') || lower.includes('chocho')) return CROP_DATABASE.tarwi;
   if (lower.includes('haba')) return CROP_DATABASE.habas;
   if (lower.includes('maiz') || lower.includes('maíz')) return CROP_DATABASE.maiz;
@@ -150,6 +178,8 @@ function resolveCropKnowledge(cropStr: string): CropKnowledge {
 export default function CopilotTab({
   profile,
   climaNasa,
+  liveAgrometeo,
+  cultivos = [],
   smapPercent = 16,
   initialVoice = 'kipu',
   onOpenDiagnostic,
@@ -187,7 +217,7 @@ export default function CopilotTab({
   const parcelAreaHa = activeParcel?.areaHa || profile.areaHa || 1.73;
   const currentSmap = activeParcel?.smapHumidity ?? smapPercent;
   const altitude = activeParcel?.altitudeMsnm || profile.altitude || 3380;
-  const cropKnowledge = useMemo(() => resolveCropKnowledge(cropName), [cropName]);
+  const cropKnowledge = useMemo(() => resolveCropKnowledge(cropName, cultivos), [cropName, cultivos]);
 
   // Initial greeting tailored to real telemetry
   const initialGreeting = useMemo(() => {

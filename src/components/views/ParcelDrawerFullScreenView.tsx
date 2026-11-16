@@ -23,6 +23,7 @@ import {
 import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
 import { Cultivo, ParcelItem } from '@/lib/types';
 import { saveParcel } from '@/lib/deviceProfile';
+import DynamicTreeQuestionnaireView from '@/components/wizard/DynamicTreeQuestionnaireView';
 import {
   calculateParcelAreaHa,
   calculateParcelCentroid,
@@ -200,6 +201,7 @@ export default function ParcelDrawerFullScreenView({
 }: ParcelDrawerFullScreenViewProps) {
   // Wizard Step: 1 = Delimitar en mapa, 2 = Confirmar telemetría, 3 = Nombre de chacra, 4 = Seleccionar cultivo real
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
+  const [calibratingParcel, setCalibratingParcel] = useState<ParcelItem | null>(null);
 
   // Drawing Mode: 'freehand' (clics para vértices libres) vs 'box' (chacra rápida 1 clic + slider)
   // En trazo libre, iniciamos limpio sin polígono predefinido para que el agricultor marque libremente
@@ -743,7 +745,7 @@ export default function ParcelDrawerFullScreenView({
     };
 
     saveParcel(newParcel);
-    onParcelCreated(newParcel);
+    setCalibratingParcel(newParcel);
   };
 
   const filteredCrops = dbCrops.filter(
@@ -751,6 +753,20 @@ export default function ParcelDrawerFullScreenView({
       c.nombre_comun.toLowerCase().includes(cropFilter.toLowerCase()) ||
       c.nombre_cientifico.toLowerCase().includes(cropFilter.toLowerCase())
   );
+
+  if (calibratingParcel) {
+    return (
+      <DynamicTreeQuestionnaireView
+        parcel={calibratingParcel}
+        onComplete={(calibratedParcel) => {
+          onParcelCreated(calibratedParcel);
+        }}
+        onCancel={() => {
+          onParcelCreated(calibratingParcel);
+        }}
+      />
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-black text-white font-sans overflow-hidden">
@@ -1244,7 +1260,7 @@ export default function ParcelDrawerFullScreenView({
                 className="flex-2 py-3 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] disabled:opacity-40 text-[#132A1C] font-semibold text-xs flex items-center justify-center gap-2 shadow-lg shadow-lime-600/30"
               >
                 <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
-                <span>Guardar Parcela</span>
+                <span>Continuar a Calibración In Situ</span>
               </button>
             </div>
           </div>

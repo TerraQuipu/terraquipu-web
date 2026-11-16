@@ -97,6 +97,7 @@ export interface FarmerProfile {
   sowingWindow?: 'esta_semana' | '2_4_semanas' | '1_2_meses' | 'proxima_campana';
   pest?: 'sano' | 'gorgojo' | 'rancha';
   pestLabel?: string;
+  healthScore?: number;
 }
 
 export interface RotationRecommendation {
@@ -108,6 +109,28 @@ export interface RotationRecommendation {
   waterDemand: string;
   advice: string;
   sequence: Cultivo[];
+}
+
+export interface DiagnosticoIncertidumbre {
+  total: number;
+  fiabilidad: number;
+  nivel: 'Alta (🟢)' | 'Media (🟡)' | 'Baja (🔴)';
+  desglose: {
+    clima_base: number;
+    geometria_espacial: number;
+    choque_macro_micro: number;
+    satelite_ciego: number;
+    resolucion_edafica: number;
+    historial_desconocido: number;
+  };
+  motivos?: string[];
+}
+
+export interface RotacionA13Resultado {
+  cultivo_sugerido: string | null;
+  alternativa: string | null;
+  confianza: 'alta' | 'media' | 'baja';
+  motivo: string;
 }
 
 export interface ParcelItem {
@@ -131,5 +154,13 @@ export interface ParcelItem {
   photoUrl: string;
   notes?: string;
   createdAt: string;
+
+  // Calibración Agroambiental In Situ (Cuestionario Dinámico por Parcela)
+  cuestionarioRespuestas?: Record<string, string>;
+  cuestionarioParametros?: Record<string, any>;
+  diagnosticoIncertidumbre?: DiagnosticoIncertidumbre;
+  rotacionA13?: RotacionA13Resultado;
+  fechaCalibracion?: string;
+  vulnerabilidad?: 'Baja' | 'Media' | 'Alta';
 }
 

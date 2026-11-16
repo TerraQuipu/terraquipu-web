@@ -1,4 +1,4 @@
-import { FarmerProfile, ParcelItem } from './types';
+import { FarmerProfile, ParcelItem, DiagnosticoIncertidumbre, RotacionA13Resultado } from './types';
 
 /**
  * Deterministic hardware hash function based on non-volatile hardware telemetry.
@@ -148,6 +148,24 @@ export function updateParcel(id: string, updates: Partial<ParcelItem>): ParcelIt
   } catch (e) {
     return [];
   }
+}
+
+export function calibrateParcel(
+  id: string,
+  calibration: {
+    cuestionarioRespuestas: Record<string, string>;
+    cuestionarioParametros: Record<string, any>;
+    diagnosticoIncertidumbre: DiagnosticoIncertidumbre;
+    rotacionA13?: RotacionA13Resultado;
+    vulnerabilidad?: 'Baja' | 'Media' | 'Alta';
+  }
+): ParcelItem | null {
+  const updates: Partial<ParcelItem> = {
+    ...calibration,
+    fechaCalibracion: new Date().toISOString(),
+  };
+  const updated = updateParcel(id, updates);
+  return updated.find((p) => p.id === id) || null;
 }
 
 export function deleteParcel(id: string): ParcelItem[] {

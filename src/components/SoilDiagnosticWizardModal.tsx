@@ -24,6 +24,7 @@ interface SoilDiagnosticWizardModalProps {
     cropCover: string;
     waterSource: string;
     pestStatus: string;
+    healthScore?: number;
   }) => void;
 }
 
@@ -58,6 +59,7 @@ export default function SoilDiagnosticWizardModal({
           cropCover: step3Val,
           waterSource: step4Val,
           pestStatus: step5Val,
+          healthScore: calculatedHealthScore,
         });
       }
     }
@@ -84,10 +86,61 @@ export default function SoilDiagnosticWizardModal({
 
   const progressPct = step <= 5 ? step * 20 : 100;
 
-  // Gauge calculation for conclusion (88/100)
+  // Dynamic edaphic health score based on genuine farmer answers
+  const calculatedHealthScore = React.useMemo(() => {
+    let score = 55;
+    if (step1Val.includes('Húmeda')) score += 15;
+    else if (step1Val.includes('Seca')) score += 5;
+    else score += 8;
+
+    if (step2Val.includes('Profundo')) score += 15;
+    else if (step2Val.includes('Algo')) score += 8;
+    else score -= 5;
+
+    if (step3Val.includes('abundante')) score += 12;
+    else if (step3Val.includes('disperso')) score += 6;
+    else score -= 8;
+
+    if (step4Val.includes('permanente')) score += 10;
+    else if (step4Val.includes('auxilio')) score += 6;
+    else score += 2;
+
+    if (step5Val.includes('sana')) score += 12;
+    else if (step5Val.includes('gorgojo')) score -= 14;
+    else score -= 10;
+
+    return Math.max(25, Math.min(98, score));
+  }, [step1Val, step2Val, step3Val, step4Val, step5Val]);
+
+  const dynamicActions = React.useMemo(() => {
+    const list: string[] = [];
+    if (step3Val.includes('expuesta') || step1Val.includes('Seca')) {
+      list.push('Cubre la tierra descubierta con rastrojo o paja; evita quemarlo para retener humedad.');
+    } else {
+      list.push('Mantén la cobertura vegetal de rastrojo para nutrir la microbiología del suelo.');
+    }
+
+    if (step5Val.includes('gorgojo')) {
+      list.push('Rotación obligatoria con Tarwi o Habas para romper el ciclo biológico del gorgojo.');
+    } else if (step5Val.includes('Rancha')) {
+      list.push('Abre zanjas de sangría para ventilar raíces y evitar encharcamientos fungosos.');
+    } else {
+      list.push('Aplica compost maduro o guano de corral descompuesto al fondo del surco.');
+    }
+
+    if (step2Val.includes('superficial')) {
+      list.push('Traza surcos en contorno poco profundos sin remover capas rocosas.');
+    } else if (step4Val.includes('permanente') || step4Val.includes('auxilio')) {
+      list.push('Aprovecha los turnos de riego con riegos ligeros al amanecer para minimizar evaporación.');
+    } else {
+      list.push('Aprovecha las primeras lluvias estacionales para siembra oportuna en ladera.');
+    }
+    return list;
+  }, [step1Val, step2Val, step3Val, step4Val, step5Val]);
+
   const radius = 38;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (88 / 100) * circumference;
+  const strokeDashoffset = circumference - (calculatedHealthScore / 100) * circumference;
 
   const content = (
     <div className="space-y-4 animate-in fade-in pb-16">
@@ -472,15 +525,27 @@ export default function SoilDiagnosticWizardModal({
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                 <span className="text-3xl font-black text-[#132A1C] leading-none">
-                  88<span className="text-xs text-zinc-500 font-normal">/100</span>
+                  {calculatedHealthScore}<span className="text-xs text-zinc-500 font-normal">/100</span>
                 </span>
               </div>
             </div>
 
-            {/* Badge: Resiliencia favorable */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300/60 text-xs font-black">
+            {/* Badge: Resiliencia Dinámica */}
+            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black ${
+              calculatedHealthScore >= 75
+                ? 'bg-emerald-100 text-emerald-900 border border-emerald-300/60'
+                : calculatedHealthScore >= 50
+                ? 'bg-amber-100 text-amber-900 border border-amber-300/60'
+                : 'bg-red-100 text-red-900 border border-red-300/60'
+            }`}>
               <Check className="w-3.5 h-3.5 text-emerald-800 stroke-[3]" />
-              <span>Resiliencia favorable</span>
+              <span>
+                {calculatedHealthScore >= 75
+                  ? 'Resiliencia favorable'
+                  : calculatedHealthScore >= 50
+                  ? 'Resiliencia moderada'
+                  : 'Atención requerida'}
+              </span>
             </div>
           </div>
 
@@ -489,7 +554,11 @@ export default function SoilDiagnosticWizardModal({
             <h2 className="text-2xl font-black text-[#132A1C] leading-tight">
               Tu suelo tiene{' '}
               <span className="font-serif italic text-emerald-800 font-normal">
-                un buen punto de partida.
+                {calculatedHealthScore >= 75
+                  ? 'un buen punto de partida.'
+                  : calculatedHealthScore >= 50
+                  ? 'capacidad de recuperación.'
+                  : 'necesidad de cuidados especiales.'}
               </span>
             </h2>
             <p className="text-xs text-zinc-600 max-w-xs mx-auto">
@@ -497,7 +566,7 @@ export default function SoilDiagnosticWizardModal({
             </p>
           </div>
 
-          {/* TRES ACCIONES PARA TU CHACRA */}
+          {/* TRES ACCIONES PARA TU CHACRA (DINÁMICAS SEGÚN RESPUESTAS) */}
           <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] space-y-3">
             <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
               TRES ACCIONES PARA TU CHACRA
@@ -510,7 +579,7 @@ export default function SoilDiagnosticWizardModal({
                   01
                 </span>
                 <p className="text-xs font-medium text-zinc-800 leading-snug">
-                  Agrega compost maduro al surco para mejorar retención de agua.
+                  {dynamicActions[0]}
                 </p>
               </div>
               <Check className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
@@ -523,7 +592,7 @@ export default function SoilDiagnosticWizardModal({
                   02
                 </span>
                 <p className="text-xs font-medium text-zinc-800 leading-snug">
-                  Cubre la tierra desnuda con rastrojo; evita quemarlo.
+                  {dynamicActions[1]}
                 </p>
               </div>
               <Check className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
@@ -536,7 +605,7 @@ export default function SoilDiagnosticWizardModal({
                   03
                 </span>
                 <p className="text-xs font-medium text-zinc-800 leading-snug">
-                  Aprovecha el acceso a agua con riegos cortos al amanecer.
+                  {dynamicActions[2]}
                 </p>
               </div>
               <Check className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
@@ -548,6 +617,16 @@ export default function SoilDiagnosticWizardModal({
             type="button"
             onClick={() => {
               playSuccessFanfare();
+              if (onSaveProfileData) {
+                onSaveProfileData({
+                  soilMoisture: step1Val,
+                  soilDepth: step2Val,
+                  cropCover: step3Val,
+                  waterSource: step4Val,
+                  pestStatus: step5Val,
+                  healthScore: calculatedHealthScore,
+                });
+              }
               onCompleteToRotation();
             }}
             className="w-full py-3.5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-black text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-98 cursor-pointer"

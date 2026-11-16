@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ClimaNasa, FarmerProfile, ParcelItem } from '@/lib/types';
+import type { LiveAgrometeoData } from '@/lib/agrometeoClient';
 import {
   Bell,
   MapPin,
@@ -24,6 +25,7 @@ import { getStoredParcels, setActiveParcelId } from '@/lib/deviceProfile';
 interface InicioTabProps {
   profile: FarmerProfile;
   climaNasa: ClimaNasa | null;
+  liveAgrometeo?: LiveAgrometeoData | null;
   smapPercent: number;
   hardwareId?: string;
   isElNino?: boolean;
@@ -38,6 +40,7 @@ interface InicioTabProps {
 export default function InicioTab({
   profile,
   climaNasa,
+  liveAgrometeo,
   smapPercent = 16,
   hardwareId,
   isElNino,
@@ -98,7 +101,23 @@ export default function InicioTab({
       );
 
   // Circular gauge calculations and dynamic smooth animation
-  const healthScore = (profile as any)?.healthScore || 78;
+  const activeParcel = parcels[0];
+  const dynamicHealthScore = React.useMemo(() => {
+    if (profile.healthScore !== undefined) return profile.healthScore;
+    if (activeParcel?.healthScore !== undefined) return activeParcel.healthScore;
+    // Derive dynamic soil health from live SMAP moisture and parcel metrics
+    let score = 70;
+    if (smapPercent >= 20 && smapPercent <= 50) score += 12;
+    else if (smapPercent < 15) score -= 18;
+    else if (smapPercent > 65) score -= 8;
+
+    if (activeParcel?.ndviScore !== undefined) {
+      score += Math.round((activeParcel.ndviScore - 0.5) * 20);
+    }
+    return Math.max(30, Math.min(95, score));
+  }, [profile.healthScore, activeParcel?.healthScore, activeParcel?.ndviScore, smapPercent]);
+
+  const healthScore = dynamicHealthScore;
   const [animatedScore, setAnimatedScore] = useState(0);
 
   useEffect(() => {
@@ -114,10 +133,22 @@ export default function InicioTab({
   const scoreStatus = healthScore >= 75 ? 'BUEN ESTADO' : healthScore >= 50 ? 'REGULAR' : 'ALERTA';
   const scoreColor = healthScore >= 75 ? '#7BB63E' : healthScore >= 50 ? '#F59E0B' : '#EF4444';
 
-  // Real or calibrated telemetry readings
-  const tempC = climaNasa?.temp_media_c ? Math.round(climaNasa.temp_media_c) : 21;
-  const rainMm = climaNasa?.precipitacion_mm ? climaNasa.precipitacion_mm.toFixed(1) : '2.4';
-  const windKm = 14;
+  // Real or calibrated telemetry readings from liveAgrometeo / Supabase climaNasa
+  const tempC = liveAgrometeo?.temperatureNowC !== undefined
+    ? Math.round(liveAgrometeo.temperatureNowC)
+    : climaNasa?.temp_media_c
+    ? Math.round(climaNasa.temp_media_c)
+    : 18;
+
+  const rainMm = liveAgrometeo?.precipitationTodayMm !== undefined
+    ? liveAgrometeo.precipitationTodayMm.toFixed(1)
+    : climaNasa?.precipitacion_mm
+    ? climaNasa.precipitacion_mm.toFixed(1)
+    : '0.0';
+
+  const windKm = liveAgrometeo?.windSpeedKmH ?? 12;
+
+  const conditionLabel = liveAgrometeo?.conditionLabel || (rainMm !== '0.0' ? 'LLUVIA' : 'SOLEADO');
 
   // Agricultural warning banner calculated dynamically from SMAP and NASA weather
   const agriculturalBanner = React.useMemo(() => {
@@ -272,11 +303,11 @@ export default function InicioTab({
 
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-900/60 border border-emerald-500/20 text-[#FACC15] font-semibold text-[10.5px] tracking-wider uppercase shrink-0">
                 <Sun className="w-3.5 h-3.5 text-[#FACC15]" />
-                <span>SOLEADO</span>
+                <span>{conditionLabel}</span>
               </div>
             </div>
 
-            {/* Middle Row: Temperature + Riesgo de sequía */}
+            {/* Middle Row: Temperature + Riesgo de sequía dinámico */}
             <div className="flex items-baseline gap-3 pt-0.5">
               <span className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
                 {tempC}°C
@@ -286,8 +317,10 @@ export default function InicioTab({
                   Riesgo de sequía
                 </span>
                 <div className="flex items-center gap-1.5 text-[11px] text-zinc-300">
-                  <span className="w-2 h-2 rounded-full bg-amber-400" />
-                  <span>Moderado · hoy</span>
+                  <span className={`w-2 h-2 rounded-full ${smapPercent < 15 ? 'bg-rose-400' : smapPercent < 25 ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+                  <span>
+                    {smapPercent < 15 ? 'Alto · hoy' : smapPercent < 25 ? 'Moderado · hoy' : 'Bajo · hoy'}
+                  </span>
                 </div>
               </div>
             </div>

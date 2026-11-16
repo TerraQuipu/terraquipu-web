@@ -271,6 +271,9 @@ export default function MapViewer({
               slopePct: real.slopePct,
               smapMoisturePct: real.smapMoisturePct,
               ndvi: real.ndvi,
+              precipitationTodayMm: real.precipitationTodayMm,
+              soilTempC: real.soilTempC,
+              evapotranspirationMm: real.evapotranspirationMm,
             });
           }).catch(() => {});
 
@@ -499,6 +502,9 @@ export default function MapViewer({
         slopePct: real.slopePct,
         smapMoisturePct: real.smapMoisturePct,
         ndvi: real.ndvi,
+        precipitationTodayMm: real.precipitationTodayMm,
+        soilTempC: real.soilTempC,
+        evapotranspirationMm: real.evapotranspirationMm,
       });
     }).catch(() => {});
 
@@ -553,6 +559,9 @@ export default function MapViewer({
           slopePct: real.slopePct,
           smapMoisturePct: real.smapMoisturePct,
           ndvi: real.ndvi,
+          precipitationTodayMm: real.precipitationTodayMm,
+          soilTempC: real.soilTempC,
+          evapotranspirationMm: real.evapotranspirationMm,
         });
         onShowToast(`Telemetría en vivo actualizada: DEM Copernicus 30m y NASA SMAP`);
       } catch (err) {

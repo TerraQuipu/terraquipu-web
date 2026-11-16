@@ -1,10 +1,23 @@
 import assert from 'node:assert';
+import fs from 'node:fs';
 
 console.log('🧪 Starting deep verification suite for TerraQuipu updates...');
 
+function resolveTestPath(p: string): string {
+  if (fs.existsSync(p)) return p;
+  if (p.startsWith('terraquipu-web/')) {
+    const sub = p.replace('terraquipu-web/', '');
+    if (fs.existsSync(sub)) return sub;
+  }
+  if (p.startsWith('terraquipu-app/')) {
+    const sub = p.replace('terraquipu-app/', '../terraquipu-app/');
+    if (fs.existsSync(sub)) return sub;
+  }
+  return p;
+}
+
 // Test 1: Plain Writing Rule (zero en-dash and zero em-dash)
 {
-  const fs = await import('node:fs');
   const files = [
     'terraquipu-web/src/app/app/page.tsx',
     'terraquipu-web/src/components/views/KipuFarmerWelcomeView.tsx',
@@ -12,6 +25,15 @@ console.log('🧪 Starting deep verification suite for TerraQuipu updates...');
     'terraquipu-web/src/components/tabs/ChacraTab.tsx',
     'terraquipu-web/src/components/tabs/RotationTab.tsx',
     'terraquipu-web/src/components/tabs/CopilotTab.tsx',
+    'terraquipu-web/src/components/SoilDiagnosticWizardModal.tsx',
+    'terraquipu-web/src/components/views/ParcelDrawerFullScreenView.tsx',
+    'terraquipu-web/src/components/wizard/DynamicTreeQuestionnaireView.tsx',
+    'terraquipu-web/src/lib/agroenvironmentalEngine.ts',
+    'terraquipu-web/src/lib/agrometeoClient.ts',
+    'terraquipu-web/src/lib/dynamicQuestionnaireEngine.ts',
+    'terraquipu-web/src/lib/uncertaintyEngine.ts',
+    'terraquipu-web/src/lib/types.ts',
+    'terraquipu-web/src/lib/geoUtils.ts',
     'terraquipu-web/src/lib/deviceProfile.ts',
     'terraquipu-app/app/page.tsx',
     'terraquipu-app/components/views/KipuFarmerWelcomeView.tsx',
@@ -19,11 +41,21 @@ console.log('🧪 Starting deep verification suite for TerraQuipu updates...');
     'terraquipu-app/components/tabs/ChacraTab.tsx',
     'terraquipu-app/components/tabs/RotationTab.tsx',
     'terraquipu-app/components/tabs/CopilotTab.tsx',
+    'terraquipu-app/components/SoilDiagnosticWizardModal.tsx',
+    'terraquipu-app/components/views/ParcelDrawerFullScreenView.tsx',
+    'terraquipu-app/components/wizard/DynamicTreeQuestionnaireView.tsx',
+    'terraquipu-app/lib/agroenvironmentalEngine.ts',
+    'terraquipu-app/lib/agrometeoClient.ts',
+    'terraquipu-app/lib/dynamicQuestionnaireEngine.ts',
+    'terraquipu-app/lib/uncertaintyEngine.ts',
+    'terraquipu-app/lib/types.ts',
+    'terraquipu-app/lib/geoUtils.ts',
     'terraquipu-app/lib/deviceProfile.ts',
   ];
 
   for (const f of files) {
-    const text = fs.readFileSync(f, 'utf8');
+    const resolved = resolveTestPath(f);
+    const text = fs.readFileSync(resolved, 'utf8');
     assert.strictEqual(text.includes('\u2013'), false, `En-dash found in ${f}`);
     assert.strictEqual(text.includes('\u2014'), false, `Em-dash found in ${f}`);
   }
@@ -32,7 +64,6 @@ console.log('🧪 Starting deep verification suite for TerraQuipu updates...');
 
 // Test 2: Synchrony between web and app repositories
 {
-  const fs = await import('node:fs');
   const pairs = [
     ['terraquipu-web/src/app/app/page.tsx', 'terraquipu-app/app/page.tsx'],
     ['terraquipu-web/src/components/views/KipuFarmerWelcomeView.tsx', 'terraquipu-app/components/views/KipuFarmerWelcomeView.tsx'],
@@ -40,12 +71,21 @@ console.log('🧪 Starting deep verification suite for TerraQuipu updates...');
     ['terraquipu-web/src/components/tabs/ChacraTab.tsx', 'terraquipu-app/components/tabs/ChacraTab.tsx'],
     ['terraquipu-web/src/components/tabs/RotationTab.tsx', 'terraquipu-app/components/tabs/RotationTab.tsx'],
     ['terraquipu-web/src/components/tabs/CopilotTab.tsx', 'terraquipu-app/components/tabs/CopilotTab.tsx'],
+    ['terraquipu-web/src/components/SoilDiagnosticWizardModal.tsx', 'terraquipu-app/components/SoilDiagnosticWizardModal.tsx'],
+    ['terraquipu-web/src/components/views/ParcelDrawerFullScreenView.tsx', 'terraquipu-app/components/views/ParcelDrawerFullScreenView.tsx'],
+    ['terraquipu-web/src/components/wizard/DynamicTreeQuestionnaireView.tsx', 'terraquipu-app/components/wizard/DynamicTreeQuestionnaireView.tsx'],
+    ['terraquipu-web/src/lib/dynamicQuestionnaireEngine.ts', 'terraquipu-app/lib/dynamicQuestionnaireEngine.ts'],
+    ['terraquipu-web/src/lib/uncertaintyEngine.ts', 'terraquipu-app/lib/uncertaintyEngine.ts'],
+    ['terraquipu-web/src/lib/agroenvironmentalEngine.ts', 'terraquipu-app/lib/agroenvironmentalEngine.ts'],
+    ['terraquipu-web/src/lib/agrometeoClient.ts', 'terraquipu-app/lib/agrometeoClient.ts'],
+    ['terraquipu-web/src/lib/types.ts', 'terraquipu-app/lib/types.ts'],
+    ['terraquipu-web/src/lib/geoUtils.ts', 'terraquipu-app/lib/geoUtils.ts'],
     ['terraquipu-web/src/lib/deviceProfile.ts', 'terraquipu-app/lib/deviceProfile.ts'],
   ];
 
   for (const [w, a] of pairs) {
-    const textW = fs.readFileSync(w, 'utf8').replace(/\r\n/g, '\n');
-    const textA = fs.readFileSync(a, 'utf8').replace(/\r\n/g, '\n');
+    const textW = fs.readFileSync(resolveTestPath(w), 'utf8').replace(/\r\n/g, '\n');
+    const textA = fs.readFileSync(resolveTestPath(a), 'utf8').replace(/\r\n/g, '\n');
     assert.strictEqual(textW, textA, `File divergence between ${w} and ${a}`);
   }
   console.log('✅ Test 2 Passed: 100% synchrony between terraquipu-web and terraquipu-app');

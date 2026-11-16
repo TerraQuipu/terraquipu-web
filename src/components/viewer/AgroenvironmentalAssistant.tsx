@@ -38,16 +38,19 @@ import {
   TiempoSemanal,
   ResultadoAsistenteAgroambiental,
 } from '@/lib/agroenvironmentalEngine';
+import { ClimaNasa } from '@/lib/types';
 import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
 import KipuFullScreenWizard from '@/components/KipuFullScreenWizard';
 
 interface AgroenvironmentalAssistantProps {
   activeParcel: ActiveParcel;
+  climaNasa?: ClimaNasa | null;
   onShowToast: (msg: string) => void;
 }
 
 export default function AgroenvironmentalAssistant({
   activeParcel,
+  climaNasa,
   onShowToast,
 }: AgroenvironmentalAssistantProps) {
   // Wizard Modal state
@@ -83,16 +86,21 @@ export default function AgroenvironmentalAssistant({
     confianza: 'alta',
   });
 
-  // Estado climático local observado V3 (NASA POWER + SMAP)
+  // Estado climático local observado V3 (NASA POWER + SMAP + Open-Meteo)
   const estadoClimaticoV3: EstadoClimaticoV3 = useMemo(
     () => ({
-      precipitacion_reciente_mm: 1.8,
-      humedad_suelo_pct: Math.round(activeParcel.smapMoisturePct || 14),
-      temp_min_c: 3.2,
-      alerta_helada: false,
-      fuente: 'NASA SMAP L4 + SENAMHI Cusco',
+      precipitacion_reciente_mm: activeParcel.precipitationTodayMm !== undefined
+        ? activeParcel.precipitationTodayMm
+        : climaNasa?.precipitacion_mm ?? 0.0,
+      humedad_suelo_pct: Math.round(
+        activeParcel.smapMoisturePct ||
+        (climaNasa?.humedad_suelo_smap_m3m3 ? climaNasa.humedad_suelo_smap_m3m3 * 100 : 35)
+      ),
+      temp_min_c: climaNasa?.temp_min_c ?? (activeParcel.soilTempC !== undefined ? Math.round(activeParcel.soilTempC) : 4.0),
+      alerta_helada: climaNasa?.alerta_helada ?? ((activeParcel.soilTempC !== undefined && activeParcel.soilTempC <= 2) || false),
+      fuente: 'NASA SMAP L4 + Open-Meteo & Supabase Clima Diario',
     }),
-    [activeParcel.smapMoisturePct]
+    [activeParcel.smapMoisturePct, activeParcel.precipitationTodayMm, activeParcel.soilTempC, climaNasa]
   );
 
   // Datos espaciales de la parcela activa desde el Visor (Fuente 1)

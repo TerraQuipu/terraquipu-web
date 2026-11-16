@@ -72,6 +72,7 @@ export default function AgroenvironmentalAssistantModal({
         <div className="p-4 overflow-y-auto flex-1 space-y-4">
           <AgroenvironmentalAssistant
             activeParcel={parcel}
+            climaNasa={climaNasa}
             onShowToast={onToast}
           />
         </div>

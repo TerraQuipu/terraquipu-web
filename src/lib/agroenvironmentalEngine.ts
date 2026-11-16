@@ -76,6 +76,9 @@ export interface ActiveParcel {
   center: [number, number];
   bounds: [number, number][];
   isCustom?: boolean;
+  precipitationTodayMm?: number;
+  soilTempC?: number;
+  evapotranspirationMm?: number;
 }
 
 export interface DatosVisorParcela {
@@ -146,7 +149,8 @@ export interface ResultadoAsistenteAgroambiental {
   estadoClima: string;
   coincidenciaClima: 'Alerta y señal coinciden' | 'Alerta sin señal local todavía' | 'Señal local sin alerta' | 'No confirmada';
   recomendacionA13: {
-    cultivo_sugerido: 'Papa' | 'Olluco' | 'Quinua' | 'Oca' | null;
+    cultivo_sugerido: 'Papa' | 'Olluco' | 'Quinua' | 'Oca' | 'Tarwi' | 'Haba' | string | null;
+    alternativa?: string | null;
     confianza: NivelConfianza;
     motivo: string;
     diferenciaConIntencion?: string | null;
@@ -257,8 +261,23 @@ export const CATALOGO_ACCIONES: Record<CodigoAccion, AccionCatalogo> = {
 // 3. ALGORITMO A13: RECOMENDACIÓN DE ROTACIÓN (PORT DE PYTHON)
 // ============================================================================
 
-const CULTIVOS_PERMITIDOS_SET = new Set(['papa', 'olluco', 'quinua', 'oca']);
 const TUBERCULOS_SET = new Set(['papa', 'olluco', 'oca']);
+const LEGUMINOSAS_SET = new Set(['tarwi', 'haba']);
+const EXTRACTORES_SET = new Set(['papa', 'olluco', 'oca', 'quinua']);
+const CULTIVOS_PERMITIDOS_SET = new Set(['papa', 'olluco', 'oca', 'tarwi', 'haba', 'quinua']);
+
+const ALIAS_CULTIVOS: Record<string, string> = {
+  quinoa: 'quinua',
+  oyuco: 'olluco',
+  habas: 'haba',
+  chocho: 'tarwi',
+  lupino: 'tarwi',
+  maiz: 'quinua',
+  cebada: 'quinua',
+  trigo: 'quinua',
+  arveja: 'haba',
+  frejol: 'tarwi',
+};
 
 const PREFERENCIAS_SUELO: Record<ClaseTextura, ('olluco' | 'papa' | 'oca')[]> = {
   arenosa: ['olluco', 'papa', 'oca'],
@@ -277,18 +296,30 @@ export function limpiarTexto(valor: unknown): string | null {
 export function obtenerCultivo(valor: unknown): string | null {
   if (!valor) return null;
   let raw = valor;
+  let tipo: unknown = null;
   if (typeof valor === 'object' && valor !== null && 'cultivo' in valor) {
     raw = (valor as any).cultivo;
+    tipo = (valor as any).tipo;
   }
-  const clave = limpiarTexto(raw);
+  let clave = limpiarTexto(raw);
   if (!clave) return null;
+  clave = ALIAS_CULTIVOS[clave] || clave;
 
   if (CULTIVOS_PERMITIDOS_SET.has(clave)) {
     return clave;
   }
-  if (['descanso', 'descansar', 'descanso_de_parcela', 'barbecho'].includes(clave)) {
+  if (['descanso', 'descansar', 'descanso_de_parcela', 'barbecho', 'puruma'].includes(clave)) {
     return 'descanso';
   }
+
+  // Si eligió 'otro' cultivo o un cultivo fuera del catálogo andino directo, inferir por familia botánica
+  if (tipo) {
+    const tipoLimpio = limpiarTexto(tipo);
+    if (tipoLimpio === 'leguminosa') return 'haba';
+    if (tipoLimpio === 'tuberculo_raiz' || tipoLimpio === 'tuberculo') return 'papa';
+    if (tipoLimpio === 'cereal_grano' || tipoLimpio === 'cereal' || tipoLimpio === 'hortaliza') return 'quinua';
+  }
+
   return null;
 }
 
@@ -319,16 +350,51 @@ export function obtenerTextura(valor: unknown): ClaseTextura | null {
   return null;
 }
 
+export function elegirLeguminosa(
+  suelo: ClaseTextura,
+  agua?: unknown
+): { sugerido: 'tarwi' | 'haba'; alternativa: 'tarwi' | 'haba'; detalle: string } {
+  const aguaLimpia = limpiarTexto(agua);
+  if (aguaLimpia === 'secano') {
+    return {
+      sugerido: 'tarwi',
+      alternativa: 'haba',
+      detalle: 'Con cultivo de secano se prioriza el tarwi por su mayor tolerancia a la falta de agua.',
+    };
+  }
+  if (suelo === 'arenosa') {
+    return {
+      sugerido: 'tarwi',
+      alternativa: 'haba',
+      detalle: 'Se prioriza el tarwi por su adaptación a suelos sueltos de textura arenosa.',
+    };
+  }
+  if (suelo === 'franca') {
+    return {
+      sugerido: 'haba',
+      alternativa: 'tarwi',
+      detalle: 'Se prioriza el haba por su buen desarrollo en suelos francos y profundos.',
+    };
+  }
+  return {
+    sugerido: 'haba',
+    alternativa: 'tarwi',
+    detalle: 'Se prioriza el haba, pero debe comprobarse que el suelo arcilloso tenga buen drenaje.',
+  };
+}
+
 /**
  * Función central recomendar_A13 (port estricto de Python).
- * Devuelve exclusivamente: Papa, Olluco, Quinua u Oca.
+ * Sugiere el siguiente cultivo entre: Papa, Olluco, Oca, Quinua, Tarwi o Haba.
  */
 export function recomendar_A13(
   ultimoCultivo: unknown,
   penultimoCultivo: unknown,
-  textura: unknown
+  textura: unknown,
+  agua?: unknown
 ): {
-  cultivo_sugerido: 'Papa' | 'Olluco' | 'Quinua' | 'Oca' | null;
+  cultivo_sugerido: string | null;
+  alternativa: string | null;
   confianza: NivelConfianza;
   motivo: string;
 } {
@@ -340,6 +406,7 @@ export function recomendar_A13(
   if (ultimo === null || penultimo === null) {
     return {
       cultivo_sugerido: null,
+      alternativa: null,
       confianza: 'baja',
       motivo: 'Falta identificar los dos cultivos anteriores para calcular la rotación biológica.',
     };
@@ -348,6 +415,7 @@ export function recomendar_A13(
   if (suelo === null) {
     return {
       cultivo_sugerido: null,
+      alternativa: null,
       confianza: 'baja',
       motivo: 'Falta conocer la textura del suelo (arenosa, franca o arcillosa).',
     };
@@ -358,33 +426,43 @@ export function recomendar_A13(
     origen = limpiarTexto((textura as any).origen) || '';
   }
 
-  let sugerido: 'papa' | 'olluco' | 'quinua' | 'oca';
+  let sugerido = '';
+  let alternativa: string | null = null;
   let motivo = '';
   let confianza: NivelConfianza = 'media';
 
-  // REGLA 1: Después de un tubérculo se prioriza la quinua
-  if (TUBERCULOS_SET.has(ultimo)) {
-    sugerido = 'quinua';
-
-    if (ultimo === 'papa') {
-      motivo =
-        'Después de la papa se propone quinua para alternar cultivos y reducir la repetición de tubérculos.';
-      confianza = 'media';
-    } else {
-      motivo =
-        'Después de un tubérculo andino se propone quinua como alternancia entre grupos de cultivo. Esta es una regla orientativa del algoritmo.';
+  // REGLA 1: El último cultivo fue leguminosa (aprovechar nitrógeno fijado con tubérculo exigente)
+  if (LEGUMINOSAS_SET.has(ultimo)) {
+    sugerido = 'papa';
+    confianza = 'media';
+    motivo = `Después de ${ultimo} (leguminosa) se propone papa para aprovechar el nitrógeno que deja en el suelo.`;
+  }
+  // REGLA 2: Los dos cultivos anteriores fueron extractores (priorizar leguminosa)
+  else if (EXTRACTORES_SET.has(ultimo) && EXTRACTORES_SET.has(penultimo)) {
+    const leg = elegirLeguminosa(suelo, agua);
+    sugerido = leg.sugerido;
+    alternativa = leg.alternativa;
+    confianza = 'media';
+    motivo = `Los dos cultivos anteriores (${penultimo} y ${ultimo}) extraen muchos nutrientes del suelo, por lo que se propone una leguminosa. ${leg.detalle}`;
+    if (suelo === 'arcillosa' && sugerido === 'haba') {
       confianza = 'baja';
     }
-
-    if (TUBERCULOS_SET.has(penultimo)) {
-      motivo +=
-        ' Los dos cultivos anteriores fueron tubérculos, por lo que conviene priorizar el cambio.';
+  }
+  // REGLA 3: Último tubérculo, penúltimo no extractor
+  else if (TUBERCULOS_SET.has(ultimo)) {
+    sugerido = 'quinua';
+    if (ultimo === 'papa') {
+      confianza = 'media';
+      motivo = 'Después de la papa se propone quinua para alternar cultivos y evitar repetir tubérculos.';
+    } else {
+      confianza = 'baja';
+      motivo = 'Después de un tubérculo andino se propone quinua como alternancia entre grupos de cultivo. Es una regla orientativa.';
     }
-  } else {
-    // REGLA 2: Después de quinua o descanso se selecciona un tubérculo según la textura
+  }
+  // REGLA 4: Último quinua o descanso (penúltimo no extractor)
+  else {
     const candidatos = [...PREFERENCIAS_SUELO[suelo]];
-
-    // Evita repetir el cultivo de la campaña anterior cuando existe otra alternativa
+    // Evita repetir el cultivo de la campaña anterior
     if (penultimo && (candidatos as string[]).includes(penultimo)) {
       const idx = candidatos.indexOf(penultimo as any);
       if (idx > -1) {
@@ -392,24 +470,14 @@ export function recomendar_A13(
         candidatos.push(penultimo as any);
       }
     }
-
     sugerido = candidatos[0];
-
-    if (suelo === 'arenosa') {
-      motivo = 'Se prioriza olluco por su adaptación a suelos sueltos de textura arenosa.';
-      confianza = 'media';
-    } else if (suelo === 'franca') {
-      motivo = 'Se prioriza oca por su preferencia por suelos francos y profundos.';
-      confianza = 'media';
-    } else {
-      motivo =
-        'Se propone papa como alternativa provisional. Debe comprobarse que el suelo tenga buena estructura y drenaje.';
-      confianza = 'baja';
+    confianza = suelo !== 'arcillosa' ? 'media' : 'baja';
+    motivo = `Se propone ${sugerido} como tubérculo más adecuado para suelo ${suelo}.`;
+    if (suelo === 'arcillosa') {
+      motivo += ' Debe comprobarse buena estructura y drenaje.';
     }
-
     if (ultimo === 'descanso') {
-      motivo +=
-        ' La parcela tuvo un periodo de descanso; se utiliza el historial anterior como referencia.';
+      motivo += ' La parcela estuvo en descanso; se usa el historial anterior como referencia.';
       confianza = 'baja';
     }
   }
@@ -419,10 +487,11 @@ export function recomendar_A13(
     confianza = 'baja';
   }
 
-  const capitalize = (s: string) => (s.charAt(0).toUpperCase() + s.slice(1)) as any;
+  const capitalize = (s: string | null) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : null);
 
   return {
     cultivo_sugerido: capitalize(sugerido),
+    alternativa: capitalize(alternativa),
     confianza,
     motivo,
   };
@@ -444,7 +513,7 @@ export function ejecutar_A13(
     penultimo = historial.antes_de_esa;
   }
 
-  const res = recomendar_A13(ultimo, penultimo, complementarias.textura);
+  const res = recomendar_A13(ultimo, penultimo, complementarias.textura, complementarias.agua);
 
   // Comparación con cultivo_proximo si fue indicado por el agricultor
   let diferenciaConIntencion: string | null = null;
