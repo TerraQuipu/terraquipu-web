@@ -8,7 +8,7 @@ import {
   type CuestionarioAgricultor,
   type PrediccionZonaV2,
   type DatosVisorParcela,
-} from '../src/lib/agroenvironmentalEngine';
+} from '../src/lib/agroenvironmentalEngine.ts';
 
 console.log('🧪 Iniciando Suite de Pruebas: Motor Agroambiental TerraQuipu...');
 
