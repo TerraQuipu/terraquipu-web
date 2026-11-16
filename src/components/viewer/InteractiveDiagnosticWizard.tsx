@@ -40,9 +40,9 @@ export default function InteractiveDiagnosticWizard({
   const [step, setStep] = useState<number>(1);
 
   const KIPU_TIPS = [
-    '¡Allillanchu! Soy Kipu, tu asistente agroclimático. Primero, ¿en qué sector o andén se ubica tu parcela para calibrar la pendiente y el suelo?',
-    'Excelente. Indícame el último cultivo cosechado para romper el ciclo biológico del gorgojo andino y reponer el nitrógeno.',
-    'Paso final. Elige la prioridad de tu familia para que el motor determinista calibre el agua y la rentabilidad.',
+    'Allillanchu! I am Kipu, your agroclimatic assistant. First, in which sector or terrace system is your parcel located to calibrate slope and soil structure?',
+    'Excellent. Indicate the last crop harvested to disrupt the Andean potato weevil biological cycle and replenish soil nitrogen.',
+    'Final step. Select your family farming priority so the deterministic engine calibrates water demand and economic margin.',
   ];
 
   return (
@@ -52,25 +52,25 @@ export default function InteractiveDiagnosticWizard({
         <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-zinc-200 bg-amber-50/60 flex-shrink-0 shadow-xs flex items-center justify-center p-1">
           <img
             src="/images/kipu_llama.png"
-            alt="Kipu - Asistente Andino"
+            alt="Kipu - Andean Assistant"
             className="w-full h-full object-contain filter drop-shadow-xs"
           />
         </div>
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <span className="font-bold text-xs text-zinc-950 flex items-center gap-1.5">
-              <span>Kipu • Asistente Agroclimático</span>
+              <span>Kipu • Agroclimatic Assistant</span>
               <Sparkles className="w-3 h-3 text-amber-500" />
             </span>
             <div className="flex items-center gap-1.5">
               <span className="text-[10px] font-mono text-zinc-600 font-semibold bg-zinc-100 px-1.5 py-0.5 rounded">
-                Paso {step} de 3
+                Step {step} of 3
               </span>
               {onCancel && (
                 <button
                   onClick={onCancel}
                   className="text-zinc-400 hover:text-zinc-700 p-0.5 rounded transition"
-                  title="Cerrar asistente"
+                  title="Close assistant"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -95,30 +95,30 @@ export default function InteractiveDiagnosticWizard({
       {step === 1 && (
         <div className="space-y-2.5 animate-in fade-in duration-150">
           <label className="block text-xs font-bold text-zinc-900">
-            1. Selecciona tu Sector en Chinchero:
+            1. Select your Sector in Chinchero:
           </label>
           <div className="grid grid-cols-1 gap-2">
             {[
               {
                 id: 'yanacona',
                 name: 'Yanacona',
-                slope: '14% Pendiente',
-                alt: '3,754 msnm',
-                soil: 'Franco Arcilloso',
+                slope: '14% Slope Gradient',
+                alt: '3,754 m a.s.l.',
+                soil: 'Clay Loam',
               },
               {
                 id: 'taucca',
-                name: 'Taucca - Andén Alto',
-                slope: '8% Pendiente',
-                alt: '3,740 msnm',
-                soil: 'Franco Limoso',
+                name: 'Taucca - Upper Terrace',
+                slope: '8% Slope Gradient',
+                alt: '3,740 m a.s.l.',
+                soil: 'Silt Loam',
               },
               {
                 id: 'cuper',
-                name: 'Cuper Alto - Quebrada',
-                slope: '19% Pendiente',
-                alt: '3,780 msnm',
-                soil: 'Franco Pedregoso',
+                name: 'Cuper Alto - Ravine',
+                slope: '19% Slope Gradient',
+                alt: '3,780 m a.s.l.',
+                soil: 'Stony Loam',
               },
             ].map((s) => (
               <button
@@ -155,7 +155,7 @@ export default function InteractiveDiagnosticWizard({
               onClick={() => setStep(2)}
               className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold rounded-lg shadow-xs flex items-center gap-1.5 transition active:scale-95"
             >
-              <span>Continuar</span>
+              <span>Continue</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -166,14 +166,14 @@ export default function InteractiveDiagnosticWizard({
       {step === 2 && (
         <div className="space-y-2.5 animate-in fade-in duration-150">
           <label className="block text-xs font-bold text-zinc-900">
-            2. ¿Qué cultivo cosechaste en tu última campaña?
+            2. Which crop did you harvest in your last season?
           </label>
           <div className="grid grid-cols-2 gap-2 text-xs">
             {[
-              { id: 'papa', name: 'Papa Nativa', desc: 'Solanum andigena • Gasto N₂' },
-              { id: 'quinua', name: 'Quinua Pasankalla', desc: 'Chenopodium • Bajo requerimiento' },
-              { id: 'tarwi', name: 'Tarwi / Chocho', desc: 'Lupinus • Fija +95 kg N₂/ha' },
-              { id: 'haba', name: 'Haba Verde', desc: 'Vicia faba • Fija +75 kg N₂/ha' },
+              { id: 'papa', name: 'Native Andean Potato', desc: 'Solanum andigena • N₂ Depletion' },
+              { id: 'quinua', name: 'Pasankalla Real Quinoa', desc: 'Chenopodium • Low nutrient extraction' },
+              { id: 'tarwi', name: 'Tarwi / Andean Lupin', desc: 'Lupinus mutabilis • Fixes +95 kg N₂/ha' },
+              { id: 'haba', name: 'Highland Broad Bean', desc: 'Vicia faba • Fixes +75 kg N₂/ha' },
             ].map((c) => (
               <button
                 key={c.id}
@@ -202,13 +202,13 @@ export default function InteractiveDiagnosticWizard({
               className="px-3 py-1.5 text-zinc-600 hover:text-zinc-950 text-xs font-medium flex items-center gap-1 transition"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Atrás</span>
+              <span>Back</span>
             </button>
             <button
               onClick={() => setStep(3)}
               className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold rounded-lg shadow-xs flex items-center gap-1.5 transition active:scale-95"
             >
-              <span>Continuar</span>
+              <span>Continue</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -219,26 +219,26 @@ export default function InteractiveDiagnosticWizard({
       {step === 3 && (
         <div className="space-y-2.5 animate-in fade-in duration-150">
           <label className="block text-xs font-bold text-zinc-900">
-            3. ¿Cuál es la prioridad para esta nueva campaña?
+            3. What is the priority for this upcoming season?
           </label>
           <div className="grid grid-cols-1 gap-2">
             {[
               {
                 id: 'alimento',
-                title: 'Seguridad Alimentaria (Consumo Familiar)',
-                desc: 'Garantizar papa y leguminosas nutritivas para la mesa campesina',
+                title: 'Food Security (Family Consumption)',
+                desc: 'Secure nutritious Andean potatoes and legumes for household subsistence',
                 icon: Home,
               },
               {
                 id: 'venta',
-                title: 'Comercialización y Mercado',
-                desc: 'Maximizar rentabilidad en ferias de Urubamba y nichos gastronómicos',
+                title: 'Commercialization & Market Trade',
+                desc: 'Maximize economic returns in Urubamba agro-markets and gastronomic niches',
                 icon: DollarSign,
               },
               {
                 id: 'suelo',
-                title: 'Regeneración Integral del Suelo',
-                desc: 'Recargar materia orgánica y nitrógeno antes de resembrar solanáceas',
+                title: 'Integral Soil Regeneration',
+                desc: 'Replenish organic matter and active biological nitrogen before replanting solanaceae',
                 icon: Leaf,
               },
             ].map((p) => {
@@ -270,10 +270,10 @@ export default function InteractiveDiagnosticWizard({
           </div>
 
           <div className="p-2.5 bg-zinc-50 rounded-lg border border-zinc-200 text-[11px] text-zinc-600 font-mono">
-            <span>Vinculación Hardware: </span>
+            <span>Hardware Device Binding: </span>
             <strong className="text-zinc-900">{hardwareId}</strong>
             <span className="block text-[10px] text-zinc-500 font-sans mt-0.5">
-              Tu perfil se guardará en este dispositivo y no requerirá volver a ingresar el formulario en visitas posteriores.
+              Your profile is stored locally on this device and will persist across future sessions without re-entry.
             </span>
           </div>
 
@@ -283,18 +283,21 @@ export default function InteractiveDiagnosticWizard({
               className="px-3 py-1.5 text-zinc-600 hover:text-zinc-950 text-xs font-medium flex items-center gap-1 transition"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Atrás</span>
+              <span>Back</span>
             </button>
             <button
               onClick={onCompleteProfile}
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-xs flex items-center gap-1.5 transition active:scale-95"
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
             >
               <CheckCircle2 className="w-4 h-4" />
-              <span>Guardar Perfil &amp; Activar Quipu</span>
+              <span>Save Profile &amp; Activate Quipu Engine</span>
             </button>
           </div>
         </div>
       )}
+    </div>
+  );
+}
     </div>
   );
 }

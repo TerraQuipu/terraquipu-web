@@ -63,7 +63,7 @@ function resolveCropFromAnswers(respuestas: Record<string, string>): {
   if (cropKey === 'papa') {
     return {
       cropId: 'papa_nativa',
-      cropName: 'Papa Nativa Andina',
+      cropName: 'Native Andean Potato',
       cropCategory: 'Papa nativa',
       photoUrl: '/images/papa_nativa.jpg',
     };
@@ -71,7 +71,7 @@ function resolveCropFromAnswers(respuestas: Record<string, string>): {
   if (cropKey === 'tarwi') {
     return {
       cropId: 'tarwi',
-      cropName: 'Tarwi / Chocho',
+      cropName: 'Tarwi / Andean Lupin',
       cropCategory: 'Habas',
       photoUrl: '/images/tarwi_chocho.jpg',
     };
@@ -79,7 +79,7 @@ function resolveCropFromAnswers(respuestas: Record<string, string>): {
   if (cropKey === 'quinua') {
     return {
       cropId: 'quinua_real',
-      cropName: 'Quinua Real del Altiplano',
+      cropName: 'Real Andean Quinoa',
       cropCategory: 'Quinua',
       photoUrl: '/images/quinua_real.jpg',
     };
@@ -87,7 +87,7 @@ function resolveCropFromAnswers(respuestas: Record<string, string>): {
   if (cropKey === 'haba') {
     return {
       cropId: 'habas_verdes',
-      cropName: 'Habas Verdes',
+      cropName: 'Green Broad Beans',
       cropCategory: 'Habas',
       photoUrl: '/images/haba_verde.jpg',
     };
@@ -95,15 +95,15 @@ function resolveCropFromAnswers(respuestas: Record<string, string>): {
   if (cropKey === 'maiz') {
     return {
       cropId: 'maiz_blanco',
-      cropName: 'Maíz Blanco Gigante',
-      cropCategory: 'Maíz',
+      cropName: 'Giant White Corn',
+      cropCategory: 'Corn',
       photoUrl: '/images/maiz_blanco.jpg',
     };
   }
   if (cropKey === 'cebada') {
     return {
       cropId: 'cebada_grano',
-      cropName: 'Cebada Grano',
+      cropName: 'Malting & Grain Barley',
       cropCategory: 'Cebada',
       photoUrl: '/images/trigo_viento_poster.jpg',
     };
@@ -111,7 +111,7 @@ function resolveCropFromAnswers(respuestas: Record<string, string>): {
   if (cropKey === 'olluco') {
     return {
       cropId: 'olluco',
-      cropName: 'Olluco Andino',
+      cropName: 'Andean Olluco',
       cropCategory: 'Hortalizas',
       photoUrl: '/images/cultivos_poster.jpg',
     };
@@ -119,7 +119,7 @@ function resolveCropFromAnswers(respuestas: Record<string, string>): {
   if (cropKey === 'oca') {
     return {
       cropId: 'oca',
-      cropName: 'Oca Tradicional',
+      cropName: 'Traditional Oca',
       cropCategory: 'Hortalizas',
       photoUrl: '/images/cultivos_poster.jpg',
     };
@@ -128,7 +128,7 @@ function resolveCropFromAnswers(respuestas: Record<string, string>): {
   if (tipoKey === 'leguminosa') {
     return {
       cropId: 'leguminosa_custom',
-      cropName: 'Leguminosa Andina',
+      cropName: 'Andean Legume',
       cropCategory: 'Habas',
       photoUrl: '/images/haba_verde.jpg',
     };
@@ -136,7 +136,7 @@ function resolveCropFromAnswers(respuestas: Record<string, string>): {
   if (tipoKey === 'tuberculo') {
     return {
       cropId: 'tuberculo_custom',
-      cropName: 'Tubérculo Andino',
+      cropName: 'Andean Tuber',
       cropCategory: 'Papa nativa',
       photoUrl: '/images/papa_nativa.jpg',
     };
@@ -144,7 +144,7 @@ function resolveCropFromAnswers(respuestas: Record<string, string>): {
   if (tipoKey === 'cereal_grano') {
     return {
       cropId: 'cereal_custom',
-      cropName: 'Cereal / Grano Andino',
+      cropName: 'Andean Cereal / Grain',
       cropCategory: 'Cebada',
       photoUrl: '/images/trigo_viento_poster.jpg',
     };
@@ -472,7 +472,7 @@ export default function DynamicTreeQuestionnaireView({
           <div>
             <div className="flex items-center gap-1.5">
               <span className="text-[10px] font-bold text-[#A3E635] tracking-widest uppercase">
-                CALIBRACIÓN AGROAMBIENTAL IN SITU
+                IN-SITU AGROENVIRONMENTAL CALIBRATION
               </span>
             </div>
             <h2 className="text-xs sm:text-sm font-bold text-white truncate max-w-[200px] sm:max-w-xs">
@@ -485,7 +485,7 @@ export default function DynamicTreeQuestionnaireView({
         <div className="flex items-center gap-1.5 bg-emerald-950/80 px-2.5 py-1 rounded-full border border-emerald-800/80 text-[11px] font-medium text-emerald-300">
           <Sprout className="w-3.5 h-3.5 text-[#A3E635]" />
           <span className="font-semibold text-white">
-            {phase === 'summary' ? 'Diagnóstico Listo' : `Pregunta ${currentQuestionIndex + 1} de ${activeQuestions.length}`}
+            {phase === 'summary' ? 'Diagnostic Ready' : `Question ${currentQuestionIndex + 1} of ${activeQuestions.length}`}
           </span>
         </div>
       </div>
@@ -510,8 +510,8 @@ export default function DynamicTreeQuestionnaireView({
             {/* Question Header Card */}
             <div className="bg-emerald-950/70 rounded-3xl p-4 border border-emerald-800/60 space-y-2 shadow-lg">
               <div className="flex items-center justify-between text-[10px] text-zinc-400 font-mono">
-                <span>PREGUNTA {currentPregunta.id}</span>
-                <span className="text-[#A3E635] font-semibold">{progressPct}% completado</span>
+                <span>QUESTION {currentPregunta.id}</span>
+                <span className="text-[#A3E635] font-semibold">{progressPct}% completed</span>
               </div>
               <h3 className="text-base sm:text-lg font-bold text-white leading-snug">
                 {currentPregunta.texto}
@@ -622,7 +622,7 @@ export default function DynamicTreeQuestionnaireView({
                 className="flex-1 py-2.5 rounded-full border border-white/20 text-zinc-300 hover:text-white font-semibold text-xs flex items-center justify-center gap-1 transition cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
-                <span>Anterior</span>
+                <span>Previous</span>
               </button>
 
               {respuestas[currentPregunta.id] && (
@@ -640,7 +640,7 @@ export default function DynamicTreeQuestionnaireView({
                   className="flex-1 py-2.5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-semibold text-xs flex items-center justify-center gap-1 shadow-md shadow-lime-600/30 transition cursor-pointer"
                 >
                   <span>
-                    {currentQuestionIndex < activeQuestions.length - 1 ? 'Siguiente' : 'Ver Diagnóstico'}
+                    {currentQuestionIndex < activeQuestions.length - 1 ? 'Next' : 'View Diagnostic'}
                   </span>
                   <ChevronRight className="w-4 h-4 stroke-[2.5]" />
                 </button>
@@ -655,13 +655,13 @@ export default function DynamicTreeQuestionnaireView({
             {/* Header: Diagnóstico Listo */}
             <div className="text-center space-y-1">
               <span className="text-[10px] font-bold uppercase tracking-widest text-[#A3E635] bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-800/80 font-mono">
-                DIAGNÓSTICO INTEGRAL CALIBRADO
+                INTEGRATED CALIBRATED DIAGNOSTIC
               </span>
               <h3 className="text-lg sm:text-xl font-bold text-white">
                 Ficha Agroambiental In Situ
               </h3>
               <p className="text-xs text-zinc-300">
-                Calibración individual para <strong>{parcel.name}</strong> ({parcel.areaHa} ha)
+                Individualized calibration for <strong>{parcel.name}</strong> ({parcel.areaHa} ha)
               </p>
             </div>
 
@@ -674,7 +674,7 @@ export default function DynamicTreeQuestionnaireView({
                   </span>
                   <h4 className="text-sm font-bold text-white flex items-center gap-1.5 mt-0.5">
                     <ShieldCheck className="w-4 h-4 text-[#A3E635]" />
-                    <span>Confianza {calculatedData.incertidumbre.nivel_confianza_ux}</span>
+                    <span>Confidence: {calculatedData.incertidumbre.nivel_confianza_ux}</span>
                   </h4>
                 </div>
 
@@ -709,7 +709,7 @@ export default function DynamicTreeQuestionnaireView({
                   onClick={() => setShowBreakdown((prev) => !prev)}
                   className="w-full flex items-center justify-between text-[11px] text-emerald-300 font-semibold hover:text-white transition cursor-pointer"
                 >
-                  <span>Ver desglose técnico de 6 penalizaciones</span>
+                  <span>View technical breakdown of 6 uncertainty penalties</span>
                   <ChevronRight
                     className={`w-3.5 h-3.5 transition-transform ${showBreakdown ? 'rotate-90' : ''}`}
                   />
@@ -724,7 +724,7 @@ export default function DynamicTreeQuestionnaireView({
                       </span>
                     </div>
                     <div className="flex justify-between text-zinc-300">
-                      <span>2. Geometría Espacial ({parcel.areaHa} ha):</span>
+                      <span>2. Spatial Geometry ({parcel.areaHa} ha):</span>
                       <span className="font-mono font-bold text-white">
                         +{calculatedData.incertidumbre.desglose_penalizaciones.geometria_espacial}%
                       </span>
@@ -736,19 +736,19 @@ export default function DynamicTreeQuestionnaireView({
                       </span>
                     </div>
                     <div className="flex justify-between text-zinc-300">
-                      <span>4. Satélite "Ciego" (NDVI vs campo):</span>
+                      <span>4. Satellite "Blindness" (NDVI vs Ground-Truth):</span>
                       <span className="font-mono font-bold text-white">
                         +{calculatedData.incertidumbre.desglose_penalizaciones.satelite_ciego}%
                       </span>
                     </div>
                     <div className="flex justify-between text-zinc-300">
-                      <span>5. Resolución Edáfica (Prueba Puñado):</span>
+                      <span>5. Edaphic Resolution (Hand Squeeze Test):</span>
                       <span className="font-mono font-bold text-white">
                         +{calculatedData.incertidumbre.desglose_penalizaciones.resolucion_edafica}%
                       </span>
                     </div>
                     <div className="flex justify-between text-zinc-300">
-                      <span>6. Historial de Rotación / Nutrientes:</span>
+                      <span>6. Rotational History / Nutrients:</span>
                       <span className="font-mono font-bold text-white">
                         +{calculatedData.incertidumbre.desglose_penalizaciones.historial_desconocido}%
                       </span>
@@ -803,7 +803,7 @@ export default function DynamicTreeQuestionnaireView({
             <div className="bg-gradient-to-br from-[#132A1C] to-emerald-950 rounded-3xl p-4 border border-[#7BB63E]/40 space-y-2 shadow-lg">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold text-[#A3E635] uppercase tracking-wider block">
-                  ROTACIÓN BIOLÓGICA (ACCIÓN A13)
+                  BIOLOGICAL CROP ROTATION (ACTION A13)
                 </span>
                 <span className="text-[9.5px] bg-[#7BB63E]/20 text-[#A3E635] px-2 py-0.5 rounded-full border border-[#7BB63E]/40 font-mono">
                   Confianza {calculatedData.rotacionA13.confianza}
@@ -836,11 +836,11 @@ export default function DynamicTreeQuestionnaireView({
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-bold text-[#A3E635] uppercase tracking-wider block">
-                    CALENDARIO PREVENTIVO Y TÁCTICO
+                    PREVENTATIVE & TACTICAL CALENDAR
                   </span>
                   <h4 className="text-sm font-bold text-white flex items-center gap-1.5 mt-0.5">
                     <Calendar className="w-4 h-4 text-[#A3E635]" />
-                    <span>Catálogo de Acciones A1 - A13 para tu Chacra</span>
+                    <span>Agronomic Action Catalog A1 - A13 for Your Field</span>
                   </h4>
                 </div>
                 <span className="text-[9.5px] bg-emerald-900 text-[#A3E635] px-2 py-0.5 rounded-full border border-emerald-700/60 font-mono">
@@ -893,7 +893,7 @@ export default function DynamicTreeQuestionnaireView({
                 className="w-full py-3.5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xl shadow-lime-600/30 transition cursor-pointer active:scale-98"
               >
                 <CheckCircle2 className="w-5 h-5 stroke-[2.5]" />
-                <span>Aplicar Calibración y Ver Chacra</span>
+                <span>Apply Calibration & View Field</span>
               </button>
 
               <button
@@ -905,7 +905,7 @@ export default function DynamicTreeQuestionnaireView({
                 className="w-full py-2.5 rounded-full border border-white/20 text-zinc-300 hover:text-white font-medium text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
-                <span>Modificar respuestas del árbol</span>
+                <span>Modify questionnaire responses</span>
               </button>
             </div>
           </div>

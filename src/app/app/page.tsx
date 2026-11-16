@@ -27,7 +27,9 @@ import {
   getActiveParcel,
   getStoredParcels,
   setActiveParcelId,
+  getStoredLanguage,
 } from '@/lib/deviceProfile';
+import { SupportedLanguage } from '@/lib/translations';
 import {
   getMicrocuencas,
   getCultivos,
@@ -63,6 +65,14 @@ export default function MobileApp() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [hardwareId, setHardwareId] = useState('TQ-HW-C249');
+  const [appLang, setAppLang] = useState<SupportedLanguage>('es');
+
+  useEffect(() => {
+    setAppLang(getStoredLanguage() as SupportedLanguage);
+    const handleLang = () => setAppLang(getStoredLanguage() as SupportedLanguage);
+    window.addEventListener('languageChange', handleLang);
+    return () => window.removeEventListener('languageChange', handleLang);
+  }, []);
 
   // Full-screen first-time setup / onboarding state
   const [onboardingPhase, setOnboardingPhase] = useState<OnboardingPhase>('none');
@@ -85,11 +95,11 @@ export default function MobileApp() {
     provincia: '',
     departamento: '',
     moisture: 'HUMEDAD_MEDIA',
-    moistureLabel: 'Húmeda y Mullida',
+    moistureLabel: 'Moist & Friable',
     previousCropId: '',
     previousCropName: '',
     priority: 'tierra',
-    priorityName: 'Curar y Abonar Suelo',
+    priorityName: 'Restore & Nourish Soil',
     lat: -13.332,
     lon: -72.158,
     altitude: 3380,
@@ -182,11 +192,11 @@ export default function MobileApp() {
       setIsOnline(navigator.onLine);
       const handleOnline = () => {
         setIsOnline(true);
-        triggerToast('Conexión reestablecida con la nube');
+        triggerToast('Cloud synchronization restored');
       };
       const handleOffline = () => {
         setIsOnline(false);
-        triggerToast('Modo Sin Señal activado (100% Funcional)');
+        triggerToast('Offline mode active (100% functional)');
       };
 
       window.addEventListener('online', handleOnline);
@@ -273,7 +283,7 @@ export default function MobileApp() {
 
   const handleRefreshData = async () => {
     setIsRefreshing(true);
-    triggerToast('Conectando con Supabase y NASA SMAP...');
+    triggerToast('Connecting to Supabase & NASA SMAP...');
 
     try {
       const [cuencasData, cultivosData, liveMeteo] = await Promise.all([
@@ -307,10 +317,10 @@ export default function MobileApp() {
         second: '2-digit',
       });
 
-      triggerToast(`Telemetría actualizada (Hora Perú: ${peruTime})`);
+      triggerToast(`Telemetry updated (Peru Time: ${peruTime})`);
     } catch (e) {
       console.error(e);
-      triggerToast('Error al conectar con la nube');
+      triggerToast('Error connecting to cloud services');
     } finally {
       setTimeout(() => {
         setIsRefreshing(false);
@@ -322,7 +332,7 @@ export default function MobileApp() {
     const saved = saveDeviceProfile(newProfile);
     setProfile(saved);
     setShowOnboarding(false);
-    triggerToast(`Chacra (${saved.areaHa} ha) calibrada en hardware [${saved.deviceId}]`);
+    triggerToast(`Field (${saved.areaHa} ha) calibrated on hardware [${saved.deviceId}]`);
 
     submitReportToCloud({
       id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `rep-${Date.now()}`,
@@ -338,7 +348,7 @@ export default function MobileApp() {
       created_at: new Date().toISOString(),
     }).then((res) => {
       if (res.success) {
-        triggerToast('Calibración enviada a Supabase (Ground-Truth Comunal)');
+        triggerToast('Calibration synced to cloud (Communal Ground-Truth)');
       }
     }).catch(() => {});
   };
@@ -388,7 +398,7 @@ export default function MobileApp() {
             setProfile((prev) => ({
               ...prev,
               farmerName,
-              parcelName: `Chacra de ${farmerName}`,
+              parcelName: `${farmerName}'s Parcel`,
               distrito: community,
               ...(regionData
                 ? {
@@ -420,7 +430,7 @@ export default function MobileApp() {
         onParcelCreated={(newParcel) => {
           const updatedProfile: FarmerProfile = {
             ...profile,
-            farmerName: profile.farmerName || 'Agricultor Andino',
+            farmerName: profile.farmerName || 'Andean Farmer',
             parcelName: newParcel.name,
             areaHa: newParcel.areaHa,
             lat: newParcel.lat,
@@ -438,7 +448,7 @@ export default function MobileApp() {
           setSelectedParcelForDetail(newParcel.id);
           refreshParcels();
           handleSelectParcel(newParcel.id);
-          triggerToast(`¡Bienvenido ${updatedProfile.farmerName}! Tu chacra "${newParcel.name}" ha sido guardada y calibrada in situ.`);
+          triggerToast(`Welcome ${updatedProfile.farmerName}! Your field "${newParcel.name}" has been saved and calibrated in-situ.`);
           navigateTo('parcelas');
         }}
       />
@@ -513,7 +523,7 @@ export default function MobileApp() {
           setSelectedParcelForDetail(newParcel.id);
           refreshParcels();
           handleSelectParcel(newParcel.id);
-          triggerToast(`Parcela "${newParcel.name}" guardada y calibrada con éxito`);
+          triggerToast(`Parcel "${newParcel.name}" successfully saved and calibrated`);
           navigateTo('parcelas');
         }}
         initialLat={profile.lat}
@@ -545,13 +555,13 @@ export default function MobileApp() {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-[#132A1C] font-semibold text-xs transition cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Volver a Inicio</span>
+              <span>{appLang === 'qu' ? 'Qallariyman kutiy' : 'Volver al Inicio'}</span>
             </button>
 
             <span className="text-xs font-semibold text-zinc-800 capitalize">
-              {currentScreen === 'parcelas' && 'Mis Parcelas'}
-              {currentScreen === 'rotacion' && 'Cronograma y ahorro'}
-              {currentScreen === 'copiloto' && 'Copiloto Andino'}
+              {currentScreen === 'parcelas' && (appLang === 'qu' ? 'Chajrakuna' : 'Mis Chacras')}
+              {currentScreen === 'rotacion' && (appLang === 'qu' ? 'Muyuy & Qolqe' : 'Rotación y Ahorro')}
+              {currentScreen === 'copiloto' && (appLang === 'qu' ? 'Kipu Yanapaq' : 'Copiloto Agroambiental')}
             </span>
 
             <button
@@ -559,7 +569,7 @@ export default function MobileApp() {
               onClick={handleRefreshData}
               disabled={isRefreshing}
               className="w-8 h-8 rounded-full border border-[#E5ECE2] bg-white text-zinc-700 hover:text-emerald-800 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-2xs"
-              title="Actualizar datos satelitales"
+              title="Refresh satellite telemetry"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-700' : ''}`} />
             </button>
@@ -635,7 +645,7 @@ export default function MobileApp() {
             onClose={() => navigateTo(previousScreen === 'diagnostico' ? 'inicio' : previousScreen)}
             onCompleteToRotation={() => {
               navigateTo('rotacion');
-              triggerToast('Plan de rotación activado según resiliencia del suelo.');
+              triggerToast('Rotation plan activated based on edaphic soil resilience.');
             }}
             onSaveProfileData={(data) => {
               handleUpdateProfile({
@@ -652,7 +662,7 @@ export default function MobileApp() {
                 });
               }
               refreshParcels();
-              triggerToast(`Diagnóstico edáfico registrado: ${data.healthScore || 80}/100`);
+              triggerToast(`Edaphic soil diagnostic recorded: ${data.healthScore || 80}/100`);
             }}
           />
         )}
@@ -699,6 +709,7 @@ export default function MobileApp() {
       {currentScreen !== 'diagnostico' && (
         <BottomNav
           activeTab={currentScreen === 'inicio' || currentScreen === 'parcelas' || currentScreen === 'rotacion' || currentScreen === 'copiloto' ? currentScreen : 'inicio'}
+          lang={appLang}
           onSelectTab={(tab) => {
             if (tab === 'parcelas') setSelectedParcelForDetail(null);
             navigateTo(tab);

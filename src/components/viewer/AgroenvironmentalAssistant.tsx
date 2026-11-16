@@ -168,11 +168,11 @@ export default function AgroenvironmentalAssistant({
     datosVisor,
   ]);
 
-  // Manejo de síntesis de voz (Quechua / Español)
+  // Manejo de síntesis de voz (English / Quechua)
   const handleToggleVoice = () => {
     playBubblePop();
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-      onShowToast('Tu navegador no soporta síntesis de audio.');
+      onShowToast('Your browser does not support audio speech synthesis.');
       return;
     }
 
@@ -182,32 +182,32 @@ export default function AgroenvironmentalAssistant({
       return;
     }
 
-    const textoVoz = `Allillanchu hermano agricultor. ${resultado.estadoChacra}. ${resultado.estadoClima}. Para rotación recomendamos ${resultado.recomendacionA13.cultivo_sugerido || 'Quinua'}. ${resultado.recomendacionA13.motivo}. ${resultado.condicionalFinal}`;
+    const textoVoz = `Allillanchu farmer. ${resultado.estadoChacra}. ${resultado.estadoClima}. For biological rotation we recommend ${resultado.recomendacionA13.cultivo_sugerido || 'Quinoa'}. ${resultado.recomendacionA13.motivo}. ${resultado.condicionalFinal}`;
 
     const utter = new SpeechSynthesisUtterance(textoVoz);
-    utter.lang = 'es-PE';
+    utter.lang = 'en-US';
     utter.rate = 0.95;
     utter.onend = () => setIsSpeaking(false);
     utter.onerror = () => setIsSpeaking(false);
 
     setIsSpeaking(true);
     window.speechSynthesis.speak(utter);
-    onShowToast('🔊 Reproduciendo diagnóstico de Kipu...');
+    onShowToast('🔊 Playing Kipu diagnostic audio...');
   };
 
   const handleShare = () => {
     playBubblePop();
     if (navigator.share) {
       navigator.share({
-        title: 'Calendario Preventivo TerraQuipu',
-        text: `${resultado.estadoChacra}. Rotación A13 recomendada: ${resultado.recomendacionA13.cultivo_sugerido}.`,
+        title: 'TerraQuipu Preventative Agroclimatic Calendar',
+        text: `${resultado.estadoChacra}. Action A13 crop rotation: ${resultado.recomendacionA13.cultivo_sugerido}.`,
         url: window.location.href,
       }).catch(() => {});
     } else {
       navigator.clipboard.writeText(
-        `TerraQuipu: ${resultado.estadoChacra}\n${resultado.estadoClima}\nCultivo sugerido: ${resultado.recomendacionA13.cultivo_sugerido}\n${resultado.condicionalFinal}`
+        `TerraQuipu: ${resultado.estadoChacra}\n${resultado.estadoClima}\nSuggested crop: ${resultado.recomendacionA13.cultivo_sugerido}\n${resultado.condicionalFinal}`
       );
-      onShowToast('✓ Diagnóstico copiado al portapapeles');
+      onShowToast('✓ Diagnostic report copied to clipboard');
     }
   };
 
@@ -255,7 +255,7 @@ export default function AgroenvironmentalAssistant({
                 profile.soilStoniness === 'pedregoso' ? 'muy_pedregoso' : 'profundo'
               );
             }
-            onShowToast('✓ Cuestionario completado y calendario preventivo generado');
+            onShowToast('✓ Questionnaire completed and preventative schedule generated');
           }}
           onCancel={() => setIsWizardOpen(false)}
         />
@@ -270,13 +270,13 @@ export default function AgroenvironmentalAssistant({
             </span>
             <div>
               <h2 className="text-sm font-black tracking-tight text-white flex items-center gap-1.5">
-                <span>Asistente Agroambiental TerraQuipu</span>
+                <span>TerraQuipu Agroenvironmental Assistant</span>
                 <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded-full border border-emerald-400/30">
-                  El Niño
+                  ENSO / El Niño
                 </span>
               </h2>
               <p className="text-[11px] text-zinc-400">
-                {datosVisor.microcuenca} • Parcela: {datosVisor.nombre} ({datosVisor.areaHa} ha)
+                {datosVisor.microcuenca} • Parcel: {datosVisor.nombre} ({datosVisor.areaHa} ha)
               </p>
             </div>
           </div>
@@ -288,7 +288,7 @@ export default function AgroenvironmentalAssistant({
                 ? 'bg-amber-500 text-zinc-950 border-amber-400 animate-pulse'
                 : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700'
             }`}
-            title="Escuchar en Quechua / Español"
+            title="Listen in English / Audio"
           >
             <Volume2 className="w-4 h-4" />
           </button>
@@ -297,11 +297,11 @@ export default function AgroenvironmentalAssistant({
         {/* Telemetría Integrada (Fuente 1 + Fuente 3) */}
         <div className="grid grid-cols-4 gap-1.5 text-center text-[10px] pt-1 border-t border-zinc-800">
           <div className="bg-zinc-800/80 p-2 rounded-xl">
-            <span className="text-zinc-400 block">Pendiente</span>
+            <span className="text-zinc-400 block">Slope</span>
             <span className="text-white font-mono font-bold">{datosVisor.pendientePct}%</span>
           </div>
           <div className="bg-zinc-800/80 p-2 rounded-xl">
-            <span className="text-zinc-400 block">Altitud</span>
+            <span className="text-zinc-400 block">Elevation</span>
             <span className="text-white font-mono font-bold">{datosVisor.altitudMsnm}m</span>
           </div>
           <div className="bg-zinc-800/80 p-2 rounded-xl">
@@ -332,13 +332,13 @@ export default function AgroenvironmentalAssistant({
           </span>
           <div>
             <div className="text-sm font-black text-white flex items-center gap-2">
-              <span>Cuestionario de Parcela con Kipu</span>
+              <span>In-Situ Parcel Questionnaire with Kipu</span>
               <span className="text-[10px] bg-emerald-300/30 text-emerald-100 font-extrabold px-2 py-0.5 rounded-full border border-emerald-300/40">
-                Estilo Duolingo
+                Interactive Stepper
               </span>
             </div>
             <p className="text-xs text-emerald-100/90 mt-0.5 leading-snug">
-              Cobertura vegetal, agua, obras andinas, historial A13 y mano de obra
+              Canopy cover, water source, soil conservation works, A13 crop history, and labor availability
             </p>
           </div>
         </div>
@@ -354,7 +354,7 @@ export default function AgroenvironmentalAssistant({
       {/* LÍNEA 1: Estado de la Chacra */}
       <div className="p-3.5 rounded-2xl bg-zinc-900 text-white shadow-xs space-y-1">
         <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">
-          Estado de la Chacra
+          Field Parcel Status
         </span>
         <p className="text-xs font-medium leading-relaxed font-sans text-zinc-200">
           <strong
@@ -366,7 +366,7 @@ export default function AgroenvironmentalAssistant({
                 : 'text-emerald-400'
             }`}
           >
-            Vulnerabilidad {resultado.nivelVulnerabilidad}.
+            Vulnerability Level: {resultado.nivelVulnerabilidad}.
           </strong>{' '}
           {resultado.motivoVulnerabilidad}
         </p>
@@ -376,7 +376,7 @@ export default function AgroenvironmentalAssistant({
       <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-950 shadow-xs space-y-1">
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 block">
-            Estado del Clima
+            Climate Regime Status
           </span>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 border border-amber-300">
             {resultado.coincidenciaClima}
@@ -403,15 +403,15 @@ export default function AgroenvironmentalAssistant({
               </span>
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900 block">
-                  Recomendación A13: Rotación de Cultivos
+                  Action A13: Biological Crop Rotation
                 </span>
                 <span className="text-sm font-black text-emerald-950">
-                  Sembrar {resultado.recomendacionA13.cultivo_sugerido}
+                  Plant {resultado.recomendacionA13.cultivo_sugerido}
                 </span>
               </div>
             </div>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-900 border border-emerald-300">
-              Confianza {resultado.recomendacionA13.confianza}
+              Confidence: {resultado.recomendacionA13.confianza}
             </span>
           </div>
 
@@ -421,7 +421,7 @@ export default function AgroenvironmentalAssistant({
 
           {resultado.recomendacionA13.diferenciaConIntencion && (
             <div className="pt-1 text-[11px] text-amber-900 bg-amber-50 p-2 rounded-xl border border-amber-200">
-              <span className="font-bold">Nota de discrepancia: </span>
+              <span className="font-bold">Discrepancy Note: </span>
               {resultado.recomendacionA13.diferenciaConIntencion}
             </div>
           )}
@@ -434,11 +434,11 @@ export default function AgroenvironmentalAssistant({
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-emerald-700" />
             <h3 className="text-xs font-black text-zinc-950 uppercase tracking-wide">
-              Calendario Preventivo (4 Bloques Temporales)
+              Preventative Schedule (4 Seasonal Blocks)
             </h3>
           </div>
           <span className="text-[10px] text-zinc-500 font-mono">
-            {resultado.calendario.length} tareas programadas
+            {resultado.calendario.length} scheduled actions
           </span>
         </div>
 
@@ -470,8 +470,8 @@ export default function AgroenvironmentalAssistant({
               </div>
 
               <div className="flex items-center justify-between text-[10px] text-zinc-400 pt-1 border-t border-zinc-100">
-                <span>Fuente: {item.fuente}</span>
-                <span className="font-mono text-zinc-500 font-bold">Código: {item.accionCodigo}</span>
+                <span>Source: {item.fuente}</span>
+                <span className="font-mono text-zinc-500 font-bold">Code: {item.accionCodigo}</span>
               </div>
             </div>
           ))}
@@ -482,7 +482,7 @@ export default function AgroenvironmentalAssistant({
       <div className="p-3.5 rounded-2xl bg-zinc-100 border border-zinc-300 text-zinc-800 text-xs shadow-2xs flex items-start gap-2.5">
         <Info className="w-4 h-4 text-zinc-600 shrink-0 mt-0.5" />
         <div>
-          <strong className="block font-black text-zinc-900 mb-0.5">Condicional de Vigencia:</strong>
+          <strong className="block font-black text-zinc-900 mb-0.5">Validity Condition:</strong>
           <p className="text-zinc-700 leading-relaxed font-sans">{resultado.condicionalFinal}</p>
         </div>
       </div>
@@ -495,7 +495,7 @@ export default function AgroenvironmentalAssistant({
           className="py-3 px-3 rounded-2xl bg-white border border-zinc-300 text-zinc-800 font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-zinc-50 active:scale-98 transition cursor-pointer shadow-2xs"
         >
           <Share2 className="w-3.5 h-3.5 text-zinc-600" />
-          <span>Compartir Ficha</span>
+          <span>Share Card</span>
         </button>
 
         <button
@@ -507,7 +507,7 @@ export default function AgroenvironmentalAssistant({
           className="py-3 px-3 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs flex items-center justify-center gap-1.5 active:scale-98 transition cursor-pointer shadow-xs"
         >
           <Download className="w-3.5 h-3.5 text-emerald-200" />
-          <span>Descargar Ficha PDF</span>
+          <span>Export PDF Report</span>
         </button>
       </div>
 
@@ -525,10 +525,10 @@ export default function AgroenvironmentalAssistant({
             <span className="text-xs">⚙️</span>
             <div>
               <span className="font-bold text-xs text-zinc-900 block">
-                {showAdvancedSettings ? 'Ocultar Parámetros Directos' : 'Ver Parámetros Directos Calibrados'}
+                {showAdvancedSettings ? 'Hide Calibrated Direct Parameters' : 'View Calibrated Direct Parameters'}
               </span>
               <span className="text-[10px] text-zinc-500">
-                Ajustar manualmente cobertura, agua u obras
+                Manually tune ground cover, water access, or conservation works
               </span>
             </div>
           </div>
@@ -543,55 +543,55 @@ export default function AgroenvironmentalAssistant({
           <div className="p-4 border-t border-zinc-100 space-y-3 bg-zinc-50/50 text-xs animate-in fade-in duration-150">
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[10px] font-bold text-zinc-700 block mb-1">Cobertura:</label>
+                <label className="text-[10px] font-bold text-zinc-700 block mb-1">Ground Cover:</label>
                 <select
                   value={cobertura}
                   onChange={(e) => setCobertura(e.target.value as any)}
                   className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
                 >
-                  <option value="cultivo">Cultivo Creciendo</option>
-                  <option value="rastrojo">Rastrojo Protector</option>
-                  <option value="pasto">Pasto Natural</option>
-                  <option value="suelo_desnudo">Suelo Desnudo</option>
+                  <option value="cultivo">Growing Crop</option>
+                  <option value="rastrojo">Protective Stubble Mulch</option>
+                  <option value="pasto">Natural Grassland</option>
+                  <option value="suelo_desnudo">Bare Soil</option>
                 </select>
               </div>
 
               <div>
-                <label className="text-[10px] font-bold text-zinc-700 block mb-1">Agua:</label>
+                <label className="text-[10px] font-bold text-zinc-700 block mb-1">Water Access:</label>
                 <select
                   value={agua}
                   onChange={(e) => setAgua(e.target.value as any)}
                   className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
                 >
-                  <option value="secano">Secano (Solo Lluvia)</option>
-                  <option value="riego_auxilio">Riego de Auxilio</option>
-                  <option value="riego_permanente">Riego Permanente</option>
+                  <option value="secano">Rainfed Only (Secano)</option>
+                  <option value="riego_auxilio">Supplementary Irrigation</option>
+                  <option value="riego_permanente">Permanent Irrigation</option>
                 </select>
               </div>
 
               <div>
-                <label className="text-[10px] font-bold text-zinc-700 block mb-1">Obras de Conservación:</label>
+                <label className="text-[10px] font-bold text-zinc-700 block mb-1">Conservation Works:</label>
                 <select
                   value={obras}
                   onChange={(e) => setObras(e.target.value as any)}
                   className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
                 >
-                  <option value="buen_estado">Buen Estado</option>
-                  <option value="mal_estado">Mal Estado / Deterioradas</option>
-                  <option value="ninguna">Ninguna Obra</option>
+                  <option value="buen_estado">Good Condition</option>
+                  <option value="mal_estado">Degraded / Needs Maintenance</option>
+                  <option value="ninguna">No Conservation Works</option>
                 </select>
               </div>
 
               <div>
-                <label className="text-[10px] font-bold text-zinc-700 block mb-1">Personas / Trabajo:</label>
+                <label className="text-[10px] font-bold text-zinc-700 block mb-1">Labor Availability:</label>
                 <select
                   value={personas}
                   onChange={(e) => setPersonas(e.target.value as any)}
                   className="w-full p-2 rounded-xl border border-zinc-300 bg-white text-xs font-semibold"
                 >
-                  <option value="solo_yo">Solo yo (1 persona)</option>
-                  <option value="dos_o_tres">2 o 3 personas</option>
-                  <option value="cuatro_o_mas">4 o más personas</option>
+                  <option value="solo_yo">Solo farmer (1 person)</option>
+                  <option value="dos_o_tres">2 or 3 persons</option>
+                  <option value="cuatro_o_mas">4 or more persons</option>
                 </select>
               </div>
             </div>

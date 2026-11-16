@@ -18,8 +18,11 @@ import {
   Users, 
   QrCode,
   Github,
-  ChevronDown
+  ChevronDown,
+  Globe,
 } from "lucide-react";
+import { getStoredLanguage, saveStoredLanguage } from "@/lib/deviceProfile";
+import { getTranslation, SupportedLanguage } from "@/lib/translations";
 
 // Royalty-free background video playlist (Optimized local MP4 with CDN fallback - Andes aerials & Andean agriculture)
 const BASE_PATH = '';
@@ -27,21 +30,21 @@ const BASE_PATH = '';
 const HERO_PLAYLIST = [
   {
     id: "andes",
-    label: "Cordillera de los Andes",
+    label: "Andes Mountain Range",
     url: `${BASE_PATH}/videos/andes.mp4`,
     fallback: "https://assets.mixkit.co/videos/4132/4132-720.mp4",
     poster: `${BASE_PATH}/videos/andes_poster.jpg`
   },
   {
     id: "cultivos",
-    label: "Valles y Maizales",
+    label: "Valleys & Cornfields",
     url: `${BASE_PATH}/videos/cultivos.mp4`,
     fallback: "https://assets.mixkit.co/videos/35854/35854-720.mp4",
     poster: `${BASE_PATH}/videos/cultivos_poster.jpg`
   },
   {
     id: "cosecha",
-    label: "Cosecha & Semilla",
+    label: "Harvest & Heritage Seeds",
     url: `${BASE_PATH}/videos/cosecha.mp4`,
     fallback: "https://assets.mixkit.co/videos/48769/48769-720.mp4",
     poster: `${BASE_PATH}/videos/cosecha_poster.jpg`
@@ -50,77 +53,153 @@ const HERO_PLAYLIST = [
 
 const DIAGNOSTICO_TABS = [
   {
-    label: "Diagnóstico en Parcela",
-    title: "Cada parcela comienza con 100+ indicadores agroclimáticos.",
-    subtitle: "Diagnóstico edáfico a 30m de resolución con telemetría satelital en tiempo real para anticipar sequías, optimizar nitrógeno y proteger tus cultivos frente a El Niño."
+    label: "In-Situ Parcel Diagnostic",
+    title: "Every parcel begins with 100+ agroclimatic indicators.",
+    subtitle: "30-meter resolution edaphic diagnostic with real-time satellite telemetry to anticipate droughts, optimize nitrogen, and protect crops against El Nino."
   },
   {
-    label: "Historial Agroclimático",
-    title: "Dos décadas de memoria satelital para tu cuenca.",
-    subtitle: "Modelado agroclimático de 20 años con NASA POWER para anticipar anomalías pluviométricas y calcular curvas de evapotranspiración con rigor científico."
+    label: "Agroclimatic History",
+    title: "Two decades of satellite memory for your watershed.",
+    subtitle: "20-year agroclimatic modeling with NASA POWER to anticipate rainfall anomalies and calculate evapotranspiration curves with scientific rigor."
   },
   {
-    label: "Rotación Quipu",
-    title: "Un plan multianual regenerativo para tu suelo.",
-    subtitle: "Secuencia determinista auditada por INIA: Tarwi para inyección biológica de nitrógeno (+95 kg N/ha), Quinua tolerante y Papa Nativa resistente."
+    label: "Quipu Rotation",
+    title: "A regenerative multi-year plan for your soil.",
+    subtitle: "Deterministic sequence audited by INIA: Tarwi for biological nitrogen fixation (+95 kg N/ha), resilient Quinoa, and tolerant Native Andean Potato."
   },
   {
-    label: "Alertas El Niño",
-    title: "Alertas predictivas antes de que la sequía golpee.",
-    subtitle: "Telemetría radar NASA SMAP para calibrar la humedad radicular y activar planes de contingencia hídrica meses antes de la siembra."
+    label: "El Nino Early Warning",
+    title: "Predictive alerts months before drought strikes.",
+    subtitle: "NASA SMAP radar telemetry to calibrate root-zone soil moisture and trigger water contingency plans months before sowing."
+  }
+];
+
+const DIAGNOSTICO_TABS_QU = [
+  {
+    label: "Chajra Allpa Qhaway",
+    title: "Sapa chajramanta pachakmanta aswan tupuykuna rikhurin.",
+    subtitle: "Allpapa kurpawasqa tupusqan 30 metrokama, chiri-poqoy yupaywan ch'aki pachata ñawpaqchanapaq, wanuta allichanapaq, Hatun Paranpaq amachanapaqpas."
+  },
+  {
+    label: "Ñawpa Pacha Willakuy",
+    title: "Iskay chunka wata hanaq pacha willakuy chajraykipaq.",
+    subtitle: "NASA POWER nisqawan 20 wata para yupaykunata qhawarispa sapa killapi yaku chinkayta yachanchik yachay taripaq hina."
+  },
+  {
+    label: "Khipu Muyuy Tarpuy",
+    title: "Watantin watantin allpa kawsarichiq tarpuykuna.",
+    subtitle: "INIA kamachisqan tarpuy: Tarwi allpaman wanu kawsachiq (+95 kg N/ha), kallpasapa Kinwa, allin Papa Nativapas."
+  },
+  {
+    label: "Hatun Para Sasachakuy",
+    title: "Ch'aki pacha manaraq chayamuptin ñawpaq willakuy.",
+    subtitle: "NASA SMAP radarwan saphikama allpapa yakunta tupuspa yaku waqaychayta qallarinchik manaraq tarpuchkaspa."
   }
 ];
 
 const DIAGNOSTICO_FAQS = [
   {
-    q: "¿Cómo mide Terraquipu la humedad a 30m?",
-    a: "Combinando radar L-Band NASA SMAP con downscaling topográfico SRTM a 90m y modelos edáficos SoilGrids a 30m calibrados para laderas andinas."
+    q: "How does Terraquipu measure moisture at 30m resolution?",
+    a: "By combining NASA SMAP L-Band radar with SRTM 90m topographic downscaling and SoilGrids 30m edaphic models calibrated for Andean mountain slopes."
   },
   {
-    q: "¿Qué datos satelitales y públicos se integran?",
-    a: "Datos abiertos de NASA POWER (clima y radiación solar), NASA SMAP (humedad de suelo), ISRIC SoilGrids v2 (perfil de suelo) y registros meteorológicos de SENAMHI."
+    q: "Which satellite and open science datasets are integrated?",
+    a: "Open data from NASA POWER (agroclimatology & solar radiation), NASA SMAP (soil moisture), ISRIC SoilGrids v2 (soil profile), and SENAMHI meteorological records."
   },
   {
-    q: "¿Cómo se valida la rotación con normas INIA?",
-    a: "El motor algorítmico sigue las guías técnicas del INIA (Instituto Nacional de Innovación Agraria) para fijación biológica de nitrógeno (+95 kg N/ha) y control del gorgojo andino."
+    q: "How is crop rotation validated against INIA standards?",
+    a: "The algorithmic engine adheres to official INIA (National Institute of Agrarian Innovation) technical guidelines for biological nitrogen fixation (+95 kg N/ha) and Andean potato weevil (Premnotrypes spp.) lifecycle disruption."
+  }
+];
+
+const DIAGNOSTICO_FAQS_QU = [
+  {
+    q: "Imaynatam Terraquipu 30m tupuypi allpapa yakunta yupan?",
+    a: "NASA SMAP L-Band radar nisqata SRTM 90m urqukunap kayninwan, ISRIC SoilGrids 30m allpa yachaykunata kuskanchaspa."
+  },
+  {
+    q: "Ima hanaq pacha willakuykunatan huñun?",
+    a: "NASA POWER (inti kanchay, para), NASA SMAP (allpa chiri-poqo), ISRIC SoilGrids v2 (allpapa kawsaynin) SENAMHI kawsay willakuykunawan."
+  },
+  {
+    q: "Imaynatam INIA kamachiykunawan tarpuy muyuyta qhawachikun?",
+    a: "Algoritmo yachayqa Perú INIA kamachiykunatam qatin, Tarwi wanu huñuyninta (+95 kg N/ha) papa kuru (Premnotrypes spp.) kawsayninta chinkachinapaq."
   }
 ];
 
 const ROTACION_TABS = [
   {
-    label: "Secuencia Quipu Multianual",
-    title: "El Quipu agronómico que regenera la fertilidad del suelo.",
-    subtitle: "Algoritmos biológicos que alternan leguminosas fijadoras de nitrógeno, granos andinos y tubérculos de alta resiliencia para proteger cosechas frente a El Niño."
+    label: "Multi-Year Quipu Sequence",
+    title: "The agronomic Quipu that regenerates soil fertility.",
+    subtitle: "Biological algorithms that alternate nitrogen-fixing legumes, Andean grains, and high-resilience tubers to secure harvests against El Nino."
   },
   {
-    label: "Fijación Biológica de Nitrógeno",
-    title: "+95 kg de nitrógeno orgánico por hectárea sin agroquímicos.",
-    subtitle: "Inoculación y aporte natural de biomasa mediante Tarwi (Lupinus mutabilis) que ahorra cientos de dólares en fertilizantes sintéticos y recupera la estructura edáfica."
+    label: "Biological Nitrogen Fixation",
+    title: "+95 kg of organic nitrogen per hectare without agrochemicals.",
+    subtitle: "Inoculation and natural biomass contribution through Tarwi / Andean Lupin (Lupinus mutabilis), saving hundreds of dollars in synthetic fertilizers and rebuilding soil structure."
   },
   {
-    label: "Corte de Ciclos de Plagas",
-    title: "-75% de incidencia del gorgojo andino y nematodos.",
-    subtitle: "Ruptura del nicho biológico de plagas mediante alternancia botánica estricta (Leguminosa → Chenopodiácea → Solanácea) validada con normas INIA."
+    label: "Pest Cycle Disruption",
+    title: "-75% incidence of Andean potato weevil and nematodes.",
+    subtitle: "Disruption of pest biological niches through strict botanical alternation (Legume -> Amaranthaceae -> Solanaceae) validated with INIA standards."
   },
   {
-    label: "Monitoreo Satelital de Clorofila",
-    title: "Seguimiento multiespectral de biomasa y rendimiento.",
-    subtitle: "Telemetría NDVI cada 5 días para detectar estrés hídrico o nutricional semanas antes de que sea perceptible en la superficie del cultivo."
+    label: "Satellite Chlorophyll Monitoring",
+    title: "Multispectral tracking of vegetative biomass and vigor.",
+    subtitle: "Sentinel-2 NDVI telemetry every 5 days to detect water or nutrient stress weeks before symptoms become visible on the canopy."
+  }
+];
+
+const ROTACION_TABS_QU = [
+  {
+    label: "Khipu Watantin Muyuy",
+    title: "Allpa kawsayta allichaq Khipu tarpuy.",
+    subtitle: "Kawsay yachaywan Tarwi, Kinwa, Papa Nativata muyuchispa mikuyta Hatun Paranmanta amachanchik."
+  },
+  {
+    label: "Allpapi Wanu Huñuy",
+    title: "+95 kg kawsay wanu sapa hectáreapi mana qolqellapaq.",
+    subtitle: "Tarwi kawsaywan allpa samasqata wanuwan hunt'achispa qolqeta waqaychanchik, allpata kawsarichinchik."
+  },
+  {
+    label: "Kuru Chinkachiy",
+    title: "-75% papa kuruwan nematodokunata chinkachispa.",
+    subtitle: "Tarpuykunata sapa wata tikraspa (Tarwi -> Kinwa -> Papa) INIA kamachiywan kurukunata manañam kawsachinchu."
+  },
+  {
+    label: "Hanaq Pacha Q'omer Qhaway",
+    title: "Sentinel-2 satélite sapa 5 p'unchaw q'omerta tupun.",
+    subtitle: "Chajrapa q'omerninta qhawaspa yakumanta icha unquymanta sasachakuyta ñawpaqmantapacha yachanchik."
   }
 ];
 
 const ROTACION_FAQS = [
   {
-    q: "¿Cómo calcula Terraquipu la rotación óptima de parcelas?",
-    a: "Analizando la elevación SRTM, el pH de SoilGrids y el déficit hídrico de NASA POWER para diseñar la alternancia de 3 años que maximiza nutrientes sin fertilizantes sintéticos."
+    q: "How does Terraquipu calculate the optimal parcel rotation?",
+    a: "By analyzing SRTM elevation, SoilGrids pH, and NASA POWER water deficits to engineer a 3-year alternation that maximizes nutrients without synthetic fertilizers."
   },
   {
-    q: "¿Cuánto ahorra un agricultor al usar fijación con Tarwi?",
-    a: "Hasta 95 kg de N/ha equivalen a 4 sacos de urea comercial (aprox. $450 USD por hectárea), además de mejorar la retención de humedad en un 22%."
+    q: "How much does a farmer save by utilizing Tarwi fixation?",
+    a: "Up to 95 kg N/ha is equivalent to 4 commercial urea sacks (approx. $450 USD per hectare), while improving soil moisture retention by 22%."
   },
   {
-    q: "¿Cómo se accede a las fichas técnicas sin conexión a internet?",
-    a: "Terraquipu genera cartillas agronómicas comunitarias descargables en PDF y cuenta con modo offline PWA para consultar en la parcela sin cobertura celular."
+    q: "How can farmers access technical sheets without internet connectivity?",
+    a: "Terraquipu generates downloadable community agronomic cards in PDF and features offline PWA caching for field consultation with zero cellular signal."
+  }
+];
+
+const ROTACION_FAQS_QU = [
+  {
+    q: "Imaynatam Terraquipu sapa chajra tarpuy muyuyta yupan?",
+    a: "SRTM alturata, SoilGrids pH nisqata, NASA POWER yaku chinkayta qhawaspa kimsantin wata tarpuyta allichan mana chimika wanullawan."
+  },
+  {
+    q: "Hayk'atan tarpukamayoc waqaychan Tarwi wanunwan?",
+    a: "95 kg N/ha nisqaqa tawa urea saqukunawan kuskam (yaqa $450 USD sapa hectáreapi), allpapa yakuntapas 22% aswanta waqaychan."
+  },
+  {
+    q: "Imaynatam tarpukamayokkuna willakuyta qhawanku mana internet kachkaptin?",
+    a: "Terraquipuqa PDF p'anqakunatam ruran offline PWA nisqawan mana señal kachkaptinpas llamk'anallapaq."
   }
 ];
 
@@ -132,6 +211,26 @@ export default function SuperpowerTerraquipuLanding() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [activeRotacionTab, setActiveRotacionTab] = useState(0);
   const [expandedRotacionFaq, setExpandedRotacionFaq] = useState<number | null>(null);
+  const [lang, setLang] = useState<SupportedLanguage>('es');
+
+  useEffect(() => {
+    setLang(getStoredLanguage() as SupportedLanguage);
+    const handle = () => setLang(getStoredLanguage() as SupportedLanguage);
+    window.addEventListener('languageChange', handle);
+    return () => window.removeEventListener('languageChange', handle);
+  }, []);
+
+  const toggleLanguage = () => {
+    const nextLang: SupportedLanguage = lang === 'es' ? 'qu' : 'es';
+    saveStoredLanguage(nextLang);
+    setLang(nextLang);
+  };
+
+  const t = getTranslation(lang);
+  const diagnosticoTabs = lang === 'qu' ? DIAGNOSTICO_TABS_QU : DIAGNOSTICO_TABS;
+  const diagnosticoFaqs = lang === 'qu' ? DIAGNOSTICO_FAQS_QU : DIAGNOSTICO_FAQS;
+  const rotacionTabs = lang === 'qu' ? ROTACION_TABS_QU : ROTACION_TABS;
+  const rotacionFaqs = lang === 'qu' ? ROTACION_FAQS_QU : ROTACION_FAQS;
 
   // Automatic seamless transition across videos every 9 seconds
   useEffect(() => {
@@ -165,21 +264,40 @@ export default function SuperpowerTerraquipuLanding() {
           
           {/* Left Navigation Links */}
           <nav className="hidden lg:flex items-center gap-7 text-[13px] font-semibold text-white/90">
-            <a href="#como-funciona" className="hover:text-white transition">Cómo funciona</a>
-            <a href="#diagnostico" className="hover:text-white transition">Diagnóstico 30m</a>
-            <a href="#quipu" className="hover:text-white transition">Plan Quipu</a>
-            <a href="#comunidad" className="hover:text-white transition">Comunidad</a>
+            <a href="#como-funciona" className="hover:text-white transition">
+              {lang === 'qu' ? 'Imaynatam Llamk\'an' : 'Cómo Funciona'}
+            </a>
+            <a href="#diagnostico" className="hover:text-white transition">
+              {lang === 'qu' ? '30m Allpa Qhaway' : 'Diagnóstico 30m'}
+            </a>
+            <a href="#quipu" className="hover:text-white transition">
+              {lang === 'qu' ? 'Khipu Tarpuy' : 'Plan Quipu'}
+            </a>
+            <a href="#comunidad" className="hover:text-white transition">
+              {lang === 'qu' ? 'Ayllukuna' : 'Comunidad'}
+            </a>
           </nav>
 
-          {/* Center Brand Name (Exact Superpower Style: lowercase bold centered wordmark) */}
+          {/* Center Brand Name */}
           <a href="#" className="flex items-center gap-2 group mx-auto lg:mx-0">
             <span className="brand-logo text-xl sm:text-2xl font-extrabold tracking-tight text-white lowercase">
               terraquipu
             </span>
           </a>
 
-          {/* Right Action Cluster (Log in, Become a member, 3x3 Grid Dots) */}
-          <div className="flex items-center gap-3">
+          {/* Right Action Cluster */}
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* Language Switcher Pill */}
+            <button
+              type="button"
+              onClick={toggleLanguage}
+              className="px-3 py-1.5 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+              title={lang === 'qu' ? 'Castellano simiman tikray' : 'Cambiar a Runasimi (Quechua)'}
+            >
+              <Globe className="w-3.5 h-3.5 text-emerald-400" />
+              <span>{lang === 'qu' ? 'Runasimi (QU)' : 'Castellano (ES)'}</span>
+            </button>
+
             <a 
               href="https://github.com/TerraQuipu" 
               target="_blank" 
@@ -189,29 +307,29 @@ export default function SuperpowerTerraquipuLanding() {
               GitHub
             </a>
 
-            {/* Outline Button to /app (TerraQuipu Móvil PWA) */}
+            {/* Outline Button to /app (TerraQuipu Mobile PWA) */}
             <Link 
               href="/app" 
-              className="px-4 py-1.5 rounded-full border-2 border-emerald-500 bg-transparent text-emerald-400 hover:bg-emerald-900 hover:border-emerald-600 hover:text-white font-semibold text-xs transition-all shadow-sm flex items-center gap-1.5 active:scale-95 cursor-pointer group"
+              className="px-3.5 sm:px-4 py-1.5 rounded-full border-2 border-emerald-500 bg-transparent text-emerald-400 hover:bg-emerald-900 hover:border-emerald-600 hover:text-white font-semibold text-xs transition-all shadow-sm flex items-center gap-1.5 active:scale-95 cursor-pointer group"
             >
               <Smartphone className="w-3.5 h-3.5 text-emerald-400 group-hover:text-white transition-colors" />
-              <span>App Móvil</span>
+              <span>{t.nav.appLink}</span>
             </Link>
 
             {/* White Pill Button to /visor */}
             <Link 
               href="/visor" 
-              className="px-4 py-1.5 rounded-full bg-white text-black text-xs font-semibold hover:bg-zinc-100 transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98]"
+              className="px-3.5 sm:px-4 py-1.5 rounded-full bg-white text-black text-xs font-semibold hover:bg-zinc-100 transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98]"
             >
               <Satellite className="w-3.5 h-3.5 text-zinc-900" />
-              <span>Visor Satelital</span>
+              <span>{t.nav.visorLink}</span>
             </Link>
 
             {/* Circular 3x3 Grid Dots Icon Button */}
             <button 
               type="button" 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              title="Menú"
+              title="Menu"
               className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center text-white transition cursor-pointer"
             >
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -233,13 +351,25 @@ export default function SuperpowerTerraquipuLanding() {
         {/* Mobile Dropdown Drawer */}
         {mobileMenuOpen && (
           <div className="max-w-6xl mx-auto mt-2 p-5 rounded-3xl bg-[#1c1c1f]/95 backdrop-blur-2xl border border-white/15 text-white shadow-2xl flex flex-col gap-3 text-sm font-medium animate-in fade-in slide-in-from-top-2 duration-200">
+            {/* Language Switcher in Mobile Drawer */}
+            <button
+              type="button"
+              onClick={() => {
+                toggleLanguage();
+                setMobileMenuOpen(false);
+              }}
+              className="py-2.5 px-4 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-95"
+            >
+              <Globe className="w-4 h-4 text-emerald-400" />
+              <span>{lang === 'qu' ? 'Runasimi (QU) -> Castellano (ES)' : 'Castellano (ES) -> Runasimi (QU)'}</span>
+            </button>
             <Link 
               href="/app" 
               onClick={() => setMobileMenuOpen(false)} 
               className="border-2 border-emerald-500 bg-transparent text-emerald-400 hover:bg-emerald-900 hover:border-emerald-600 hover:text-white font-bold text-center py-2.5 rounded-full shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer group"
             >
               <Smartphone className="w-4 h-4 text-emerald-400 group-hover:text-white transition-colors" />
-              <span>Abrir App Móvil (/app)</span>
+              <span>{t.nav.appLink}</span>
             </Link>
             <Link 
               href="/visor" 
@@ -247,14 +377,22 @@ export default function SuperpowerTerraquipuLanding() {
               className="bg-white text-black font-semibold text-center py-2.5 rounded-full shadow-sm hover:bg-zinc-200 transition flex items-center justify-center gap-2 cursor-pointer"
             >
               <Satellite className="w-4 h-4" />
-              <span>Lanzar Visor Satelital (/visor)</span>
+              <span>{t.nav.visorLink}</span>
             </Link>
-            <a href="#como-funciona" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Cómo funciona</a>
-            <a href="#diagnostico" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Diagnóstico 30m</a>
-            <a href="#quipu" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">El Quipu de Rotación</a>
-            <a href="#comunidad" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">Acceso Comunitario</a>
+            <a href="#como-funciona" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">
+              {lang === 'qu' ? 'Imaynatam Llamk\'an' : 'Cómo Funciona'}
+            </a>
+            <a href="#diagnostico" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">
+              {lang === 'qu' ? '30m Allpa Qhaway' : 'Diagnóstico 30m'}
+            </a>
+            <a href="#quipu" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">
+              {lang === 'qu' ? 'Khipu Tarpuy' : 'Plan Quipu'}
+            </a>
+            <a href="#comunidad" onClick={() => setMobileMenuOpen(false)} className="hover:text-amber-400 py-1.5 border-b border-white/10">
+              {lang === 'qu' ? 'Ayllukuna' : 'Comunidad'}
+            </a>
             <a href="https://github.com/TerraQuipu" target="_blank" rel="noreferrer" className="hover:text-amber-400 py-1.5 flex items-center justify-between">
-              <span>Repositorio en GitHub</span>
+              <span>GitHub Repository</span>
               <span>↗</span>
             </a>
           </div>
@@ -293,28 +431,28 @@ export default function SuperpowerTerraquipuLanding() {
             {/* Trust Badge: Open Science Attribution */}
             <div className="flex items-center gap-2 text-xs font-semibold text-white/90">
               <span className="text-amber-400 font-bold">✓</span>
-              <span>Protocolos basados en datos de INIA & SENAMHI • NASA Space Apps Challenge</span>
+              <span>{t.hero.badge}</span>
             </div>
 
             <h1 className="hero-headline text-4xl sm:text-6xl md:text-7xl font-bold text-white leading-[1.08] tracking-tight">
-              Inteligencia satelital para regenerar la salud del suelo, <br className="hidden sm:inline" />
+              {t.hero.titleMain}, <br className="hidden sm:inline" />
               <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500">
-                cada campaña.
+                {t.hero.titleHighlight}
               </span>
             </h1>
 
             <p className="text-base sm:text-lg text-zinc-300 max-w-xl font-normal leading-relaxed">
-              100+ indicadores agroclimáticos. Un plan diseñado para tu cuenca. Todo lo que necesitas para proteger tus cultivos frente a El Niño.
+              {t.hero.subtitle}
             </p>
 
-            {/* Exact Superpower Button Styles: Outline Emerald App Pill + Solid White Visor Pill */}
+            {/* Superpower Button Styles: Outline Emerald App Pill + Solid White Visor Pill */}
             <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <Link 
                 href="/app" 
                 className="px-7 py-3.5 rounded-full border-2 border-emerald-500 bg-transparent text-emerald-300 hover:bg-emerald-900 hover:border-emerald-400 hover:text-white font-bold text-sm transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] flex items-center justify-center gap-2.5 hover:scale-[1.01] active:scale-[0.99] cursor-pointer group"
               >
                 <Smartphone className="w-4 h-4 text-emerald-400 group-hover:text-white transition-colors" />
-                <span>Abrir App Móvil PWA</span>
+                <span>{t.hero.openFarmerApp}</span>
                 <ArrowRight className="w-4 h-4 text-emerald-400 group-hover:translate-x-0.5 group-hover:text-white transition-all" />
               </Link>
               <Link 
@@ -322,13 +460,13 @@ export default function SuperpowerTerraquipuLanding() {
                 className="px-7 py-3.5 rounded-full bg-white text-black font-semibold text-sm hover:bg-zinc-100 transition shadow-[0_0_25px_rgba(255,255,255,0.25)] flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
               >
                 <Satellite className="w-4 h-4 text-zinc-900" />
-                <span>Visor Técnico GIS</span>
+                <span>{t.hero.exploreVisor}</span>
               </Link>
               <a 
                 href="#como-funciona" 
                 className="px-6 py-3.5 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-md text-white border border-white/15 font-semibold text-sm transition text-center hover:scale-[1.01] active:scale-[0.99]"
               >
-                Cómo funciona ↓
+                {lang === 'qu' ? 'Imaynatam llamk\'an ↓' : 'Cómo Funciona ↓'}
               </a>
             </div>
 
@@ -342,57 +480,57 @@ export default function SuperpowerTerraquipuLanding() {
       <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <p className="text-[11px] font-mono uppercase tracking-widest text-zinc-400 mb-6 font-semibold">
-            DESARROLLADO CON PROTOCOLOS Y DATOS DE CIENCIA PÚBLICA ABIERTA
+            DEVELOPED WITH OPEN PUBLIC SCIENCE PROTOCOLS AND DATA
           </p>
           <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14 opacity-75 grayscale hover:grayscale-0 transition-all duration-300">
             <div className="font-mono text-xs font-bold text-zinc-800">✦ NASA POWER API</div>
             <div className="font-mono text-xs font-bold text-zinc-800">✦ NASA SMAP RADAR</div>
-            <div className="font-mono text-xs font-bold text-zinc-800">✦ INIA PERÚ</div>
-            <div className="font-mono text-xs font-bold text-zinc-800">✦ SENAMHI CLIMA</div>
+            <div className="font-mono text-xs font-bold text-zinc-800">✦ INIA PERU</div>
+            <div className="font-mono text-xs font-bold text-zinc-800">✦ SENAMHI CLIMATE</div>
             <div className="font-mono text-xs font-bold text-zinc-800">✦ ISRIC SOILGRIDS</div>
             <div className="font-mono text-xs font-bold text-zinc-800">✦ OPEN-METEO DEM</div>
           </div>
         </div>
       </section>
 
-      {/* ================= 4. FEATURE CAROUSEL CARDS ("CÓMO FUNCIONA" - SUPERPOWER 4 CARDS) ================= */}
+      {/* ================= 4. FEATURE CAROUSEL CARDS ("HOW IT WORKS" - 4 CARDS) ================= */}
       <section id="como-funciona" className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 space-y-14">
           
           <div className="text-center max-w-3xl mx-auto space-y-4">
             <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold">
-              METODOLOGÍA TERRAQUIPU
+              {lang === 'qu' ? 'TERRAQUIPUPA TUPUYNINKUNA' : 'METODOLOGÍA TERRAQUIPU'}
             </span>
             <h2 className="hero-headline text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-950 tracking-tight leading-tight">
-              La salud del suelo es el escudo más poderoso frente a El Niño.
+              {lang === 'qu' ? 'Allpapa kawsayninqa hatun amachaqmi Hatun Paranpaq.' : 'La salud del suelo es el escudo más poderoso frente a El Niño.'}
             </h2>
             <p className="text-sm sm:text-base text-zinc-600 leading-relaxed max-w-2xl mx-auto font-sans">
-              Un sistema integral de cuatro fases que convierte mediciones espaciales en decisiones agrícolas que salvan cosechas.
+              {lang === 'qu' ? 'Tawa taqapi churasqa llamkay, hanaq pacha yachaywan allpata kawsarichinapaq.' : 'Un sistema integral de cuatro fases que transforma telemetría espacial en decisiones agrícolas que salvan cosechas.'}
             </p>
           </div>
 
-          {/* Superpower 4-Card Row */}
+          {/* 4-Card Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             
-            {/* ================= Card 1: Escaneo Orbital Continuo ================= */}
+            {/* ================= Card 1: Continuous Orbital Scanning ================= */}
             <div className="flex flex-col group">
               {/* Visual Container */}
               <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-3.5">
                 {/* Background Image: NASA Space Orbit */}
                 <img
                   src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop"
-                  alt="Escaneo Orbital y Satelital"
+                  alt="Continuous Orbital Scanning"
                   className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
                 />
                 {/* Gradient vignette for seamless telemetry contrast */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 pointer-events-none" />
 
-                {/* Top Number Badge (Superpower Style) */}
+                {/* Top Number Badge */}
                 <div className="relative z-10 w-7 h-7 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
                   1
                 </div>
 
-                {/* Floating Telemetry (Pure Text - No Background Card) */}
+                {/* Floating Telemetry */}
                 <div className="relative z-10 w-full text-white space-y-1.5">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-mono font-bold tracking-wider text-zinc-200 uppercase">
@@ -403,31 +541,31 @@ export default function SuperpowerTerraquipuLanding() {
                     </span>
                   </div>
                   <div className="pt-1.5 border-t border-white/20 flex justify-between items-baseline font-mono text-[11px] text-zinc-300">
-                    <span>Humedad Radicular</span>
-                    <span className="text-emerald-400 font-medium">Óptimo</span>
+                    <span>Root-Zone Moisture</span>
+                    <span className="text-emerald-400 font-medium">Optimal</span>
                   </div>
                 </div>
               </div>
 
-              {/* Text Information Below Card (Arial Font) */}
+              {/* Text Information Below Card */}
               <div className="pt-4 space-y-1.5 font-sans">
                 <h3 className="hero-headline text-lg font-bold text-zinc-950 tracking-tight">
-                  Escaneo Orbital Continuo
+                  {t.pillars.p1Title}
                 </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
-                  Monitoreo de precipitación histórica (NASA POWER) y humedad del suelo (NASA SMAP) para detectar anomalías de sequía con meses de anticipación.
+                  {t.pillars.p1Desc}
                 </p>
               </div>
             </div>
 
-            {/* ================= Card 2: Perfil Edáfico a 30m ================= */}
+            {/* ================= Card 2: 30m Edaphic Profile ================= */}
             <div className="flex flex-col group">
               {/* Visual Container */}
               <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-3.5">
                 {/* Background Image: Andean agricultural terraces */}
                 <img
                   src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=800&auto=format&fit=crop"
-                  alt="Perfil Edáfico Andenes"
+                  alt="30m Edaphic Profile Terraces"
                   className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
                 />
                 {/* Gradient vignette */}
@@ -438,11 +576,11 @@ export default function SuperpowerTerraquipuLanding() {
                   2
                 </div>
 
-                {/* Floating Telemetry (Pure Text - No Background Card) */}
+                {/* Floating Telemetry */}
                 <div className="relative z-10 w-full text-white space-y-1.5">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-mono font-bold tracking-wider text-zinc-200 uppercase">
-                      MUESTRA EDÁFICA
+                      EDAPHIC SAMPLE
                     </span>
                     <span className="text-[10px] font-mono text-emerald-400 font-bold">
                       30m SRTM
@@ -451,40 +589,42 @@ export default function SuperpowerTerraquipuLanding() {
 
                   <div className="pt-1.5 border-t border-white/20 space-y-1 font-mono text-[11px]">
                     <div className="flex justify-between items-center text-zinc-300">
-                      <span>pH Suelo</span>
-                      <span className="font-bold text-white">6.4 <span className="text-[10px] text-emerald-400 font-normal">(Óptimo)</span></span>
+                      <span>Soil pH</span>
+                      <span className="font-bold text-white">6.4 <span className="text-[10px] text-emerald-400 font-normal">(Optimal)</span></span>
                     </div>
                     <div className="flex justify-between items-center text-zinc-300">
-                      <span>Materia Orgánica</span>
+                      <span>Organic Matter</span>
                       <span className="font-bold text-emerald-400">3.8%</span>
                     </div>
                     <div className="flex justify-between items-center text-zinc-300">
-                      <span>Pendiente Valle</span>
-                      <span className="font-bold text-white">18° Grados</span>
+                      <span>Valley Slope</span>
+                      <span className="font-bold text-white">18° Degrees</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Text Information Below Card (Arial Font) */}
+              {/* Text Information Below Card */}
               <div className="pt-4 space-y-1.5 font-sans">
                 <h3 className="hero-headline text-lg font-bold text-zinc-950 tracking-tight">
-                  Perfil Edáfico a 30m
+                  {lang === 'qu' ? '30m Allpa Tupuy' : 'Perfil Edáfico 30m'}
                 </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
-                  Corrección topográfica con elevaciones SRTM a 90m y SoilGrids para calcular pendiente, pH, materia orgánica y piso ecológico exacto.
+                  {lang === 'qu'
+                    ? 'SoilGrids v2 nisqawan Copernicus DEM nisqawan allpa turpukunata, urqukunata qhawarispa allin chakichata allichanchik.'
+                    : 'Modelado edáfico 30m con SoilGrids e inclinación topográfica para mapear retención hídrica en laderas andinas.'}
                 </p>
               </div>
             </div>
 
-            {/* ================= Card 3: El Quipu de Rotación ================= */}
+            {/* ================= Card 3: The Rotation Quipu ================= */}
             <div className="flex flex-col group">
               {/* Visual Container */}
               <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-3.5">
                 {/* Background Image: Soil and seeds in farmer hands */}
                 <img
                   src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?q=80&w=800&auto=format&fit=crop"
-                  alt="Quipu de Rotación Semillas"
+                  alt="Rotation Quipu Seeds"
                   className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
                 />
                 {/* Gradient vignette */}
@@ -495,11 +635,11 @@ export default function SuperpowerTerraquipuLanding() {
                   3
                 </div>
 
-                {/* Floating Telemetry (Pure Text - No Background Card) */}
+                {/* Floating Telemetry */}
                 <div className="relative z-10 w-full text-white space-y-1.5">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-mono font-bold tracking-wider text-amber-400 uppercase">
-                      SECUENCIA QUIPU
+                      QUIPU SEQUENCE
                     </span>
                     <span className="text-[10px] font-mono text-zinc-400">
                       INIA 2026
@@ -508,40 +648,40 @@ export default function SuperpowerTerraquipuLanding() {
 
                   <div className="pt-1.5 border-t border-white/20 space-y-1 font-mono text-[11px]">
                     <div className="flex justify-between items-center text-zinc-300">
-                      <span>1. Tarwi (Leguminosa)</span>
+                      <span>1. Tarwi (Legume)</span>
                       <span className="text-emerald-400 font-bold">+95 kg N/ha</span>
                     </div>
                     <div className="flex justify-between items-center text-zinc-300">
-                      <span>2. Quinua Real</span>
-                      <span className="text-amber-300 font-bold">Corte ciclo</span>
+                      <span>2. Real Quinoa</span>
+                      <span className="text-amber-300 font-bold">Cycle disruption</span>
                     </div>
                     <div className="flex justify-between items-center text-zinc-300">
-                      <span>3. Papa Nativa</span>
-                      <span className="text-blue-300 font-bold">Alta resiliencia</span>
+                      <span>3. Native Potato</span>
+                      <span className="text-blue-300 font-bold">High resilience</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Text Information Below Card (Arial Font) */}
+              {/* Text Information Below Card */}
               <div className="pt-4 space-y-1.5 font-sans">
                 <h3 className="hero-headline text-lg font-bold text-zinc-950 tracking-tight">
-                  El Quipu de Rotación
+                  {t.pillars.p2Title}
                 </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
-                  Algoritmo determinista que diseña la secuencia multianual óptima: Leguminosa (Tarwi) → Grano resiliente (Quinua) → Papa Nativa.
+                  {t.pillars.p2Desc}
                 </p>
               </div>
             </div>
 
-            {/* ================= Card 4: Regeneración y Cosecha ================= */}
+            {/* ================= Card 4: Regeneration & Harvest ================= */}
             <div className="flex flex-col group">
               {/* Visual Container */}
               <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-3.5">
                 {/* Background Image: Golden Harvest Fields */}
                 <img
                   src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=800&auto=format&fit=crop"
-                  alt="Cosecha y Regeneración de Suelo"
+                  alt="Harvest and Soil Regeneration"
                   className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 pointer-events-none"
                 />
                 {/* Gradient vignette */}
@@ -552,37 +692,37 @@ export default function SuperpowerTerraquipuLanding() {
                   4
                 </div>
 
-                {/* Floating Telemetry (Pure Text - No Background Card) */}
+                {/* Floating Telemetry */}
                 <div className="relative z-10 w-full text-white space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-mono font-bold tracking-wider text-zinc-200 uppercase">
-                      CAMPAÑA COSECHADA
+                      HARVESTED CAMPAIGN
                     </span>
                     <span className="text-[10px] font-mono text-emerald-400 font-bold">
-                      Éxito
+                      Success
                     </span>
                   </div>
 
                   <div className="pt-1.5 border-t border-white/20 grid grid-cols-2 gap-2 text-center font-mono">
                     <div>
                       <div className="text-2xl font-bold text-emerald-400 tracking-tight">+34%</div>
-                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">Rendimiento</div>
+                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">{lang === 'qu' ? 'Aymoray' : 'Rendimiento'}</div>
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-amber-300 tracking-tight">-75%</div>
-                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">Gorgojo Plaga</div>
+                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">{lang === 'qu' ? 'Kurukuna' : 'Plaga Gorgojo'}</div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Text Information Below Card (Arial Font) */}
+              {/* Text Information Below Card */}
               <div className="pt-4 space-y-1.5 font-sans">
                 <h3 className="hero-headline text-lg font-bold text-zinc-950 tracking-tight">
-                  Regeneración y Cosecha
+                  {t.pillars.p3Title}
                 </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
-                  Aporte biológico de +95 kg N/ha, reducción del 75% en la incidencia del gorgojo andino y suelo 100% fértil sin comprar fertilizantes químicos.
+                  {t.pillars.p3Desc}
                 </p>
               </div>
             </div>
@@ -592,39 +732,39 @@ export default function SuperpowerTerraquipuLanding() {
         </div>
       </section>
 
-      {/* ================= 5. LIFESTYLE TABLET SHOWCASE ("DIAGNÓSTICO INTEGRAL" - FULL SCREEN, BORDE A LA IMAGEN SIN LÍNEA) ================= */}
+      {/* ================= 5. LIFESTYLE TABLET SHOWCASE ("IN-SITU DIAGNOSTIC" - FULL SCREEN) ================= */}
       <section id="diagnostico" className="relative w-full min-h-[720px] lg:min-h-[840px] bg-white overflow-hidden flex items-center rounded-[48px] sm:rounded-[64px] lg:rounded-[80px]">
         
-        {/* Full Section Background Image with rounded corners on image only (sin línea de borde) */}
+        {/* Full Section Background Image with rounded corners on image only */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-[48px] sm:rounded-[64px] lg:rounded-[80px]">
           <img 
             src={`${BASE_PATH}/images/agronomist_white_bg.jpg`} 
-            alt="Diagnóstico en Parcela con Tablet" 
+            alt="In-Situ Field Diagnostic with Tablet" 
             className="w-full h-full object-cover object-[center_35%] lg:object-[center_40%] select-none rounded-[48px] sm:rounded-[64px] lg:rounded-[80px]"
           />
         </div>
 
-        {/* Content Container (Floats directly over full-screen white canvas) */}
+        {/* Content Container */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 w-full py-12 lg:py-20">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-8">
             
-            {/* Left Block: Heading, Subtitle & Floating Glass FAQs (Superpower Pattern) */}
+            {/* Left Block: Heading, Subtitle & Floating Glass FAQs */}
             <div className="w-full lg:max-w-[360px] xl:max-w-[380px] space-y-7 shrink-0">
               <div className="space-y-4">
                 <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold">
-                  DIAGNÓSTICO EN PARCELA
+                  {lang === 'qu' ? 'CHAJRA ALLPA QHAWAY' : 'IN-SITU PARCEL DIAGNOSTIC'}
                 </span>
                 <h2 className="hero-headline text-3xl sm:text-4xl lg:text-[40px] font-bold text-zinc-950 leading-[1.12] tracking-tight transition-all duration-300">
-                  {DIAGNOSTICO_TABS[activeDiagnosticoTab].title}
+                  {diagnosticoTabs[activeDiagnosticoTab].title}
                 </h2>
                 <p className="text-sm text-zinc-600 font-sans leading-relaxed transition-all duration-300 max-w-[340px]">
-                  {DIAGNOSTICO_TABS[activeDiagnosticoTab].subtitle}
+                  {diagnosticoTabs[activeDiagnosticoTab].subtitle}
                 </p>
               </div>
 
-              {/* Floating Frosted Glass FAQ Accordions with Smooth Expand/Collapse Animation */}
+              {/* Floating Frosted Glass FAQ Accordions */}
               <div className="space-y-2.5 pt-2 w-full max-w-[360px]">
-                {DIAGNOSTICO_FAQS.map((faq, idx) => (
+                {diagnosticoFaqs.map((faq, idx) => (
                   <div 
                     key={idx} 
                     className="rounded-2xl bg-zinc-900/95 hover:bg-zinc-900 backdrop-blur-xl border border-white/10 p-3.5 text-white transition-all duration-300 shadow-md"
@@ -661,12 +801,12 @@ export default function SuperpowerTerraquipuLanding() {
               </div>
             </div>
 
-            {/* Spacer for Center Space (where the huge tablet in the background is displayed) */}
+            {/* Spacer for Center Space */}
             <div className="hidden lg:block lg:flex-1 pointer-events-none" />
 
-            {/* Right Block: Vertical Tab Navigation (Sitting in pure white corridor between iPad and person) */}
+            {/* Right Block: Vertical Tab Navigation */}
             <div className="w-full lg:w-auto flex flex-row lg:flex-col gap-3 lg:gap-5 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 shrink-0 self-center z-20 mr-0 lg:mr-4 xl:mr-8 -translate-y-16 lg:-translate-y-28">
-              {DIAGNOSTICO_TABS.map((tab, idx) => (
+              {diagnosticoTabs.map((tab, idx) => (
                 <button
                   key={idx}
                   type="button"
@@ -689,19 +829,21 @@ export default function SuperpowerTerraquipuLanding() {
         </div>
       </section>
 
-      {/* ================= 6. COMMUNITY PLAN TRANSPARENT COMPARISON CARD (SUPERPOWER STYLE) ================= */}
+      {/* ================= 6. COMMUNITY PLAN TRANSPARENT COMPARISON CARD ================= */}
       <section id="comunidad" className="py-24 bg-[#090A0D] text-white">
         <div className="max-w-4xl mx-auto px-6 space-y-12">
           
           <div className="text-center space-y-3">
             <span className="text-xs font-mono uppercase tracking-widest text-amber-400 font-semibold">
-              ACCESO COMUNITARIO ABIERTO
+              {lang === 'qu' ? 'LLAPAN AYLLUKUNAPAQ LLAMK\'AY' : 'OPEN COMMUNITY ACCESS'}
             </span>
             <h2 className="text-3xl sm:text-5xl font-serif font-light text-white">
-              Todo lo que incluye el programa Terraquipu.
+              {lang === 'qu' ? 'Terraquipu llamk\'aypiqa tukuy imapunim kachkan.' : 'Everything included in the Terraquipu program.'}
             </h2>
             <p className="text-sm text-zinc-400 max-w-xl mx-auto">
-              Tecnología espacial libre para campesinos y científicos, sin cuotas de licencia ni barreras comerciales.
+              {lang === 'qu' 
+                ? 'Hanaq pacha yachay ayllukunapaq, chakra kamayoqkunapaq, mana qolqellapaq mana sasachakuspa.' 
+                : 'Open space technology for smallholders, agronomists, and researchers with zero license fees or commercial barriers.'}
             </p>
           </div>
 
@@ -710,61 +852,65 @@ export default function SuperpowerTerraquipuLanding() {
             
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h3 className="text-2xl font-serif text-white">Membresía Abierta de Microcuenca</h3>
-                <p className="text-xs text-zinc-400 mt-1">Para comunidades agrícolas, investigadores y desarrolladores</p>
+                <h3 className="text-2xl font-serif text-white">
+                  {lang === 'qu' ? 'Ayllu Chajra Huñunakuy' : 'Open Micro-Watershed Membership'}
+                </h3>
+                <p className="text-xs text-zinc-400 mt-1">
+                  {lang === 'qu' ? 'Ayllukunapaq, yachaqkunapaq, llamk\'aqkunapaqpas' : 'For farming communities, researchers, and developers'}
+                </p>
               </div>
               <div className="text-left sm:text-right">
                 <span className="text-xs sm:text-sm text-emerald-400 font-mono font-medium">
-                  100% Open Source (Licencia MIT)
+                  {lang === 'qu' ? '100% Llapa Runapaq (MIT Licencia)' : '100% Open Source (MIT License)'}
                 </span>
               </div>
             </div>
 
-            {/* Features Checklist (10 items) */}
+            {/* Features Checklist (8 items) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div className="flex items-center gap-2.5 text-zinc-300">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>Monitoreo satelital continuo (NASA POWER & SMAP)</span>
+                <span>{lang === 'qu' ? 'Sapa p\'unchaw satélite qhaway (NASA POWER & SMAP)' : 'Continuous satellite monitoring (NASA POWER & SMAP)'}</span>
               </div>
               <div className="flex items-center gap-2.5 text-zinc-300">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>Alertas tempranas de estrés por El Niño</span>
+                <span>{lang === 'qu' ? 'Hatun Para sasachakuy ñawpaq willakuy' : 'Early stress alerts for El Nino anomalies'}</span>
               </div>
               <div className="flex items-center gap-2.5 text-zinc-300">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>Secuencia multianual de 3 campañas (Quipu)</span>
+                <span>{lang === 'qu' ? 'Kimsa wata kawsay muyuy tarpuy (Khipu)' : '3-campaign multi-year succession (Quipu)'}</span>
               </div>
               <div className="flex items-center gap-2.5 text-zinc-300">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>Justificación técnica con citas INIA Perú</span>
+                <span>{lang === 'qu' ? 'INIA Peru kamachiywan allichasqa' : 'Technical justification cited from INIA Peru'}</span>
               </div>
               <div className="flex items-center gap-2.5 text-zinc-300">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>Matriz agronómica abierta (crop_matrix.json)</span>
+                <span>{lang === 'qu' ? 'Llapa tarpuykunapa yachaynin (crop_matrix.json)' : 'Open agronomic crop matrix (crop_matrix.json)'}</span>
               </div>
               <div className="flex items-center gap-2.5 text-zinc-300">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>API REST de alto rendimiento en FastAPI</span>
+                <span>{lang === 'qu' ? 'Utqaylla REST API FastAPI nisqawan' : 'High-performance REST API built with FastAPI'}</span>
               </div>
               <div className="flex items-center gap-2.5 text-zinc-300">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>Emulador de telemetría de campo Arduino</span>
+                <span>{lang === 'qu' ? 'Arduino chajra tupuchiq llamk\'ana' : 'Arduino field telemetry hardware emulator'}</span>
               </div>
               <div className="flex items-center gap-2.5 text-zinc-300">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>Visor interactivo en Leaflet sin costo de servidor</span>
+                <span>{lang === 'qu' ? 'Leaflet GIS visor qhawaq mana qolqellapaq' : 'Interactive Leaflet GIS visor with zero server cost'}</span>
               </div>
             </div>
 
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-xs text-zinc-400 font-mono">
-                Desplegado para Cusco, Valle Sagrado y nuevas cuencas 2026-2027.
+                {lang === 'qu' ? 'Qosqo, Valle Sagrado, hatun mayukunapaq 2026-2027.' : 'Deployed for Cusco, Sacred Valley, and expanding watersheds 2026-2027.'}
               </div>
               <a 
                 href="#quipu" 
                 className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-wider hover:bg-zinc-200 transition shadow-lg text-center"
               >
-                Explorar Plan de Rotación Quipu ↓
+                {lang === 'qu' ? 'Khipu Tarpuyta Qhaway ↓' : 'Explore Quipu Rotation Plan ↓'}
               </a>
             </div>
 
@@ -773,10 +919,10 @@ export default function SuperpowerTerraquipuLanding() {
         </div>
       </section>
 
-      {/* ================= 7. QUIPU ROTATION & ACTION PLAN SHOWCASE (FULL-BLEED WHEAT IN WIND VIDEO LOOP) ================= */}
+      {/* ================= 7. QUIPU ROTATION & ACTION PLAN SHOWCASE (VIDEO LOOP) ================= */}
       <section id="quipu" className="relative w-full min-h-[720px] lg:min-h-[840px] bg-[#f8f7f4] overflow-hidden flex items-center rounded-[48px] sm:rounded-[64px] lg:rounded-[80px]">
         
-        {/* Full Section Background Video Loop: Golden Wheat Field Whipped by Wind */}
+        {/* Full Section Background Video Loop */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-[48px] sm:rounded-[64px] lg:rounded-[80px]">
           <video
             autoPlay
@@ -790,38 +936,34 @@ export default function SuperpowerTerraquipuLanding() {
             <source src="https://assets.mixkit.co/videos/8582/8582-720.mp4" type="video/mp4" />
           </video>
           
-          {/* Editorial Scrim: Smooth white-to-transparent gradient on the left so black typography and FAQs are 100% sharp */}
+          {/* Editorial Scrim */}
           <div className="absolute inset-0 bg-gradient-to-r from-white via-white/85 to-transparent w-full lg:w-[58%] pointer-events-none" />
-          
-          {/* Subtle right-side soft scrim for tabs contrast while keeping wheat movement fully visible */}
           <div className="absolute inset-y-0 right-0 w-full lg:w-[35%] bg-gradient-to-l from-white/70 via-white/30 to-transparent pointer-events-none" />
-          
-          {/* Top and bottom subtle atmospheric blending */}
           <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/30 pointer-events-none" />
         </div>
 
-        {/* Content Container (Floats directly over full-screen canvas) */}
+        {/* Content Container */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 w-full py-12 lg:py-20">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-8">
             
-            {/* Left Block: Heading, Subtitle & Floating Glass FAQs (Superpower Pattern) */}
+            {/* Left Block: Heading, Subtitle & Floating Glass FAQs */}
             <div className="w-full lg:max-w-[380px] xl:max-w-[400px] space-y-7 shrink-0">
               <div className="space-y-4">
                 <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                  PLAN DE ACCIÓN AGROECOLÓGICO
+                  {lang === 'qu' ? 'KHIPU TARPUY ALLICHAY' : 'AGROECOLOGICAL ACTION PLAN'}
                 </span>
                 <h2 className="hero-headline text-3xl sm:text-4xl lg:text-[40px] font-bold text-zinc-950 leading-[1.12] tracking-tight transition-all duration-300">
-                  {ROTACION_TABS[activeRotacionTab].title}
+                  {rotacionTabs[activeRotacionTab].title}
                 </h2>
                 <p className="text-sm text-zinc-700 font-sans leading-relaxed transition-all duration-300 max-w-[360px]">
-                  {ROTACION_TABS[activeRotacionTab].subtitle}
+                  {rotacionTabs[activeRotacionTab].subtitle}
                 </p>
               </div>
 
-              {/* Floating Frosted Glass FAQ Accordions with Smooth Expand/Collapse Animation */}
+              {/* Floating Frosted Glass FAQ Accordions */}
               <div className="space-y-2.5 pt-2 w-full max-w-[360px]">
-                {ROTACION_FAQS.map((faq, idx) => (
+                {rotacionFaqs.map((faq, idx) => (
                   <div 
                     key={idx} 
                     className="rounded-2xl bg-zinc-900/95 hover:bg-zinc-900 backdrop-blur-xl border border-white/10 p-3.5 text-white transition-all duration-300 shadow-md"
@@ -858,12 +1000,12 @@ export default function SuperpowerTerraquipuLanding() {
               </div>
             </div>
 
-            {/* Spacer for Center Space (where the wheat field whipped by wind is fully appreciated) */}
+            {/* Spacer for Center Space */}
             <div className="hidden lg:block lg:flex-1 pointer-events-none" />
 
-            {/* Right Block: Vertical Tab Navigation (Floating in frosted pill over living wind backdrop) */}
+            {/* Right Block: Vertical Tab Navigation */}
             <div className="w-full lg:w-auto flex flex-row lg:flex-col gap-3 lg:gap-4 text-xs font-sans overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 shrink-0 self-center z-20 bg-white/80 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-black/5 shadow-md">
-              {ROTACION_TABS.map((tab, idx) => (
+              {rotacionTabs.map((tab, idx) => (
                 <button
                   key={idx}
                   type="button"
@@ -886,29 +1028,29 @@ export default function SuperpowerTerraquipuLanding() {
         </div>
       </section>
 
-      {/* ================= 8. SCIENTIFIC ADVISORY & VALIDATION (METODOLOGÍA STYLE WITH VIDEOS) ================= */}
+      {/* ================= 8. SCIENTIFIC ADVISORY & VALIDATION ================= */}
       <section id="respaldo" className="py-24 bg-white">
         <div className="max-w-6xl mx-auto px-6 space-y-12">
           
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <span className="text-xs font-mono uppercase tracking-widest text-amber-700 font-semibold">
-              RESPALDO CIENTÍFICO OFICIAL
+              OFFICIAL SCIENTIFIC VALIDATION
             </span>
             <h2 className="hero-headline text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-950 tracking-tight leading-tight">
-              Guiado por agrónomos y científicos del clima.
+              Guided by agronomists and climate scientists.
             </h2>
             <p className="text-sm text-zinc-600 font-sans leading-relaxed max-w-xl mx-auto">
-              Validamos cada parámetro agronómico con literatura técnica oficial peruana y modelos de telemetría de observación espacial.
+              We validate every agronomic parameter against official Peruvian technical literature and Earth observation telemetry models.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             
-            {/* ================= Card 1: INIA Perú ================= */}
+            {/* ================= Card 1: INIA Peru ================= */}
             <div className="flex flex-col group">
               {/* Visual Container */}
               <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-3.5">
-                {/* Background Video: Terrazas y Cultivos Agrícolas */}
+                {/* Background Video */}
                 <video
                   autoPlay
                   muted
@@ -921,28 +1063,28 @@ export default function SuperpowerTerraquipuLanding() {
                 </video>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 pointer-events-none" />
 
-                {/* Top Institution Label (Pure Elegant Font - No Card, No Icon) */}
+                {/* Top Institution Label */}
                 <div className="relative z-10 pt-1 px-1">
                   <span className="hero-headline text-lg sm:text-xl font-bold text-white tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
-                    INIA Perú
+                    INIA Peru
                   </span>
                 </div>
 
-                {/* Floating Telemetry (Pure Text - No Background Card) */}
+                {/* Floating Telemetry */}
                 <div className="relative z-10 w-full text-white space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-mono font-bold tracking-wider text-zinc-200 uppercase">
-                      MANUAL TÉCNICO N° 14
+                      TECHNICAL MANUAL NO. 14
                     </span>
                     <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider font-semibold">
-                      Oficial INIA
+                      Official INIA
                     </span>
                   </div>
 
                   <div className="pt-1.5 border-t border-white/20 grid grid-cols-2 gap-2 text-center font-mono">
                     <div>
                       <div className="text-2xl font-bold text-emerald-400 tracking-tight">+100 kg</div>
-                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">N / ha fijado</div>
+                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">N / ha fixed</div>
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-amber-300 tracking-tight">Tarwi</div>
@@ -955,10 +1097,10 @@ export default function SuperpowerTerraquipuLanding() {
               {/* Text Information Below Card */}
               <div className="pt-4 space-y-1.5 font-sans">
                 <h3 className="hero-headline text-lg font-bold text-zinc-950 tracking-tight">
-                  Manual Técnico N° 14
+                  Technical Manual No. 14
                 </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
-                  Manejo agronómico oficial del cultivo de Tarwi (<em>Lupinus mutabilis</em>) y fijación biológica de hasta 100 kg N/ha en suelos andinos de altura.
+                  Official agronomic management of Tarwi (<em>Lupinus mutabilis</em>) and biological nitrogen fixation up to 100 kg N/ha in high Andean soils.
                 </p>
               </div>
             </div>
@@ -967,7 +1109,7 @@ export default function SuperpowerTerraquipuLanding() {
             <div className="flex flex-col group">
               {/* Visual Container */}
               <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-3.5">
-                {/* Background Video: Atmósfera y Nubes en la Cordillera */}
+                {/* Background Video */}
                 <video
                   autoPlay
                   muted
@@ -980,31 +1122,31 @@ export default function SuperpowerTerraquipuLanding() {
                 </video>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 pointer-events-none" />
 
-                {/* Top Institution Label (Pure Elegant Font - No Card, No Icon) */}
+                {/* Top Institution Label */}
                 <div className="relative z-10 pt-1 px-1">
                   <span className="hero-headline text-lg sm:text-xl font-bold text-white tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
                     SENAMHI
                   </span>
                 </div>
 
-                {/* Floating Telemetry (Pure Text - No Background Card) */}
+                {/* Floating Telemetry */}
                 <div className="relative z-10 w-full text-white space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-mono font-bold tracking-wider text-zinc-200 uppercase">
-                      BOLETINES AGROCLIMÁTICOS
+                      AGROCLIMATIC BULLETINS
                     </span>
                     <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider font-semibold">
-                      Validado SENAMHI
+                      Validated SENAMHI
                     </span>
                   </div>
 
                   <div className="pt-1.5 border-t border-white/20 grid grid-cols-2 gap-2 text-center font-mono">
                     <div>
                       <div className="text-2xl font-bold text-cyan-400 tracking-tight">-4°C</div>
-                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">Umbral Helada</div>
+                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">Frost Threshold</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-emerald-400 tracking-tight">Sierra Sur</div>
+                      <div className="text-2xl font-bold text-emerald-400 tracking-tight">Southern Andes</div>
                       <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">Cusco & Puno</div>
                     </div>
                   </div>
@@ -1014,10 +1156,10 @@ export default function SuperpowerTerraquipuLanding() {
               {/* Text Information Below Card */}
               <div className="pt-4 space-y-1.5 font-sans">
                 <h3 className="hero-headline text-lg font-bold text-zinc-950 tracking-tight">
-                  Boletines Agroclimáticos
+                  Agroclimatic Bulletins
                 </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
-                  Calibración de umbrales térmicos, heladas agronómicas y déficit estacional de lluvias en valles y microcuencas de la Sierra Sur.
+                  Thermal threshold calibration, agronomic frosts, and seasonal rainfall deficits across Southern Andean valleys and micro-watersheds.
                 </p>
               </div>
             </div>
@@ -1026,7 +1168,7 @@ export default function SuperpowerTerraquipuLanding() {
             <div className="flex flex-col group">
               {/* Visual Container */}
               <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] bg-zinc-950 border border-zinc-200/80 shadow-sm group-hover:shadow-xl transition-all duration-300 flex flex-col justify-between p-3.5">
-                {/* Background Video: Órbita Planetaria y Satélite */}
+                {/* Background Video */}
                 <video
                   autoPlay
                   muted
@@ -1039,21 +1181,21 @@ export default function SuperpowerTerraquipuLanding() {
                 </video>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 pointer-events-none" />
 
-                {/* Top Institution Label (Pure Elegant Font - No Card, No Icon) */}
+                {/* Top Institution Label */}
                 <div className="relative z-10 pt-1 px-1">
                   <span className="hero-headline text-lg sm:text-xl font-bold text-white tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
                     NASA Space Apps
                   </span>
                 </div>
 
-                {/* Floating Telemetry (Pure Text - No Background Card) */}
+                {/* Floating Telemetry */}
                 <div className="relative z-10 w-full text-white space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-mono font-bold tracking-wider text-zinc-200 uppercase">
                       GLOBAL CHALLENGE 2026
                     </span>
                     <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider font-semibold">
-                      NASA Galardón
+                      NASA Award
                     </span>
                   </div>
 
@@ -1064,7 +1206,7 @@ export default function SuperpowerTerraquipuLanding() {
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-emerald-400 tracking-tight">POWER</div>
-                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">Solar & Lluvia</div>
+                      <div className="text-[10px] text-zinc-300 uppercase tracking-wider mt-0.5">Solar & Rain</div>
                     </div>
                   </div>
                 </div>
@@ -1076,7 +1218,7 @@ export default function SuperpowerTerraquipuLanding() {
                   Global Challenge 2026
                 </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
-                  Solución de software desarrollada para democratizar la inteligencia de observación terrestre y telemetría espacial a comunidades agrícolas.
+                  Software solution engineered to democratize Earth observation intelligence and space telemetry for smallholder farming communities.
                 </p>
               </div>
             </div>
@@ -1086,7 +1228,7 @@ export default function SuperpowerTerraquipuLanding() {
         </div>
       </section>
 
-      {/* ================= 9. DRAMATIC BOTTOM GOLDEN HALO BANNER (SUPERPOWER SIGNATURE) ================= */}
+      {/* ================= 9. BOTTOM GOLDEN HALO BANNER ================= */}
       <section className="relative bg-[#090A0D] text-white py-28 px-6 overflow-hidden text-center">
         
         {/* Massive Centered Golden Solar Halo */}
@@ -1096,15 +1238,17 @@ export default function SuperpowerTerraquipuLanding() {
 
         <div className="max-w-3xl mx-auto space-y-6 relative z-10">
           <span className="text-xs font-mono uppercase tracking-widest text-amber-300 font-semibold">
-            TERRAQUIPU • EL PODER DEL SUELO
+            {lang === 'qu' ? 'TERRAQUIPU • ALLPAPA KAWSAYNIN' : 'TERRAQUIPU • THE POWER OF SOIL'}
           </span>
 
           <h2 className="text-4xl sm:text-6xl font-serif font-light text-white leading-tight">
-            El suelo es la mayor fuerza de los Andes.
+            {lang === 'qu' ? 'Allpan Andeskunapi aswan hatun kallpa.' : 'Soil is the greatest force in the Andes.'}
           </h2>
 
           <p className="text-sm sm:text-base text-zinc-300 max-w-lg mx-auto font-normal">
-            Únete a la red global de comunidades campesinas, agrónomos y desarrolladores que están protegiendo la soberanía alimentaria frente al cambio climático.
+            {lang === 'qu'
+              ? 'Ayllu chajrakamayoc, yachaqkunawan huñunakuy allpa mikuyta amachanapaq.'
+              : 'Join the global network of smallholder farmers, agronomists, and developers protecting food sovereignty against climate change.'}
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -1113,22 +1257,22 @@ export default function SuperpowerTerraquipuLanding() {
               className="w-full sm:w-auto px-8 py-3.5 rounded-full border-2 border-emerald-500 bg-transparent text-emerald-300 hover:bg-emerald-900 hover:border-emerald-400 hover:text-white font-semibold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-2xl cursor-pointer group"
             >
               <Smartphone className="w-4 h-4 text-emerald-400 group-hover:text-white transition-colors" />
-              <span>Abrir App Móvil</span>
+              <span>{t.nav.appLink}</span>
             </Link>
             <Link 
               href="/visor" 
               className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-wider hover:bg-zinc-200 transition shadow-2xl flex items-center justify-center gap-2"
             >
               <Satellite className="w-4 h-4 text-zinc-900" />
-              <span>Lanzar Visor Satelital</span>
+              <span>{t.nav.visorLink}</span>
             </Link>
             <a 
               href="https://github.com/TerraQuipu" 
-              target="_blank"
-              rel="noreferrer"
+              target="_blank" 
+              rel="noreferrer" 
               className="w-full sm:w-auto px-8 py-3.5 rounded-full border border-white/20 bg-white/10 text-white font-medium text-xs uppercase tracking-wider hover:bg-white/20 transition"
             >
-              Repositorio en GitHub ↗
+              GitHub Repository &rarr;
             </a>
           </div>
         </div>
@@ -1145,36 +1289,42 @@ export default function SuperpowerTerraquipuLanding() {
               TERRAQUIPU
             </div>
             <p className="text-xs text-zinc-600 max-w-sm">
-              Sistema de inteligencia territorial y regeneración edáfica en los Andes. Desarrollado con datos de la NASA para el NASA Space Apps Challenge 2026.
+              {lang === 'qu'
+                ? 'Allpa kawsay yachay Andeskunapi. NASA open datawan kallpachasqa NASA Space Apps Challenge 2026 nisqapaq.'
+                : 'Territorial intelligence and edaphic regeneration system in the Andes. Powered by NASA open data for the NASA Space Apps Challenge 2026.'}
             </p>
             <div className="text-[11px] font-mono text-zinc-400">
-              MIT License • Código Abierto Comunitario
+              MIT License • Open Source Community
             </div>
           </div>
 
           <div className="space-y-2">
-            <div className="font-mono text-[11px] uppercase tracking-wider font-bold text-zinc-900">Plataforma</div>
+            <div className="font-mono text-[11px] uppercase tracking-wider font-bold text-zinc-900">
+              {lang === 'qu' ? 'Llamk\'ana' : 'Platform'}
+            </div>
             <ul className="space-y-1.5 text-xs">
               <li>
                 <Link href="/app" className="hover:text-emerald-950 transition font-semibold text-emerald-800 flex items-center gap-1.5">
                   <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>App Móvil PWA (/app)</span>
+                  <span>{t.nav.appLink} (/app)</span>
                 </Link>
               </li>
               <li>
                 <Link href="/visor" className="hover:text-black transition flex items-center gap-1.5 text-zinc-600">
                   <Satellite className="w-3.5 h-3.5 text-zinc-500" />
-                  <span>Visor GIS Satelital (/visor)</span>
+                  <span>{t.nav.visorLink} (/visor)</span>
                 </Link>
               </li>
-              <li><a href="#como-funciona" className="hover:text-black transition">Cómo Funciona</a></li>
-              <li><a href="#diagnostico" className="hover:text-black transition">Diagnóstico 30m</a></li>
-              <li><a href="#quipu" className="hover:text-black transition">Plan Quipu de Rotación</a></li>
+              <li><a href="#como-funciona" className="hover:text-black transition">{lang === 'qu' ? 'Imaynatam Llamk\'an' : 'How It Works'}</a></li>
+              <li><a href="#diagnostico" className="hover:text-black transition">{lang === 'qu' ? '30m Allpa Qhaway' : '30m Diagnostic'}</a></li>
+              <li><a href="#quipu" className="hover:text-black transition">{lang === 'qu' ? 'Khipu Tarpuy' : 'Quipu Rotation Plan'}</a></li>
             </ul>
           </div>
 
           <div className="space-y-2">
-            <div className="font-mono text-[11px] uppercase tracking-wider font-bold text-zinc-900">Repositorios</div>
+            <div className="font-mono text-[11px] uppercase tracking-wider font-bold text-zinc-900">
+              {lang === 'qu' ? 'Waqaychanakuna' : 'Repositories'}
+            </div>
             <ul className="space-y-1.5 text-xs font-mono">
               <li><a href="https://github.com/TerraQuipu/terraquipu-web" target="_blank" className="hover:text-black transition">terraquipu-web</a></li>
               <li><a href="https://github.com/TerraQuipu/terraquipu-api" target="_blank" className="hover:text-black transition">terraquipu-api</a></li>
@@ -1184,11 +1334,13 @@ export default function SuperpowerTerraquipuLanding() {
           </div>
 
           <div className="space-y-2">
-            <div className="font-mono text-[11px] uppercase tracking-wider font-bold text-zinc-900">Ciencia Abierta</div>
+            <div className="font-mono text-[11px] uppercase tracking-wider font-bold text-zinc-900">
+              {lang === 'qu' ? 'Llapa Runapa Yachaynin' : 'Open Science'}
+            </div>
             <ul className="space-y-1.5 text-xs">
               <li><a href="https://power.larc.nasa.gov/" target="_blank" className="hover:text-black transition">NASA POWER</a></li>
               <li><a href="https://smap.jpl.nasa.gov/" target="_blank" className="hover:text-black transition">NASA SMAP</a></li>
-              <li><a href="https://www.gob.pe/inia" target="_blank" className="hover:text-black transition">INIA Perú</a></li>
+              <li><a href="https://www.gob.pe/inia" target="_blank" className="hover:text-black transition">INIA Peru</a></li>
               <li><a href="https://www.senamhi.gob.pe/" target="_blank" className="hover:text-black transition">SENAMHI</a></li>
             </ul>
           </div>
@@ -1202,14 +1354,14 @@ export default function SuperpowerTerraquipuLanding() {
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span className="font-mono text-xs uppercase tracking-wider font-bold text-zinc-900">
-                  GeoTeam • Equipo Desarrollador
+                  GeoTeam • Development Team
                 </span>
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100/70 text-emerald-800 border border-emerald-300/60">
                   NASA Space Apps Challenge 2026
                 </span>
               </div>
               <p className="text-[11px] text-zinc-500 font-sans">
-                Innovación tecnológica, teledetección espacial y regeneración edáfica para comunidades agrícolas andinas.
+                Technological innovation, satellite remote sensing, and edaphic regeneration for Andean farming communities.
               </p>
             </div>
 
@@ -1234,12 +1386,11 @@ export default function SuperpowerTerraquipuLanding() {
         </div>
 
         <div className="max-w-7xl mx-auto px-6 pt-6 mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-zinc-400">
-          <div>© 2026 Terraquipu Project. Diseñado con sabiduría ancestral y telemetría espacial.</div>
-          <div>Cusco • Valle Sagrado • Perú</div>
+          <div>© 2026 Terraquipu Project. Engineered with ancestral wisdom and satellite telemetry.</div>
+          <div>Cusco • Sacred Valley • Peru</div>
         </div>
       </footer>
 
     </div>
   );
 }
-

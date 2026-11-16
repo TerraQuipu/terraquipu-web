@@ -33,20 +33,20 @@ export interface Pregunta {
 // Catálogo de Cultivos y Tipos Botánicos
 // ----------------------------------------------------------------------
 export const CULTIVOS: Opcion[] = [
-  { clave: 'papa', texto: 'Papa', subtexto: 'Tubérculo andino demandante en nitrógeno', icono: '🥔' },
-  { clave: 'olluco', texto: 'Olluco', subtexto: 'Tubérculo de porte medio', icono: '🍠' },
-  { clave: 'quinua', texto: 'Quinua', subtexto: 'Grano andino resistente y balanceador', icono: '🌾' },
-  { clave: 'oca', texto: 'Oca', subtexto: 'Tubérculo dulce adaptado a suelos francos', icono: '🥕' },
-  { clave: 'tarwi', texto: 'Tarwi / Chocho', subtexto: 'Leguminosa fijadora de nitrógeno', icono: '🌱' },
-  { clave: 'haba', texto: 'Haba', subtexto: 'Leguminosa de vaina para rotación', icono: '🫛' },
-  { clave: 'otro', texto: 'Otro cultivo', subtexto: 'Especificar tipo biológico', icono: '🌿' },
+  { clave: 'papa', texto: 'Native Andean Potato', subtexto: 'High nitrogen-demand Andean tuber', icono: '🥔' },
+  { clave: 'olluco', texto: 'Olluco (Ullucus tuberosus)', subtexto: 'Rustic mid-tier Andean tuber', icono: '🍠' },
+  { clave: 'quinua', texto: 'Real Andean Quinoa', subtexto: 'Resilient and nutrient-balancing Andean grain', icono: '🌾' },
+  { clave: 'oca', texto: 'Oca (Oxalis tuberosa)', subtexto: 'Sweet highland tuber adapted to loamy soils', icono: '🥕' },
+  { clave: 'tarwi', texto: 'Tarwi / Andean Lupin', subtexto: 'Biological nitrogen-fixing legume', icono: '🌱' },
+  { clave: 'haba', texto: 'Broad Bean (Vicia faba)', subtexto: 'Pod legume for soil restoration and rotation', icono: '🫛' },
+  { clave: 'otro', texto: 'Other crop', subtexto: 'Specify botanical family', icono: '🌿' },
 ];
 
 export const TIPOS_DE_CULTIVO: Opcion[] = [
-  { clave: 'tuberculo_raiz', texto: 'Tubérculo / Raíz', subtexto: 'Papa, mashua, oca, camote, etc.' },
-  { clave: 'leguminosa', texto: 'Leguminosa (Vaina)', subtexto: 'Tarwi, habas, arveja, frejol (fijan nitrógeno)' },
-  { clave: 'cereal_grano', texto: 'Cereal / Grano', subtexto: 'Quinua, kiwicha, cebada, maíz, avena' },
-  { clave: 'hortaliza', texto: 'Hortaliza', subtexto: 'Zanahoria, cebolla, lechuga, etc.' },
+  { clave: 'tuberculo_raiz', texto: 'Tuber / Root Crop', subtexto: 'Potato, mashua, oca, sweet potato, etc.' },
+  { clave: 'leguminosa', texto: 'Legume (Pod Crop)', subtexto: 'Tarwi, broad beans, peas, beans (fix atmospheric N)' },
+  { clave: 'cereal_grano', texto: 'Cereal / Grain Crop', subtexto: 'Quinoa, kiwicha, barley, corn, oats' },
+  { clave: 'hortaliza', texto: 'Vegetable / Green Crop', subtexto: 'Carrot, onion, lettuce, etc.' },
 ];
 
 export const TIPO_POR_CULTIVO: Record<string, string> = {
@@ -62,8 +62,8 @@ export const TIPO_POR_CULTIVO: Record<string, string> = {
 
 export const DESCANSO: Opcion = {
   clave: 'descanso',
-  texto: 'Descansó (Puruma)',
-  subtexto: 'La chacra reposó durante toda la campaña',
+  texto: 'Fallow / Soil Rest (Puruma)',
+  subtexto: 'Parcel remained in rest throughout the campaign',
   icono: '💤',
 };
 
@@ -77,8 +77,8 @@ export function preguntaCultivo(
   const tipo: Pregunta = {
     id: `${id}_tipo`,
     bloque,
-    texto: '¿Qué tipo de cultivo es?',
-    subtexto: 'Seleccione la familia biológica para estimar nutrientes',
+    texto: 'What biological crop family is it?',
+    subtexto: 'Select botanical family to compute nutrient requirements',
     opciones: TIPOS_DE_CULTIVO,
   };
 
@@ -101,29 +101,29 @@ export function preguntaCultivo(
 export const P1: Pregunta = {
   id: '1',
   bloque: 'esencial',
-  texto: '¿Qué hay en su chacra hoy?',
-  subtexto: 'Estado actual del suelo observado en terreno',
+  texto: 'What is currently on your parcel?',
+  subtexto: 'Current ground-truth soil condition observed in-situ',
   opciones: [
-    { clave: 'cultivo_creciendo', texto: 'Cultivo creciendo', subtexto: 'Plantas vivas en desarrollo en el campo', icono: '🌱' },
-    { clave: 'rastrojo', texto: 'Sin cultivo, pero con rastrojo', subtexto: 'Restos secos de la cosecha anterior (paja, tallos)', icono: '🌾' },
-    { clave: 'pasto', texto: 'Pasto o hierba', subtexto: 'Cobertura vegetal espontánea o pastizal', icono: '🌿' },
-    { clave: 'tierra_desnuda', texto: 'Solo tierra, sin nada encima', subtexto: 'Suelo arado o expuesto a la intemperie', icono: '🟤' },
+    { clave: 'cultivo_creciendo', texto: 'Growing crop', subtexto: 'Actively developing live vegetation in the field', icono: '🌱' },
+    { clave: 'rastrojo', texto: 'No crop, but crop residue (mulch)', subtexto: 'Dry post-harvest biomass (stover, straw, stubble)', icono: '🌾' },
+    { clave: 'pasto', texto: 'Pasture or natural grassland', subtexto: 'Spontaneous vegetative cover or managed rangeland', icono: '🌿' },
+    { clave: 'tierra_desnuda', texto: 'Bare soil, completely exposed', subtexto: 'Tilled or uncovered soil vulnerable to erosion', icono: '🟤' },
   ],
   abre: {
-    cultivo_creciendo: preguntaCultivo('1a', 'esencial', '¿Qué cultivo está creciendo?'),
+    cultivo_creciendo: preguntaCultivo('1a', 'esencial', 'What crop is actively growing?'),
   },
 };
 
 export const P2: Pregunta = {
   id: '2',
   bloque: 'esencial',
-  texto: '¿Cuándo piensa sembrar?',
-  subtexto: 'Planificación de la próxima siembra en la parcela',
+  texto: 'When do you plan to sow?',
+  subtexto: 'Projected planting timeline for this parcel',
   opciones: [
-    { clave: 'esta_semana', texto: 'Empiezo esta semana', subtexto: 'Trabajos de surcado y siembra inmediata', icono: '⚡' },
-    { clave: 'dos_a_cuatro_semanas', texto: 'En unas 2 a 4 semanas', subtexto: 'Preparando la chacra para este mes', icono: '📅' },
-    { clave: 'mas_de_un_mes', texto: 'Dentro de más de un mes', subtexto: 'Esperando lluvias o época propicia', icono: '⏳' },
-    { clave: 'descansar', texto: 'Esta vez la voy a dejar descansar', subtexto: 'Descanso programado (Puruma) para recuperar suelo', icono: '💤' },
+    { clave: 'esta_semana', texto: 'Starting this week', subtexto: 'Immediate furrowing and sowing operations', icono: '⚡' },
+    { clave: 'dos_a_cuatro_semanas', texto: 'In 2 to 4 weeks', subtexto: 'Preparing seedbed for this month', icono: '📅' },
+    { clave: 'mas_de_un_mes', texto: 'In more than one month', subtexto: 'Waiting for seasonal rains or optimal window', icono: '⏳' },
+    { clave: 'descansar', texto: 'Letting the soil rest this campaign', subtexto: 'Planned fallow (Puruma) to regenerate soil health', icono: '💤' },
   ],
   condicion: (r) => r['1'] !== 'cultivo_creciendo',
 };
@@ -131,7 +131,7 @@ export const P2: Pregunta = {
 export const P2B: Pregunta = preguntaCultivo(
   '2b',
   'esencial',
-  '¿Qué piensa sembrar?',
+  'What crop do you plan to sow?',
   [],
   (r) => r['1'] !== 'cultivo_creciendo' && r['2'] !== undefined && r['2'] !== 'descansar'
 );
@@ -139,73 +139,73 @@ export const P2B: Pregunta = preguntaCultivo(
 export const P3: Pregunta = {
   id: '3',
   bloque: 'complementaria',
-  texto: '¿Cómo recibe agua su chacra?',
-  subtexto: 'Régimen hídrico disponible para esta parcela',
+  texto: 'How does your parcel receive water?',
+  subtexto: 'Hydrological regime available for this parcel',
   opciones: [
-    { clave: 'solo_lluvia', texto: 'Solo cuando llueve (Secano)', subtexto: 'Depende 100% de las precipitaciones naturales', icono: '🌧️' },
-    { clave: 'lluvia_y_auxilio', texto: 'Lluvia y riego de auxilio', subtexto: 'Secano con posibilidad de regar si hay sequía prolongada', icono: '💧' },
-    { clave: 'riego_permanente', texto: 'Tengo riego todo el año', subtexto: 'Canal de regadío, reservorio, aspersión o goteo', icono: '🚰' },
+    { clave: 'solo_lluvia', texto: 'Rainfed only (Secano)', subtexto: '100% dependent on natural precipitation', icono: '🌧️' },
+    { clave: 'lluvia_y_auxilio', texto: 'Rainfed with emergency irrigation', subtexto: 'Rainfed with occasional turn during prolonged dry spells', icono: '💧' },
+    { clave: 'riego_permanente', texto: 'Permanent irrigation year-round', subtexto: 'Gravity canal, reservoir, sprinkler or drip system', icono: '🚰' },
   ],
 };
 
 export const P4: Pregunta = {
   id: '4',
   bloque: 'complementaria',
-  texto: '¿Su parcela cuenta con defensas contra las lluvias?',
-  subtexto: 'Obras de conservación de suelo como andenes, zanjas de infiltración o barreras vivas',
+  texto: 'Does your parcel have soil conservation defenses against heavy rains?',
+  subtexto: 'Terraces (andenes), infiltration trenches, or living vegetative barriers',
   opciones: [
-    { clave: 'buen_estado', texto: 'Sí, y están en buen estado', subtexto: 'Andenes conservados, zanjas limpias y funcionales', icono: '🛡️' },
-    { clave: 'mal_estado', texto: 'Sí, pero están en mal estado', subtexto: 'Muros caídos, zanjas colmatadas o barreras ralas', icono: '⚠️' },
-    { clave: 'ninguna', texto: 'No tengo defensas', subtexto: 'Ladera abierta sin zanjas ni terrazas de contención', icono: '❌' },
+    { clave: 'buen_estado', texto: 'Yes, in good operational condition', subtexto: 'Maintained terraces, clean functional trenches', icono: '🛡️' },
+    { clave: 'mal_estado', texto: 'Yes, but degraded or clogged', subtexto: 'Collapsed retaining walls, silted infiltration trenches', icono: '⚠️' },
+    { clave: 'ninguna', texto: 'No defenses installed', subtexto: 'Open hillside without containment terraces or trenches', icono: '❌' },
   ],
 };
 
 export const P5: Pregunta = {
   id: '5',
   bloque: 'complementaria',
-  texto: 'Cuando cava con la lampa, ¿cómo es la tierra?',
-  subtexto: 'Profundidad efectiva del suelo antes de encontrar piedras o roca madre',
+  texto: 'When digging with a spade or pick, what is the soil depth?',
+  subtexto: 'Effective rooting depth before striking stones or bedrock',
   opciones: [
-    { clave: 'profundo', texto: 'Puedo cavar hondo sin problema', subtexto: 'Suelo profundo (>50 cm) con tierra suelta', icono: '⛏️' },
-    { clave: 'algo_piedras', texto: 'Hay algunas piedras, pero igual se cava', subtexto: 'Profundidad media con pedregosidad moderada', icono: '🪨' },
-    { clave: 'muy_pedregoso', texto: 'Hay muchas piedras o topa roca pronto', subtexto: 'Suelo superficial con roca o pedregal duro', icono: '⛰️' },
+    { clave: 'profundo', texto: 'Deep topsoil (>50 cm) without obstruction', subtexto: 'Deep, loose, fertile rooting layer', icono: '⛏️' },
+    { clave: 'algo_piedras', texto: 'Moderate stoniness, but easily workable', subtexto: 'Medium depth (20 - 50 cm) with scattered pebbles', icono: '🪨' },
+    { clave: 'muy_pedregoso', texto: 'Abundant rock or strikes bedrock quickly', subtexto: 'Shallow soil (<20 cm) over rocky substrate', icono: '⛰️' },
   ],
 };
 
 export const P6A: Pregunta = {
   id: '6a',
   bloque: 'complementaria',
-  texto: '¿Cómo es la textura de su tierra?',
-  subtexto: 'Comportamiento del suelo al labrarlo',
+  texto: 'What is the texture of your soil?',
+  subtexto: 'Soil behavior during field tillage',
   opciones: [
-    { clave: 'suelta', texto: 'Suelta, se deshace fácil (Arenosa)', subtexto: 'No retiene agua, drena rápido y es ligera', icono: '🏜️' },
-    { clave: 'suave', texto: 'Suave y buena para trabajar (Franca)', subtexto: 'Equilibrada, retiene humedad y nutrientes', icono: '🌱' },
-    { clave: 'pesada', texto: 'Pesada y pegajosa (Arcillosa)', subtexto: 'Se encharca con facilidad y forma terrones duros al secar', icono: '🧱' },
+    { clave: 'suelta', texto: 'Loose, easily crumbles (Sandy)', subtexto: 'Low water retention, drains rapidly, light texture', icono: '🏜️' },
+    { clave: 'suave', texto: 'Smooth and fertile to work (Loam)', subtexto: 'Balanced, retains moisture and nutrients', icono: '🌱' },
+    { clave: 'pesada', texto: 'Heavy and sticky (Clay)', subtexto: 'Prone to waterlogging, forms hard clods when dry', icono: '🧱' },
   ],
 };
 
 export const P6B: Pregunta = {
   id: '6b',
   bloque: 'complementaria',
-  texto: 'Prueba del Puñado: Coja tierra húmeda y apriétela en la mano',
-  subtexto: '¿Qué sucede al abrir la palma de la mano?',
+  texto: 'Hand Squeeze Test: Take moist topsoil and squeeze firmly in your palm',
+  subtexto: 'What happens when you open your palm?',
   opciones: [
     {
       clave: 'se_desmorona',
-      texto: 'Se desmorona y raspa la piel',
-      subtexto: 'Textura Arenosa: Granos ásperos, no forma bolita, drena muy rápido.',
+      texto: 'Crumbles immediately and grittily scratches skin',
+      subtexto: 'Sandy texture: Coarse grains, cannot form ball, drains rapidly.',
       icono: '🪨',
     },
     {
       clave: 'bolita',
-      texto: 'Se forma una bolita suave que se sostiene',
-      subtexto: 'Textura Franca: Suelo ideal andino, suave al tacto y balance hídrico.',
+      texto: 'Forms a cohesive, soft ball that holds shape',
+      subtexto: 'Loam texture: Ideal Andean agricultural soil with balanced hydrology.',
       icono: '🌰',
     },
     {
       clave: 'barro',
-      texto: 'Se pega como barro y queda marcada la mano',
-      subtexto: 'Textura Arcillosa: Moldeable como plastilina, pegajosa y retiene mucha agua.',
+      texto: 'Sticks like dough and stains the hand',
+      subtexto: 'Clay texture: Highly moldable, sticky, holds heavy moisture.',
       icono: '🧱',
     },
   ],
@@ -214,11 +214,11 @@ export const P6B: Pregunta = {
 export const P6: Pregunta = {
   id: '6',
   bloque: 'complementaria',
-  texto: '¿Sabe qué tipo de tierra tiene su chacra?',
-  subtexto: 'Conocimiento empírico de la textura edáfica',
+  texto: 'Do you know your parcel soil texture?',
+  subtexto: 'Empirical knowledge of edaphic texture',
   opciones: [
-    { clave: 'conoce', texto: 'Sí, la conozco', subtexto: 'Identifico si es suelta, suave o pesada', icono: '🧠' },
-    { clave: 'no_seguro', texto: 'No estoy seguro (Hacer prueba del puñado)', subtexto: 'Guía práctica táctil en 10 segundos', icono: '✋' },
+    { clave: 'conoce', texto: 'Yes, I know it well', subtexto: 'Can identify whether it is sandy, loamy, or clayey', icono: '🧠' },
+    { clave: 'no_seguro', texto: 'Not sure (Conduct Hand Squeeze Test)', subtexto: '10-second practical in-situ field guide', icono: '✋' },
   ],
   abre: {
     conoce: P6A,
@@ -229,38 +229,38 @@ export const P6: Pregunta = {
 export const P7A: Pregunta = preguntaCultivo(
   '7a',
   'complementaria',
-  '¿Qué sembró en esta chacra la campaña anterior?',
+  'What did you cultivate in this parcel last campaign?',
   [DESCANSO]
 );
 
 export const P7B: Pregunta = preguntaCultivo(
   '7b',
   'complementaria',
-  '¿Qué sembró la penúltima vez? (Hace dos campañas)',
+  'What was cultivated two campaigns ago?',
   [DESCANSO]
 );
 
 export const P8: Pregunta = {
   id: '8',
   bloque: 'extra',
-  texto: '¿Cuántas personas pueden trabajar en la chacra?',
-  subtexto: 'Mano de obra familiar o ayni disponible para labores',
+  texto: 'How many people can work on the parcel?',
+  subtexto: 'Available family labor or communal ayni support',
   opciones: [
-    { clave: 'solo_yo', texto: 'Solo yo', subtexto: 'Trabajo individual', icono: '👤' },
-    { clave: 'dos_o_tres', texto: '2 o 3 personas', subtexto: 'Apoyo familiar cercano', icono: '👥' },
-    { clave: 'cuatro_o_mas', texto: '4 o más personas', subtexto: 'Familia extendida o faena comunal / ayni', icono: '👨‍👩‍👧‍👦' },
+    { clave: 'solo_yo', texto: 'Only myself', subtexto: 'Individual farm labor', icono: '👤' },
+    { clave: 'dos_o_tres', texto: '2 or 3 people', subtexto: 'Close family support', icono: '👥' },
+    { clave: 'cuatro_o_mas', texto: '4 or more people', subtexto: 'Extended family or communal faena / ayni', icono: '👨‍👩‍👧‍👦' },
   ],
 };
 
 export const P9: Pregunta = {
   id: '9',
   bloque: 'extra',
-  texto: '¿Cuánto tiempo puede dedicar cada semana?',
-  subtexto: 'Disponibilidad para mantenimiento, deshierbe y aporque',
+  texto: 'How much time can you dedicate weekly?',
+  subtexto: 'Availability for maintenance, weeding, and hilling',
   opciones: [
-    { clave: 'poco', texto: 'Poco, algunas horas', subtexto: 'Visitas puntuales fines de semana', icono: '⏱️' },
-    { clave: 'algo', texto: 'Algo, uno o dos días por semana', subtexto: 'Dedicación a tiempo parcial', icono: '🗓️' },
-    { clave: 'bastante', texto: 'Bastante, tres días o más', subtexto: 'Dedicación continua a la chacra', icono: '💪' },
+    { clave: 'poco', texto: 'A few hours per week', subtexto: 'Weekend or occasional visits', icono: '⏱️' },
+    { clave: 'algo', texto: '1 or 2 days per week', subtexto: 'Part-time farm dedication', icono: '🗓️' },
+    { clave: 'bastante', texto: '3 days or more', subtexto: 'Full-time dedicated field management', icono: '💪' },
   ],
 };
 

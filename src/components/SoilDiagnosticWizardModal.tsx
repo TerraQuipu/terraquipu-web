@@ -46,11 +46,11 @@ export default function SoilDiagnosticWizardModal({
   onSelectParcel,
 }: SoilDiagnosticWizardModalProps) {
   const [step, setStep] = useState(1);
-  const [step1Val, setStep1Val] = useState<'Seca y polvo' | 'Húmeda y mullida' | 'Barro'>('Húmeda y mullida');
-  const [step2Val, setStep2Val] = useState<'Profundo (más de 40 cm)' | 'Algo de piedras (20 a 40 cm)' | 'Muy pedregoso o superficial'>('Profundo (más de 40 cm)');
-  const [step3Val, setStep3Val] = useState<'Cultivo verde o rastrojo abundante' | 'Rastrojo disperso o restos secos' | 'Tierra desnuda expuesta al sol'>('Cultivo verde o rastrojo abundante');
-  const [step4Val, setStep4Val] = useState<'Secano (solo lluvia del cielo)' | 'Riego de auxilio (turno ocasional)' | 'Riego permanente o reservorio'>('Riego de auxilio (turno ocasional)');
-  const [step5Val, setStep5Val] = useState<'Chacra sana y limpia' | 'Presencia de gorgojo de los andes' | 'Rancha o tizón tardío'>('Chacra sana y limpia');
+  const [step1Val, setStep1Val] = useState<'Dry & powdery' | 'Moist & friable' | 'Muddy / waterlogged'>('Moist & friable');
+  const [step2Val, setStep2Val] = useState<'Deep topsoil (> 40 cm)' | 'Moderately rocky (20 - 40 cm)' | 'Very stony / shallow (< 20 cm)'>('Deep topsoil (> 40 cm)');
+  const [step3Val, setStep3Val] = useState<'Green canopy or abundant residue mulch' | 'Scattered crop residue or dry stubble' | 'Bare soil exposed to solar radiation'>('Green canopy or abundant residue mulch');
+  const [step4Val, setStep4Val] = useState<'Rainfed only (precipitation dependent)' | 'Supplemental irrigation (scheduled turns)' | 'Permanent irrigation / reservoir'>('Supplemental irrigation (scheduled turns)');
+  const [step5Val, setStep5Val] = useState<'Healthy field with zero visible pests' | 'Presence of Andean potato weevil (Premnotrypes)' | 'Late blight (Phytophthora infestans)'>('Healthy field with zero visible pests');
 
   const [selectedParcelId, setSelectedParcelId] = useState<string>(activeParcel?.id || '');
 
@@ -64,7 +64,7 @@ export default function SoilDiagnosticWizardModal({
     (parcels && parcels.find((p) => p.id === selectedParcelId)) ||
     activeParcel ||
     (typeof window !== 'undefined' ? getActiveParcel() : null);
-  const parcelName = targetParcel?.name || 'Chacra principal';
+  const parcelName = targetParcel?.name || 'Main field';
   const parcelDetails = targetParcel ? `${targetParcel.cropCategory || targetParcel.cropName} • ${targetParcel.areaHa} ha` : null;
 
   if (!isOpen) return null;
@@ -108,11 +108,11 @@ export default function SoilDiagnosticWizardModal({
   const handleReset = () => {
     playWhoosh();
     setStep(1);
-    setStep1Val('Húmeda y mullida');
-    setStep2Val('Profundo (más de 40 cm)');
-    setStep3Val('Cultivo verde o rastrojo abundante');
-    setStep4Val('Riego de auxilio (turno ocasional)');
-    setStep5Val('Chacra sana y limpia');
+    setStep1Val('Moist & friable');
+    setStep2Val('Deep topsoil (> 40 cm)');
+    setStep3Val('Green canopy or abundant residue mulch');
+    setStep4Val('Supplemental irrigation (scheduled turns)');
+    setStep5Val('Healthy field with zero visible pests');
   };
 
   const progressPct = step <= 5 ? step * 20 : 100;
@@ -120,24 +120,24 @@ export default function SoilDiagnosticWizardModal({
   // Dynamic edaphic health score based on genuine farmer answers
   const calculatedHealthScore = React.useMemo(() => {
     let score = 55;
-    if (step1Val.includes('Húmeda')) score += 15;
-    else if (step1Val.includes('Seca')) score += 5;
+    if (step1Val.includes('Moist') || step1Val.includes('Húmeda')) score += 15;
+    else if (step1Val.includes('Dry') || step1Val.includes('Seca')) score += 5;
     else score += 8;
 
-    if (step2Val.includes('Profundo')) score += 15;
-    else if (step2Val.includes('Algo')) score += 8;
+    if (step2Val.includes('Deep') || step2Val.includes('Profundo')) score += 15;
+    else if (step2Val.includes('Moderately') || step2Val.includes('Algo')) score += 8;
     else score -= 5;
 
-    if (step3Val.includes('abundante')) score += 12;
-    else if (step3Val.includes('disperso')) score += 6;
+    if (step3Val.includes('abundant') || step3Val.includes('abundante') || step3Val.includes('Green')) score += 12;
+    else if (step3Val.includes('Scattered') || step3Val.includes('disperso')) score += 6;
     else score -= 8;
 
-    if (step4Val.includes('permanente')) score += 10;
-    else if (step4Val.includes('auxilio')) score += 6;
+    if (step4Val.includes('Permanent') || step4Val.includes('permanente')) score += 10;
+    else if (step4Val.includes('Supplemental') || step4Val.includes('auxilio')) score += 6;
     else score += 2;
 
-    if (step5Val.includes('sana')) score += 12;
-    else if (step5Val.includes('gorgojo')) score -= 14;
+    if (step5Val.includes('Healthy') || step5Val.includes('sana')) score += 12;
+    else if (step5Val.includes('weevil') || step5Val.includes('gorgojo')) score -= 14;
     else score -= 10;
 
     return Math.max(25, Math.min(98, score));
@@ -145,26 +145,26 @@ export default function SoilDiagnosticWizardModal({
 
   const dynamicActions = React.useMemo(() => {
     const list: string[] = [];
-    if (step3Val.includes('expuesta') || step1Val.includes('Seca')) {
-      list.push('Cubre la tierra descubierta con rastrojo o paja; evita quemarlo para retener humedad.');
+    if (step3Val.includes('Bare') || step3Val.includes('expuesta') || step1Val.includes('Dry') || step1Val.includes('Seca')) {
+      list.push('Cover bare topsoil with crop residue or mulch; avoid burning biomass to retain moisture.');
     } else {
-      list.push('Mantén la cobertura vegetal de rastrojo para nutrir la microbiología del suelo.');
+      list.push('Maintain protective vegetative mulch cover to nourish beneficial soil microbiota.');
     }
 
-    if (step5Val.includes('gorgojo')) {
-      list.push('Rotación obligatoria con Tarwi o Habas para romper el ciclo biológico del gorgojo.');
-    } else if (step5Val.includes('Rancha')) {
-      list.push('Abre zanjas de sangría para ventilar raíces y evitar encharcamientos fungosos.');
+    if (step5Val.includes('weevil') || step5Val.includes('gorgojo')) {
+      list.push('Mandatory crop rotation with Tarwi or Broad Beans to break the Andean potato weevil life cycle.');
+    } else if (step5Val.includes('blight') || step5Val.includes('Rancha')) {
+      list.push('Construct drainage contour trenches to aerate root zones and prevent fungal root waterlogging.');
     } else {
-      list.push('Aplica compost maduro o guano de corral descompuesto al fondo del surco.');
+      list.push('Incorporate mature compost or decomposed corral manure into furrow planting beds.');
     }
 
-    if (step2Val.includes('superficial')) {
-      list.push('Traza surcos en contorno poco profundos sin remover capas rocosas.');
-    } else if (step4Val.includes('permanente') || step4Val.includes('auxilio')) {
-      list.push('Aprovecha los turnos de riego con riegos ligeros al amanecer para minimizar evaporación.');
+    if (step2Val.includes('stony') || step2Val.includes('superficial')) {
+      list.push('Trace shallow contour furrows without disturbing sub-surface rocky layers.');
+    } else if (step4Val.includes('Permanent') || step4Val.includes('Supplemental') || step4Val.includes('permanente') || step4Val.includes('auxilio')) {
+      list.push('Leverage irrigation turns with dawn applications to minimize evaporative losses.');
     } else {
-      list.push('Aprovecha las primeras lluvias estacionales para siembra oportuna en ladera.');
+      list.push('Capitalize on early seasonal rainfall for timely hillside contour sowing.');
     }
     return list;
   }, [step1Val, step2Val, step3Val, step4Val, step5Val]);
@@ -175,26 +175,26 @@ export default function SoilDiagnosticWizardModal({
 
   const content = (
     <div className="space-y-4 animate-in fade-in pb-16">
-      {/* 0. Top Header Navigation (Matching Frame 006) */}
+      {/* 0. Top Header Navigation */}
       <div className="flex items-center justify-between pb-1 pt-1">
         <button
           type="button"
           onClick={handleBack}
           className="w-9 h-9 rounded-full bg-white border border-[#E5ECE2] flex items-center justify-center text-zinc-600 hover:text-zinc-900 cursor-pointer shadow-2xs transition"
-          title="Atrás"
+          title="Back"
         >
           <ArrowLeft className="w-4 h-4" />
         </button>
 
         <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/80">
-          DIAGNÓSTICO DE SUELO
+          SOIL EDAPHIC DIAGNOSTIC
         </span>
 
         <button
           type="button"
           onClick={handleReset}
           className="w-9 h-9 rounded-full bg-white border border-[#E5ECE2] flex items-center justify-center text-zinc-600 hover:text-zinc-900 cursor-pointer shadow-2xs transition"
-          title="Reiniciar cuestionario"
+          title="Reset diagnostic"
         >
           <RotateCcw className="w-3.5 h-3.5" />
         </button>
@@ -208,7 +208,7 @@ export default function SoilDiagnosticWizardModal({
           </div>
           <div className="min-w-0">
             <span className="text-[9.5px] font-bold uppercase tracking-wider text-emerald-800 block">
-              Evaluando Parcela:
+              Evaluating Parcel:
             </span>
             <span className="text-xs font-bold text-zinc-900 truncate block">
               {parcelName}
@@ -250,7 +250,7 @@ export default function SoilDiagnosticWizardModal({
         </div>
       )}
 
-      {/* HERO TITLE (Matching Frame 006) */}
+      {/* HERO TITLE */}
       {step <= 5 && (
         <div className="text-center space-y-2 pt-1">
           <div className="inline-flex w-12 h-12 rounded-2xl bg-[#EAF3E3] items-center justify-center text-emerald-800 shadow-2xs">
@@ -259,16 +259,16 @@ export default function SoilDiagnosticWizardModal({
 
           <div className="space-y-1">
             <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
-              UNA MIRADA A TU CHACRA
+              FIELD SOIL ASSESSMENT
             </span>
             <h1 className="text-2xl sm:text-3xl font-black text-[#132A1C] leading-tight">
-              Suelo fuerte,{' '}
+              Resilient soil,{' '}
               <span className="font-serif italic text-emerald-800 font-normal">
-                cosecha segura.
+                secure harvest.
               </span>
             </h1>
             <p className="text-xs text-zinc-600">
-              Responde cinco preguntas. Te tomará menos de un minuto.
+              Answer five field questions. Takes less than one minute.
             </p>
           </div>
         </div>
@@ -280,7 +280,7 @@ export default function SoilDiagnosticWizardModal({
           {/* Progress Bar & Step Label */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-[11px] font-black text-emerald-900">
-              <span>PASO {step} / 5</span>
+              <span>STEP {step} / 5</span>
               <span className="font-mono text-zinc-500">{progressPct}%</span>
             </div>
             <div className="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
@@ -296,16 +296,16 @@ export default function SoilDiagnosticWizardModal({
             <div className="space-y-3">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
-                  PRUEBA DEL PUÑO
+                  HAND SQUEEZE TEST
                 </span>
-                <h3 className="text-base font-black text-[#132A1C]">Textura y humedad</h3>
+                <h3 className="text-base font-black text-[#132A1C]">Soil Texture &amp; Moisture</h3>
                 <p className="text-xs text-zinc-500 mt-0.5">
-                  ¿Cómo se siente la tierra al apretarla con la mano?
+                  How does the soil feel when firmly squeezed in your hand?
                 </p>
               </div>
 
               <div className="space-y-2">
-                {(['Seca y polvo', 'Húmeda y mullida', 'Barro'] as const).map((opt) => (
+                {(['Dry & powdery', 'Moist & friable', 'Muddy / waterlogged'] as const).map((opt) => (
                   <button
                     key={opt}
                     type="button"
@@ -343,16 +343,16 @@ export default function SoilDiagnosticWizardModal({
             <div className="space-y-3">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
-                  PROFUNDIDAD Y PEDREGOSIDAD
+                  EFFECTIVE ROOTING DEPTH
                 </span>
-                <h3 className="text-base font-black text-[#132A1C]">Profundidad del terreno</h3>
+                <h3 className="text-base font-black text-[#132A1C]">Topsoil Depth &amp; Stoniness</h3>
                 <p className="text-xs text-zinc-500 mt-0.5">
-                  ¿Hasta dónde entra la lampa o barretón antes de topar roca?
+                  How deep does a spade penetrate before striking bedrock?
                 </p>
               </div>
 
               <div className="space-y-2">
-                {(['Profundo (más de 40 cm)', 'Algo de piedras (20 a 40 cm)', 'Muy pedregoso o superficial'] as const).map((opt) => (
+                {(['Deep topsoil (> 40 cm)', 'Moderately rocky (20 - 40 cm)', 'Very stony / shallow (< 20 cm)'] as const).map((opt) => (
                   <button
                     key={opt}
                     type="button"
@@ -390,16 +390,16 @@ export default function SoilDiagnosticWizardModal({
             <div className="space-y-3">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
-                  COBERTURA DEL SUELO
+                  SOIL CANOPY COVERAGE
                 </span>
-                <h3 className="text-base font-black text-[#132A1C]">Cobertura del terreno</h3>
+                <h3 className="text-base font-black text-[#132A1C]">Surface Soil Protection</h3>
                 <p className="text-xs text-zinc-500 mt-0.5">
-                  ¿Cómo está la superficie de tu parcela hoy?
+                  What is the condition of your parcel surface today?
                 </p>
               </div>
 
               <div className="space-y-2">
-                {(['Cultivo verde o rastrojo abundante', 'Rastrojo disperso o restos secos', 'Tierra desnuda expuesta al sol'] as const).map((opt) => (
+                {(['Green canopy or abundant residue mulch', 'Scattered crop residue or dry stubble', 'Bare soil exposed to solar radiation'] as const).map((opt) => (
                   <button
                     key={opt}
                     type="button"
@@ -437,16 +437,16 @@ export default function SoilDiagnosticWizardModal({
             <div className="space-y-3">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
-                  DISPONIBILIDAD DE AGUA
+                  WATER AVAILABILITY
                 </span>
-                <h3 className="text-base font-black text-[#132A1C]">Acceso al agua</h3>
+                <h3 className="text-base font-black text-[#132A1C]">Irrigation &amp; Water Access</h3>
                 <p className="text-xs text-zinc-500 mt-0.5">
-                  ¿Con qué fuente de riego cuenta tu chacra?
+                  What water source supplies your agricultural parcel?
                 </p>
               </div>
 
               <div className="space-y-2">
-                {(['Secano (solo lluvia del cielo)', 'Riego de auxilio (turno ocasional)', 'Riego permanente o reservorio'] as const).map((opt) => (
+                {(['Rainfed only (precipitation dependent)', 'Supplemental irrigation (scheduled turns)', 'Permanent irrigation / reservoir'] as const).map((opt) => (
                   <button
                     key={opt}
                     type="button"
@@ -484,16 +484,16 @@ export default function SoilDiagnosticWizardModal({
             <div className="space-y-3">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
-                  SANIDAD Y PLAGAS
+                  PLANT HEALTH &amp; PESTS
                 </span>
-                <h3 className="text-base font-black text-[#132A1C]">Sanidad de la chacra</h3>
+                <h3 className="text-base font-black text-[#132A1C]">Phytosanitary Condition</h3>
                 <p className="text-xs text-zinc-500 mt-0.5">
-                  ¿Has detectado señales de plagas o enfermedades en la última campaña?
+                  Have you observed pest or disease incidence during recent cycles?
                 </p>
               </div>
 
               <div className="space-y-2">
-                {(['Chacra sana y limpia', 'Presencia de gorgojo de los andes', 'Rancha o tizón tardío'] as const).map((opt) => (
+                {(['Healthy field with zero visible pests', 'Presence of Andean potato weevil (Premnotrypes)', 'Late blight (Phytophthora infestans)'] as const).map((opt) => (
                   <button
                     key={opt}
                     type="button"
@@ -526,14 +526,14 @@ export default function SoilDiagnosticWizardModal({
             </div>
           )}
 
-          {/* Nav Buttons (Frame 006 layout: < Atrás on left, Continuar -> on right) */}
+          {/* Nav Buttons */}
           <div className="flex items-center justify-between pt-2">
             <button
               type="button"
               onClick={handleBack}
               className="text-xs font-bold text-zinc-600 hover:text-zinc-900 cursor-pointer px-3 py-2"
             >
-              ‹ Atrás
+              ‹ Back
             </button>
 
             <button
@@ -541,7 +541,7 @@ export default function SoilDiagnosticWizardModal({
               onClick={handleNext}
               className="px-6 py-2.5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-black text-xs shadow-xs transition active:scale-95 cursor-pointer flex items-center gap-1.5"
             >
-              <span>{step === 5 ? 'Ver resultados' : 'Continuar'}</span>
+              <span>{step === 5 ? 'View Results' : 'Continue'}</span>
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -549,11 +549,11 @@ export default function SoilDiagnosticWizardModal({
           <div className="text-center pt-0.5">
             <span className="text-[10px] text-zinc-400 font-medium flex items-center justify-center gap-1">
               <HelpCircle className="w-3 h-3" />
-              Elige lo que más se parece a tu parcela hoy.
+              Select the condition that best matches your parcel today.
             </span>
           </div>
 
-          {/* Avatar Guiding Pill with real 3D avatars */}
+          {/* Avatar Guiding Pill */}
           <div className="bg-[#F7F9F6] rounded-2xl p-3 border border-[#E5ECE2] flex items-center gap-3 text-xs text-zinc-600">
             <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 overflow-hidden border border-emerald-300">
               <img
@@ -566,20 +566,20 @@ export default function SoilDiagnosticWizardModal({
               />
             </div>
             <p className="text-[11px] leading-tight font-medium">
-              {step === 1 && 'Kipu: Aprieta la tierra a la altura de las raíces; si conserva la forma sin agrietarse, el suelo tiene buena estructura.'}
-              {step === 2 && 'Kipu: La profundidad efectiva del suelo determina cuánta agua y nutrientes pueden retener tus raíces.'}
-              {step === 3 && 'Astro: Sentinel-2 detecta reflectancia; el rastrojo reduce la evaporación solar directa hasta en un 40%.'}
-              {step === 4 && 'Astro: SMAP calcula la capacidad de campo para programar riegos oportunos y evitar saturación.'}
-              {step === 5 && 'Kipu: Romper el ciclo biológico del gorgojo mediante rotación con Tarwi elimina hasta el 84% de larvas.'}
+              {step === 1 && 'Kipu: Squeeze topsoil at root depth; if it retains shape without cracking, the edaphic structure is sound.'}
+              {step === 2 && 'Kipu: Effective topsoil depth dictates water holding capacity and root nutrient absorption volume.'}
+              {step === 3 && 'Astro: Sentinel-2 telemetry indicates residue mulch reduces direct surface solar evaporation by up to 40%.'}
+              {step === 4 && 'Astro: SMAP telemetry computes field capacity to optimize irrigation scheduling and prevent root saturation.'}
+              {step === 5 && 'Kipu: Disrupting the Andean potato weevil life cycle through rotation with Tarwi eliminates up to 84% of pest larvae.'}
             </p>
           </div>
         </div>
       )}
 
-      {/* STEP 6: CONCLUSION SCREEN (Matching end_007.jpg) */}
+      {/* STEP 6: CONCLUSION SCREEN */}
       {step === 6 && (
         <div className="space-y-4 animate-in fade-in">
-          {/* Top Circular Gauge 88/100 */}
+          {/* Top Circular Gauge */}
           <div className="flex flex-col items-center justify-center text-center space-y-2 pt-2">
             <div className="relative flex items-center justify-center w-28 h-28">
               <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 90 90">
@@ -611,7 +611,7 @@ export default function SoilDiagnosticWizardModal({
               </div>
             </div>
 
-            {/* Badge: Resiliencia Dinámica */}
+            {/* Badge */}
             <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black ${
               calculatedHealthScore >= 75
                 ? 'bg-emerald-100 text-emerald-900 border border-emerald-300/60'
@@ -622,10 +622,10 @@ export default function SoilDiagnosticWizardModal({
               <Check className="w-3.5 h-3.5 text-emerald-800 stroke-[3]" />
               <span>
                 {calculatedHealthScore >= 75
-                  ? 'Resiliencia favorable'
+                  ? 'Favorable resilience'
                   : calculatedHealthScore >= 50
-                  ? 'Resiliencia moderada'
-                  : 'Atención requerida'}
+                  ? 'Moderate resilience'
+                  : 'Attention required'}
               </span>
             </div>
 
@@ -633,7 +633,7 @@ export default function SoilDiagnosticWizardModal({
             <div className="pt-1">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-900 border border-emerald-200/80">
                 <MapPin className="w-3 h-3 text-emerald-700" />
-                <span>Diagnóstico guardado en: <strong>{parcelName}</strong></span>
+                <span>Diagnostic saved to: <strong>{parcelName}</strong></span>
               </span>
             </div>
           </div>
@@ -641,24 +641,24 @@ export default function SoilDiagnosticWizardModal({
           {/* Editorial Header */}
           <div className="text-center space-y-1">
             <h2 className="text-2xl font-black text-[#132A1C] leading-tight">
-              Tu suelo tiene{' '}
+              Your soil demonstrates{' '}
               <span className="font-serif italic text-emerald-800 font-normal">
                 {calculatedHealthScore >= 75
-                  ? 'un buen punto de partida.'
+                  ? 'a robust edaphic baseline.'
                   : calculatedHealthScore >= 50
-                  ? 'capacidad de recuperación.'
-                  : 'necesidad de cuidados especiales.'}
+                  ? 'good recovery potential.'
+                  : 'urgent conservation needs.'}
               </span>
             </h2>
             <p className="text-xs text-zinc-600 max-w-xs mx-auto">
-              Con estas prácticas puedes aumentar su resiliencia antes de la siguiente campaña.
+              Apply these agronomic practices to reinforce soil resilience prior to the next campaign.
             </p>
           </div>
 
-          {/* TRES ACCIONES PARA TU CHACRA (DINÁMICAS SEGÚN RESPUESTAS) */}
+          {/* THREE AGROECOLOGICAL ACTIONS FOR YOUR FIELD */}
           <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] space-y-3">
             <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/60 block">
-              TRES ACCIONES PARA TU CHACRA
+              THREE AGROECOLOGICAL ACTIONS FOR YOUR FIELD
             </span>
 
             {/* Action 01 */}
@@ -701,7 +701,7 @@ export default function SoilDiagnosticWizardModal({
             </div>
           </div>
 
-          {/* Ver Plan de Rotación Button */}
+          {/* View Crop Rotation Plan Button */}
           <button
             type="button"
             onClick={() => {
@@ -721,7 +721,7 @@ export default function SoilDiagnosticWizardModal({
             }}
             className="w-full py-3.5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-black text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-98 cursor-pointer"
           >
-            <span>Ver plan de rotación</span>
+            <span>View Crop Rotation Plan</span>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>

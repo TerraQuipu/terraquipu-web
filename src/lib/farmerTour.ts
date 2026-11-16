@@ -12,223 +12,223 @@ export function createFarmerTour(options?: FarmerTourOptions) {
   const { onSetDecisionStep, onComplete } = options || {};
 
   const steps: DriveStep[] = [
-    // 1. Bienvenida e Identidad del Visor
+    // 1. Welcome & Visor Identity
     {
       element: '#tour-brand',
       popover: {
-        title: '🌾 Bienvenido al Visor Terraquipu',
+        title: 'Welcome to the TerraQuipu GIS Suite',
         description:
-          'Esta plataforma fue creada para que tú y tu comunidad tomen las mejores decisiones de siembra, protejan el agua de su suelo y prevengan pérdidas por heladas o sequías usando satélites de la NASA y sabiduría andina.',
+          'This geospatial platform enables you and your community to make rigorous agronomic planting decisions, safeguard root-zone soil moisture, and mitigate frost or drought losses using NASA Earth Observation telemetry and Andean agroecology.',
         side: 'bottom',
         align: 'start',
       },
     },
 
-    // 2. Herramienta Trazar Parcela
+    // 2. Delineate Parcel Tool
     {
       element: '#tour-tool-draw-polygon',
       popover: {
-        title: '✏️ Trazar Parcela (Límites de tu Chacra)',
+        title: 'Delineate Parcel (Field Boundaries)',
         description:
-          'Haz clic aquí para dibujar el contorno exacto de tu terreno haciendo toques sobre el mapa en cada esquina o lindero. El sistema calculará al instante los metros cuadrados y hectáreas reales.',
+          'Click here to trace the exact polygonal boundary of your parcel by clicking vertices along edges and corners. The system computes surface area in hectares and square meters instantly.',
         side: 'bottom',
         align: 'center',
       },
     },
 
-    // 3. Herramienta Clic en Terreno
+    // 3. Quick Point Click Tool
     {
       element: '#tour-tool-click-point',
       popover: {
-        title: '🎯 Clic Rápido en Terreno',
+        title: 'Quick Point Click on Terrain',
         description:
-          'Si no deseas marcar esquina por esquina, activa esta opción y haz un solo toque sobre cualquier ladera o andén del mapa. Terraquipu creará una parcela de referencia con la altura y pendiente de ese lugar.',
+          'If you prefer not to trace corner by corner, toggle this tool and tap once on any terrace or hillside. TerraQuipu generates a calibrated reference parcel with local SRTM slope and elevation metrics.',
         side: 'bottom',
         align: 'center',
       },
     },
 
-    // 4. Presets Comunales
+    // 4. Communal Reference Sectors
     {
       element: '#tour-presets',
       popover: {
-        title: '🏔️ Sectores Comunales de Chinchero',
+        title: 'Communal Terracing Sectors',
         description:
-          'Accede rápidamente a andenerías y sectores de referencia conocidos (Yanacona, Taucca y Cuper Alto). Al tocarlos, el mapa vuela a esa zona y actualiza la información satelital en vivo.',
+          'Quickly fly to known communal terracing sectors (Yanacona, Taucca, and Cuper Alto). Clicking flies the camera directly and pulls real-time satellite telemetry.',
         side: 'bottom',
         align: 'center',
       },
     },
 
-    // 5. Sensor NASA SMAP
+    // 5. NASA SMAP Radar
     {
       element: '#tour-sensor-smap',
       popover: {
-        title: '💧 Sensor NASA SMAP (Agua en la Raíz)',
+        title: 'NASA SMAP Radar (Root-Zone Moisture)',
         description:
-          'Mide con radar cuánta agua hay bajo la tierra en el estrato donde comen las raíces (0-100 cm). Te indica si el suelo tiene humedad óptima para sembrar o si sufre estrés por falta de lluvias.',
+          'Measures topsoil volumetric water content (0-5 cm microwave radiometry / root-zone assimilation). Identifies whether soil moisture is optimal for sowing or facing hydrological drought deficit.',
         side: 'bottom',
         align: 'center',
       },
     },
 
-    // 6. Sensor NDVI
+    // 6. Sentinel-2 NDVI
     {
       element: '#tour-sensor-ndvi',
       popover: {
-        title: '🌱 Sensor NDVI (Salud y Vigor del Cultivo)',
+        title: 'Sentinel-2 NDVI (Vegetation Vigor & Chlorophyll)',
         description:
-          'Observa mediante satélite qué tan verde, frondoso y vivo está el follaje de las plantas. Te ayuda a detectar a tiempo si una zona del cultivo se está amarilleando, secando o sufriendo plagas.',
+          'Monitors photosynthetic activity and green canopy density via Sentinel-2 optical bands. Enables early detection of crop stress, senescence, or pest infestation.',
         side: 'bottom',
         align: 'center',
       },
     },
 
-    // 7. Sensor SRTM
+    // 7. NASA SRTM
     {
       element: '#tour-sensor-srtm',
       popover: {
-        title: '⛰️ Sensor SRTM (Pendiente y Altitud)',
+        title: 'NASA SRTM (Elevation & Slope Gradient)',
         description:
-          'Calcula qué tan empinada está la ladera y a cuántos metros sobre el nivel del mar se ubica tu chacra. Es fundamental para saber si necesitas andenes, terrazas o zanjas para evitar que la lluvia arrastre la tierra fértil.',
+          'Computes hillside slope gradient (%) and meters above sea level (m a.s.l.). Essential for evaluating erosion risk, contour furrow requirements, and terrace maintenance.',
         side: 'bottom',
         align: 'center',
       },
     },
 
-    // 8. Ground-Truth Comunal
+    // 8. Communal Ground-Truth
     {
       element: '#tour-sensor-groundtruth',
       popover: {
-        title: '👥 Ground-Truth (Validación de la Comunidad)',
+        title: 'Communal Ground-Truth Telemetry',
         description:
-          'Muestra las parcelas donde campesinos y técnicos vecinos han verificado la salud del suelo y plagas directamente con sus manos. Une la tecnología del espacio con la voz real del campo.',
+          'Displays validation points where agricultural technicians and local farmers have verified soil health and pests in-situ, bridging spaceborne remote sensing with field reality.',
         side: 'bottom',
         align: 'center',
       },
     },
 
-    // 9. HUD Ficha Parcela Activa
+    // 9. Active Parcel Telemetry HUD
     {
       element: '#tour-parcel-hud',
       popover: {
-        title: '📋 Ficha Resumen de tu Parcela',
+        title: 'Active Parcel Telemetry HUD',
         description:
-          'En este cuadro ves de un solo vistazo el tamaño de tu terreno (en hectáreas), el porcentaje de humedad radicular, el vigor vegetal y el botón para descargar el archivo geográfico para mapas (QGIS).',
+          'Summarizes parcel surface area (ha), root-zone moisture percentage, vegetative vigor, and exports GeoJSON/Shapefile boundary layers for GIS platforms.',
         side: 'top',
         align: 'start',
       },
     },
 
-    // 10. Selector de Capas Base
+    // 10. Basemap Layer Toggle
     {
       element: '#tour-map-layers',
       popover: {
-        title: '🗺️ Tipo de Mapa (Satelital / Topográfico)',
+        title: 'Basemap Layer Toggle',
         description:
-          'Cambia entre el mapa de caminos (OpenStreetMap), las curvas de nivel (Topográfico) o la foto satelital real de alta resolución para ubicar tus linderos, árboles y senderos.',
+          'Switch between OpenStreetMap road network, topographic contour lines, or high-resolution Esri World Imagery satellite basemaps to identify field landmarks.',
         side: 'top',
         align: 'end',
       },
     },
 
-    // 11. Stepper del Flujo de Decisión
+    // 11. 4-Step Decision Stepper
     {
       element: '#tour-decision-stepper',
       onHighlightStarted: () => {
         if (onSetDecisionStep) onSetDecisionStep('parcel');
       },
       popover: {
-        title: '🧭 Flujo de 4 Pasos del Planificador',
+        title: '4-Step Decision Planning Flow',
         description:
-          'A tu derecha tienes la ruta guiada para planificar tu campaña: 1) Datos de Parcela, 2) Diagnóstico Satelital, 3) Plan Quipu de Rotación, y 4) Asistente frente a heladas.',
+          'Guided decision pathway on your right: 1) Parcel Geometry, 2) Satellite & Climate Diagnostics, 3) Quipu Rotational Plan, and 4) Preventative Agroclimatic Assistant.',
         side: 'bottom',
         align: 'center',
       },
     },
 
-    // 12. Paso 1: Calibración en Campo (Ground-Truth 5+1)
+    // 12. Step 1: In-Situ Ground-Truth Calibration
     {
       element: '#tour-groundtruth-card',
       onHighlightStarted: () => {
         if (onSetDecisionStep) onSetDecisionStep('parcel');
       },
       popover: {
-        title: '✨ Calibración 5+1 (Kipu y Astro)',
+        title: '5-Step In-Situ Ground-Truth Calibration',
         description:
-          'Responde 5 preguntas sencillas guiadas por Kipu y Astro sobre cómo sientes tu tierra (textura del suelo, abonos usados, riego). Esto permite afinar los satélites a la realidad exacta de tu chacra.',
+          'Answer 5 structured agronomic questions regarding soil texture, amendments, and water access to ground-truth calibrate NASA radar signals to your parcel.',
         side: 'left',
         align: 'center',
       },
     },
 
-    // 13. Paso 2: Simulación Clima y El Niño
+    // 13. Step 2: ENSO Drought Simulation
     {
       element: '#tour-climate-mode',
       onHighlightStarted: () => {
         if (onSetDecisionStep) onSetDecisionStep('satellite');
       },
       popover: {
-        title: '☀️ Simular El Niño vs Año Normal',
+        title: 'ENSO Drought vs. Baseline Climate Simulation',
         description:
-          'Prueba este botón para ver qué pasaría si viene sequía por El Niño (-24% de lluvia). Terraquipu adaptará de inmediato los cultivos recomendados hacia semillas andinas rústicas que resisten la falta de agua.',
+          'Simulate the impact of an ENSO drought anomaly (-24% seasonal precipitation). The system automatically pivots crop recommendations toward resilient rustic Andean cultivars.',
         side: 'left',
         align: 'center',
       },
     },
 
-    // 14. Paso 3: Preguntas de Cultivo Anterior y Prioridad
+    // 14. Step 3: Rotational Predecessor & Management Goal
     {
       element: '#tour-rotation-inputs',
       onHighlightStarted: () => {
         if (onSetDecisionStep) onSetDecisionStep('rotation');
       },
       popover: {
-        title: '🥔 ¿Qué cosechaste y qué necesitas?',
+        title: 'Rotational Predecessor & Management Goal',
         description:
-          'Dinos qué sembraste en la última campaña (papa, quinua, haba o tarwi) y si tu meta este año es asegurar alimento para tu hogar, vender en la feria o curar el suelo cansado.',
+          'Specify the predecessor crop cultivated during the prior campaign and designate your primary management priority (food security, commercial fair, or soil fertility restoration).',
         side: 'left',
         align: 'center',
       },
     },
 
-    // 15. Paso 3: Recomendación Científica y Ahorro en Soles
+    // 15. Step 3: Scientific Succession Recommendation
     {
       element: '#tour-rotation-recommendation',
       onHighlightStarted: () => {
         if (onSetDecisionStep) onSetDecisionStep('rotation');
       },
       popover: {
-        title: '🏆 Cultivo Recomendado y Ahorro de Abono',
+        title: 'Scientific Succession Recommendation & Savings',
         description:
-          'El motor científico te indica la mejor semilla para rotar (por ejemplo, Tarwi tras Papa). Te muestra cuántos sacos de abono te ahorras en soles (S/.) gracias al nitrógeno natural y cómo cortar plagas como el gorgojo andino. ¡Incluso puedes escuchar la explicación en audio!',
+          'The agroecological engine recommends optimal crop succession (e.g., Tarwi following Native Potato). Calculates synthetic fertilizer savings (PEN) from biological nitrogen fixation.',
         side: 'left',
         align: 'center',
       },
     },
 
-    // 16. Paso 3: Guardar Plan en la Nube y Descargar Informe
+    // 16. Step 3: Save Plan & Export Dossier
     {
       element: '#tour-save-cloud',
       onHighlightStarted: () => {
         if (onSetDecisionStep) onSetDecisionStep('rotation');
       },
       popover: {
-        title: '💾 Guardar Plan y Descargar Informe',
+        title: 'Save Plan & Export Agronomic Dossier',
         description:
-          'Guarda tu plan agrícola y genera un informe listo para imprimir o abrir en Word (.doc) para gestionar créditos en agencias agrarias o compartirlo con la asamblea comunal.',
+          'Persist your campaign plan to cloud storage and download an executive agronomic report (.doc) for agricultural credit applications or communal assembly review.',
         side: 'top',
         align: 'center',
       },
     },
 
-    // 17. Botón de Paseo Guiado en Cabecera
+    // 17. Guided Tour Replay
     {
       element: '#tour-start-btn',
       popover: {
-        title: '🌾 ¿Quieres repasar este paseo después?',
+        title: 'Revisit Guided Tour Anytime',
         description:
-          '¡Listo! Cuando quieras volver a recordar qué hace cada herramienta o mostrárselo a otro comunero, presiona este botón "Paseo Guiado" en cualquier momento.',
+          'Click "Guided Tour" in the top header at any point to replay this walkthrough or demonstrate geospatial tools to communal colleagues.',
         side: 'bottom',
         align: 'end',
       },
@@ -242,10 +242,10 @@ export function createFarmerTour(options?: FarmerTourOptions) {
     allowClose: true,
     stagePadding: 4,
     stageRadius: 8,
-    progressText: 'Paso {{current}} de {{total}}',
-    nextBtnText: 'Siguiente →',
-    prevBtnText: '← Anterior',
-    doneBtnText: '¡Entendido!',
+    progressText: 'Step {{current}} of {{total}}',
+    nextBtnText: 'Next ->',
+    prevBtnText: '<- Previous',
+    doneBtnText: 'Finish Tour',
     waitForElement: 1200,
     onDestroyed: () => {
       if (typeof window !== 'undefined') {

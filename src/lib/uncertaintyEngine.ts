@@ -82,7 +82,7 @@ export interface ResultadoIncertidumbre {
   incertidumbre_total_porcentaje: number;
   fiabilidad_porcentaje: number; // 100 - total (mínimo 0)
   desglose_penalizaciones: DesglosePenalizaciones;
-  nivel_confianza_ux: 'Alta (🟢)' | 'Media (🟡)' | 'Baja (🔴)';
+  nivel_confianza_ux: 'High (🟢)' | 'Medium (🟡)' | 'Low (🔴)' | 'Alta (🟢)' | 'Media (🟡)' | 'Baja (🔴)';
   nivel_simple: 'alta' | 'media' | 'baja';
   motivos_principales: string[];
 }
@@ -115,7 +115,7 @@ export function calcular_incertidumbre_recomendacion(
   desglose.clima_base = i_clima;
   i_total += i_clima;
   if (i_clima > 25) {
-    motivos.push(`Pronóstico climático regional con dispersión (${prob_oficial}% certidumbre oficial).`);
+    motivos.push(`Regional climate forecast dispersion (${prob_oficial}% official certainty).`);
   }
 
   // 2. Incertidumbre Espacial (Topografía / Tamaño del polígono del Visor)
@@ -131,9 +131,9 @@ export function calcular_incertidumbre_recomendacion(
   if (area_m2 < 1000 || area_m2 > 30000) {
     i_espacial = 15;
     if (area_m2 < 1000) {
-      motivos.push('Parcela menor a 1,000 m² (inferior a la resolución del sensor SMAP/NASA).');
+      motivos.push('Parcel smaller than 1,000 m2 (below SMAP/NASA microwave sensor resolution).');
     } else {
-      motivos.push('Parcela extensa (>3 ha): posible heterogeneidad de pendientes y humedad.');
+      motivos.push('Extensive parcel (>3 ha): potential slope and moisture heterogeneity.');
     }
   }
   desglose.geometria_espacial = i_espacial;
@@ -149,10 +149,10 @@ export function calcular_incertidumbre_recomendacion(
     precipitacion_api > 5.0
   ) {
     i_macro_micro = 15;
-    motivos.push('Discrepancia macro-micro: Alerta regional de sequía, pero agrometeo local reporta lluvia.');
+    motivos.push('Macro-micro discrepancy: Regional drought advisory, but local agrometeo reports precipitation.');
   } else if (escenario === 'lluvias_intensas' && precipitacion_api === 0.0) {
     i_macro_micro = 15;
-    motivos.push('Discrepancia macro-micro: Alerta de lluvias fuertes, pero sensores locales registran sequedad.');
+    motivos.push('Macro-micro discrepancy: Severe rain warning, but local sensors record dry conditions.');
   }
   desglose.choque_macro_micro = i_macro_micro;
   i_total += i_macro_micro;
@@ -164,7 +164,7 @@ export function calcular_incertidumbre_recomendacion(
     ('cobertura' in discrepancias_esenciales || 'agua' in discrepancias_esenciales)
   ) {
     i_satelite = 20;
-    motivos.push('Corrección in situ: La observación en campo del agricultor rectificó la lectura de NDVI satelital.');
+    motivos.push('In-situ correction: Farmer ground observation rectified satellite NDVI reading.');
   }
   desglose.satelite_ciego = i_satelite;
   i_total += i_satelite;
@@ -179,7 +179,7 @@ export function calcular_incertidumbre_recomendacion(
     i_edafica = 5; // Leve margen empírico
   } else if (origen_textura === 'desconocido') {
     i_edafica = 10;
-    motivos.push('Textura inferida por modelo global SoilGrids (resolución 250 m).');
+    motivos.push('Soil texture inferred from SoilGrids global model (250 m resolution).');
   }
   desglose.resolucion_edafica = i_edafica;
   i_total += i_edafica;
@@ -195,23 +195,23 @@ export function calcular_incertidumbre_recomendacion(
     (a_de_esa && typeof a_de_esa === 'object' && a_de_esa.cultivo === 'otro')
   ) {
     i_historial = 5;
-    motivos.push('Historial con cultivo no estándar: ajuste aproximado de balance de nitrógeno.');
+    motivos.push('Non-standard crop in rotational history: Approximate nitrogen balance adjustment.');
   }
   desglose.historial_desconocido = i_historial;
   i_total += i_historial;
 
   // --- Traducción de la Incertidumbre a UX (Semáforo de la App) ---
-  let nivel_ux: 'Alta (🟢)' | 'Media (🟡)' | 'Baja (🔴)';
+  let nivel_ux: 'High (🟢)' | 'Medium (🟡)' | 'Low (🔴)' | 'Alta (🟢)' | 'Media (🟡)' | 'Baja (🔴)';
   let nivel_simple: 'alta' | 'media' | 'baja';
 
   if (i_total <= 20) {
-    nivel_ux = 'Alta (🟢)';
+    nivel_ux = 'High (🟢)';
     nivel_simple = 'alta';
   } else if (i_total <= 45) {
-    nivel_ux = 'Media (🟡)';
+    nivel_ux = 'Medium (🟡)';
     nivel_simple = 'media';
   } else {
-    nivel_ux = 'Baja (🔴)';
+    nivel_ux = 'Low (🔴)';
     nivel_simple = 'baja';
   }
 

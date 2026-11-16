@@ -264,3 +264,25 @@ export function resetDeviceProfile(): void {
   }
 }
 
+export const APP_LANGUAGE_KEY = 'terraquipu_app_language';
+
+export function getStoredLanguage(): 'es' | 'qu' {
+  if (typeof window === 'undefined') return 'es';
+  try {
+    const lang = localStorage.getItem(APP_LANGUAGE_KEY);
+    return lang === 'qu' ? 'qu' : 'es';
+  } catch (e) {
+    return 'es';
+  }
+}
+
+export function saveStoredLanguage(lang: 'es' | 'qu'): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(APP_LANGUAGE_KEY, lang);
+    window.dispatchEvent(new Event('languageChange'));
+  } catch (e) {
+    // ignore
+  }
+}
+

@@ -72,7 +72,7 @@ export default function ChacraTab({
 }: ChacraTabProps) {
   // Parcels list from local storage
   const [parcels, setParcels] = useState<ParcelItem[]>([]);
-  const [selectedCropFilter, setSelectedCropFilter] = useState<string>('Todos');
+  const [selectedCropFilter, setSelectedCropFilter] = useState<string>('All');
   const [selectedParcel, setSelectedParcel] = useState<ParcelItem | null>(null);
   const [calibratingParcel, setCalibratingParcel] = useState<ParcelItem | null>(null);
 
@@ -108,21 +108,21 @@ export default function ChacraTab({
     playBubblePop();
     const next = !layerSmap;
     setLayerSmap(next);
-    onToast(next ? 'Capa SMAP humedad activada' : 'Capa SMAP desactivada');
+    onToast(next ? 'NASA SMAP soil moisture layer enabled' : 'SMAP moisture layer disabled');
   };
 
   const handleToggleNdvi = () => {
     playBubblePop();
     const next = !layerNdvi;
     setLayerNdvi(next);
-    onToast(next ? 'Capa NDVI vegetación activada' : 'Capa NDVI desactivada');
+    onToast(next ? 'Sentinel-2 NDVI vegetation layer enabled' : 'NDVI layer disabled');
   };
 
   const handleToggleDrought = () => {
     playBubblePop();
     const next = !layerDrought;
     setLayerDrought(next);
-    onToast(next ? 'Capa Calor y sequía activada' : 'Capa Sequía desactivada');
+    onToast(next ? 'Thermal drought risk layer enabled' : 'Drought risk layer disabled');
   };
 
   const handleSelectParcel = (parcel: ParcelItem) => {
@@ -157,7 +157,7 @@ export default function ChacraTab({
     const updatedSelected = updatedList.find((p) => p.id === editingParcel.id) || null;
     setSelectedParcel(updatedSelected);
     setEditingParcel(null);
-    onToast('Parcela actualizada correctamente');
+    onToast('Parcel updated successfully');
   };
 
   const handleDeleteConfirm = () => {
@@ -170,15 +170,15 @@ export default function ChacraTab({
       setSelectedParcel(null);
     }
     setDeletingParcelId(null);
-    onToast('Parcela eliminada');
+    onToast('Parcel deleted');
   };
 
-  const filteredParcels = selectedCropFilter === 'Todos'
+  const filteredParcels = selectedCropFilter === 'All'
     ? parcels
     : parcels.filter((p) => p.cropCategory === selectedCropFilter || p.cropName.includes(selectedCropFilter));
 
   // =========================================================================
-  // VISTA CALIBRACIÓN DINÁMICA POR PARCELA
+  // DYNAMIC CALIBRATION VIEW PER PARCEL
   // =========================================================================
   if (calibratingParcel) {
     return (
@@ -189,7 +189,7 @@ export default function ChacraTab({
           setParcels(refreshed);
           setSelectedParcel(calibrated);
           setCalibratingParcel(null);
-          onToast(`¡Calibración guardada exitosamente para "${calibrated.name}"!`);
+          onToast(`In-situ calibration saved successfully for "${calibrated.name}"!`);
         }}
         onCancel={() => setCalibratingParcel(null)}
       />
@@ -197,7 +197,7 @@ export default function ChacraTab({
   }
 
   // =========================================================================
-  // VISTA 1: MIS PARCELAS (CARDS VIEW)
+  // VIEW 1: FIELD PARCELS (CARDS VIEW)
   // =========================================================================
   if (!selectedParcel) {
     return (
@@ -206,10 +206,10 @@ export default function ChacraTab({
         <div className="flex items-start justify-between px-1 pt-1">
           <div>
             <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-900/60 block">
-              CAMPO Y SABERES
+              FIELD & INDIGENOUS KNOWLEDGE
             </span>
             <h1 className="text-xl sm:text-2xl font-semibold text-[#132A1C] leading-tight">
-              Mis parcelas
+              Field Parcels
             </h1>
           </div>
 
@@ -222,14 +222,14 @@ export default function ChacraTab({
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-semibold text-xs transition cursor-pointer shadow-xs active:scale-95"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
-            <span>Nueva parcela</span>
+            <span>New Parcel</span>
           </button>
         </div>
 
         {/* Filter Pills */}
         {parcels.length > 0 && (
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            {['Todos', 'Papa nativa', 'Maíz', 'Quinua', 'Cebada', 'Habas'].map((filter) => {
+            {['All', 'Native Andean Potato', 'Giant White Corn', 'Real Quinoa', 'Barley', 'Broad Bean'].map((filter) => {
               const isSelected = selectedCropFilter === filter;
               return (
                 <button
@@ -252,7 +252,7 @@ export default function ChacraTab({
           </div>
         )}
 
-        {/* Cards Grid or Cordial Empty State */}
+        {/* Cards Grid or Empty State */}
         {parcels.length === 0 ? (
           <div className="bg-white rounded-3xl p-8 border border-[#E5ECE2] text-center space-y-3.5 shadow-xs">
             <div className="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center mx-auto text-emerald-800 shadow-xs">
@@ -260,10 +260,10 @@ export default function ChacraTab({
             </div>
             <div className="space-y-1">
               <h3 className="text-base font-bold text-zinc-800">
-                Aún no has delimitado tus parcelas
+                No parcels delimited yet
               </h3>
               <p className="text-xs text-zinc-600 max-w-xs mx-auto leading-relaxed">
-                Dibuja el contorno de tu primera chacra en el mapa satelital para calibrar la humedad NASA y el calendario preventivo.
+                Trace your first parcel perimeter on the satellite map to calibrate NASA moisture telemetry and the preventative schedule.
               </p>
             </div>
             <button
@@ -275,7 +275,7 @@ export default function ChacraTab({
               }}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-semibold text-xs shadow-md transition active:scale-95 cursor-pointer"
             >
-              <span>Delimitar mi primera parcela</span>
+              <span>Delimit First Parcel</span>
               <Plus className="w-4 h-4 stroke-[2.5]" />
             </button>
           </div>
@@ -284,9 +284,9 @@ export default function ChacraTab({
             <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto text-emerald-800">
               <MapPin className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-zinc-800">No hay parcelas en esta categoría</h3>
+            <h3 className="text-base font-bold text-zinc-800">No parcels in this category</h3>
             <p className="text-xs text-zinc-600 max-w-xs mx-auto">
-              Delimita una nueva parcela utilizando el visor satelital con el botón superior.
+              Delimit a new parcel using the satellite viewer above.
             </p>
             <button
               type="button"
@@ -297,7 +297,7 @@ export default function ChacraTab({
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#7BB63E] text-[#132A1C] font-semibold text-xs"
             >
               <Plus className="w-4 h-4" />
-              <span>Delimitar con Visor QGIS</span>
+              <span>Delimit with QGIS Viewer</span>
             </button>
           </div>
         ) : (
@@ -332,7 +332,7 @@ export default function ChacraTab({
                         parcel.fechaCalibracion ? 'bg-[#A3E635]' : 'bg-amber-400 animate-pulse'
                       }`}
                     />
-                    <span>{parcel.fechaCalibracion ? 'Calibrada 🟢' : 'Pendiente 🟡'}</span>
+                    <span>{parcel.fechaCalibracion ? 'Calibrated 🟢' : 'Pending 🟡'}</span>
                   </div>
                 </div>
 
@@ -350,7 +350,7 @@ export default function ChacraTab({
                   {/* 3 Metric Pills */}
                   <div className="grid grid-cols-3 gap-1.5 pt-1 text-center font-mono">
                     <div className="bg-[#132A1C]/80 backdrop-blur-xs rounded-xl p-1.5 border border-white/10">
-                      <span className="text-[9px] text-zinc-400 block">ÁREA</span>
+                      <span className="text-[9px] text-zinc-400 block">AREA</span>
                       <span className="text-xs font-bold text-white">{parcel.areaHa} ha</span>
                     </div>
                     <div className="bg-[#132A1C]/80 backdrop-blur-xs rounded-xl p-1.5 border border-white/10">
@@ -358,13 +358,13 @@ export default function ChacraTab({
                       <span className="text-xs font-bold text-[#A3E635]">{parcel.smapHumidity}%</span>
                     </div>
                     <div className="bg-[#132A1C]/80 backdrop-blur-xs rounded-xl p-1.5 border border-white/10">
-                      <span className="text-[9px] text-zinc-400 block">SALUD</span>
+                      <span className="text-[9px] text-zinc-400 block">HEALTH</span>
                       <span className="text-xs font-bold text-white">{parcel.healthScore}/100</span>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between pt-1 text-[11px] text-emerald-300 font-semibold">
-                    <span>Ver mapa e informe satelital</span>
+                    <span>View map & satellite report</span>
                     <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
@@ -377,7 +377,7 @@ export default function ChacraTab({
   }
 
   // =========================================================================
-  // VISTA 2: DETALLE DE PARCELA (SATELLITE MAP + LAYER TOGGLES + EDIT/DELETE)
+  // VIEW 2: PARCEL DETAIL (SATELLITE MAP + LAYER TOGGLES + EDIT/DELETE)
   // =========================================================================
   const currentArea = selectedParcel.areaHa;
   const topos = (currentArea * 3.3).toFixed(1);
@@ -397,16 +397,16 @@ export default function ChacraTab({
             className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 hover:text-emerald-950 transition cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Volver a Mis Parcelas</span>
+            <span>Back to Field Parcels</span>
           </button>
           <div>
             <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-900/60 block">
               {selectedParcel.microcuenca.toUpperCase()}
             </span>
             <h1 className="text-xl sm:text-2xl font-semibold text-[#132A1C] leading-tight">
-              Tu campo,{' '}
+              Your field,{' '}
               <span className="italic text-emerald-800 font-normal">
-                desde arriba.
+                from orbit.
               </span>
             </h1>
           </div>
@@ -419,7 +419,7 @@ export default function ChacraTab({
             setShowInfoModal(!showInfoModal);
           }}
           className="w-9 h-9 rounded-full bg-white border border-[#E5ECE2] text-zinc-600 hover:text-emerald-800 flex items-center justify-center shadow-xs transition cursor-pointer"
-          title="Información de capas satelitales"
+          title="Satellite Telemetry Guide"
         >
           <HelpCircle className="w-5 h-5" />
         </button>
@@ -429,7 +429,7 @@ export default function ChacraTab({
       {showInfoModal && (
         <div className="bg-white rounded-2xl p-3.5 border border-[#E5ECE2] shadow-sm text-xs text-zinc-700 space-y-2 animate-in fade-in">
           <div className="flex items-center justify-between font-semibold text-emerald-900 text-[11px] uppercase">
-            <span>Guía de Telemetría Satelital</span>
+            <span>Satellite Telemetry Guide</span>
             <button
               type="button"
               onClick={() => setShowInfoModal(false)}
@@ -439,12 +439,12 @@ export default function ChacraTab({
             </button>
           </div>
           <p className="leading-relaxed">
-            Las capas combinan radiometría radar L-band (NASA SMAP) a 9 km interpolada con topografía SRTM 30m y reflectancia espectral Sentinel-2 para el Valle de Urubamba.
+            The layers combine NASA SMAP L-band radar radiometry interpolated with SRTM 30m topography and Sentinel-2 spectral reflectance for the Urubamba Watershed.
           </p>
         </div>
       )}
 
-      {/* 2. SATELLITE MAP CONTAINER (CONCENTRIC RADAR RINGS & OVERLAYS - Imagen 8) */}
+      {/* 2. SATELLITE MAP CONTAINER */}
       <div className="relative overflow-hidden rounded-3xl bg-[#132A1C] border border-[#E5ECE2] shadow-sm min-h-[300px] h-[300px]">
         {/* Leaflet Satellite Map Layer */}
         <div className="h-full w-full relative z-0">
@@ -467,16 +467,16 @@ export default function ChacraTab({
           <div className="w-80 h-80 rounded-full border border-white/10 border-dashed absolute" />
         </div>
 
-        {/* Top Floating Badges on Map: LOCALIDAD · MSNM · EN VIVO */}
+        {/* Top Floating Badges on Map */}
         <div className="absolute top-3 left-3 right-3 z-20 flex items-center justify-between pointer-events-none">
           <div className="bg-[#132A1C]/85 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/15 text-[10px] font-bold text-white flex items-center gap-1 shadow-sm">
             <MapPin className="w-3 h-3 text-[#A3E635]" />
-            <span>{selectedParcel.name.split('•')[0].trim().toUpperCase()} · {selectedParcel.altitudeMsnm} MSNM</span>
+            <span>{selectedParcel.name.split('•')[0].trim().toUpperCase()} · {selectedParcel.altitudeMsnm} M A.S.L.</span>
           </div>
 
           <div className="bg-[#132A1C]/85 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/15 text-[10px] font-bold text-[#A3E635] flex items-center gap-1 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-[#A3E635] animate-ping" />
-            <span>EN VIVO</span>
+            <span>LIVE</span>
           </div>
         </div>
 
@@ -489,7 +489,7 @@ export default function ChacraTab({
               onOpenQgisDrawer();
             }}
             className="absolute bottom-3 right-3 z-20 bg-white/90 hover:bg-white text-[#132A1C] text-[10px] font-semibold px-2.5 py-1 rounded-xl shadow-md border border-zinc-200 flex items-center gap-1 cursor-pointer transition active:scale-95"
-            title="Redelimitar con visor satelital QGIS"
+            title="Redelimit with QGIS satellite viewer"
           >
             <PenTool className="w-3 h-3 text-emerald-800" />
             <span>QGIS</span>
@@ -497,10 +497,10 @@ export default function ChacraTab({
         )}
       </div>
 
-      {/* 3. LAYER TOGGLE SWITCHES UNDER MAP (Exact styling from Frame 003 / Imagen 8) */}
+      {/* 3. LAYER TOGGLE SWITCHES UNDER MAP */}
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          {/* Toggle 1: SMAP humedad */}
+          {/* Toggle 1: SMAP moisture */}
           <button
             type="button"
             onClick={handleToggleSmap}
@@ -512,7 +512,7 @@ export default function ChacraTab({
           >
             <div className="flex items-center gap-1.5 min-w-0">
               <Droplets className={`w-3.5 h-3.5 shrink-0 ${layerSmap ? 'text-emerald-700' : 'text-zinc-400'}`} />
-              <span className="truncate">SMAP humedad</span>
+              <span className="truncate">SMAP moisture</span>
             </div>
             <div
               className={`w-8 h-4.5 rounded-full transition-colors p-0.5 flex items-center shrink-0 ${
@@ -527,7 +527,7 @@ export default function ChacraTab({
             </div>
           </button>
 
-          {/* Toggle 2: NDVI vegetación */}
+          {/* Toggle 2: NDVI vegetation */}
           <button
             type="button"
             onClick={handleToggleNdvi}
@@ -539,7 +539,7 @@ export default function ChacraTab({
           >
             <div className="flex items-center gap-1.5 min-w-0">
               <Leaf className={`w-3.5 h-3.5 shrink-0 ${layerNdvi ? 'text-emerald-700' : 'text-zinc-400'}`} />
-              <span className="truncate">NDVI vegetación</span>
+              <span className="truncate">NDVI vegetation</span>
             </div>
             <div
               className={`w-8 h-4.5 rounded-full transition-colors p-0.5 flex items-center shrink-0 ${
@@ -555,7 +555,7 @@ export default function ChacraTab({
           </button>
         </div>
 
-        {/* Toggle 3: Calor y sequía */}
+        {/* Toggle 3: Thermal & drought */}
         <div className="flex items-center">
           <button
             type="button"
@@ -568,7 +568,7 @@ export default function ChacraTab({
           >
             <div className="flex items-center gap-1.5 min-w-0">
               <Sun className={`w-3.5 h-3.5 shrink-0 ${layerDrought ? 'text-amber-600' : 'text-zinc-400'}`} />
-              <span className="truncate">Calor y sequía</span>
+              <span className="truncate">Thermal & drought</span>
             </div>
             <div
               className={`w-8 h-4.5 rounded-full transition-colors p-0.5 flex items-center shrink-0 ${
@@ -585,13 +585,13 @@ export default function ChacraTab({
         </div>
       </div>
 
-      {/* 4. SELECTED PARCEL CARD (Imagen 8) */}
+      {/* 4. SELECTED PARCEL CARD */}
       <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] space-y-4">
-        {/* Header row: PARCELA SELECCIONADA + Crop Name + Edit/Delete Actions */}
+        {/* Header row: SELECTED PARCEL + Crop Name + Edit/Delete Actions */}
         <div className="flex items-center justify-between">
           <div>
             <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-900/60 block">
-              PARCELA SELECCIONADA · {selectedParcel.name}
+              SELECTED PARCEL · {selectedParcel.name}
             </span>
             <h2 className="text-xl font-bold text-[#132A1C] mt-0.5">
               {selectedParcel.cropName}
@@ -603,7 +603,7 @@ export default function ChacraTab({
               type="button"
               onClick={() => handleOpenEdit(selectedParcel)}
               className="w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center text-zinc-700 transition cursor-pointer"
-              title="Editar datos de parcela"
+              title="Edit parcel data"
             >
               <Edit3 className="w-4 h-4 text-emerald-800" />
             </button>
@@ -611,7 +611,7 @@ export default function ChacraTab({
               type="button"
               onClick={() => setDeletingParcelId(selectedParcel.id)}
               className="w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 flex items-center justify-center text-red-700 transition cursor-pointer"
-              title="Eliminar parcela"
+              title="Delete parcel"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -621,19 +621,19 @@ export default function ChacraTab({
         {/* 3 Summary Stats with vertical divider lines */}
         <div className="grid grid-cols-3 divide-x divide-[#E5ECE2] border-t border-b border-[#E5ECE2] py-3 text-center">
           <div className="px-1">
-            <span className="text-[10px] font-semibold text-zinc-500 block">Área total</span>
+            <span className="text-[10px] font-semibold text-zinc-500 block">Total acreage</span>
             <span className="text-sm font-semibold text-[#132A1C] mt-0.5 block">
               {currentArea} ha
             </span>
           </div>
           <div className="px-1">
-            <span className="text-[10px] font-semibold text-zinc-500 block">Edad cultivo</span>
+            <span className="text-[10px] font-semibold text-zinc-500 block">Crop age</span>
             <span className="text-sm font-semibold text-[#132A1C] mt-0.5 block">
-              {selectedParcel.plantAgeDays} días
+              {selectedParcel.plantAgeDays} days
             </span>
           </div>
           <div className="px-1">
-            <span className="text-[10px] font-semibold text-zinc-500 block">Rendimiento est.</span>
+            <span className="text-[10px] font-semibold text-zinc-500 block">Est. yield</span>
             <span className="text-sm font-semibold text-[#132A1C] mt-0.5 block">
               {selectedParcel.estimatedYieldTons} t
             </span>
@@ -642,73 +642,73 @@ export default function ChacraTab({
 
         {/* 2x2 Grid of 4 Metric Cards */}
         <div className="grid grid-cols-2 gap-3">
-          {/* Metric 1: Humedad suelo */}
+          {/* Metric 1: Soil moisture */}
           <div className="bg-[#F7F9F6] rounded-2xl p-3.5 border border-[#E5ECE2] space-y-1">
             <div className="w-7 h-7 rounded-lg bg-[#EAF3E3] flex items-center justify-center text-emerald-800">
               <Droplets className="w-4 h-4 text-emerald-700" />
             </div>
-            <span className="text-[10px] font-bold text-zinc-500 block">Humedad suelo</span>
+            <span className="text-[10px] font-bold text-zinc-500 block">Soil moisture</span>
             <span className="text-xl font-semibold text-[#132A1C] block leading-none">
               {selectedParcel.smapHumidity}%
             </span>
-            <span className="text-[9.5px] text-zinc-400 block font-mono">SMAP</span>
+            <span className="text-[9.5px] text-zinc-400 block font-mono">NASA SMAP</span>
           </div>
 
-          {/* Metric 2: Salud planta */}
+          {/* Metric 2: Vegetative vigor */}
           <div className="bg-[#F7F9F6] rounded-2xl p-3.5 border border-[#E5ECE2] space-y-1">
             <div className="w-7 h-7 rounded-lg bg-[#EAF3E3] flex items-center justify-center text-emerald-800">
               <Leaf className="w-4 h-4 text-emerald-700" />
             </div>
-            <span className="text-[10px] font-bold text-zinc-500 block">Salud planta</span>
+            <span className="text-[10px] font-bold text-zinc-500 block">Vegetative vigor</span>
             <span className="text-xl font-semibold text-[#132A1C] block leading-none">
               {Math.round(selectedParcel.ndviScore * 100)}%
             </span>
-            <span className="text-[9.5px] text-zinc-400 block font-mono">NDVI</span>
+            <span className="text-[9.5px] text-zinc-400 block font-mono">Sentinel-2 NDVI</span>
           </div>
 
-          {/* Metric 3: Calidad suelo */}
+          {/* Metric 3: Edaphic resilience */}
           <div className="bg-[#F7F9F6] rounded-2xl p-3.5 border border-[#E5ECE2] space-y-1">
             <div className="w-7 h-7 rounded-lg bg-[#EAF3E3] flex items-center justify-center text-emerald-800">
               <Layers className="w-4 h-4 text-emerald-700" />
             </div>
-            <span className="text-[10px] font-bold text-zinc-500 block">Calidad suelo</span>
+            <span className="text-[10px] font-bold text-zinc-500 block">Edaphic resilience</span>
             <span className="text-xl font-semibold text-[#132A1C] block leading-none">
               {selectedParcel.healthScore}%
             </span>
-            <span className="text-[9.5px] text-zinc-400 block font-mono">Muestreo local</span>
+            <span className="text-[9.5px] text-zinc-400 block font-mono">In-situ calibration</span>
           </div>
 
-          {/* Metric 4: Riesgo sequía */}
+          {/* Metric 4: Drought risk */}
           <div className="bg-[#F7F9F6] rounded-2xl p-3.5 border border-[#E5ECE2] space-y-1">
             <div className="w-7 h-7 rounded-lg bg-[#EAF3E3] flex items-center justify-center text-emerald-800">
               <AlertTriangle className="w-4 h-4 text-emerald-700" />
             </div>
-            <span className="text-[10px] font-bold text-zinc-500 block">Riesgo sequía</span>
+            <span className="text-[10px] font-bold text-zinc-500 block">Drought risk</span>
             <span className="text-xl font-semibold text-[#132A1C] block leading-none">
-              {selectedParcel.smapHumidity < 15 ? 'Alto' : 'Moderado'}
+              {selectedParcel.smapHumidity < 15 ? 'High' : 'Moderate'}
             </span>
-            <span className="text-[9.5px] text-zinc-400 block font-mono">Alerta preventiva</span>
+            <span className="text-[9.5px] text-zinc-400 block font-mono">Preventative alert</span>
           </div>
         </div>
 
         {/* Notes if available */}
         {selectedParcel.notes && (
           <div className="bg-emerald-50/50 rounded-2xl p-3 border border-emerald-200/60 text-xs text-emerald-950">
-            <span className="font-semibold text-[10px] uppercase block text-emerald-800">Notas de campo:</span>
+            <span className="font-semibold text-[10px] uppercase block text-emerald-800">Field management notes:</span>
             <p className="mt-0.5">{selectedParcel.notes}</p>
           </div>
         )}
       </div>
 
-      {/* 5. CALIBRACIÓN AGROAMBIENTAL IN SITU (Acceso Técnico Posterior por Parcela) */}
+      {/* 5. IN-SITU AGROENVIRONMENTAL CALIBRATION */}
       <div className="bg-gradient-to-br from-[#132A1C] to-emerald-950 text-white rounded-3xl p-5 shadow-sm border border-emerald-800/80 space-y-3.5">
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-0.5">
             <span className="text-[10px] font-bold text-[#A3E635] tracking-widest uppercase block font-mono">
-              FICHA TÉCNICA · RECOMENDACIÓN A13
+              TECHNICAL DATA SHEET · A13 SPECIFICATION
             </span>
             <h3 className="text-base font-bold text-white">
-              Calibración Agroambiental In Situ
+              In-Situ Agroenvironmental Calibration
             </h3>
           </div>
 
@@ -725,7 +725,7 @@ export default function ChacraTab({
               }`}
             />
             <span>
-              {selectedParcel.fechaCalibracion ? 'Calibrada 🟢' : 'Pendiente de Calibración 🟡'}
+              {selectedParcel.fechaCalibracion ? 'Calibrated 🟢' : 'Pending Calibration 🟡'}
             </span>
           </span>
         </div>
@@ -734,20 +734,20 @@ export default function ChacraTab({
           <div className="space-y-3 pt-1">
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="bg-black/40 rounded-2xl p-2.5 border border-white/10 space-y-0.5">
-                <span className="text-[10px] text-zinc-400 block">Fiabilidad Semáforo</span>
+                <span className="text-[10px] text-zinc-400 block">Uncertainty Traffic Light</span>
                 <span className="text-sm font-bold text-[#A3E635] flex items-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>{selectedParcel.diagnosticoIncertidumbre?.nivel || 'Alta (🟢)'}</span>
+                  <span>{selectedParcel.diagnosticoIncertidumbre?.nivel || 'High (🟢)'}</span>
                 </span>
                 <span className="text-[9.5px] text-zinc-400 block font-mono">
-                  {selectedParcel.diagnosticoIncertidumbre?.fiabilidad ?? 80}% fiabilidad global
+                  {selectedParcel.diagnosticoIncertidumbre?.fiabilidad ?? 80}% global reliability
                 </span>
               </div>
 
               <div className="bg-black/40 rounded-2xl p-2.5 border border-white/10 space-y-0.5">
-                <span className="text-[10px] text-zinc-400 block">Rotación Sugerida A13</span>
+                <span className="text-[10px] text-zinc-400 block">Suggested A13 Succession</span>
                 <span className="text-sm font-bold text-white truncate block">
-                  {selectedParcel.rotacionA13?.cultivo_sugerido || 'Papa / Quinua'}
+                  {selectedParcel.rotacionA13?.cultivo_sugerido || 'Potato / Quinoa'}
                 </span>
                 {selectedParcel.rotacionA13?.alternativa && (
                   <span className="text-[9.5px] text-emerald-300 block truncate">
@@ -772,13 +772,13 @@ export default function ChacraTab({
               className="w-full py-2.5 rounded-full bg-emerald-800/80 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer border border-emerald-600/60 shadow-xs"
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              <span>Ver Diagnóstico o Recalibrar Parcela</span>
+              <span>Review Diagnostic or Recalibrate Parcel</span>
             </button>
           </div>
         ) : (
           <div className="space-y-3 pt-1">
             <p className="text-xs text-zinc-300 leading-snug">
-              Esta parcela aún no cuenta con calibración de suelo in situ. Responde el árbol de preguntas de Kipu para calcular el semáforo de incertidumbre y rotación biológica específica.
+              This parcel does not have in-situ soil calibration yet. Answer the Kipu tree questionnaire to calculate the uncertainty traffic light and specific biological rotation.
             </p>
 
             <button
@@ -790,20 +790,20 @@ export default function ChacraTab({
               className="w-full py-3 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer shadow-md shadow-lime-600/30"
             >
               <Sparkles className="w-4 h-4 stroke-[2.5]" />
-              <span>Iniciar Calibración Agroambiental In Situ</span>
+              <span>Start In-Situ Agroenvironmental Calibration</span>
             </button>
           </div>
         )}
       </div>
 
       {/* =========================================================================
-          MODAL: EDITAR PARCELA
+          MODAL: EDIT PARCEL
          ========================================================================= */}
       {editingParcel && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-5 max-w-sm w-full space-y-4 shadow-2xl border border-[#E5ECE2] animate-in fade-in">
             <div className="flex items-center justify-between border-b border-[#E5ECE2] pb-3">
-              <h3 className="text-base font-bold text-[#132A1C]">Editar Parcela</h3>
+              <h3 className="text-base font-bold text-[#132A1C]">Edit Parcel</h3>
               <button
                 type="button"
                 onClick={() => setEditingParcel(null)}
@@ -815,7 +815,7 @@ export default function ChacraTab({
 
             <form onSubmit={handleSaveEdit} className="space-y-3 text-xs">
               <div>
-                <label className="font-semibold text-zinc-700 block mb-1">Nombre</label>
+                <label className="font-semibold text-zinc-700 block mb-1">Name</label>
                 <input
                   type="text"
                   value={editName}
@@ -826,7 +826,7 @@ export default function ChacraTab({
               </div>
 
               <div>
-                <label className="font-semibold text-zinc-700 block mb-1">Cultivo</label>
+                <label className="font-semibold text-zinc-700 block mb-1">Crop</label>
                 <input
                   type="text"
                   value={editCrop}
@@ -838,7 +838,7 @@ export default function ChacraTab({
 
               <div>
                 <div className="flex items-center justify-between font-semibold text-zinc-700 mb-1">
-                  <span>Área: {editArea} ha</span>
+                  <span>Acreage: {editArea} ha</span>
                   <span className="text-zinc-500 font-normal font-mono">({(editArea * 3.3).toFixed(1)} topos)</span>
                 </div>
                 <input
@@ -853,7 +853,7 @@ export default function ChacraTab({
               </div>
 
               <div>
-                <label className="font-semibold text-zinc-700 block mb-1">Notas de manejo</label>
+                <label className="font-semibold text-zinc-700 block mb-1">Management notes</label>
                 <textarea
                   value={editNotes}
                   onChange={(e) => setEditNotes(e.target.value)}
@@ -868,13 +868,13 @@ export default function ChacraTab({
                   onClick={() => setEditingParcel(null)}
                   className="flex-1 py-2.5 rounded-full border border-zinc-300 text-zinc-700 font-semibold text-xs"
                 >
-                  Cancelar
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   className="flex-1 py-2.5 rounded-full bg-[#7BB63E] text-[#132A1C] font-semibold text-xs shadow-xs"
                 >
-                  Guardar Cambios
+                  Save Changes
                 </button>
               </div>
             </form>
@@ -883,7 +883,7 @@ export default function ChacraTab({
       )}
 
       {/* =========================================================================
-          MODAL: CONFIRMAR BORRADO
+          MODAL: CONFIRM DELETION
          ========================================================================= */}
       {deletingParcelId && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
@@ -892,9 +892,9 @@ export default function ChacraTab({
               <Trash2 className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-zinc-800">¿Eliminar esta parcela?</h3>
+              <h3 className="text-base font-bold text-zinc-800">Delete this parcel?</h3>
               <p className="text-xs text-zinc-600 mt-1">
-                Esta acción eliminará el registro de la parcela y su calibración satelital.
+                This action will permanently delete the parcel record and its satellite calibration.
               </p>
             </div>
             <div className="flex items-center gap-2 pt-1">
@@ -903,14 +903,14 @@ export default function ChacraTab({
                 onClick={() => setDeletingParcelId(null)}
                 className="flex-1 py-2.5 rounded-full border border-zinc-300 text-zinc-700 font-semibold text-xs"
               >
-                Cancelar
+                Cancel
               </button>
               <button
                 type="button"
                 onClick={handleDeleteConfirm}
                 className="flex-1 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white font-semibold text-xs shadow-xs"
               >
-                Sí, Eliminar
+                Yes, Delete
               </button>
             </div>
           </div>

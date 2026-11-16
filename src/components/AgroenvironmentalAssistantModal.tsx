@@ -24,7 +24,7 @@ export default function AgroenvironmentalAssistantModal({
   if (!isOpen) return null;
 
   const parcel: ActiveParcel = {
-    id: profile.parcelName || 'Chacra Calibrada',
+    id: profile.parcelName || 'Calibrated Parcel',
     name: `${profile.parcelName} • ${profile.distrito}`,
     areaHa: profile.areaHa || 1.68,
     slopePct: profile.slope || 14.0,
@@ -52,10 +52,10 @@ export default function AgroenvironmentalAssistantModal({
             <span className="text-xl">🌱</span>
             <div>
               <h3 className="font-black text-sm text-white">
-                Asistente Agroambiental TerraQuipu
+                TerraQuipu Agroenvironmental Assistant
               </h3>
               <p className="text-[10px] text-zinc-300 font-mono">
-                Prevención El Niño • Piuray-Qorimarca &amp; {profile.distrito}
+                ENSO Preventative Action • Piuray-Qorimarca &amp; {profile.distrito}
               </p>
             </div>
           </div>

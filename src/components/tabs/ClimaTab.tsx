@@ -36,10 +36,10 @@ export default function ClimaTab({
 
   return (
     <div className="space-y-4 animate-in fade-in pt-1">
-      {/* Sub-navegación por Índice (Elimina el scroll infinito en móvil) */}
+      {/* Sub-navigation via Index */}
       {climaView === 'index' && (
         <div className="space-y-4 animate-in fade-in">
-          {/* Banner Carrusel Dinámico con múltiples tarjetas rotativas */}
+          {/* Dynamic Carousel Banner */}
           <ClimaCarouselBanner
             profile={profile}
             climaNasa={climaNasa}
@@ -48,7 +48,7 @@ export default function ClimaTab({
             onOpenSanidadModal={() => setIsSanidadOpen(true)}
           />
 
-          {/* Boletines Científicos Oficiales & Alertas ENOS */}
+          {/* Official Scientific Bulletins & ENSO Alerts */}
           <div className="flex justify-center pt-0.5 pb-0.5">
             <button
               type="button"
@@ -59,16 +59,16 @@ export default function ClimaTab({
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-2xs hover:shadow-xs hover:border-amber-300 text-xs font-bold text-slate-700 active:scale-95 transition cursor-pointer"
             >
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-              <span>3 Boletines ENOS &amp; INIA disponibles</span>
+              <span>3 ENSO &amp; INIA Agroclimatic Bulletins Available</span>
               <span className="text-slate-400 font-normal">↗</span>
             </button>
           </div>
 
           <AgroClimaNewsFeed isOpen={isNewsOpen} onClose={() => setIsNewsOpen(false)} />
 
-          {/* Módulos Temáticos Dark Forest Glassmorphism */}
+          {/* Dark Forest Glassmorphism Modules */}
           <div className="space-y-3 pt-1">
-            {/* Tarjeta 1: Pronóstico 5 Días & Heladas */}
+            {/* Card 1: 5-Day Forecast & Frost Telemetry */}
             <div
               onClick={() => {
                 playBubblePop();
@@ -79,28 +79,28 @@ export default function ClimaTab({
               <div className="w-24 sm:w-28 h-24 sm:h-28 rounded-2xl overflow-hidden shrink-0 shadow-lg border border-emerald-500/30 bg-slate-950">
                 <img
                   src="/images/andes_poster.jpg"
-                  alt="Cordillera de los Andes Pronóstico"
+                  alt="Andean Mountain Range Forecast"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
 
               <div className="flex-1 min-w-0 space-y-1">
                 <h3 className="font-black text-sm sm:text-base text-white group-hover:text-emerald-300 transition leading-snug">
-                  Pronóstico a 5 Días &amp; Heladas
+                  5-Day Forecast &amp; Frost Telemetry
                 </h3>
                 <p className="text-xs text-slate-300 font-medium font-sans leading-relaxed line-clamp-2">
-                  Temperaturas mín/máx, radiación solar UV y alerta de heladas nocturnas para {profile.distrito}.
+                  Min/max temperatures, solar UV flux, and nocturnal radiative frost warnings for {profile.distrito}.
                 </p>
                 <div className="pt-1">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-cyan-950/80 border border-cyan-500/40 text-cyan-200 text-xs font-bold shadow-sm group-hover:bg-cyan-900 transition">
-                    <span>Ver pronóstico</span>
+                    <span>View forecast</span>
                     <ArrowRight className="w-3 h-3 text-cyan-300" />
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Tarjeta 2: Simulador El Niño & Plagas */}
+            {/* Card 2: ENSO Drought Simulator & Pest Control */}
             <div
               onClick={() => {
                 playBubblePop();
@@ -111,28 +111,28 @@ export default function ClimaTab({
               <div className="w-24 sm:w-28 h-24 sm:h-28 rounded-2xl overflow-hidden shrink-0 shadow-lg border border-emerald-500/30 bg-slate-950">
                 <img
                   src="/images/cultivos_poster.jpg"
-                  alt="Simulador Sequía El Niño"
+                  alt="ENSO Drought Simulator"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
 
               <div className="flex-1 min-w-0 space-y-1">
                 <h3 className="font-black text-sm sm:text-base text-white group-hover:text-amber-300 transition leading-snug">
-                  Simulador Sequía El Niño &amp; Plagas
+                  ENSO Drought Simulator &amp; Pest Disruption
                 </h3>
                 <p className="text-xs text-slate-300 font-medium font-sans leading-relaxed line-clamp-2">
-                  Simula escenarios de sequía andina, variedades de contingencia (Tarwi) y corte del gorgojo.
+                  Simulate Andean drought scenarios, contingency crops (Tarwi / Andean Lupin), and Andean potato weevil disruption.
                 </p>
                 <div className="pt-1">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-950/80 border border-amber-500/40 text-amber-200 text-xs font-bold shadow-sm group-hover:bg-amber-900 transition">
-                    <span>Abrir simulador</span>
+                    <span>Open simulator</span>
                     <ArrowRight className="w-3 h-3 text-amber-300" />
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Tarjeta 3: Sanidad Vegetal & Biocontrol Andino */}
+            {/* Card 3: Plant Health & Andean Biocontrol */}
             <div
               onClick={() => {
                 playBubblePop();
@@ -143,28 +143,28 @@ export default function ClimaTab({
               <div className="w-24 sm:w-28 h-24 sm:h-28 rounded-2xl overflow-hidden shrink-0 shadow-lg border border-emerald-500/30 bg-slate-950">
                 <img
                   src="/images/tarwi_chocho.jpg"
-                  alt="Sanidad Vegetal Tarwi Biocontrol"
+                  alt="Plant Health Tarwi Biocontrol"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
 
               <div className="flex-1 min-w-0 space-y-1">
                 <h3 className="font-black text-sm sm:text-base text-white group-hover:text-emerald-300 transition leading-snug">
-                  Sanidad Vegetal &amp; Biocontrol Andino
+                  Plant Health &amp; Andean Biocontrol
                 </h3>
                 <p className="text-xs text-slate-300 font-medium font-sans leading-relaxed line-clamp-2">
-                  Barrera perimetral de Tarwi con alcaloides repelentes (-84% gorgojo) y zanjas trampa.
+                  Perimeter barrier of Tarwi with repellent quinolizidine alkaloids (-84% weevil damage) and pitfall trap trenches.
                 </p>
                 <div className="pt-1">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-200 text-xs font-bold shadow-sm group-hover:bg-emerald-900 transition">
-                    <span>Ver sanidad vegetal</span>
+                    <span>View plant health</span>
                     <ArrowRight className="w-3 h-3 text-emerald-300" />
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Tarjeta 4: Asistente Agroambiental & Calendario Preventivo El Niño */}
+            {/* Card 4: Agroclimatic Assistant & Preventative Calendar */}
             <div
               onClick={() => {
                 playBubblePop();
@@ -175,21 +175,21 @@ export default function ClimaTab({
               <div className="w-24 sm:w-28 h-24 sm:h-28 rounded-2xl overflow-hidden shrink-0 shadow-lg border border-emerald-500/30 bg-slate-950">
                 <img
                   src="/images/quipu_plan.jpg"
-                  alt="Asistente Agroambiental El Niño"
+                  alt="Agroclimatic Assistant ENSO"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
 
               <div className="flex-1 min-w-0 space-y-1">
                 <h3 className="font-black text-sm sm:text-base text-white group-hover:text-lime-300 transition leading-snug">
-                  Asistente Agroambiental &amp; Calendario
+                  Agroclimatic Assistant &amp; Seasonal Calendar
                 </h3>
                 <p className="text-xs text-slate-300 font-medium font-sans leading-relaxed line-clamp-2">
-                  Calendario preventivo en 4 bloques temporales y rotación A13 para proteger tu suelo ante El Niño.
+                  4-phase preventative calendar and A13 rotational succession to safeguard soil moisture during ENSO anomalies.
                 </p>
                 <div className="pt-1">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gradient-to-r from-lime-400 to-emerald-400 text-slate-950 text-xs font-black shadow-md group-hover:from-lime-300 group-hover:to-emerald-300 transition">
-                    <span>Consultar Asistente</span>
+                    <span>Consult Assistant</span>
                     <ArrowRight className="w-3 h-3 text-slate-950" />
                   </span>
                 </div>
@@ -208,7 +208,7 @@ export default function ClimaTab({
         </div>
       )}
 
-      {/* Vista 1: Pronóstico Detallado con Botón de Regreso */}
+      {/* View 1: Detailed Forecast */}
       {climaView === 'forecast' && (
         <div className="space-y-3 animate-in fade-in">
           <button
@@ -220,7 +220,7 @@ export default function ClimaTab({
             className="px-4 py-2 rounded-2xl bg-[#132A1C]/80 border border-emerald-500/40 text-emerald-200 hover:text-white font-bold text-xs flex items-center gap-2 transition active:scale-95 cursor-pointer shadow-lg backdrop-blur-md"
           >
             <ArrowLeft className="w-4 h-4 text-emerald-400" />
-            <span>Volver al Índice de Clima</span>
+            <span>Back to Climate Index</span>
           </button>
 
           <WeatherForecastCard
@@ -233,7 +233,7 @@ export default function ClimaTab({
         </div>
       )}
 
-      {/* Vista 2: Simulador El Niño con Botón de Regreso */}
+      {/* View 2: ENSO Simulator */}
       {climaView === 'elnino' && (
         <div className="space-y-3 animate-in fade-in">
           <button
@@ -245,7 +245,7 @@ export default function ClimaTab({
             className="px-4 py-2 rounded-2xl bg-[#132A1C]/80 border border-emerald-500/40 text-emerald-200 hover:text-white font-bold text-xs flex items-center gap-2 transition active:scale-95 cursor-pointer shadow-lg backdrop-blur-md"
           >
             <ArrowLeft className="w-4 h-4 text-emerald-400" />
-            <span>Volver al Índice de Clima</span>
+            <span>Back to Climate Index</span>
           </button>
 
           <ElNinoSimulatorCard
@@ -258,7 +258,7 @@ export default function ClimaTab({
         </div>
       )}
 
-      {/* Modal de Sanidad Vegetal */}
+      {/* Plant Health Modal */}
       <SanidadVegetalModal
         isOpen={isSanidadOpen}
         onClose={() => setIsSanidadOpen(false)}

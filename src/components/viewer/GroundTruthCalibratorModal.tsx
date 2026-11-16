@@ -85,20 +85,20 @@ export default function GroundTruthCalibratorModal({
   const getScoreBadge = (score: number) => {
     if (score >= 75) {
       return {
-        label: 'Resiliencia Alta • Suelo Óptimo',
+        label: 'High Resilience • Optimal Edaphic Profile',
         color: 'bg-emerald-100 text-emerald-800 border-emerald-300',
         textColor: 'text-emerald-700',
       };
     }
     if (score >= 50) {
       return {
-        label: 'Resiliencia Moderada • Requiere Mulch',
+        label: 'Moderate Resilience • Mulch Cover Required',
         color: 'bg-amber-100 text-amber-800 border-amber-300',
         textColor: 'text-amber-700',
       };
     }
     return {
-      label: 'Vulnerabilidad Severa • Alerta de Erosión',
+      label: 'Severe Vulnerability • Soil Erosion Alert',
       color: 'bg-rose-100 text-rose-800 border-rose-300',
       textColor: 'text-rose-700',
     };
@@ -163,10 +163,10 @@ export default function GroundTruthCalibratorModal({
       };
 
       onCalibrationComplete(updatedParcel, res.data);
-      onShowToast(`✓ Parcela ${activeParcel.name} calibrada con Verdad Terrestre (Supabase sync)`);
+      onShowToast(`✓ Parcel ${activeParcel.name} calibrated with In-Situ Ground Truth (Supabase sync)`);
       onClose();
     } catch (err: any) {
-      onShowToast(`Error al guardar en Supabase: ${err.message || 'Error de red'}`);
+      onShowToast(`Error saving to Supabase: ${err.message || 'Network error'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -189,14 +189,14 @@ export default function GroundTruthCalibratorModal({
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider">
-                  Estación de Calibración en Campo
+                  In-Situ Ground-Truth Field Station
                 </span>
                 <span className="text-[10px] font-mono bg-emerald-500/30 text-emerald-200 px-2 py-0.5 rounded-full border border-emerald-400/40 font-semibold">
                   NASA Ground-Truth 5+1
                 </span>
               </div>
               <h2 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-                Validar {activeParcel.name}
+                Validate {activeParcel.name}
               </h2>
             </div>
           </div>
@@ -212,7 +212,7 @@ export default function GroundTruthCalibratorModal({
         {/* Live Soil Health Gauge Bar */}
         <div className="bg-zinc-50 border-b border-zinc-200 px-4 py-2.5 flex items-center justify-between flex-wrap gap-2 flex-shrink-0">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-zinc-700">Índice de Salud Edáfica y Resiliencia:</span>
+            <span className="text-xs font-bold text-zinc-700">Soil Health & Resilience Score:</span>
             <span className="text-base font-mono font-bold text-zinc-950">{healthScore}/100</span>
           </div>
           <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border font-mono ${badge.color}`}>
@@ -229,29 +229,29 @@ export default function GroundTruthCalibratorModal({
                 <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold flex items-center justify-center">
                   1
                 </span>
-                ¿Cómo se siente la tierra al apretarla húmeda? (Prueba del Puño)
+                How does the soil feel when squeezed moist? (Hand Squeeze Test)
               </label>
-              <span className="text-[10px] font-mono text-zinc-500">Calibra SMAP y SoilGrids</span>
+              <span className="text-[10px] font-mono text-zinc-500">Calibrates SMAP & SoilGrids</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
               {[
                 {
                   id: 'arena' as const,
-                  title: 'Se suelta / Arena',
-                  desc: 'Infiltración rápida, drena rápido, poca retención de abono',
+                  title: 'Loose / Sandy',
+                  desc: 'Rapid infiltration, fast drainage, low organic nutrient retention',
                   emoji: '🥪',
                 },
                 {
                   id: 'franca' as const,
-                  title: 'Forma bola suave (Franca)',
-                  desc: 'Estructura ideal, esponjosa, equilibra retención y aire',
+                  title: 'Forms pliable ball (Loam)',
+                  desc: 'Ideal crumbly structure, balanced water holding and aeration',
                   emoji: '🌱',
                 },
                 {
                   id: 'arcilla' as const,
-                  title: 'Muy pegajosa (Arcilla)',
-                  desc: 'Alta retención hídrica, riesgo de barro y compactación',
+                  title: 'Sticky / Plastic (Clay)',
+                  desc: 'High moisture retention, compaction and waterlogging risk',
                   emoji: '🧱',
                 },
               ].map((opt) => (
@@ -282,23 +282,23 @@ export default function GroundTruthCalibratorModal({
                 <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold flex items-center justify-center">
                   2
                 </span>
-                ¿La parcela tiene muchas piedras o tierra poco profunda?
+                Does the parcel have high stoniness or shallow soil depth?
               </label>
-              <span className="text-[10px] font-mono text-zinc-500">Profundidad Efectiva</span>
+              <span className="text-[10px] font-mono text-zinc-500">Effective Rooting Depth</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
               {[
                 {
                   id: 'pedregoso' as const,
-                  title: 'Sí • Suelo delgado o pedregoso',
-                  desc: 'Capa superficial <30 cm, presencia de piedras. Requiere camellones y mulch.',
+                  title: 'Yes • Shallow or Stony Soil',
+                  desc: 'Topsoil depth <30 cm, high stone fraction. Requires ridges and mulch.',
                   emoji: '🪨',
                 },
                 {
                   id: 'profundo' as const,
-                  title: 'No • Tierra profunda y fértil',
-                  desc: 'Capa arable >40 cm. Permite aporque profundo y raíces extensas.',
+                  title: 'No • Deep and Fertile Soil',
+                  desc: 'Topsoil depth >40 cm. Allows deep hilling and extensive rooting.',
                   emoji: '🌾',
                 },
               ].map((opt) => (
@@ -329,7 +329,7 @@ export default function GroundTruthCalibratorModal({
                 <span className="w-5 h-5 rounded-full bg-sky-100 text-sky-800 text-[11px] font-bold flex items-center justify-center">
                   3
                 </span>
-                ¿Cómo está la cobertura del suelo hoy?
+                What is the current soil surface cover?
               </label>
               <span className="text-[10px] font-mono text-sky-700 font-semibold bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
                 🛰️ Sentinel-2 NDVI
@@ -338,10 +338,10 @@ export default function GroundTruthCalibratorModal({
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
               {[
-                { id: 'sembrado' as const, title: 'Con Cultivo', desc: 'Follaje verde vigoroso', emoji: '🌱' },
-                { id: 'barbecho' as const, title: 'Barbecho / Mulch', desc: 'Rastrojo protector', emoji: '🍂' },
-                { id: 'pasto' as const, title: 'Pasto Natural', desc: 'Pradera andina forrajera', emoji: '🌾' },
-                { id: 'suelo_desnudo' as const, title: 'Suelo Pelado', desc: 'Expuesto a erosión', emoji: '🏜️' },
+                { id: 'sembrado' as const, title: 'Cultivated Crop', desc: 'Active green vegetative canopy', emoji: '🌱' },
+                { id: 'barbecho' as const, title: 'Fallow / Mulch', desc: 'Protective crop stubble residue', emoji: '🍂' },
+                { id: 'pasto' as const, title: 'Natural Grassland', desc: 'Highland forage grassland cover', emoji: '🌾' },
+                { id: 'suelo_desnudo' as const, title: 'Bare Soil', desc: 'Direct exposure to rainfall erosion', emoji: '🏜️' },
               ].map((opt) => (
                 <button
                   key={opt.id}
@@ -368,7 +368,7 @@ export default function GroundTruthCalibratorModal({
                 <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-800 text-[11px] font-bold flex items-center justify-center">
                   4
                 </span>
-                ¿De dónde proviene el agua de esta chacra?
+                What is the primary water source for this parcel?
               </label>
               <span className="text-[10px] font-mono text-blue-700 font-semibold bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
                 🌧️ NASA GPM Rain
@@ -379,20 +379,20 @@ export default function GroundTruthCalibratorModal({
               {[
                 {
                   id: 'secano' as const,
-                  title: 'Solo Lluvia (Secano)',
-                  desc: 'Depende 100% de la lluvia. Muy vulnerable a sequías.',
+                  title: 'Rainfed Only (Secano)',
+                  desc: '100% dependent on precipitation. Highly vulnerable to drought.',
                   emoji: '🌧️',
                 },
                 {
                   id: 'auxilio' as const,
-                  title: 'Riego de Auxilio',
-                  desc: 'Canal comunal o acequia para salvar sequías cortas.',
+                  title: 'Supplementary Irrigation',
+                  desc: 'Communal ditch / canal network for mitigating short dry spells.',
                   emoji: '💧',
                 },
                 {
                   id: 'permanente' as const,
-                  title: 'Riego Tecnificado',
-                  desc: 'Aspersión o goteo constante. Permite cultivos exigentes.',
+                  title: 'Technical Irrigation',
+                  desc: 'Pressurized sprinkler or drip system. Supports high-demand crops.',
                   emoji: '🚰',
                 },
               ].map((opt) => (
@@ -423,7 +423,7 @@ export default function GroundTruthCalibratorModal({
                 <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold flex items-center justify-center">
                   5
                 </span>
-                ¿Cuándo tienes previsto sembrar? (Estrategia El Niño)
+                When is sowing planned? (ENSO Climate Strategy)
               </label>
               <span className="text-[10px] font-mono text-amber-800 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
                 ⚠️ ENOS ENFEN
@@ -432,10 +432,10 @@ export default function GroundTruthCalibratorModal({
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
               {[
-                { id: 'esta_semana' as const, title: 'Esta Semana', desc: 'Siembra urgente', emoji: '⚡' },
-                { id: '2_4_semanas' as const, title: 'En 2-4 Semanas', desc: 'Siembra normal', emoji: '📅' },
-                { id: '1_2_meses' as const, title: 'En 1-2 Meses', desc: 'Siembra tardía', emoji: '⏳' },
-                { id: 'proxima_campana' as const, title: 'Próximo Año', desc: 'Suelo en descanso', emoji: '⏸️' },
+                { id: 'esta_semana' as const, title: 'This Week', desc: 'Urgent sowing window', emoji: '⚡' },
+                { id: '2_4_semanas' as const, title: 'In 2-4 Weeks', desc: 'Standard planting window', emoji: '📅' },
+                { id: '1_2_meses' as const, title: 'In 1-2 Months', desc: 'Late sowing window', emoji: '⏳' },
+                { id: 'proxima_campana' as const, title: 'Next Season', desc: 'Soil resting in fallow', emoji: '⏸️' },
               ].map((opt) => (
                 <button
                   key={opt.id}
@@ -462,8 +462,8 @@ export default function GroundTruthCalibratorModal({
               hasWeevil ? 'bg-rose-50 border-rose-300' : 'bg-zinc-50 border-zinc-200'
             }`}>
               <div>
-                <span className="text-xs font-bold text-zinc-900 block">¿Hay presencia de Gorgojo?</span>
-                <span className="text-[10px] text-zinc-500">Premnotrypes spp. en tubérculos</span>
+                <span className="text-xs font-bold text-zinc-900 block">Is Andean Potato Weevil Present?</span>
+                <span className="text-[10px] text-zinc-500">Premnotrypes spp. in tubers</span>
               </div>
               <button
                 type="button"
@@ -472,7 +472,7 @@ export default function GroundTruthCalibratorModal({
                   hasWeevil ? 'bg-rose-600 text-white shadow-xs' : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'
                 }`}
               >
-                {hasWeevil ? '⚠️ SÍ DETECTADO' : 'NO OBSERVADO'}
+                {hasWeevil ? '⚠️ DETECTED' : 'NOT OBSERVED'}
               </button>
             </div>
 
@@ -481,8 +481,8 @@ export default function GroundTruthCalibratorModal({
               hasFrostAlert ? 'bg-amber-50 border-amber-300' : 'bg-zinc-50 border-zinc-200'
             }`}>
               <div>
-                <span className="text-xs font-bold text-zinc-900 block">¿Se observó escarcha o helada?</span>
-                <span className="text-[10px] text-zinc-500">En las últimas 48 horas en campo</span>
+                <span className="text-xs font-bold text-zinc-900 block">Was frost or ground freeze observed?</span>
+                <span className="text-[10px] text-zinc-500">Within the last 48 hours in the field</span>
               </div>
               <button
                 type="button"
@@ -491,7 +491,7 @@ export default function GroundTruthCalibratorModal({
                   hasFrostAlert ? 'bg-amber-600 text-white shadow-xs' : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'
                 }`}
               >
-                {hasFrostAlert ? '❄️ SÍ OBSERVADA' : 'SIN HELADA'}
+                {hasFrostAlert ? '❄️ OBSERVED' : 'NO FROST'}
               </button>
             </div>
           </div>
@@ -505,7 +505,7 @@ export default function GroundTruthCalibratorModal({
             disabled={isSubmitting}
             className="px-4 py-2 bg-zinc-200 hover:bg-zinc-300 text-zinc-800 rounded-xl text-xs font-semibold transition"
           >
-            Cancelar
+            Cancel
           </button>
 
           <button
@@ -517,12 +517,12 @@ export default function GroundTruthCalibratorModal({
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin text-emerald-200" />
-                <span>Sincronizando con Supabase PostGIS...</span>
+                <span>Synchronizing with Supabase PostGIS...</span>
               </>
             ) : (
               <>
                 <Send className="w-4 h-4 text-emerald-300" />
-                <span>Guardar Ground-Truth & Calibrar Parcela</span>
+                <span>Save Ground-Truth & Calibrate Parcel</span>
               </>
             )}
           </button>

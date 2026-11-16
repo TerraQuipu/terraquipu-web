@@ -15,6 +15,8 @@ import QuickCropSelector from './campaigns/QuickCropSelector';
 import CampaignSpotlightCard from './campaigns/CampaignSpotlightCard';
 import KipuFullScreenWizard from './KipuFullScreenWizard';
 
+import { getStoredLanguage } from '@/lib/deviceProfile';
+
 interface QuipuRotationCardProps {
   cultivos: Cultivo[];
   isElNino: boolean;
@@ -105,11 +107,16 @@ export default function QuipuRotationCard({
     if (typeof window === 'undefined' || !recommendation) return;
     const msg = new SpeechSynthesisUtterance();
     const totalSavings = Math.round(420 * areaHa);
-    msg.text = `Hermano agricultor: para tu parcela de ${areaHa} hectáreas, ${recommendation.advice}. Con esta rotación ahorras aproximadamente ${totalSavings} soles en fertilizante químico.`;
+    const lang = getStoredLanguage();
+    if (lang === 'qu') {
+      msg.text = `Tarpukamayoc wawqiy panay: kay ${areaHa} hectarea chajraykipaq, allpa samachiq tarwiwan hawaswan muyuy tarpuyta churay. Kaywanqa yaqa ${totalSavings} soles qolqetan waqaychanki mana quimica wanuta rantispa.`;
+    } else {
+      msg.text = `Hermano agricultor: para tu parcela de ${areaHa} hectáreas, ${recommendation.advice}. Con esta rotación ahorras aproximadamente ${totalSavings} soles en fertilizante químico.`;
+    }
     msg.lang = 'es-PE';
     msg.rate = 0.9;
     window.speechSynthesis.speak(msg);
-    onToast('🔊 Reproduciendo consejo agronómico en audio...');
+    onToast(lang === 'qu' ? '🔊 Yachaqpa rimayninta uyarichkan...' : '🔊 Reproduciendo consejo agronómico en audio...');
   };
 
   if (!recommendation) {

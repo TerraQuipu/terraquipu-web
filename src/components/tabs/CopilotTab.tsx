@@ -58,7 +58,7 @@ interface CropKnowledge {
 
 const CROP_DATABASE: Record<string, CropKnowledge> = {
   papa: {
-    name: 'Papa Nativa Andina',
+    name: 'Native Andean Potato (Solanum tuberosum subsp. andigena)',
     family: 'Solanaceae',
     waterDemandMinMm: 500,
     waterDemandOptMm: 650,
@@ -69,10 +69,10 @@ const CROP_DATABASE: Record<string, CropKnowledge> = {
     nitrogenKgHa: -70.0,
     breaksWeevilPest: false,
     frostToleranceC: -1.5,
-    favSuccessors: ['Tarwi', 'Habas', 'Quinua'],
+    favSuccessors: ['Tarwi', 'Broad Beans', 'Quinoa'],
   },
   tarwi: {
-    name: 'Tarwi / Chocho',
+    name: 'Tarwi / Andean Lupin (Lupinus mutabilis)',
     family: 'Fabaceae',
     waterDemandMinMm: 350,
     waterDemandOptMm: 480,
@@ -83,10 +83,10 @@ const CROP_DATABASE: Record<string, CropKnowledge> = {
     nitrogenKgHa: 95.0,
     breaksWeevilPest: true,
     frostToleranceC: -3.0,
-    favSuccessors: ['Papa nativa', 'Maíz Blanco', 'Quinua'],
+    favSuccessors: ['Native Potato', 'Giant White Corn', 'Quinoa'],
   },
   habas: {
-    name: 'Habas Serranas',
+    name: 'Highland Broad Beans (Vicia faba)',
     family: 'Fabaceae',
     waterDemandMinMm: 400,
     waterDemandOptMm: 550,
@@ -97,10 +97,10 @@ const CROP_DATABASE: Record<string, CropKnowledge> = {
     nitrogenKgHa: 75.0,
     breaksWeevilPest: true,
     frostToleranceC: -2.0,
-    favSuccessors: ['Maíz Blanco', 'Papa nativa', 'Cereales'],
+    favSuccessors: ['Giant White Corn', 'Native Potato', 'Cereals'],
   },
   maiz: {
-    name: 'Maíz Blanco Gigante',
+    name: 'Giant White Corn (Zea mays var. amylacea)',
     family: 'Poaceae',
     waterDemandMinMm: 500,
     waterDemandOptMm: 700,
@@ -111,10 +111,10 @@ const CROP_DATABASE: Record<string, CropKnowledge> = {
     nitrogenKgHa: -50.0,
     breaksWeevilPest: false,
     frostToleranceC: 0.0,
-    favSuccessors: ['Tarwi', 'Habas', 'Alfalfa'],
+    favSuccessors: ['Tarwi', 'Broad Beans', 'Alfalfa'],
   },
   quinua: {
-    name: 'Quinua Real',
+    name: 'Real Andean Quinoa (Chenopodium quinoa)',
     family: 'Amaranthaceae',
     waterDemandMinMm: 250,
     waterDemandOptMm: 400,
@@ -125,10 +125,10 @@ const CROP_DATABASE: Record<string, CropKnowledge> = {
     nitrogenKgHa: -30.0,
     breaksWeevilPest: true,
     frostToleranceC: -4.0,
-    favSuccessors: ['Habas', 'Tarwi', 'Papa nativa'],
+    favSuccessors: ['Broad Beans', 'Tarwi', 'Native Potato'],
   },
   cebada: {
-    name: 'Cebada Grano',
+    name: 'Malting & Grain Barley (Hordeum vulgare)',
     family: 'Poaceae',
     waterDemandMinMm: 300,
     waterDemandOptMm: 450,
@@ -139,7 +139,7 @@ const CROP_DATABASE: Record<string, CropKnowledge> = {
     nitrogenKgHa: -30.0,
     breaksWeevilPest: true,
     frostToleranceC: -4.5,
-    favSuccessors: ['Tarwi', 'Habas', 'Papa nativa'],
+    favSuccessors: ['Tarwi', 'Broad Beans', 'Native Potato'],
   },
 };
 
@@ -165,7 +165,7 @@ function resolveCropKnowledge(cropStr: string, dbCrops?: Cultivo[]): CropKnowled
         nitrogenKgHa: found.balance_nitrogeno_kg_ha,
         breaksWeevilPest: found.rompe_plaga_gorgojo,
         frostToleranceC: found.tolerancia_helada_c,
-        favSuccessors: found.sucesores_favorables || ['Tarwi', 'Habas'],
+        favSuccessors: found.sucesores_favorables || ['Tarwi', 'Broad Beans'],
       };
     }
   }
@@ -229,11 +229,11 @@ export default function CopilotTab({
     if (onSelectParcel) {
       onSelectParcel(p.id);
     }
-    if (onToast) onToast(`Copiloto y reporte enfocados en ${p.name.split('•')[0].trim()}`);
+    if (onToast) onToast(`Copilot & field telemetry focused on ${p.name.split('•')[0].trim()}`);
   };
 
-  const parcelName = activeParcel?.name || profile.parcelName || 'Chacra principal';
-  const cropName = activeParcel?.cropName || profile.previousCropName || 'Papa nativa';
+  const parcelName = activeParcel?.name || profile.parcelName || 'Main field';
+  const cropName = activeParcel?.cropName || profile.previousCropName || 'Native Andean Potato';
   const parcelAreaHa = activeParcel?.areaHa || profile.areaHa || 1.73;
   const currentSmap = activeParcel?.smapHumidity ?? smapPercent;
   const altitude = activeParcel?.altitudeMsnm || profile.altitude || 3380;
@@ -241,11 +241,11 @@ export default function CopilotTab({
 
   // Initial greeting tailored to real telemetry
   const initialGreeting = useMemo(() => {
-    const farmer = profile.farmerName || 'hermano agricultor';
+    const farmer = profile.farmerName || 'farmer colleague';
     if (activeVoice === 'astro') {
-      return `¡Saludos, ${farmer}! Soy Astro de NASA Telemetría. En tu parcela "${parcelName}" el radar SMAP registra ${currentSmap}% de humedad superficial a ${altitude} msnm con cultivo de ${cropName}. ¿Qué análisis de precisión deseas realizar?`;
+      return `Greetings, ${farmer}! I am Astro from NASA Telemetry. At your parcel "${parcelName}", SMAP radar records ${currentSmap}% surface soil moisture at ${altitude} m a.s.l. with a ${cropName} standing crop. What precision geospatial analysis would you like to conduct today?`;
     }
-    return `¡Allillanchu, hermano ${farmer}! Soy Kipu, tu compañero andino. Veo que en tu chacra "${parcelName}" la tierra tiene ${currentSmap}% de humedad para tu ${cropName} a ${altitude} msnm. ¿Qué labor o rotación deseas planificar hoy?`;
+    return `Allillanchu, brother ${farmer}! I am Kipu, your Andean agroecological companion. At your field "${parcelName}", the topsoil holds ${currentSmap}% moisture for your ${cropName} at ${altitude} m a.s.l. Which field task or crop rotation would you like to plan today?`;
   }, [profile.farmerName, activeVoice, parcelName, currentSmap, altitude, cropName]);
 
   // Active dialogue shown in the prominent Duolingo mascot speech bubble
@@ -262,8 +262,8 @@ export default function CopilotTab({
       sender: initialVoice,
       text: initialGreeting,
       timestamp: typeof window !== 'undefined'
-        ? new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })
-        : 'EN VIVO',
+        ? new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        : 'LIVE',
     },
   ]);
 
@@ -280,30 +280,30 @@ export default function CopilotTab({
     {
       id: 'opt-humedad',
       icon: <Droplets className="w-4 h-4 text-emerald-600" />,
-      title: 'Humedad SMAP y Mulch',
-      desc: `Verificar suelo en ${currentSmap}% de humedad`,
-      query: `¿Cómo proteger la humedad de mi suelo en ${parcelName}?`,
+      title: 'SMAP Moisture & Mulch',
+      desc: `Monitor soil at ${currentSmap}% volumetric moisture`,
+      query: `How can I protect soil moisture in ${parcelName}?`,
     },
     {
       id: 'opt-helada',
       icon: <AlertTriangle className="w-4 h-4 text-amber-600" />,
-      title: 'Riesgo de Heladas',
-      desc: `Pronóstico para tus ${altitude} msnm`,
-      query: `¿Hay peligro de helada para mi cultivo de ${cropName}?`,
+      title: 'Frost Risk Telemetry',
+      desc: `Microclimatic forecast for ${altitude} m a.s.l.`,
+      query: `Is there an imminent frost risk for my ${cropName} crop?`,
     },
     {
       id: 'opt-rotacion',
       icon: <Leaf className="w-4 h-4 text-lime-600" />,
-      title: 'Rotación y Ahorro',
-      desc: `Fijación de nitrógeno en ${parcelAreaHa} ha`,
-      query: `¿Cuánto nitrógeno y abono ahorro si roto mi chacra?`,
+      title: 'Crop Rotation & Savings',
+      desc: `Biological N-fixation across ${parcelAreaHa} ha`,
+      query: `How much synthetic fertilizer and cost can I save by rotating my field?`,
     },
     {
       id: 'opt-aporque',
       icon: <Sprout className="w-4 h-4 text-emerald-700" />,
-      title: 'Labores y Aporque',
-      desc: `Calendario para ${cropKnowledge.name}`,
-      query: `¿En qué momento debo aporcar mi ${cropName}?`,
+      title: 'Hilling & Agronomic Care',
+      desc: `Optimal calendar for ${cropKnowledge.name}`,
+      query: `When should I hill up and weed my ${cropName}?`,
     },
   ];
 
@@ -314,49 +314,49 @@ export default function CopilotTab({
     const isFrostAlert = climaNasa?.alerta_helada || tempMedia <= 2;
     const savingsSoles = Math.round(parcelAreaHa * 286);
 
-    // 1. Humedad / Riego / SMAP / Sequía
-    if (lower.includes('humedad') || lower.includes('agua') || lower.includes('riego') || lower.includes('seco') || lower.includes('smap')) {
+    // 1. Moisture / Irrigation / SMAP / Drought
+    if (lower.includes('humedad') || lower.includes('agua') || lower.includes('riego') || lower.includes('seco') || lower.includes('smap') || lower.includes('moisture') || lower.includes('water') || lower.includes('irrigation')) {
       if (activeVoice === 'astro') {
-        return `Reporte Satelital SMAP para ${parcelName}: la humedad volumétrica del suelo está en ${currentSmap}%. Para ${cropKnowledge.name}, cuya demanda óptima es de ${cropKnowledge.waterDemandOptMm} mm, un nivel de ${currentSmap}% exige no voltear tierra al mediodía para prevenir pérdidas de 3.2 mm/día por evapotranspiración.`;
+        return `SMAP Radar Telemetry Report for ${parcelName}: Soil volumetric moisture is currently ${currentSmap}%. For ${cropKnowledge.name}, which requires an optimal water balance of ${cropKnowledge.waterDemandOptMm} mm, a level of ${currentSmap}% requires avoiding midday soil tillage to curb 3.2 mm/day evapotranspirative losses.`;
       }
-      return `Hermano, en ${parcelName} la tierra te avisa: con ${currentSmap}% de humedad superficial, el viento andino reseca las raíces tiernas. Aplica una cobertura de 6 a 8 cm con rastrojo de cebada o paja brava para conservar el rocío de la madrugada y evitar grietas en el suelo.`;
+      return `Colleague, at ${parcelName} the soil is speaking: with ${currentSmap}% surface moisture, dry Andean winds desiccate tender roots. Apply a 6 to 8 cm mulch layer using barley stover or ichu straw to preserve morning dew and arrest topsoil crusting.`;
     }
 
-    // 2. Helada / Temperatura / Frío / Clima
-    if (lower.includes('helada') || lower.includes('frio') || lower.includes('frío') || lower.includes('temperatura') || lower.includes('clima')) {
+    // 2. Frost / Temperature / Cold / Weather
+    if (lower.includes('helada') || lower.includes('frio') || lower.includes('frío') || lower.includes('temperatura') || lower.includes('clima') || lower.includes('frost') || lower.includes('cold') || lower.includes('temperature') || lower.includes('weather')) {
       if (isFrostAlert) {
         if (activeVoice === 'astro') {
-          return `Alerta de helada activa: A ${altitude} msnm en ${parcelName}, la temperatura nocturna descenderá cerca de 0°C con viento en calma y cielo despejado. La tolerancia crítica de ${cropKnowledge.name} es de ${cropKnowledge.frostToleranceC}°C. Recomendamos riego preventivo al atardecer para liberar calor latente.`;
+          return `Active Frost Alert: At ${altitude} m a.s.l. in ${parcelName}, night radiative cooling will drop temperatures near 0°C under calm winds and clear skies. The critical biological tolerance for ${cropKnowledge.name} is ${cropKnowledge.frostToleranceC}°C. We recommend preventative evening irrigation to release latent heat.`;
         }
-        return `¡Cuidado, hermano! La noche andina se viene muy clara y sin viento a ${altitude} msnm. Hay riesgo de helada blanca para tu ${cropName}. Si puedes, riega ligero los bordes al atardecer o genera humo suave con rastrojo húmedo en los linderos altos para abrigar la chacra.`;
+        return `Attention! The Andean night will be clear and windless at ${altitude} m a.s.l. White radiative frost threatens your ${cropName}. If accessible, apply light perimeter irrigation at dusk or maintain gentle moist residue smoke smudges along upper borders to shelter the parcel.`;
       }
       return activeVoice === 'astro'
-        ? `Telemetría térmica favorable: Temperatura media actual de ${tempMedia}°C a ${altitude} msnm. No se detectan anomalías térmicas severas para las próximas 48 horas en ${parcelName}. Monitorea vigor NDVI de forma regular.`
-        : `Por el momento los vientos protegen tu chacra ${parcelName}. Con ${tempMedia}°C el frío se mantiene en rango normal para la época. Sin embargo, no descuides el mulch protector en los linderos.`;
+        ? `Favorable thermal telemetry: Current mean temperature is ${tempMedia}°C at ${altitude} m a.s.l. No severe thermal anomalies are projected for the next 48 hours in ${parcelName}. Continue regular NDVI vigor monitoring.`
+        : `Winds are currently protecting your parcel ${parcelName}. At ${tempMedia}°C, nighttime cold stays within normal seasonal ranges. Ensure perimeter mulch barriers remain intact against sudden night temperature inversions.`;
     }
 
-    // 3. Rotación / Nitrógeno / Abonos / Ahorro
-    if (lower.includes('rotar') || lower.includes('rotacion') || lower.includes('rotación') || lower.includes('nitrogeno') || lower.includes('nitrógeno') || lower.includes('abono') || lower.includes('ahorro')) {
+    // 3. Rotation / Nitrogen / Fertilizers / Savings
+    if (lower.includes('rotar') || lower.includes('rotacion') || lower.includes('rotación') || lower.includes('nitrogeno') || lower.includes('nitrógeno') || lower.includes('abono') || lower.includes('ahorro') || lower.includes('rotat') || lower.includes('nitrogen') || lower.includes('fertiliz') || lower.includes('saving')) {
       const successors = cropKnowledge.favSuccessors.join(', ');
       if (cropKnowledge.nitrogenKgHa > 0) {
-        return `Tu cultivo actual de ${cropName} es una leguminosa fijadora de nitrógeno que aporta +${cropKnowledge.nitrogenKgHa} kg N/ha en ${parcelName}. Al rotar en la siguiente campaña con Papa nativa o Maíz Blanco, ahorrarás aproximadamente S/ ${savingsSoles.toLocaleString('es-PE')} en fertilizantes químicos en tus ${parcelAreaHa} ha.`;
+        return `Your current ${cropName} crop is an active symbiotic nitrogen-fixing legume contributing +${cropKnowledge.nitrogenKgHa} kg N/ha at ${parcelName}. In subsequent rotational succession with Native Potato or Giant White Corn, you will save approximately S/ ${savingsSoles.toLocaleString('en-US')} in synthetic nitrogen fertilizers across your ${parcelAreaHa} ha.`;
       }
-      return `En tu parcela ${parcelName} de ${parcelAreaHa} ha, tu ${cropName} consume ${Math.abs(cropKnowledge.nitrogenKgHa)} kg N/ha. Te conviene rotar inmediatamente con leguminosas como ${successors}, las cuales fijan entre +75 y +95 kg N/ha y te generarán un ahorro verificado de S/ ${savingsSoles.toLocaleString('es-PE')} en abonos orgánicos.`;
+      return `In your parcel ${parcelName} of ${parcelAreaHa} ha, your ${cropName} extracts ${Math.abs(cropKnowledge.nitrogenKgHa)} kg N/ha. We recommend immediate crop rotation with legumes such as ${successors}, fixing +75 to +95 kg N/ha and delivering a verified savings of S/ ${savingsSoles.toLocaleString('en-US')} in organic soil amendments.`;
     }
 
-    // 4. Aporque / Deshierbe / Plagas / Gorgojo / Siembra
-    if (lower.includes('aporcar') || lower.includes('aporque') || lower.includes('deshierbe') || lower.includes('plaga') || lower.includes('gorgojo') || lower.includes('siembra')) {
+    // 4. Hilling / Weeding / Pests / Weevil / Sowing
+    if (lower.includes('aporcar') || lower.includes('aporque') || lower.includes('deshierbe') || lower.includes('plaga') || lower.includes('gorgojo') || lower.includes('siembra') || lower.includes('hill') || lower.includes('weed') || lower.includes('pest') || lower.includes('weevil') || lower.includes('sow')) {
       if (cropKnowledge.breaksWeevilPest) {
-        return `Excelente consulta: ${cropKnowledge.name} es un cultivo que rompe el ciclo biológico del gorgojo de los Andes. El aporque debe ser ligero a los 35 días para airear la rizosfera y facilitar la formación de nódulos fijadores de nitrógeno sin dañar las raíces laterales.`;
+        return `Key agroecological insight: ${cropKnowledge.name} disrupts the biological life cycle of the Andean potato weevil (Premnotrypes spp.). Light hilling should occur at 35 days to aerate the rhizosphere and foster Rhizobium nodule formation without disturbing lateral root architecture.`;
       }
-      return `Para tu ${cropName} en ${parcelName}, realiza el primer aporque cuando los tallos alcancen entre 18 y 22 cm de altura. Levanta surcos altos en contorno para proteger los tubérculos del sol directo, impedir la entrada del gorgojo y canalizar el agua de lluvia.`;
+      return `For your ${cropName} in ${parcelName}, conduct the first hilling when stems reach 18 to 22 cm in height. Build high contour mounds to protect tubers from solar greening, deter oviposition by the Andean potato weevil, and channel seasonal rainfall into the root zone.`;
     }
 
     // Default general grounding
     if (activeVoice === 'astro') {
-      return `Análisis satelital integrado: Parcela "${parcelName}" calibrada a ${altitude} msnm con ${parcelAreaHa} ha de ${cropName}. Humedad SMAP en ${currentSmap}%, pH óptimo entre ${cropKnowledge.phMin} y ${cropKnowledge.phMax}. Datos satelitales confirmados con telemetría NASA.`;
+      return `Integrated satellite telemetry: Parcel "${parcelName}" calibrated at ${altitude} m a.s.l. spanning ${parcelAreaHa} ha of ${cropName}. SMAP soil moisture stands at ${currentSmap}%, with optimal edaphic pH between ${cropKnowledge.phMin} and ${cropKnowledge.phMax}. Telemetry confirmed via NASA Earth observation streams.`;
     }
-    return `Comprendido sobre tu chacra "${parcelName}". Nuestros abuelos siempre observaban la luna y el comportamiento del suelo a ${altitude} msnm. Con ${currentSmap}% de humedad, tu ${cropName} responderá muy bien si mantienes el rastrojo y realizas aporque a tiempo.`;
+    return `Understood regarding your field "${parcelName}". Ancestral wisdom has long read lunar cycles and soil temperature at ${altitude} m a.s.l. At ${currentSmap}% moisture, your ${cropName} will flourish with maintained surface mulch and timely contour hilling.`;
   };
 
   const handleSendMessage = (textToSend?: string) => {
@@ -368,7 +368,7 @@ export default function CopilotTab({
       id: `usr-${Date.now()}`,
       sender: 'user',
       text,
-      timestamp: new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
     };
 
     setMessages((prev) => [...prev, userMsg]);
@@ -385,7 +385,7 @@ export default function CopilotTab({
         id: `bot-${Date.now()}`,
         sender: activeVoice,
         text: reply,
-        timestamp: new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }),
+        timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
       };
 
       setMessages((prev) => [...prev, botMsg]);
@@ -410,7 +410,7 @@ export default function CopilotTab({
             }`}
           >
             <Sprout className="w-3.5 h-3.5 text-[#A3E635]" />
-            <span>Kipu · Saber Local</span>
+            <span>Kipu - Local Agroecology</span>
           </button>
 
           <button
@@ -426,14 +426,14 @@ export default function CopilotTab({
             }`}
           >
             <Sun className="w-3.5 h-3.5 text-amber-400" />
-            <span>Astro · Datos NASA</span>
+            <span>Astro - NASA Telemetry</span>
           </button>
         </div>
 
         {/* Gamification Streak Badge */}
         <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-300/70 px-3 py-1.5 rounded-2xl text-amber-800 text-xs font-bold shadow-2xs shrink-0">
           <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-          <span>5 días</span>
+          <span>5-day streak</span>
         </div>
       </div>
 
@@ -456,7 +456,7 @@ export default function CopilotTab({
             </div>
             <div className="mt-1.5 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-black/50 border border-white/10 text-[10px] font-semibold text-lime-300">
               <span className="w-1.5 h-1.5 rounded-full bg-[#A3E635] animate-pulse" />
-              <span>{activeVoice === 'astro' ? 'Astro NASA' : 'Kipu Andino'}</span>
+              <span>{activeVoice === 'astro' ? 'Astro NASA' : 'Kipu Andean'}</span>
             </div>
           </div>
 
@@ -467,11 +467,11 @@ export default function CopilotTab({
               <div className="flex items-center justify-between pb-1.5 border-b border-emerald-500/20 mb-2">
                 <div className="flex items-center gap-1.5 min-w-0">
                   <span className="text-xs font-bold text-[#A3E635] truncate">
-                    {activeVoice === 'astro' ? 'Astro (Telemetría NASA)' : 'Kipu (Copiloto Andino)'}
+                    {activeVoice === 'astro' ? 'Astro (NASA Telemetry)' : 'Kipu (Andean Copilot)'}
                   </span>
                 </div>
                 <span className="text-[9.5px] font-mono text-emerald-300/80 uppercase shrink-0">
-                  {cropName} · {currentSmap}% SMAP
+                  {cropName} - {currentSmap}% SMAP
                 </span>
               </div>
 
@@ -479,7 +479,7 @@ export default function CopilotTab({
               {isTyping ? (
                 <div className="flex items-center gap-2 py-1 text-xs text-emerald-200">
                   <Sprout className="w-4 h-4 text-[#A3E635] animate-spin shrink-0" />
-                  <span>Consultando telemetría satelital y matriz agronómica...</span>
+                  <span>Querying satellite telemetry and agronomic matrix...</span>
                 </div>
               ) : (
                 <p className="text-xs text-zinc-100 leading-relaxed font-normal">
@@ -496,10 +496,10 @@ export default function CopilotTab({
         <div className="space-y-1.5">
           <div className="flex items-center justify-between px-1">
             <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider block">
-              CHACRA ACTIVA EN CONVERSACIÓN
+              ACTIVE FIELD IN CONSULTATION
             </span>
             <span className="text-[10px] font-mono text-emerald-700 font-semibold">
-              SMAP {currentSmap}% · {altitude} msnm
+              SMAP {currentSmap}% - {altitude} m a.s.l.
             </span>
           </div>
 
@@ -532,7 +532,7 @@ export default function CopilotTab({
       {/* 4. DUOLINGO STYLE INTERACTIVE CHOICE CARDS */}
       <div className="space-y-2">
         <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider px-1 block">
-          CONSULTAS RÁPIDAS SOBRE TU CHACRA
+          QUICK FIELD INQUIRIES
         </span>
         <div className="grid grid-cols-2 gap-2.5">
           {duolingoOptions.map((opt) => (
@@ -626,14 +626,14 @@ export default function CopilotTab({
             type="text"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Pregunta a Kipu sobre tu parcela o suelo..."
+            placeholder="Ask Kipu or Astro about your parcel, soil health, or satellite telemetry..."
             className="flex-1 h-10 px-3.5 rounded-full bg-[#F7F9F6] border border-[#E5ECE2] text-xs text-zinc-800 placeholder-zinc-400 focus:outline-hidden focus:border-[#7BB63E] transition"
           />
           <button
             type="submit"
             disabled={!inputMessage.trim() || isTyping}
             className="w-10 h-10 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] disabled:opacity-40 text-[#132A1C] flex items-center justify-center shadow-xs transition active:scale-95 cursor-pointer shrink-0"
-            title="Enviar mensaje"
+            title="Send message"
           >
             <Send className="w-4 h-4 stroke-[2.5]" />
           </button>
@@ -645,13 +645,13 @@ export default function CopilotTab({
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <span className="text-[10px] font-semibold text-emerald-800 uppercase tracking-wider block">
-              REPORTE DE CAMPO
+              IN-SITU FIELD REPORT
             </span>
             <h4 className="text-sm font-bold text-zinc-800 leading-tight">
-              ¿Deseas registrar un reporte de campo hoy?
+              Would you like to record an in-situ field diagnostic today?
             </h4>
             <p className="text-[11px] text-zinc-500 mt-0.5 font-normal">
-              Compara la señal satelital con la textura y humedad in situ de tu parcela.
+              Validate satellite radar signals against ground-truth soil texture and moisture.
             </p>
           </div>
           <button
@@ -663,7 +663,7 @@ export default function CopilotTab({
             className="px-4 py-2.5 rounded-full bg-[#132A1C] hover:bg-emerald-950 text-white font-semibold text-xs shrink-0 cursor-pointer shadow-xs transition active:scale-95 flex items-center gap-1.5"
           >
             <Sparkles className="w-3.5 h-3.5 text-[#A3E635]" />
-            <span>Evaluar suelo</span>
+            <span>Assess Soil Health</span>
           </button>
         </div>
 
@@ -674,12 +674,12 @@ export default function CopilotTab({
           </div>
           <div className="min-w-0 flex-1">
             <span className="text-[9.5px] font-bold uppercase tracking-wider text-emerald-800 block">
-              Parcela que está dando el dato:
+              Reference parcel:
             </span>
             <span className="text-xs font-bold text-zinc-900 truncate block">
               {activeParcel
-                ? `${activeParcel.name} • ${activeParcel.cropCategory || activeParcel.cropName} (${activeParcel.areaHa} ha)`
-                : profile.parcelName || 'Chacra principal'}
+                ? `${activeParcel.name} - ${activeParcel.cropCategory || activeParcel.cropName} (${activeParcel.areaHa} ha)`
+                : profile.parcelName || 'Main field'}
             </span>
           </div>
         </div>
@@ -688,7 +688,7 @@ export default function CopilotTab({
         {parcels.length > 0 && (
           <div className="space-y-1.5 pt-0.5">
             <span className="text-[9.5px] font-semibold text-zinc-500 uppercase tracking-wider block">
-              Elegir parcela para este reporte:
+              Select parcel for this field report:
             </span>
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
               {parcels.map((p) => {

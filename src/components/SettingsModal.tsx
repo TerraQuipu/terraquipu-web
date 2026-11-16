@@ -49,7 +49,7 @@ export default function SettingsModal({
   const testGPS = () => {
     playBubblePop();
     if (typeof window === 'undefined' || !navigator.geolocation) {
-      setGpsResult('⚠️ Geolocalización no disponible en este dispositivo.');
+      setGpsResult('⚠️ Geolocation unavailable on this device.');
       return;
     }
     setGpsTesting(true);
@@ -60,9 +60,9 @@ export default function SettingsModal({
         setGpsTesting(false);
         playSuccessFanfare();
         setGpsResult(
-          `✅ GPS Calibrado: Lat ${pos.coords.latitude.toFixed(4)}, Lon ${pos.coords.longitude.toFixed(4)} (Precisión: ±${Math.round(pos.coords.accuracy)}m)`
+          `✅ GPS Calibrated: Lat ${pos.coords.latitude.toFixed(4)}, Lon ${pos.coords.longitude.toFixed(4)} (Accuracy: ±${Math.round(pos.coords.accuracy)}m)`
         );
-        onToast('🛰️ Satélite GPS conectado con éxito');
+        onToast('🛰️ GNSS / GPS satellite fix established');
         if (onUpdateProfile) {
           onUpdateProfile({
             lat: Number(pos.coords.latitude.toFixed(4)),
@@ -73,21 +73,21 @@ export default function SettingsModal({
       (err) => {
         setGpsTesting(false);
         if (err.code === err.PERMISSION_DENIED) {
-          setGpsResult('⚠️ Permiso GPS bloqueado en el navegador. Por favor actívalo en permisos.');
+          setGpsResult('⚠️ GPS permission blocked in browser. Please enable location permissions.');
         } else {
-          setGpsResult(`⚠️ Error GPS (${err.message}).`);
+          setGpsResult(`⚠️ GPS Error (${err.message}).`);
         }
-        onToast('⚠️ GPS no disponible');
+        onToast('⚠️ GPS unavailable');
       },
       { timeout: 7000 }
     );
   };
 
   const handleResetProfile = () => {
-    if (confirm('¿Deseas restaurar la configuración inicial y calibrar de nuevo tu chacra?')) {
+    if (confirm('Reset configuration and recalibrate your field parcel from scratch?')) {
       playWhoosh();
       resetDeviceProfile();
-      onToast('🔄 Configuración de chacra restablecida.');
+      onToast('🔄 Field parcel configuration reset.');
       onReset();
       onClose();
     }
@@ -103,7 +103,7 @@ export default function SettingsModal({
               <Cpu className="w-4 h-4 text-emerald-800" />
             </div>
             <div>
-              <h2 className="text-sm font-black text-[#132A1C]">Ajustes de Parcela & Hardware</h2>
+              <h2 className="text-sm font-black text-[#132A1C]">Field Parcel &amp; Hardware Settings</h2>
               <span className="text-[10px] text-zinc-500 font-mono">ID: {hardwareId || 'TQ-HW-C249'}</span>
             </div>
           </div>
@@ -112,7 +112,7 @@ export default function SettingsModal({
             type="button"
             onClick={onClose}
             className="w-8 h-8 rounded-full bg-white border border-[#E5ECE2] flex items-center justify-center text-zinc-600 hover:text-zinc-900 cursor-pointer shadow-2xs"
-            title="Cerrar"
+            title="Close"
           >
             <X className="w-4 h-4" />
           </button>
@@ -122,10 +122,10 @@ export default function SettingsModal({
         <div className="bg-white rounded-2xl p-4 border border-[#E5ECE2] shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60">
-              PARCELA ACTIVA
+              ACTIVE PARCEL
             </span>
             <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-              {profile.altitude || 3380} msnm
+              {profile.altitude || 3380} m a.s.l.
             </span>
           </div>
 
@@ -140,11 +140,11 @@ export default function SettingsModal({
 
           <div className="grid grid-cols-2 gap-2 pt-2 text-xs border-t border-[#E5ECE2]">
             <div>
-              <span className="text-[10px] text-zinc-400 block">Cultivo Principal:</span>
-              <span className="font-bold text-[#132A1C]">{profile.previousCropName || 'Papa Nativa'}</span>
+              <span className="text-[10px] text-zinc-400 block">Primary Crop:</span>
+              <span className="font-bold text-[#132A1C]">{profile.previousCropName || 'Native Andean Potato'}</span>
             </div>
             <div>
-              <span className="text-[10px] text-zinc-400 block">Área Registrada:</span>
+              <span className="text-[10px] text-zinc-400 block">Registered Area:</span>
               <span className="font-bold text-[#132A1C]">{profile.areaHa || 1.0} ha (≈ {((profile.areaHa || 1.0) * 3.3).toFixed(1)} topos)</span>
             </div>
           </div>
@@ -154,13 +154,13 @@ export default function SettingsModal({
         <div className="bg-white rounded-2xl p-4 border border-[#E5ECE2] shadow-xs space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60">
-              CONEXIÓN SATELITAL GPS
+              GPS / GNSS SATELLITE CONNECTION
             </span>
             <Satellite className="w-4 h-4 text-emerald-800" />
           </div>
 
           <p className="text-xs text-zinc-600 leading-relaxed">
-            Sincroniza la antena GNSS de tu dispositivo con las coordenadas orbitales de NASA SMAP.
+            Synchronize device GNSS receiver with NASA SMAP and Sentinel-2 orbital grids.
           </p>
 
           <button
@@ -174,7 +174,7 @@ export default function SettingsModal({
             }`}
           >
             <Navigation className={`w-3.5 h-3.5 ${gpsTesting ? 'animate-spin' : ''}`} />
-            <span>{gpsTesting ? 'Triangulando Satélites...' : 'Probar Precisión GPS en Vivo'}</span>
+            <span>{gpsTesting ? 'Triangulating Satellites...' : 'Test Live GNSS Accuracy'}</span>
           </button>
 
           {gpsResult && (
@@ -187,19 +187,19 @@ export default function SettingsModal({
         {/* Telemetría y Persistencia en Hardware */}
         <div className="bg-white rounded-2xl p-4 border border-[#E5ECE2] shadow-xs space-y-2">
           <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900/60 block">
-            PERSISTENCIA OFFLINE EN HARDWARE
+            OFFLINE HARDWARE PERSISTENCE
           </span>
           <div className="flex items-center justify-between text-xs text-zinc-600">
-            <span>Identificador Hardware Único:</span>
+            <span>Unique Hardware Identifier:</span>
             <span className="font-mono font-bold text-emerald-900">{hardwareId || 'TQ-HW-C249'}</span>
           </div>
           <div className="flex items-center justify-between text-xs text-zinc-600">
-            <span>Almacenamiento Local (IndexedDB):</span>
-            <span className="font-bold text-emerald-700">100% Operativo sin señal</span>
+            <span>Local Storage (IndexedDB):</span>
+            <span className="font-bold text-emerald-700">100% Offline Operational</span>
           </div>
           <div className="flex items-center justify-between text-xs text-zinc-600">
-            <span>Sincronización Supabase Cloud:</span>
-            <span className="font-bold text-emerald-700">Outbox activo</span>
+            <span>Supabase Cloud Sync:</span>
+            <span className="font-bold text-emerald-700">Active Outbox Sync</span>
           </div>
         </div>
 
@@ -215,7 +215,7 @@ export default function SettingsModal({
             className="w-full py-3 rounded-full bg-[#84CC16] hover:bg-[#72b012] text-[#132A1C] font-black text-xs flex items-center justify-center gap-1.5 transition active:scale-98 cursor-pointer shadow-xs"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Recalibrar Asistente Completo (Onboarding)</span>
+            <span>Recalibrate Full Field Profile (Onboarding)</span>
           </button>
 
           <button
@@ -224,7 +224,7 @@ export default function SettingsModal({
             className="w-full py-2.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
           >
             <Trash2 className="w-3.5 h-3.5" />
-            <span>Restablecer Configuración a Valores de Fábrica</span>
+            <span>Reset All Settings to Factory Defaults</span>
           </button>
         </div>
 

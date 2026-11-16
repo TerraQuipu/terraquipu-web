@@ -61,7 +61,7 @@ export default function InicioTab({
 }: InicioTabProps) {
   const [currentTime, setCurrentTime] = useState<string>('');
   const [isBannerDismissed, setIsBannerDismissed] = useState(false);
-  const [selectedCropFilter, setSelectedCropFilter] = useState<string>('Todos');
+  const [selectedCropFilter, setSelectedCropFilter] = useState<string>('All');
   const [activeConsejoVoice, setActiveConsejoVoice] = useState<'astro' | 'kipu'>('astro');
   const [parcels, setParcels] = useState<ParcelItem[]>([]);
   const [localActiveParcelId, setLocalActiveParcelId] = useState<string>(() => {
@@ -102,7 +102,7 @@ export default function InicioTab({
     const updateTime = () => {
       const now = new Date();
       setCurrentTime(
-        now.toLocaleTimeString('es-PE', {
+        now.toLocaleTimeString('en-US', {
           hour: '2-digit',
           minute: '2-digit',
         })
@@ -126,7 +126,7 @@ export default function InicioTab({
 
   // Dynamic filter pills derived from real parcels
   const availableFilters = React.useMemo(() => {
-    const base = ['Todos'];
+    const base = ['All'];
     const categories = Array.from(
       new Set(
         parcels
@@ -137,7 +137,7 @@ export default function InicioTab({
     return [...base, ...categories];
   }, [parcels]);
 
-  const filteredParcels = selectedCropFilter === 'Todos'
+  const filteredParcels = selectedCropFilter === 'All'
     ? parcels
     : parcels.filter(
         (p) =>
@@ -158,7 +158,7 @@ export default function InicioTab({
   const radius = 34;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (animatedScore / 100) * circumference;
-  const scoreStatus = healthScore >= 75 ? 'BUEN ESTADO' : healthScore >= 50 ? 'REGULAR' : 'ALERTA';
+  const scoreStatus = healthScore >= 75 ? 'OPTIMAL' : healthScore >= 50 ? 'MODERATE' : 'ALERT';
   const scoreColor = healthScore >= 75 ? '#7BB63E' : healthScore >= 50 ? '#F59E0B' : '#EF4444';
 
   // Real or calibrated telemetry readings from liveAgrometeo / Supabase climaNasa
@@ -176,15 +176,15 @@ export default function InicioTab({
 
   const windKm = liveAgrometeo?.windSpeedKmH ?? 12;
 
-  const conditionLabel = liveAgrometeo?.conditionLabel || (rainMm !== '0.0' ? 'LLUVIA' : 'SOLEADO');
+  const conditionLabel = liveAgrometeo?.conditionLabel || (rainMm !== '0.0' ? 'RAIN' : 'SUNNY');
 
   // Agricultural warning banner calculated dynamically from SMAP and NASA weather
   const agriculturalBanner = React.useMemo(() => {
     const isFrostRisk = climaNasa?.alerta_helada || tempC <= 2;
     if (isFrostRisk) {
       return {
-        title: 'Alerta de helada en la zona',
-        description: `Temperatura estimada en ${tempC}°C. Protege los brotes con mulch o riego nocturno.`,
+        title: 'Agroclimatic frost risk alert',
+        description: `Estimated surface temperature at ${tempC}°C. Protect shoots with mulch cover or nighttime auxiliary irrigation.`,
         bg: 'bg-[#EFF6FF] border-[#BFDBFE]',
         iconBg: 'bg-blue-100/90 border-blue-300/50 text-blue-800',
         icon: <AlertTriangle className="w-4 h-4 text-blue-700" />,
@@ -192,8 +192,8 @@ export default function InicioTab({
     }
     if (smapPercent < 15) {
       return {
-        title: 'Protege el suelo, no quemes el rastrojo',
-        description: `Humedad SMAP baja (${smapPercent}%). La cobertura conserva humedad en días secos.`,
+        title: 'Conserve soil moisture: Burning strictly prohibited',
+        description: `Critical SMAP root moisture (${smapPercent}%). Maintain crop residue cover to prevent edaphic desiccation.`,
         bg: 'bg-[#FDF8F0] border-[#F2E5D0]',
         iconBg: 'bg-amber-100/90 border-amber-300/50 text-amber-800',
         icon: <AlertTriangle className="w-4 h-4 text-amber-700" />,
@@ -201,16 +201,16 @@ export default function InicioTab({
     }
     if (smapPercent > 35) {
       return {
-        title: 'Humedad alta en el suelo',
-        description: `Humedad SMAP en ${smapPercent}%. Revisa zanjas de drenaje para evitar asfixia radicular.`,
+        title: 'High soil moisture saturation',
+        description: `SMAP moisture at ${smapPercent}%. Inspect drainage infiltration furrows to prevent root hypoxia.`,
         bg: 'bg-[#ECFDF5] border-[#A7F3D0]',
         iconBg: 'bg-emerald-100/90 border-emerald-300/50 text-emerald-800',
         icon: <Droplets className="w-4 h-4 text-emerald-700" />,
       };
     }
     return {
-      title: 'Condiciones favorables en el suelo',
-      description: `Humedad SMAP óptima (${smapPercent}%). Buen momento para labores de aporque y abonado.`,
+      title: 'Favorable edaphic conditions',
+      description: `Optimal SMAP root moisture (${smapPercent}%). Favorable window for hilling and organic fertilization.`,
       bg: 'bg-[#F0FDF4] border-[#BBF7D0]',
       iconBg: 'bg-emerald-100/90 border-emerald-300/50 text-emerald-800',
       icon: <CheckCircle2 className="w-4 h-4 text-emerald-700" />,
@@ -224,35 +224,35 @@ export default function InicioTab({
 
     if (smap < 15) {
       return {
-        title: 'Conservar humedad con mulch',
-        description: `Humedad SMAP en ${smap}%. Mantén cobertura de rastrojo frente a la sequía.`,
+        title: 'Retain moisture with mulch cover',
+        description: `SMAP moisture at ${smap}%. Maintain crop residue cover against drought anomaly.`,
         icon: <Leaf className="w-4 h-4 text-emerald-800" />,
       };
     }
     if (cropLower.includes('tarwi') || cropLower.includes('haba')) {
       return {
-        title: 'Fijación biológica de nitrógeno',
-        description: 'Leguminosa activa aportando fertilidad natural y rompiendo plagas.',
+        title: 'Biological Nitrogen Fixation (BNF)',
+        description: 'Active legume fixing bioavailable nitrogen (+95 kg N/ha) and disrupting pest cycle.',
         icon: <Sprout className="w-4 h-4 text-emerald-800" />,
       };
     }
     if (cropLower.includes('maiz') || cropLower.includes('maíz')) {
       return {
-        title: 'Surcos en contorno',
-        description: 'Retienen el agua de lluvia y reducen el lavado de nutrientes en ladera.',
+        title: 'Contour ridge tillage',
+        description: 'Conserves runoff rainwater and mitigates hillside nutrient runoff.',
         icon: <Sun className="w-4 h-4 text-emerald-800" />,
       };
     }
     if (cropLower.includes('quinua')) {
       return {
-        title: 'Resistencia a heladas y sequía',
-        description: 'Monitorea vigor Sentinel-2 con alta resiliencia climática.',
+        title: 'Frost and drought resilience',
+        description: 'Monitor Sentinel-2 NDVI vigor with high ecophysiological resilience.',
         icon: <ShieldCheck className="w-4 h-4 text-emerald-800" />,
       };
     }
     return {
-      title: 'Manejo agroecológico de suelo',
-      description: `Abonado orgánico y aporque oportuno para ${parcel.cropName}.`,
+      title: 'Agroecological soil stewardship',
+      description: `Timely organic fertilization and hilling for ${parcel.cropName}.`,
       icon: <Sprout className="w-4 h-4 text-emerald-800" />,
     };
   };
@@ -260,7 +260,7 @@ export default function InicioTab({
   return (
     <div className="space-y-4 animate-in fade-in -mx-4 -mt-4 pb-24">
       {/* =========================================================================
-          HERO SUPERIOR: FOTO ANDINA + HEADER + GREETING + WEATHER GLASS CARD
+          HERO SUPERIOR: ANDEAN PHOTO + HEADER + GREETING + WEATHER GLASS CARD
          ========================================================================= */}
       <div className="relative w-full overflow-hidden bg-emerald-950 px-4 pt-4 pb-6 rounded-b-[2.5rem] shadow-lg">
         {/* Andean Mountain Photographic Background */}
@@ -290,8 +290,8 @@ export default function InicioTab({
                 if (onOpenNews) onOpenNews();
               }}
               className="relative w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 border border-white/20 backdrop-blur-md flex items-center justify-center text-white transition active:scale-95 cursor-pointer shadow-md"
-              title="Ver boletines científicos y alertas ENOS"
-              aria-label="Ver boletines científicos y alertas ENOS"
+              title="View scientific bulletins and ENSO alerts"
+              aria-label="View scientific bulletins and ENSO alerts"
             >
               <Bell className="w-4 h-4 text-white" />
               <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#7BB63E] ring-2 ring-emerald-950" />
@@ -305,26 +305,26 @@ export default function InicioTab({
             </div>
             <div>
               <h2 className="text-base font-bold text-white leading-tight">
-                Hola, {profile?.farmerName || 'Miguel'}
+                Hello, {profile?.farmerName || 'Miguel'}
               </h2>
               <p className="text-xs text-white/80 font-normal">
-                Comunidad {profile.distrito || profile.cuencaName || 'Urubamba'}
+                Community {profile.distrito || profile.cuencaName || 'Urubamba'}
               </p>
             </div>
           </div>
 
           {/* Weather Glassmorphic Dark Forest Green Card */}
           <div className="bg-[#1B3B22]/90 backdrop-blur-md rounded-3xl p-5 border border-emerald-500/20 shadow-2xl text-white space-y-3.5">
-            {/* Top Row: Location & Soleado */}
+            {/* Top Row: Location & Weather Condition */}
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-1.5 text-xs min-w-0">
                 <MapPin className="w-3.5 h-3.5 text-[#A3E635] shrink-0" />
                 <div className="leading-tight truncate">
                   <span className="font-semibold text-white/95 block truncate">
-                    Microcuenca {profile.distrito || 'Vilcanota'}
+                    Micro-watershed {profile.distrito || 'Vilcanota'}
                   </span>
                   <span className="text-[10px] text-white/70">
-                    {profile.departamento || 'Cusco'} · {profile.altitude || 3400} msnm
+                    {profile.departamento || 'Cusco'} · {profile.altitude || 3400} m a.s.l.
                   </span>
                 </div>
               </div>
@@ -335,19 +335,19 @@ export default function InicioTab({
               </div>
             </div>
 
-            {/* Middle Row: Temperature + Riesgo de sequía dinámico */}
+            {/* Middle Row: Temperature + Dynamic Drought Risk */}
             <div className="flex items-baseline gap-3 pt-0.5">
               <span className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
                 {tempC}°C
               </span>
               <div className="space-y-0.5">
                 <span className="text-xs font-medium text-white/90 block">
-                  Riesgo de sequía
+                  Drought risk
                 </span>
                 <div className="flex items-center gap-1.5 text-[11px] text-zinc-300">
                   <span className={`w-2 h-2 rounded-full ${smapPercent < 15 ? 'bg-rose-400' : smapPercent < 25 ? 'bg-amber-400' : 'bg-emerald-400'}`} />
                   <span>
-                    {smapPercent < 15 ? 'Alto · hoy' : smapPercent < 25 ? 'Moderado · hoy' : 'Bajo · hoy'}
+                    {smapPercent < 15 ? 'High · today' : smapPercent < 25 ? 'Moderate · today' : 'Low · today'}
                   </span>
                 </div>
               </div>
@@ -356,14 +356,14 @@ export default function InicioTab({
             {/* Divider + 3 Metrics Row */}
             <div className="pt-2 border-t border-emerald-500/20">
               <div className="grid grid-cols-3 gap-2 text-left">
-                {/* Metric 1: Humedad SMAP */}
+                {/* Metric 1: SMAP Moisture */}
                 <div className="flex items-center gap-2 min-w-0">
                   <div className="w-7 h-7 rounded-lg bg-emerald-900/60 border border-emerald-500/30 flex items-center justify-center text-[#A3E635] shrink-0">
                     <Droplets className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0">
                     <span className="text-[9.5px] text-white/70 block truncate">
-                      Humedad · SMAP
+                      Moisture · SMAP
                     </span>
                     <span className="text-xs font-semibold text-white/95">
                       {smapPercent}%
@@ -371,14 +371,14 @@ export default function InicioTab({
                   </div>
                 </div>
 
-                {/* Metric 2: Lluvia GPM */}
+                {/* Metric 2: GPM Rainfall */}
                 <div className="flex items-center gap-2 min-w-0">
                   <div className="w-7 h-7 rounded-lg bg-emerald-900/60 border border-emerald-500/30 flex items-center justify-center text-[#A3E635] shrink-0">
                     <CloudRain className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0">
                     <span className="text-[9.5px] text-white/70 block truncate">
-                      Lluvia · GPM
+                      Rainfall · GPM
                     </span>
                     <span className="text-xs font-semibold text-white/95">
                       {rainMm} mm
@@ -386,14 +386,14 @@ export default function InicioTab({
                   </div>
                 </div>
 
-                {/* Metric 3: Viento */}
+                {/* Metric 3: Wind */}
                 <div className="flex items-center gap-2 min-w-0">
                   <div className="w-7 h-7 rounded-lg bg-emerald-900/60 border border-emerald-500/30 flex items-center justify-center text-[#A3E635] shrink-0">
                     <Wind className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0">
                     <span className="text-[9.5px] text-white/70 block truncate">
-                      Viento
+                      Wind
                     </span>
                     <span className="text-xs font-semibold text-white/95">
                       {windKm} km/h
@@ -403,32 +403,32 @@ export default function InicioTab({
               </div>
             </div>
 
-            {/* Sub-bar: REPORTE DE CAMPO · HORA REAL EN VIVO */}
+            {/* Sub-bar: IN-SITU FIELD REPORT · REAL-TIME TELEMETRY */}
             <div className="flex items-center justify-between text-[10px] font-mono text-zinc-300/80 pt-2 border-t border-emerald-500/15">
               <span className="font-semibold tracking-wider text-emerald-300 uppercase">
-                REPORTE DE CAMPO
+                IN-SITU FIELD REPORT
               </span>
-              <span>HOY · {currentTime || 'EN VIVO'}</span>
+              <span>TODAY · {currentTime || 'LIVE'}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* =========================================================================
-          CONTENIDO INFERIOR: SALUD DEL SUELO + ALERTA DINÁMICA + PARCELAS + CONSEJO
+          LOWER CONTENT: SOIL HEALTH + DYNAMIC ALERT + PARCELS + DAILY INSIGHT
          ========================================================================= */}
       <div className="px-4 space-y-4 max-w-md mx-auto">
-        {/* 1. SECCIÓN SALUD DEL SUELO */}
+        {/* 1. SOIL HEALTH & EDAPHIC RESILIENCE SECTION */}
         <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] space-y-3.5">
           {/* Active Parcel Header & Chip Selector */}
           {parcels.length > 0 && (
             <div className="space-y-2 pb-2 border-b border-[#F0F4ED]">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-800/80 block">
-                  SALUD DEL SUELO
+                  SOIL HEALTH & EDAPHIC RESILIENCE
                 </span>
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/60 truncate max-w-[220px]">
-                  📍 {activeParcel?.name || 'Chacra principal'}
+                  📍 {activeParcel?.name || 'Main parcel'}
                 </span>
               </div>
 
@@ -463,7 +463,7 @@ export default function InicioTab({
 
           {parcels.length === 0 && (
             <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-800/80 block">
-              SALUD DEL SUELO
+              SOIL HEALTH & EDAPHIC RESILIENCE
             </span>
           )}
 
@@ -472,26 +472,26 @@ export default function InicioTab({
               <h1 className="text-xl sm:text-2xl font-bold text-zinc-800 leading-tight">
                 {parcels.length === 0 ? (
                   <>
-                    Listo para{' '}
+                    Ready to{' '}
                     <span className="italic text-emerald-800 font-normal">
-                      calibrar tu chacra.
+                      calibrate your parcel.
                     </span>
                   </>
                 ) : (
                   <>
-                    Tu suelo está{' '}
+                    Your soil is{' '}
                     <span className="italic text-emerald-800 font-normal">
-                      {healthScore >= 75 ? 'respondiendo bien.' : healthScore >= 50 ? 'en recuperación.' : 'bajo estrés hídrico.'}
+                      {healthScore >= 75 ? 'responding vigorously.' : healthScore >= 50 ? 'in recovery.' : 'under moisture stress.'}
                     </span>
                   </>
                 )}
               </h1>
               <p className="text-xs text-zinc-600 leading-relaxed font-normal">
                 {parcels.length === 0
-                  ? 'Delimita tu parcela para monitorear humedad de suelo y vigor con satélites.'
+                  ? 'Delimit your parcel to monitor soil moisture and vegetative vigor via satellites.'
                   : activeParcel
-                  ? `Evaluando ${activeParcel.name.split('•')[0].trim()} (${activeParcel.areaHa} ha). Pequeñas prácticas protegen la cosecha.`
-                  : 'Pequeñas prácticas de hoy protegen la cosecha de mañana.'}
+                  ? `Evaluating ${activeParcel.name.split('•')[0].trim()} (${activeParcel.areaHa} ha). Ground-truth practices protect harvest resilience.`
+                  : 'Ground-truth practices protect harvest resilience.'}
               </p>
             </div>
 
@@ -534,7 +534,7 @@ export default function InicioTab({
           {onOpenWizard && (
             <div className="pt-2 border-t border-[#F0F4ED] flex items-center justify-between gap-2">
               <span className="text-[11px] text-zinc-500 font-normal truncate">
-                {activeParcel ? `Diagnóstico de ${activeParcel.name.split('•')[0].trim()}` : 'Registrar reporte de campo'}
+                {activeParcel ? `Diagnostic for ${activeParcel.name.split('•')[0].trim()}` : 'Record in-situ field report'}
               </span>
               <button
                 type="button"
@@ -545,13 +545,13 @@ export default function InicioTab({
                 className="px-3.5 py-1.5 rounded-full bg-[#132A1C] hover:bg-emerald-950 text-white font-semibold text-xs transition cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5 shrink-0"
               >
                 <Sparkles className="w-3.5 h-3.5 text-[#A3E635]" />
-                <span>Evaluar suelo</span>
+                <span>Evaluate soil</span>
               </button>
             </div>
           )}
         </div>
 
-        {/* 2. ALERTA DINÁMICA MOMENTÁNEA / DESCARTABLE */}
+        {/* 2. DYNAMIC DISMISSABLE ALERT BANNER */}
         {!isBannerDismissed && (
           <div
             role="button"
@@ -585,7 +585,7 @@ export default function InicioTab({
                   setIsBannerDismissed(true);
                 }}
                 className="p-1 rounded-full hover:bg-black/10 text-zinc-400 hover:text-zinc-600 transition"
-                title="Descartar aviso"
+                title="Dismiss alert"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -594,14 +594,14 @@ export default function InicioTab({
           </div>
         )}
 
-        {/* 3. SECCIÓN CAMPO Y SABERES (MIS PARCELAS DINÁMICAS) */}
+        {/* 3. FIELD & INDIGENOUS KNOWLEDGE SECTION (PARCELS) */}
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
             <div>
               <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-900/60 block">
-                CAMPO Y SABERES
+                FIELD & INDIGENOUS KNOWLEDGE
               </span>
-              <h2 className="text-base sm:text-lg font-bold text-zinc-800">Mis parcelas</h2>
+              <h2 className="text-base sm:text-lg font-bold text-zinc-800">Field Parcels</h2>
             </div>
             {onNavigateToParcelas && (
               <button
@@ -612,7 +612,7 @@ export default function InicioTab({
                 }}
                 className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 flex items-center gap-1 cursor-pointer transition"
               >
-                <span>Ver mapa</span>
+                <span>View map</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}
@@ -706,10 +706,10 @@ export default function InicioTab({
               </div>
               <div className="space-y-1">
                 <h3 className="text-sm font-bold text-zinc-800">
-                  Aún no has delimitado tus parcelas
+                  No parcels delimited yet
                 </h3>
                 <p className="text-xs text-zinc-600 max-w-xs mx-auto">
-                  Dibuja el contorno de tu chacra en el visor satelital para calibrar humedad y recomendaciones.
+                  Trace your parcel perimeter in the GIS satellite viewer to calibrate moisture telemetry and recommendations.
                 </p>
               </div>
               <button
@@ -724,22 +724,22 @@ export default function InicioTab({
                 }}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-semibold text-xs shadow-md transition active:scale-95 cursor-pointer"
               >
-                <span>Delimitar mi primera parcela</span>
+                <span>Delimit First Parcel</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           )}
         </div>
 
-        {/* 4. SECCIÓN CONSEJO DEL DÍA ("DOS MIRADAS, UNA CHACRA") */}
+        {/* 4. DAILY INSIGHT SECTION */}
         <div className="bg-white rounded-3xl p-5 shadow-xs border border-[#E5ECE2] space-y-3.5">
           <div className="flex items-center justify-between">
             <div>
               <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-900/60 block">
-                CONSEJO DEL DÍA
+                DAILY INSIGHT
               </span>
               <h2 className="text-base font-bold text-zinc-800">
-                Dos miradas, una chacra.
+                Two perspectives, one parcel.
               </h2>
             </div>
             {onNavigateToCopiloto && (
@@ -751,7 +751,7 @@ export default function InicioTab({
                 }}
                 className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 flex items-center gap-1 cursor-pointer transition"
               >
-                <span>Explorar</span>
+                <span>Explore</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}
@@ -788,7 +788,7 @@ export default function InicioTab({
               }`}
             >
               <Sprout className="w-3.5 h-3.5 text-emerald-500" />
-              <span>Kipu · saber local</span>
+              <span>Kipu · Local Wisdom</span>
             </button>
           </div>
 
@@ -796,11 +796,11 @@ export default function InicioTab({
           <div className="bg-[#F7F9F6] rounded-2xl p-3.5 border border-[#E5ECE2] text-xs text-zinc-700 leading-relaxed">
             {activeConsejoVoice === 'astro' ? (
               <p className="italic text-zinc-700 text-[12.5px] leading-relaxed font-normal">
-                &ldquo;SMAP observa humedad en {smapPercent}%. Mantén mulch de 5 a 8 cm y revisa el surco al amanecer para evaluar retención.&rdquo;
+                &ldquo;SMAP records surface moisture at {smapPercent}%. Maintain 5 to 8 cm mulch and inspect furrows at dawn to assess moisture retention.&rdquo;
               </p>
             ) : (
               <p className="italic text-zinc-700 text-[12.5px] leading-relaxed font-normal">
-                &ldquo;La luna menguante pide cuidar la humedad de la raíz. No remuevas la tierra en horas de sol fuerte y aporca con tierra fresca.&rdquo;
+                &ldquo;The waning moon calls for protecting root moisture. Avoid tilling soil during intense midday sun and hill up with fresh ground.&rdquo;
               </p>
             )}
           </div>
@@ -808,7 +808,7 @@ export default function InicioTab({
           {/* Footnote */}
           <div className="text-[10px] text-zinc-500 flex items-center gap-1.5 font-normal pt-0.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-            <span>Datos satelitales actualizados · SMAP, GPM y NDVI</span>
+            <span>Live satellite feeds updated · NASA SMAP, GPM & Sentinel-2 NDVI</span>
           </div>
         </div>
       </div>

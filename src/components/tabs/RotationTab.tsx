@@ -41,8 +41,8 @@ interface MonthInfo {
 }
 
 function getUpcomingMonths(baseDate: Date, count: number, offset = 0): MonthInfo[] {
-  const shortNames = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DIC'];
-  const titleNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Dic'];
+  const shortNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  const titleNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const list: MonthInfo[] = [];
 
   for (let i = 0; i < count; i++) {
@@ -75,92 +75,92 @@ interface AgronomicCropData {
 const AGRONOMIC_MAP: Record<string, AgronomicCropData> = {
   papa: {
     id: 'papa_nativa',
-    name: 'Papa Nativa Andina',
+    name: 'Native Andean Potato (Solanum tuberosum subsp. andigena)',
     balanceN: -70,
     balanceLabel: '-70',
     isPositive: false,
-    description: 'Demanda nitrógeno. Consume los nutrientes del suelo preparado.',
+    description: 'High nitrogen demand crop. Exhausts mineral nutrients in prepared topsoil.',
     successor: {
-      name: 'Tarwi y Habas',
+      name: 'Tarwi & Broad Beans',
       balanceN: 95,
       balanceLabel: '+95',
       isPositive: true,
-      description: 'Leguminosas fijan nitrógeno en las raíces y rompen el ciclo del gorgojo.',
+      description: 'Symbiotic legumes fix atmospheric nitrogen in root nodules and disrupt the Andean potato weevil (Premnotrypes spp.) life cycle.',
     },
   },
   habas: {
     id: 'habas',
-    name: 'Habas Andinas',
+    name: 'Andean Broad Bean (Vicia faba)',
     balanceN: 75,
     balanceLabel: '+75',
     isPositive: true,
-    description: 'Leguminosa fijadora simbiótica. Enriquece el suelo con nitrógeno orgánico.',
+    description: 'Symbiotic N-fixing legume. Enriches topsoil with organic nitrogen nodules.',
     successor: {
-      name: 'Maíz Blanco Gigante',
+      name: 'Giant White Corn (Zea mays var. amylacea)',
       balanceN: -50,
       balanceLabel: '-50',
       isPositive: false,
-      description: 'Gramínea de alto rendimiento que aprovecha el nitrógeno residual de las habas.',
+      description: 'High-yielding Andean grain crop that scavenges residual nitrogen left by broad beans.',
     },
   },
   tarwi: {
     id: 'tarwi',
-    name: 'Tarwi / Chocho',
+    name: 'Tarwi / Andean Lupin (Lupinus mutabilis)',
     balanceN: 95,
     balanceLabel: '+95',
     isPositive: true,
-    description: 'Poderoso fijador de nitrógeno (+95 kg N/ha) y biofumigante natural con alcaloides.',
+    description: 'Potent biological nitrogen fixer (+95 kg N/ha) and natural alkaloid biofumigant against soil-borne pathogens.',
     successor: {
-      name: 'Papa Nativa',
+      name: 'Native Andean Potato',
       balanceN: -70,
       balanceLabel: '-70',
       isPositive: false,
-      description: 'Aprovecha al máximo el nitrógeno y suelo desinfectado dejado por el tarwi.',
+      description: 'Maximizes yield by leveraging fixed nitrogen and sanitized soil conditions left by Andean lupin.',
     },
   },
   maiz: {
     id: 'maiz_blanco',
-    name: 'Maíz Blanco Gigante',
+    name: 'Giant White Corn (Zea mays)',
     balanceN: -50,
     balanceLabel: '-50',
     isPositive: false,
-    description: 'Gramínea extractora moderada de nitrógeno. Aporta abundante rastrojo superficial.',
+    description: 'Moderate nitrogen-extracting cereal. Generates abundant organic crop residue (stover).',
     successor: {
-      name: 'Tarwi y Habas',
+      name: 'Tarwi & Broad Beans',
       balanceN: 95,
       balanceLabel: '+95',
       isPositive: true,
-      description: 'Restaura los macronutrientes consumidos y mejora la microbiología del suelo.',
+      description: 'Restores extracted macronutrients and enhances beneficial soil microbiota.',
     },
   },
   quinua: {
     id: 'quinua',
-    name: 'Quinua Roja / Real',
+    name: 'Real Andean Quinoa (Chenopodium quinoa)',
     balanceN: -30,
     balanceLabel: '-30',
     isPositive: false,
-    description: 'Demanda moderada de fertilidad con gran rusticidad y tolerancia a sequías.',
+    description: 'Moderate fertility demand with high rusticity, salinity tolerance, and drought resistance.',
     successor: {
-      name: 'Habas serranas',
+      name: 'Highland Broad Beans',
       balanceN: 75,
       balanceLabel: '+75',
       isPositive: true,
-      description: 'Recupera la capa fértil antes de volver a sembrar cultivos de raíz.',
+      description: 'Replenishes topsoil fertility layer prior to subsequent root or tuber cropping.',
     },
   },
   cebada: {
     id: 'cebada',
-    name: 'Cebada Grano',
+    name: 'Malting & Grain Barley (Hordeum vulgare)',
     balanceN: -30,
     balanceLabel: '-30',
     isPositive: false,
-    description: 'Cereal rústico de ciclo corto. Tolera heladas y aporta rastrojo para mulch.',
+    description: 'Short-cycle rustic cereal. Frost-tolerant and supplies protective biomass for surface mulch.',
     successor: {
-      name: 'Tarwi y Habas',
+      name: 'Tarwi & Broad Beans',
       balanceN: 95,
       balanceLabel: '+95',
       isPositive: true,
-      description: 'Leguminosa que restaura nitrógeno y aprovecha la cobertura del rastrojo.',
+      description: 'Restores nitrogen reserves while benefiting from surface mulch residue.',
     },
   },
 };
@@ -181,7 +181,7 @@ function getCropAgronomics(parcel: ParcelItem | null, dbCrops?: Cultivo[]): Agro
       const succId = found.sucesores_favorables?.[0] || 'tarwi';
       const succCrop = dbCrops.find((c) => c.crop_id.toLowerCase().includes(succId.toLowerCase()));
       const succBal = succCrop?.balance_nitrogeno_kg_ha ?? 95;
-      const succName = succCrop?.nombre_comun || 'Tarwi Chocho';
+      const succName = succCrop?.nombre_comun || 'Tarwi / Andean Lupin';
 
       return {
         id: found.crop_id,
@@ -190,14 +190,14 @@ function getCropAgronomics(parcel: ParcelItem | null, dbCrops?: Cultivo[]): Agro
         balanceLabel: found.balance_nitrogeno_kg_ha > 0 ? `+${found.balance_nitrogeno_kg_ha}` : `${found.balance_nitrogeno_kg_ha}`,
         isPositive: found.balance_nitrogeno_kg_ha > 0,
         description: found.rompe_plaga_gorgojo
-          ? 'Rompe el ciclo del gorgojo andino y enriquece la microbiología del suelo.'
-          : 'Demanda nutrientes del suelo preparado; requiere rotación con leguminosas.',
+          ? 'Disrupts Andean potato weevil (Premnotrypes spp.) life cycle and enriches soil microbiota.'
+          : 'Depletes topsoil nutrients; requires crop rotation with symbiotic legumes.',
         successor: {
           name: succName,
           balanceN: succBal,
           balanceLabel: succBal > 0 ? `+${succBal}` : `${succBal}`,
           isPositive: succBal > 0,
-          description: `Sucesor agroecológico favorable según matriz INIA con balance de ${succBal > 0 ? '+' : ''}${succBal} kg N/ha.`,
+          description: `Favorable agroecological successor per INIA matrix with an edaphic balance of ${succBal > 0 ? '+' : ''}${succBal} kg N/ha.`,
         },
       };
     }
@@ -267,7 +267,7 @@ export default function RotationTab({
     if (onSelectParcel) {
       onSelectParcel(p.id);
     }
-    if (onToast) onToast(`Plan adaptado a ${p.name.split('•')[0].trim()}`);
+    if (onToast) onToast(`Plan adapted to ${p.name.split('•')[0].trim()}`);
   };
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -319,23 +319,23 @@ export default function RotationTab({
     if (raw.includes('tarwi') || raw.includes('chocho') || raw.includes('haba')) {
       return [
         {
-          title: 'Preparación de cama de siembra',
-          subtitle: `Semana 3 · ${crop} · Nivelación del terreno`,
+          title: 'Seedbed preparation & leveling',
+          subtitle: `Week 3 - ${crop} - Field leveling & tilth`,
           icon: <Tractor className="w-4 h-4 text-emerald-700" />,
         },
         {
-          title: 'Siembra e inoculación de nódulos',
-          subtitle: 'Primera lluvia · Incorporación de cepas fijadoras de N',
+          title: 'Sowing & nodule inoculation',
+          subtitle: 'First rains - Biological N-fixing strain incorporation',
           icon: <Sprout className="w-4 h-4 text-emerald-700" />,
         },
         {
-          title: 'Deshierbe manual y aporque ligero',
-          subtitle: 'Cada 15 días · Oxigenación de las raíces',
+          title: 'Manual weeding & light hilling',
+          subtitle: 'Every 15 days - Root zone aeration',
           icon: <Leaf className="w-4 h-4 text-emerald-700" />,
         },
         {
-          title: 'Monitoreo de floración y humedad',
-          subtitle: 'Llenado de vainas · Calibrar radar SMAP',
+          title: 'Flowering & moisture monitoring',
+          subtitle: 'Pod filling - Calibrate SMAP radar telemetry',
           icon: <Droplets className="w-4 h-4 text-emerald-700" />,
         },
       ];
@@ -344,23 +344,23 @@ export default function RotationTab({
     if (raw.includes('maiz') || raw.includes('maíz')) {
       return [
         {
-          title: 'Surcos en contorno y abonado base',
-          subtitle: `Semana 3 · ${crop} · Incorporar guano de corral`,
+          title: 'Contour furrowing & basal fertilization',
+          subtitle: `Week 3 - ${crop} - Compost & organic manure incorporation`,
           icon: <Tractor className="w-4 h-4 text-emerald-700" />,
         },
         {
-          title: 'Siembra de maíz en golpe',
-          subtitle: 'Primeras lluvias firmes · Densidad óptima de semilla',
+          title: 'Hill-drop corn sowing',
+          subtitle: 'First stable rains - Optimal seed density',
           icon: <Sprout className="w-4 h-4 text-emerald-700" />,
         },
         {
-          title: 'Primer aporque y deshierbe',
-          subtitle: 'Soporte del tallo contra viento y retención de humedad',
+          title: 'First hilling & mechanical weeding',
+          subtitle: 'Stem lodging support & moisture retention',
           icon: <Leaf className="w-4 h-4 text-emerald-700" />,
         },
         {
-          title: 'Monitoreo de crecimiento y SMAP',
-          subtitle: 'Control preventivo de humedad y espigado',
+          title: 'Growth monitoring & SMAP telemetry',
+          subtitle: 'Moisture deficit control & tasseling stage',
           icon: <Droplets className="w-4 h-4 text-emerald-700" />,
         },
       ];
@@ -369,23 +369,23 @@ export default function RotationTab({
     if (raw.includes('quinua')) {
       return [
         {
-          title: 'Preparación de cama fina y mullida',
-          subtitle: `Semana 3 · ${crop} · Nivelación del suelo`,
+          title: 'Fine seedbed tilth preparation',
+          subtitle: `Week 3 - ${crop} - Surface leveling`,
           icon: <Tractor className="w-4 h-4 text-emerald-700" />,
         },
         {
-          title: 'Siembra en líneas continuas',
-          subtitle: 'Primeras lluvias · Distribución superficial de semilla',
+          title: 'Continuous row precision sowing',
+          subtitle: 'First rains - Shallow seed distribution',
           icon: <Sprout className="w-4 h-4 text-emerald-700" />,
         },
         {
-          title: 'Deshierbe y primer raleo',
-          subtitle: 'A los 25 días · Espaciamiento óptimo entre plantas',
+          title: 'Weeding & first plant thinning',
+          subtitle: 'At 25 days - Optimal inter-plant spacing',
           icon: <Leaf className="w-4 h-4 text-emerald-700" />,
         },
         {
-          title: 'Monitoreo de panoja y rusticidad',
-          subtitle: 'Resistencia a heladas · Calibrar radar SMAP',
+          title: 'Panicle emergence & rusticity check',
+          subtitle: 'Frost resilience - Calibrate SMAP radar telemetry',
           icon: <Droplets className="w-4 h-4 text-emerald-700" />,
         },
       ];
@@ -394,23 +394,23 @@ export default function RotationTab({
     if (raw.includes('cebada')) {
       return [
         {
-          title: 'Preparación de suelo y surcado',
-          subtitle: `Semana 3 · ${crop} · Cama de siembra rústica`,
+          title: 'Soil tillage & furrowing',
+          subtitle: `Week 3 - ${crop} - Rustic seedbed`,
           icon: <Tractor className="w-4 h-4 text-emerald-700" />,
         },
         {
-          title: 'Siembra de grano y abonado',
-          subtitle: 'Primeras lluvias · Incorporación de abono orgánico',
+          title: 'Barley grain sowing & fertilization',
+          subtitle: 'First rains - Organic amendment incorporation',
           icon: <Sprout className="w-4 h-4 text-emerald-700" />,
         },
         {
-          title: 'Monitoreo de macollamiento',
-          subtitle: 'Desarrollo vegetativo vigoroso contra heladas',
+          title: 'Tillering stage monitoring',
+          subtitle: 'Vigorous vegetative growth against frost',
           icon: <Leaf className="w-4 h-4 text-emerald-700" />,
         },
         {
-          title: 'Calibración SMAP para espigado',
-          subtitle: 'Retención de humedad antes de la fase de grano',
+          title: 'SMAP calibration for heading stage',
+          subtitle: 'Moisture retention prior to grain filling',
           icon: <Droplets className="w-4 h-4 text-emerald-700" />,
         },
       ];
@@ -418,23 +418,23 @@ export default function RotationTab({
 
     return [
       {
-        title: 'Preparar surcos en contorno',
-        subtitle: `Semana 3 · ${crop} · Retención de humedad`,
+        title: 'Contour furrow preparation',
+        subtitle: `Week 3 - ${crop} - Moisture retention`,
         icon: <Tractor className="w-4 h-4 text-emerald-700" />,
       },
       {
-        title: 'Siembra y abonado de fondo',
-        subtitle: 'Primeras lluvias · Distribución de semilla seleccionada',
+        title: 'Planting & basal fertilization',
+        subtitle: 'First rains - Selected certified seed distribution',
         icon: <Sprout className="w-4 h-4 text-emerald-700" />,
       },
       {
-        title: 'Aporque alto y cobertura de rastrojo',
-        subtitle: 'Cada 10 días · Evitar evaporación del suelo',
+        title: 'High hilling & mulch cover',
+        subtitle: 'Every 10 days - Prevent evaporative loss',
         icon: <Leaf className="w-4 h-4 text-emerald-700" />,
       },
       {
-        title: 'Medir humedad del suelo y tubérculos',
-        subtitle: 'Desarrollo vegetativo · Calibrar SMAP',
+        title: 'Soil moisture & tuber bulking assessment',
+        subtitle: 'Vegetative development - Calibrate SMAP',
         icon: <Droplets className="w-4 h-4 text-emerald-700" />,
       },
     ];
@@ -448,16 +448,16 @@ export default function RotationTab({
       <div className="flex items-start justify-between px-1 pt-1">
         <div>
           <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-900/60 block">
-            PLAN DE CAMPAÑA · {campaignYear} / {nextYear}
+            CAMPAIGN PLAN - {campaignYear} / {nextYear}
           </span>
           <h1 className="text-xl sm:text-2xl font-semibold text-[#132A1C] leading-tight">
-            Cronograma y ahorro
+            Schedule & Input Savings
           </h1>
         </div>
 
         <div className="bg-[#EBF2E5] text-[#4E6B38] px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 border border-[#D5E5CD]">
           <Leaf className="w-3 h-3 text-[#4E6B38]" />
-          <span>ANDES SUR</span>
+          <span>SOUTHERN ANDES</span>
         </div>
       </div>
 
@@ -465,7 +465,7 @@ export default function RotationTab({
       {parcels.length > 0 ? (
         <div className="space-y-1.5">
           <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider px-1 block">
-            PARCELA SELECCIONADA
+            SELECTED PARCEL
           </span>
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
             {parcels.map((p) => {
@@ -497,10 +497,10 @@ export default function RotationTab({
             <Sprout className="w-5 h-5" />
           </div>
           <h3 className="text-sm font-bold text-zinc-800">
-            Configura tus parcelas para ver tu rotación personalizada
+            Configure your parcels to view your personalized rotation plan
           </h3>
           <p className="text-xs text-zinc-600 max-w-xs mx-auto">
-            Delimita el terreno de tu chacra con el visor satelital para calibrar la demanda de nutrientes.
+            Delineate your field boundary in the satellite GIS viewer to calibrate nutrient demand.
           </p>
           {onOpenQgisDrawer && (
             <button
@@ -509,10 +509,10 @@ export default function RotationTab({
                 playBubblePop();
                 onOpenQgisDrawer();
               }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#7BB63E] text-[#132A1C] font-semibold text-xs"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#7BB63E] text-[#132A1C] font-semibold text-xs cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>Delimitar con Visor QGIS</span>
+              <span>Delineate with QGIS Viewer</span>
             </button>
           )}
         </div>
@@ -532,9 +532,9 @@ export default function RotationTab({
               : 'text-zinc-600 hover:text-zinc-900'
           }`}
         >
-          <span className="block leading-tight">Cronograma inmediato</span>
+          <span className="block leading-tight">Immediate schedule</span>
           <span className="text-[9.5px] font-normal text-zinc-500 block">
-            {immediateMonths[0]?.title} {immediateMonths[0]?.year} a {immediateMonths[3]?.title} {immediateMonths[3]?.year}
+            {immediateMonths[0]?.title} {immediateMonths[0]?.year} to {immediateMonths[3]?.title} {immediateMonths[3]?.year}
           </span>
         </button>
 
@@ -550,20 +550,20 @@ export default function RotationTab({
               : 'text-zinc-600 hover:text-zinc-900'
           }`}
         >
-          <span className="block leading-tight">Campaña siguiente</span>
+          <span className="block leading-tight">Next campaign</span>
           <span className="text-[9.5px] font-normal text-zinc-500 block">
-            {secondaryMonths[0]?.title} {secondaryMonths[0]?.year} a {secondaryMonths[2]?.title} {secondaryMonths[2]?.year}
+            {secondaryMonths[0]?.title} {secondaryMonths[0]?.year} to {secondaryMonths[2]?.title} {secondaryMonths[2]?.year}
           </span>
         </button>
       </div>
 
-      {/* 3. Section: PRÓXIMOS CUATRO MESES */}
+      {/* 3. Section: UPCOMING FOUR MONTHS */}
       <div className="space-y-2.5">
         <div className="px-1">
           <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-900/60 block">
-            PRÓXIMOS CUATRO MESES
+            UPCOMING FOUR MONTHS
           </span>
-          <h2 className="text-base font-semibold text-[#132A1C]">Lo que toca hacer</h2>
+          <h2 className="text-base font-semibold text-[#132A1C]">Scheduled Agronomic Operations</h2>
         </div>
 
         {activeSeasonTab === 'inmediato' ? (
@@ -622,18 +622,18 @@ export default function RotationTab({
             {secondaryMonths.map((m, idx) => {
               const dryTasks = [
                 {
-                  title: 'Cosecha y selección de grano',
-                  subtitle: 'Selección de semilla y clasificación de rastrojo',
+                  title: 'Harvesting & seed selection',
+                  subtitle: 'Seed grading & crop residue sorting',
                   icon: <Wheat className="w-4 h-4 text-emerald-700" />,
                 },
                 {
-                  title: 'Mulch protector contra heladas',
-                  subtitle: 'Extender rastrojo de cebada o chala · Cobertura 8 cm',
+                  title: 'Protective mulch against frost',
+                  subtitle: 'Apply barley stover or straw - 8 cm protective layer',
                   icon: <Leaf className="w-4 h-4 text-emerald-700" />,
                 },
                 {
-                  title: 'Descanso del suelo y rotación',
-                  subtitle: `Preparar terreno para rotar con ${activeCropAgro.successor.name}`,
+                  title: 'Soil rest & rotational preparation',
+                  subtitle: `Prepare parcel for rotational succession with ${activeCropAgro.successor.name}`,
                   icon: <Layers className="w-4 h-4 text-emerald-700" />,
                 },
               ];
@@ -685,23 +685,23 @@ export default function RotationTab({
         )}
       </div>
 
-      {/* 4. Section: NUTRIENTES QUE SE QUEDAN (DINÁMICO CON DATOS VERÍDICOS) */}
+      {/* 4. Section: RESIDUAL SOIL NUTRIENTS */}
       <div className="space-y-2.5">
         <div className="px-1">
           <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-900/60 block">
-            NUTRIENTES QUE SE QUEDAN
+            RESIDUAL SOIL NUTRIENTS
           </span>
-          <h2 className="text-base font-semibold text-[#132A1C]">La secuencia importa</h2>
+          <h2 className="text-base font-semibold text-[#132A1C]">Sequence Matters for Soil Health</h2>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Card 1: Campaña 01 (Cultivo real de la parcela activa) */}
+          {/* Card 1: Campaign 01 */}
           <div className="flex-1 bg-white rounded-2xl p-3.5 shadow-xs border border-[#E5ECE2] space-y-2">
             <div className="w-7 h-7 rounded-lg bg-[#EAF3E3] flex items-center justify-center text-emerald-800">
               <Sprout className="w-4 h-4 text-emerald-700" />
             </div>
             <span className="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400 block">
-              CAMPAÑA 01
+              CAMPAIGN 01
             </span>
             <h4 className="text-xs font-semibold text-[#132A1C] truncate">
               {activeParcel?.cropName || activeCropAgro.name}
@@ -721,13 +721,13 @@ export default function RotationTab({
 
           <ArrowRight className="w-4 h-4 text-zinc-400 shrink-0" />
 
-          {/* Card 2: Campaña 02 (Sucesor agronómico favorable) */}
+          {/* Card 2: Campaign 02 */}
           <div className="flex-1 bg-white rounded-2xl p-3.5 shadow-xs border border-[#E5ECE2] space-y-2">
             <div className="w-7 h-7 rounded-lg bg-[#EAF3E3] flex items-center justify-center text-emerald-800">
               <Leaf className="w-4 h-4 text-emerald-700" />
             </div>
             <span className="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400 block">
-              CAMPAÑA 02
+              CAMPAIGN 02
             </span>
             <h4 className="text-xs font-semibold text-[#132A1C] truncate">
               {activeCropAgro.successor.name}
@@ -747,11 +747,11 @@ export default function RotationTab({
         </div>
       </div>
 
-      {/* 5. Section: SIMULADOR DE AHORRO */}
+      {/* 5. Section: INPUT SAVINGS SIMULATOR */}
       <div className="bg-[#1B3B22] rounded-3xl p-5 text-white shadow-md border border-emerald-900/60 space-y-4">
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-semibold uppercase tracking-widest text-[#A3E635]">
-            SIMULADOR DE AHORRO
+            INPUT SAVINGS SIMULATOR
           </span>
           <div className="w-7 h-7 rounded-full bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-[#A3E635]">
             <Gauge className="w-4 h-4" />
@@ -760,21 +760,21 @@ export default function RotationTab({
 
         <div className="space-y-1">
           <h3 className="text-xl font-semibold text-white leading-tight">
-            Menos insumos,{' '}
+            Fewer synthetic inputs,{' '}
             <span className="italic text-[#A3E635] font-normal">
-              más suelo vivo.
+              living, resilient soil.
             </span>
           </h3>
           <p className="text-xs text-zinc-300 leading-relaxed">
-            Estima el ahorro en fertilizantes con una rotación de leguminosas según los precios de tu microcuenca.
+            Estimate synthetic fertilizer savings through legume rotation using local micro-watershed pricing.
           </p>
         </div>
 
-        {/* Selector de parcelas para ver el precio de cada una allí */}
+        {/* Parcel selector for microcuenca pricing */}
         {parcels.length > 1 && (
           <div className="space-y-1.5 pt-1">
             <span className="text-[10px] font-semibold text-[#A3E635] uppercase tracking-wider block">
-              Elegir parcela para ver precio local:
+              Select parcel for local micro-watershed pricing:
             </span>
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
               {parcels.map((p) => {
@@ -812,21 +812,21 @@ export default function RotationTab({
               </span>
             </div>
             <span className="text-[10px] font-mono text-emerald-300 shrink-0 ml-2">
-              {activeParcel?.microcuenca || profile.cuencaName || 'Cusco Sierra'}
+              {activeParcel?.microcuenca || profile.cuencaName || 'Cusco Highlands'}
             </span>
           </div>
 
           <div className="flex items-center justify-between pt-1 border-t border-emerald-800/30">
             <div>
               <span className="text-[9.5px] uppercase tracking-wider text-zinc-400 block">
-                Precio de Urea (50 kg)
+                Urea Sack Price (50 kg)
               </span>
               <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                 <span className="text-base font-bold text-[#A3E635] font-mono">
                   S/ {savingsCalc.pricePerSack}
                 </span>
                 <span className="text-[10px] text-zinc-300 font-normal">
-                  / saco
+                  / sack
                 </span>
                 <span className={`text-[9px] px-2 py-0.5 rounded-full border ${
                   savingsCalc.isCustomPrice
@@ -847,10 +847,10 @@ export default function RotationTab({
                   setIsEditingPrice(true);
                 }}
                 className="px-2.5 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/30 text-[11px] text-[#A3E635] flex items-center gap-1 transition cursor-pointer shrink-0"
-                title="Editar precio del saco si compraste a otro valor"
+                title="Edit sack price if purchased at a different price"
               >
                 <Edit3 className="w-3 h-3" />
-                <span>Modificar</span>
+                <span>Modify</span>
               </button>
             )}
           </div>
@@ -859,7 +859,7 @@ export default function RotationTab({
           {isEditingPrice && (
             <div className="pt-2 border-t border-emerald-800/30 space-y-2">
               <label className="text-[10px] text-zinc-300 block">
-                Ingresa el precio pagado en tu feria local (S/ por saco de 50 kg):
+                Enter price paid at local market (PEN per 50 kg sack):
               </label>
               <div className="flex items-center gap-2">
                 <div className="relative flex-1">
@@ -885,20 +885,20 @@ export default function RotationTab({
                       playSuccessFanfare();
                       setCustomSackPrice(val);
                       setIsEditingPrice(false);
-                      if (onToast) onToast(`Precio de urea ajustado a S/ ${val}`);
+                      if (onToast) onToast(`Urea sack price adjusted to S/ ${val}`);
                     }
                   }}
                   className="px-3 py-1.5 rounded-xl bg-[#7BB63E] text-[#132A1C] font-bold text-xs hover:bg-[#8CD045] transition cursor-pointer flex items-center gap-1"
                 >
                   <Check className="w-3.5 h-3.5 stroke-[3]" />
-                  <span>Listo</span>
+                  <span>Save</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsEditingPrice(false)}
                   className="px-2.5 py-1.5 rounded-xl bg-emerald-950 text-zinc-400 text-xs hover:text-white transition cursor-pointer"
                 >
-                  Cancelar
+                  Cancel
                 </button>
               </div>
             </div>
@@ -912,12 +912,12 @@ export default function RotationTab({
                 onClick={() => {
                   playBubblePop();
                   setCustomSackPrice(undefined);
-                  if (onToast) onToast('Restablecido a precio oficial MIDAGRI SISAP');
+                  if (onToast) onToast('Reset to official MIDAGRI SISAP pricing');
                 }}
                 className="text-[10px] text-zinc-400 hover:text-emerald-300 underline flex items-center gap-1 cursor-pointer transition"
               >
                 <RotateCcw className="w-3 h-3" />
-                <span>Restablecer a precio oficial MIDAGRI</span>
+                <span>Reset to official MIDAGRI benchmark</span>
               </button>
             </div>
           )}
@@ -925,7 +925,7 @@ export default function RotationTab({
 
         <div className="space-y-2 pt-1">
           <div className="flex items-center justify-between text-xs font-bold">
-            <span className="text-zinc-300">Área a rotar</span>
+            <span className="text-zinc-300">Rotational Area</span>
             <span className="text-[#A3E635] text-sm font-semibold font-mono">
               {rotateAreaHa.toFixed(1)} ha
             </span>
@@ -952,16 +952,16 @@ export default function RotationTab({
         <div className="bg-[#132A1C]/90 rounded-2xl p-4 border border-emerald-800/40 flex items-center justify-between">
           <div className="space-y-0.5">
             <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-300 block">
-              AHORRO ESTIMADO EN ABONOS
+              ESTIMATED FERTILIZER SAVINGS
             </span>
             <span className="text-2xl font-bold text-[#A3E635] font-mono block">
-              S/ {savingsCalc.totalSavings.toLocaleString('es-PE')}
+              S/ {savingsCalc.totalSavings.toLocaleString('en-US')}
             </span>
             <span className="text-[10px] text-zinc-300 block">
-              Ahorro de ~{savingsCalc.totalSacksAvoided} sacos de urea (S/ {savingsCalc.pricePerSack}/saco) en {rotateAreaHa.toFixed(1)} ha
+              Avoids ~{savingsCalc.totalSacksAvoided} urea sacks (S/ {savingsCalc.pricePerSack}/sack) across {rotateAreaHa.toFixed(1)} ha
             </span>
             <span className="text-[9px] text-zinc-400 block">
-              Equivale a ~{savingsCalc.sacksAvoidedPerHa} sacos evitados por cada ha de leguminosa
+              Equivalent to ~{savingsCalc.sacksAvoidedPerHa} sacks saved per hectare of legume succession
             </span>
           </div>
           <div className="w-10 h-10 rounded-2xl bg-emerald-900/60 border border-emerald-500/30 flex items-center justify-center text-[#A3E635] shrink-0">

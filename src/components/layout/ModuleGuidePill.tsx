@@ -22,12 +22,12 @@ export default function ModuleGuidePill({ onStartTour }: ModuleGuidePillProps) {
       {/* Floating Pill Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="px-3.5 py-2 rounded-full bg-zinc-950/90 hover:bg-black text-white text-xs font-semibold shadow-lg hover:shadow-xl border border-zinc-700/80 flex items-center gap-2 backdrop-blur-md transition-all active:scale-95 group"
-        title="¿Qué hace cada módulo? Guía rápida"
+        className="px-3.5 py-2 rounded-full bg-zinc-950/90 hover:bg-black text-white text-xs font-semibold shadow-lg hover:shadow-xl border border-zinc-700/80 flex items-center gap-2 backdrop-blur-md transition-all active:scale-95 group cursor-pointer"
+        title="System Architecture Guide"
       >
         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
         <Compass className="w-3.5 h-3.5 text-emerald-400 group-hover:rotate-45 transition-transform" />
-        <span className="tracking-tight">Guía del Sistema</span>
+        <span className="tracking-tight">System Architecture</span>
       </button>
 
       {/* Slide-over Explanatory Popover */}
@@ -41,17 +41,17 @@ export default function ModuleGuidePill({ onStartTour }: ModuleGuidePillProps) {
               </div>
               <div>
                 <h4 className="font-bold text-xs tracking-tight text-white leading-tight">
-                  Arquitectura Terraquipu
+                  TerraQuipu System Architecture
                 </h4>
                 <p className="text-[10px] text-zinc-400">
-                  ¿Para quién es y qué hace cada parte?
+                  Target users and module capabilities
                 </p>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="p-1 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 transition"
-              title="Cerrar guía"
+              className="p-1 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 transition cursor-pointer"
+              title="Close guide"
             >
               <X className="w-4 h-4" />
             </button>
@@ -65,28 +65,28 @@ export default function ModuleGuidePill({ onStartTour }: ModuleGuidePillProps) {
                   setIsOpen(false);
                   onStartTour();
                 }}
-                className="w-full py-2 px-3 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition active:scale-95"
+                className="w-full py-2 px-3 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition active:scale-95 cursor-pointer"
               >
                 <span>🌾</span>
-                <span>Iniciar Paseo de Herramientas</span>
+                <span>Start Guided Tool Walkthrough</span>
               </button>
             )}
 
-            {/* 1. Visor Técnico de Campo */}
+            {/* 1. Territorial GIS & Agroclimatic Viewer */}
             <div className="p-2.5 rounded-xl border border-zinc-200 bg-zinc-50/70 hover:bg-zinc-100/70 transition space-y-1.5 group">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <span className="text-base">🗺️</span>
-                  <span className="font-bold text-xs text-zinc-950">1. Visor Técnico Territorial</span>
+                  <span className="font-bold text-xs text-zinc-950">1. Territorial GIS &amp; Agroclimatic Viewer</span>
                 </div>
                 <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800">
-                  Público Web
+                  Public Web
                 </span>
               </div>
               <p className="text-[11px] text-zinc-600 leading-relaxed font-sans">
-                <strong>¿Quién lo usa?</strong> Extensionistas, técnicos agrícolas y campesinos.
+                <strong>Target Audience:</strong> Agricultural extensionists, agronomic technicians, and farmers.
                 <br />
-                <strong>¿Qué hace?</strong> Permite trazar cualquier parcela andina en el mapa, calcula su área exacta (ha), consulta en vivo radares NASA (humedad SMAP, NDVI, pendiente) y genera la secuencia óptima de 3 campañas agrícolas.
+                <strong>Capabilities:</strong> Delineates any Andean parcel, calculates exact surface area (ha), queries live NASA microwave radars (SMAP 0-5 cm soil moisture, Sentinel-2 NDVI, SRTM slopes), and computes an optimal 3-campaign succession.
               </p>
               <div className="pt-1 flex justify-end">
                 <Link
@@ -94,56 +94,56 @@ export default function ModuleGuidePill({ onStartTour }: ModuleGuidePillProps) {
                   onClick={() => setIsOpen(false)}
                   className="text-[10px] font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-0.5"
                 >
-                  <span>Ver Visor Técnico</span>
+                  <span>Open Technical Viewer</span>
                   <ChevronRight className="w-3 h-3" />
                 </Link>
               </div>
             </div>
 
-            {/* 2. Consola Admin */}
+            {/* 2. Admin Console */}
             <div className="p-2.5 rounded-xl border border-zinc-200 bg-zinc-50/70 hover:bg-zinc-100/70 transition space-y-1.5 group">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <span className="text-base">🏛️</span>
-                  <span className="font-bold text-xs text-zinc-950">2. Consola Administrador</span>
+                  <span className="font-bold text-xs text-zinc-950">2. Administrator Console</span>
                 </div>
                 <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-900">
-                  Protegido
+                  Restricted
                 </span>
               </div>
               <p className="text-[11px] text-zinc-600 leading-relaxed font-sans">
-                <strong>¿Quién lo usa?</strong> Agencias Agrarias, INIA y coordinadores del sistema.
+                <strong>Target Audience:</strong> Agrarian agencies, INIA researchers, and system coordinators.
                 <br />
-                <strong>¿Qué hace?</strong> Calibra las reglas y cultivos en Supabase con opción de Rollback (deshacer errores), monitorea reportes de campesinos (gorgojo/helada), pipelines NASA y biblioteca RAG de manuales.
+                <strong>Capabilities:</strong> Calibrates rules and crops in Supabase with rollback capabilities, monitors farmer ground-truth reports (weevil/frost), tracks NASA pipelines, and manages the RAG agronomic library.
               </p>
               <div className="pt-1 flex items-center justify-between text-[10px] text-zinc-500 font-mono">
-                <span>Acceso restringido:</span>
+                <span>Access:</span>
                 <span className="font-semibold text-zinc-700 bg-zinc-200/80 px-1.5 py-0.5 rounded">
-                  URL directo /admin
+                  Direct URL /admin
                 </span>
               </div>
             </div>
 
-            {/* 3. App Móvil Nativa (APK) */}
+            {/* 3. Mobile Field Companion App */}
             <div className="p-2.5 rounded-xl border border-zinc-200 bg-zinc-50/70 hover:bg-zinc-100/70 transition space-y-1.5 group">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <span className="text-base">📱</span>
-                  <span className="font-bold text-xs text-zinc-950">3. App Móvil APK del Campesino</span>
+                  <span className="font-bold text-xs text-zinc-950">3. Mobile Field Companion App</span>
                 </div>
                 <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-sky-100 text-sky-900">
-                  APK Android
+                  Android APK / PWA
                 </span>
               </div>
               <p className="text-[11px] text-zinc-600 leading-relaxed font-sans">
-                <strong>¿Quién lo usa?</strong> Agricultores familiares en su teléfono en la chacra.
+                <strong>Target Audience:</strong> Smallholder farmers directly on smartphones in the field.
                 <br />
-                <strong>¿Cómo funciona?</strong> Empaquetada como aplicación APK nativa conectada a la nube Supabase. Interfaz táctil ultra-simple asistida por voz en quechua/español, calendario lunar y reporte rápido de plagas.
+                <strong>Capabilities:</strong> Packaged as a native application connected to Supabase and NASA streams. Ultra-accessible tactile interface, voice-assisted guidance, and in-situ ground-truth reporting.
               </p>
               <div className="pt-1 flex items-center justify-between text-[10px] text-sky-800 font-mono">
-                <span>Enmascarada como:</span>
+                <span>Deployment:</span>
                 <span className="font-bold bg-sky-100 px-1.5 py-0.5 rounded border border-sky-300">
-                  App Nativa Android
+                  Native Android / Web App
                 </span>
               </div>
             </div>
@@ -153,13 +153,13 @@ export default function ModuleGuidePill({ onStartTour }: ModuleGuidePillProps) {
           <div className="p-2.5 bg-zinc-50 border-t border-zinc-200 text-[10px] text-zinc-500 font-sans flex items-center justify-between">
             <span className="flex items-center gap-1">
               <Sparkles className="w-3 h-3 text-emerald-600" />
-              <span>Diseñado para uso intuitivo en campo</span>
+              <span>Engineered for in-situ field operations</span>
             </span>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-zinc-600 hover:text-zinc-950 font-bold"
+              className="text-zinc-600 hover:text-zinc-950 font-bold cursor-pointer"
             >
-              Entendido
+              Dismiss
             </button>
           </div>
         </div>

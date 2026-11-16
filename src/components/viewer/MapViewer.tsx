@@ -58,7 +58,7 @@ const PRESET_PARCELS: Record<string, ActiveParcel> = {
   },
   taucca: {
     id: 'P-02',
-    name: 'Ayllu Taucca • Andén Alto',
+    name: 'Taucca Ayllu - Upper Terrace',
     areaHa: 2.4,
     slopePct: 8.0,
     elevationMsnm: 3740,
@@ -384,7 +384,7 @@ export default function MapViewer({
               ${r.presencia_gorgojo ? '⚠️ Alerta Gorgojo Detectada' : '✓ Sin plaga de gorgojo'}
             </div>
             <div style="font-size:10px;color:#0369a1;background:#f0f9ff;padding:4px;border-radius:4px;border:1px solid #bae6fd;text-align:center;margin-bottom:6px;">
-              📡 Sincronizado vía Supabase desde TerraQuipu Móvil
+              📡 Synchronized via cloud from TerraQuipu Mobile
             </div>
             <button onclick="window.__openFarmerReportDetail && window.__openFarmerReportDetail('${r.id}')" style="width:100%;padding:6px 10px;background:#059669;color:#ffffff;border:none;border-radius:8px;font-size:11px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;box-shadow:0 1px 2px rgba(0,0,0,0.15);">
               🔍 Ver Ficha Detallada de Parcela
@@ -523,7 +523,7 @@ export default function MapViewer({
     setDrawMode('none');
 
     onSelectParcel(newParcel);
-    onShowToast(`Parcela delimitada con éxito: ${areaHa.toFixed(2)} ha calculadas`);
+    onShowToast(`Parcel delineated successfully: ${areaHa.toFixed(2)} ha calculated`);
   };
 
   // Cancel drawing
@@ -549,7 +549,7 @@ export default function MapViewer({
     if (preset) {
       handleCancelDrawing();
       onSelectParcel(preset);
-      onShowToast(`Consultando telemetría satelital en vivo para ${preset.name}...`);
+      onShowToast(`Querying real-time satellite telemetry for ${preset.name}...`);
 
       try {
         const real = await fetchRealTerrainMetrics(preset.center, preset.areaHa);
@@ -563,7 +563,7 @@ export default function MapViewer({
           soilTempC: real.soilTempC,
           evapotranspirationMm: real.evapotranspirationMm,
         });
-        onShowToast(`Telemetría en vivo actualizada: DEM Copernicus 30m y NASA SMAP`);
+        onShowToast(`Live telemetry updated: Copernicus 30m DEM & NASA SMAP`);
       } catch (err) {
         console.warn('Fallback a preset base:', err);
       }
@@ -581,13 +581,13 @@ export default function MapViewer({
 
     if (layer === 'sat') {
       sat.addTo(mapInstanceRef.current);
-      onShowToast('Capa satelital de alta resolución (Esri World Imagery) activada');
+      onShowToast('High-resolution satellite layer (Esri World Imagery) active');
     } else if (layer === 'topo') {
       topo.addTo(mapInstanceRef.current);
-      onShowToast('Capa topográfica (curvas de nivel) activada');
+      onShowToast('Topographic layer (contour lines) active');
     } else {
       osm.addTo(mapInstanceRef.current);
-      onShowToast('Cartografía base OpenStreetMap activada');
+      onShowToast('OpenStreetMap basemap active');
     }
 
     setActiveBaseMap(layer);
@@ -598,7 +598,7 @@ export default function MapViewer({
     const names = {
       smap: 'SMAP L4 Humedad Radicular (NASA SMAP 9km -> 30m)',
       ndvi: 'NDVI Vigor Vegetal (Sentinel-2 / HLS NASA)',
-      srtm: 'SRTM 30m Modelo Digital de Elevación & Pendiente',
+      srtm: 'SRTM 30m Digital Elevation Model & Slope Gradient',
     };
     onShowToast(`Sensor activado: ${names[layer]}`);
   };
@@ -623,7 +623,7 @@ export default function MapViewer({
         {/* Drawing & Selection Tools */}
         <div className="pointer-events-auto bg-white/95 backdrop-blur-md px-2 py-1.5 rounded-xl border border-zinc-200 shadow-sm flex items-center gap-1.5 overflow-x-auto max-w-full">
           <span className="text-[11px] font-bold text-zinc-600 uppercase tracking-wider px-1.5 flex items-center gap-1 border-r border-zinc-200">
-            <MapPin className="w-3.5 h-3.5 text-zinc-800" /> Área:
+            <MapPin className="w-3.5 h-3.5 text-zinc-800" /> Area:
           </span>
 
           {/* Polygon Drawing Tool */}
@@ -635,7 +635,7 @@ export default function MapViewer({
               } else {
                 handleCancelDrawing();
                 setDrawMode('polygon');
-                onShowToast('Modo Trazar Parcela: Haz clics en el mapa para marcar los límites');
+                onShowToast('Draw Polygon Mode: Click on map vertices to delineate parcel boundaries');
               }
             }}
             className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
@@ -643,7 +643,7 @@ export default function MapViewer({
                 ? 'bg-blue-600 text-white shadow-xs'
                 : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100'
             }`}
-            title="Trazar los límites de tu parcela haciendo clics en el mapa"
+            title="Trace parcel boundary vertices on the map"
           >
             <Pencil className="w-3.5 h-3.5" />
             <span>Trazar Parcela</span>
@@ -658,7 +658,7 @@ export default function MapViewer({
               } else {
                 handleCancelDrawing();
                 setDrawMode('point');
-                onShowToast('Modo Clic Rápido: Haz clic en cualquier terreno para delimitarlo');
+                onShowToast('Quick Point Mode: Click anywhere on terrain to calibrate a reference parcel');
               }
             }}
             className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
@@ -666,7 +666,7 @@ export default function MapViewer({
                 ? 'bg-blue-600 text-white shadow-xs'
                 : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100'
             }`}
-            title="Haz un solo clic sobre tu terreno para seleccionarlo automáticamente"
+            title="Click once on terrain to automatically place a reference parcel"
           >
             <Crosshair className="w-3.5 h-3.5" />
             <span>Clic en Terreno</span>
@@ -766,7 +766,7 @@ export default function MapViewer({
                 ? 'bg-emerald-800 text-white shadow-xs'
                 : 'text-zinc-700 hover:bg-zinc-100'
             }`}
-            title="Mostrar parcelas validadas por agricultores en campo vía Supabase"
+            title="Show farmer ground-truth validated parcels via cloud database"
           >
             <span>🌱</span>
             <span>Ground-Truth</span>
@@ -786,7 +786,7 @@ export default function MapViewer({
             <span className="w-2.5 h-2.5 rounded-full bg-blue-300 animate-pulse" />
             {drawMode === 'polygon' ? (
               <span>
-                <strong>Modo Trazar:</strong> Haz clic en el mapa para marcar vértices ({drawPoints.length} puntos marcados). Mínimo 3 puntos.
+                <strong>Delineate Mode:</strong> Click on map to add vertices ({drawPoints.length} puntos marcados). Mínimo 3 puntos.
               </span>
             ) : (
               <span>
@@ -802,7 +802,7 @@ export default function MapViewer({
                 className="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded-md text-xs font-bold transition flex items-center gap-1 shadow-sm"
               >
                 <Check className="w-3.5 h-3.5" />
-                <span>Finalizar Trazado</span>
+                <span>Complete Boundary</span>
               </button>
             )}
             <button
@@ -844,7 +844,7 @@ export default function MapViewer({
 
         <div className="grid grid-cols-3 gap-2 text-center text-xs mb-2.5">
           <div className="bg-zinc-50 p-2 rounded-lg border border-zinc-200">
-            <span className="text-[10px] text-zinc-500 font-medium block">Humedad SMAP</span>
+            <span className="text-[10px] text-zinc-500 font-medium block">SMAP Moisture</span>
             <span className="font-bold text-zinc-950 text-sm font-mono">
               {climateMode === 'nino'
                 ? `${(activeParcel.smapMoisturePct * 0.58).toFixed(1)}%`
@@ -852,13 +852,13 @@ export default function MapViewer({
             </span>
           </div>
           <div className="bg-zinc-50 p-2 rounded-lg border border-zinc-200">
-            <span className="text-[10px] text-zinc-500 font-medium block">NDVI Sat</span>
+            <span className="text-[10px] text-zinc-500 font-medium block">NDVI Satellite</span>
             <span className="font-bold text-emerald-700 text-sm font-mono">
               {activeParcel.ndvi.toFixed(2)}
             </span>
           </div>
           <div className="bg-zinc-50 p-2 rounded-lg border border-zinc-200">
-            <span className="text-[10px] text-zinc-500 font-medium block">Pendiente</span>
+            <span className="text-[10px] text-zinc-500 font-medium block">Slope Gradient</span>
             <span className="font-bold text-zinc-900 text-sm font-mono">
               {activeParcel.slopePct}% L{activeParcel.slopePct > 15 ? '3' : activeParcel.slopePct > 10 ? '2' : '1'}
             </span>
@@ -869,10 +869,10 @@ export default function MapViewer({
         <button
           onClick={handleExportQgis}
           className="w-full py-1.5 px-2.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-xs"
-          title="Descargar capa GeoJSON para abrir directamente en QGIS 3.x"
+          title="Download GeoJSON vector layer to open directly in QGIS / ArcGIS"
         >
           <Download className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Exportar Parcela a QGIS (.geojson)</span>
+          <span>Export Parcel to QGIS (.geojson)</span>
         </button>
       </div>
 

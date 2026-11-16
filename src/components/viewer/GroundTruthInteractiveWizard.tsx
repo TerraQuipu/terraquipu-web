@@ -105,94 +105,94 @@ export default function GroundTruthInteractiveWizard({
     {
       step: 1,
       speaker: 'kipu',
-      name: 'KIPU • COPILOTO ANDINO',
-      tag: '🌱 Prueba del Puño',
+      name: 'KIPU • ANDEAN AGROECOLOGY COPILOT',
+      tag: '🌱 Hand Squeeze Test',
       avatar: isHappy ? '/images/kipu_llama_happy.png' : '/images/kipu_llama.png',
       tagColor: 'bg-emerald-100 text-emerald-950 border-emerald-300',
       speech:
-        '¡Allillanchu! Toca la tierra húmeda de tu parcela: al apretarla con tus manos, ¿cómo se siente la textura del suelo? Tus dedos calibran los radares de la NASA.',
+        'Allillanchu! Touch the moist soil of your parcel: when squeezed firmly in your hand, how does the texture feel? Your fingers calibrate NASA orbital radar.',
       reactionSpeech:
         soilTexture === 'franca'
-          ? '¡Excelente elección! La tierra franca tiene la estructura ideal, esponjosa y mullida para retener humedad y nutrientes.'
+          ? 'Excellent choice! Loam soil has an optimal porous structure that balances water retention and aeration.'
           : soilTexture === 'arena'
-          ? '¡Registrado! Con tierra arenosa el agua drena veloz; recomendaremos acolchado con rastrojo andino para protegerla.'
-          : '¡Anotado! La tierra arcillosa retiene bastante agua; cuidaremos el drenaje para evitar que se compacte.',
+          ? 'Recorded! In sandy soil water drains rapidly; we will recommend native residue mulching for moisture retention.'
+          : 'Noted! Clay soil retains significant water; we will optimize drainage to avoid waterlogging and compaction.',
     },
     {
       step: 2,
       speaker: 'kipu',
-      name: 'KIPU • COPILOTO ANDINO',
-      tag: '🪨 Profundidad Efectiva',
+      name: 'KIPU • ANDEAN AGROECOLOGY COPILOT',
+      tag: '🪨 Effective Rooting Depth',
       avatar: isHappy ? '/images/kipu_llama_happy.png' : '/images/kipu_llama.png',
       tagColor: 'bg-emerald-100 text-emerald-950 border-emerald-300',
       speech:
-        '¿Tu chacra tiene muchas piedras superficiales o la capa de tierra fértil es delgada? Esto define si es viable cavar zanjas de infiltración y zanjas trampa.',
+        'Does your parcel feature high surface stoniness or shallow topsoil? This determines whether infiltration trenches and contour ditches are feasible.',
       reactionSpeech:
         soilStoniness === 'profundo'
-          ? '¡Magnífico! Tierra profunda (>40 cm) permite aporque generoso y desarrollo vigoroso de raíces tuberosas.'
-          : '¡Muy importante! Suelos pedregosos o delgados requieren camellones altos y barreras vivas para conservar suelo.',
+          ? 'Splendid! Deep soil (>40 cm) enables substantial hilling and vigorous development of tuberous roots.'
+          : 'Crucial observation! Stony or shallow soils require elevated ridge-beds and vegetative barriers to conserve topsoil.',
     },
     {
       step: 3,
       speaker: 'astro',
-      name: 'ASTRO • SATÉLITE NASA',
+      name: 'ASTRO • NASA EARTH ORBITAL',
       tag: '🛰️ Sentinel-2 NDVI',
       avatar: '/images/astro_satelin.png',
       tagColor: 'bg-sky-100 text-sky-950 border-sky-300',
       speech:
-        'Mis sensores orbitales escanean el índice de vegetación NDVI sobre tu parcela. ¿Cómo está la cobertura del suelo hoy en la realidad física?',
+        'Orbital multispectral sensors are scanning the NDVI vegetation index over your parcel. What is the current ground cover status in the field?',
       reactionSpeech:
         cropCoverNdvi === 'sembrado'
-          ? '¡Telemetría confirmada! Follaje verde activo validado en tus coordenadas.'
+          ? 'Telemetry confirmed! Active green photosynthetic canopy validated at your coordinates.'
           : cropCoverNdvi === 'barbecho'
-          ? '¡Excelente práctica! El rastrojo protector reduce la evaporación solar y nutre microorganismos.'
+          ? 'Excellent management! Protective crop residue mulch suppresses solar evaporation and nourishes soil microbiota.'
           : cropCoverNdvi === 'pasto'
-          ? '¡Detectado! La pradera andina ofrece una cubierta vegetal estable contra la erosión.'
-          : '¡Alerta de erosión! Suelo desnudo expuesto al viento; activaremos cobertura urgente.',
+          ? 'Detected! Natural Andean grassland provides durable vegetative soil cover against runoff erosion.'
+          : 'Erosion warning! Bare topsoil exposed to rain impact and wind; urgent cover crop or mulch recommended.',
     },
     {
       step: 4,
       speaker: 'astro',
-      name: 'ASTRO • SATÉLITE NASA',
-      tag: '🌧️ Radar GPM Precipitaciones',
+      name: 'ASTRO • NASA EARTH ORBITAL',
+      tag: '🌧️ NASA GPM Precipitation',
       avatar: '/images/astro_satelin.png',
       tagColor: 'bg-sky-100 text-sky-950 border-sky-300',
       speech:
-        'Cruzando telemetría de precipitación NASA GPM con la humedad superficial: ¿De dónde toma agua tu chacra principalmente?',
+        'Cross-referencing NASA GPM precipitation telemetry with surface moisture: What is the primary water regime for this parcel?',
       reactionSpeech:
         waterSource === 'secano'
-          ? '¡Monitoreando nubes! Calibraremos la rotación con especies de alta rusticidad hídrica como Tarwi o Quinua.'
+          ? 'Monitoring cloud dynamics! We will tune crop rotation with highly drought-tolerant crops such as Tarwi or Quinoa.'
           : waterSource === 'auxilio'
-          ? '¡Estratégico! Canal comunal o reservorio mitiga veranillos y sequías cortas.'
-          : '¡Óptimo! Riego tecnificado garantiza rendimiento sostenido frente a eventos climáticos.',
+          ? 'Strategic! Communal canal networks or micro-reservoirs mitigate mid-season dry spells (veranillos).'
+          : 'Optimal! Pressurized technical irrigation guarantees stable yields through extreme agroclimatic fluctuations.',
     },
     {
       step: 5,
       speaker: 'astro',
-      name: 'ASTRO • SATÉLITE NASA',
-      tag: '⚠️ Alerta El Niño (ENOS ENFEN)',
+      name: 'ASTRO • NASA EARTH ORBITAL',
+      tag: '⚠️ ENSO Climate Advisory',
       avatar: '/images/astro_satelin.png',
       tagColor: 'bg-amber-100 text-amber-950 border-amber-300',
       speech:
-        'Modelos climáticos pronostican variaciones hídricas por El Niño. ¿Cuándo tienes planificado preparar o sembrar tu terreno este año?',
+        'Climate models forecast hydrological anomalies associated with El Niño (ENSO). When is planting or seedbed preparation scheduled?',
       reactionSpeech:
         sowingWindow === 'esta_semana'
-          ? '¡Siembra inmediata registrada! Recomendaremos cobertura de suelo para retener la humedad inicial.'
+          ? 'Immediate sowing registered! Mulch coverage will be prioritized to preserve initial seedbed moisture.'
           : sowingWindow === '2_4_semanas'
-          ? '¡Calendario habitual! Buen margen para acondicionar el suelo con enmiendas orgánicas.'
+          ? 'Standard seasonal window! Adequate lead time to condition soil with organic compost amendments.'
           : sowingWindow === '1_2_meses'
-          ? '¡Siembra tardía! Esperando la consolidación de lluvias estacionales.'
-          : '¡Estrategia conservadora! Descanso de suelo con leguminosas mejoradoras.',
+          ? 'Late sowing strategy! Waiting for seasonal rainfall consolidation.'
+          : 'Conservative stewardship! Resting the parcel in fallow with nitrogen-fixing Andean legumes.',
     },
     {
       step: 6,
       speaker: 'kipu',
-      name: 'KIPU & ASTRO • DUPLA CIENTÍFICA',
-      tag: '✨ Calibración Final',
+      name: 'KIPU & ASTRO • CO-RESEARCH TEAM',
+      tag: '✨ Final In-Situ Calibration',
       avatar: '/images/kipu_llama_happy.png',
       tagColor: 'bg-emerald-100 text-emerald-950 border-emerald-300',
       speech:
-        '¡Paso final! Verifica si observaste gorgojo andino o heladas en campo. Con tus 5 respuestas cerramos la triangulación con la NASA y guardamos en Supabase.',
+        'Final step! Verify if Andean potato weevil or recent ground frost events occurred in the field. Your answers complete orbital triangulation and sync to Supabase.',
     },
   ];
 
@@ -275,10 +275,10 @@ export default function GroundTruthInteractiveWizard({
 
       playSuccessFanfare();
       onCalibrationComplete(updatedParcel, res.data);
-      onShowToast(`✓ Parcela ${activeParcel.name} calibrada con éxito (Supabase Ground-Truth)`);
+      onShowToast(`✓ Parcel ${activeParcel.name} successfully calibrated (Supabase Ground-Truth)`);
       onClose();
     } catch (err: any) {
-      onShowToast(`Error al sincronizar con Supabase: ${err.message || 'Error de red'}`);
+      onShowToast(`Error synchronizing with Supabase: ${err.message || 'Network error'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -291,7 +291,7 @@ export default function GroundTruthInteractiveWizard({
         <div className="bg-white border-b border-zinc-200 px-4 py-2.5 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold font-mono text-zinc-900 bg-zinc-100 px-2.5 py-0.5 rounded-full border border-zinc-300">
-              Paso {step} de 6
+              Step {step} of 6
             </span>
             <span className="text-xs text-zinc-500 font-semibold truncate max-w-[190px]">
               {activeParcel.name}
@@ -362,30 +362,30 @@ export default function GroundTruthInteractiveWizard({
             <div className="space-y-2.5 animate-in fade-in">
               <div className="mb-2">
                 <h3 className="text-sm font-bold text-zinc-950">
-                  1. ¿Cómo se siente tu tierra al apretarla húmeda?
+                  1. How does your soil feel when squeezed moist?
                 </h3>
                 <p className="text-[11px] text-zinc-500">
-                  Prueba del puño para calibrar retención e infiltración:
+                  Hand squeeze test to calibrate moisture retention and infiltration:
                 </p>
               </div>
 
               {[
                 {
                   id: 'arena' as const,
-                  label: 'Se suelta / Arena',
-                  desc: 'Infiltración rápida, el agua se escurre, poca retención de abono',
+                  label: 'Loose / Sandy',
+                  desc: 'Rapid infiltration, fast percolation, low fertilizer retention',
                   emoji: '🥪',
                 },
                 {
                   id: 'franca' as const,
-                  label: 'Forma bola suave (Franca)',
-                  desc: 'Estructura ideal, esponjosa y mullida, retiene agua y aire óptimo',
+                  label: 'Forms pliable ball (Loam)',
+                  desc: 'Optimal porous structure, balanced moisture retention and aeration',
                   emoji: '🌱',
                 },
                 {
                   id: 'arcilla' as const,
-                  label: 'Muy pegajosa / Barro duro',
-                  desc: 'Alta retención hídrica, riesgo de compactación y barro encharcado',
+                  label: 'Very sticky / Plastic Clay',
+                  desc: 'High water retention, compaction risk, and drainage puddling',
                   emoji: '🧱',
                 },
               ].map((opt) => {
@@ -420,24 +420,24 @@ export default function GroundTruthInteractiveWizard({
             <div className="space-y-2.5 animate-in fade-in">
               <div className="mb-2">
                 <h3 className="text-sm font-bold text-zinc-950">
-                  2. ¿Tu chacra tiene muchas piedras o tierra poco profunda?
+                  2. Does your field have high stoniness or shallow topsoil depth?
                 </h3>
                 <p className="text-[11px] text-zinc-500">
-                  Define zanjas de infiltración y capacidad de aporque:
+                  Determines feasibility of infiltration trenches and deep hilling:
                 </p>
               </div>
 
               {[
                 {
                   id: 'pedregoso' as const,
-                  label: 'Sí (Suelo delgado o pedregoso)',
-                  desc: 'Mucha piedra superficial, capa <30 cm. Requiere camellones elevados y mulch.',
+                  label: 'Yes (Shallow or Stony Soil)',
+                  desc: 'High rock fraction, arable depth <30 cm. Requires raised ridges and mulch.',
                   emoji: '🪨',
                 },
                 {
                   id: 'profundo' as const,
-                  label: 'No (Tierra profunda y fértil)',
-                  desc: 'Capa arable >40 cm. Permite aporque profundo, zanjas y raíces extensas.',
+                  label: 'No (Deep and Fertile Soil)',
+                  desc: 'Arable depth >40 cm. Enables deep hilling, contour ditches, and vigorous roots.',
                   emoji: '🌾',
                 },
               ].map((opt) => {
@@ -472,36 +472,36 @@ export default function GroundTruthInteractiveWizard({
             <div className="space-y-2.5 animate-in fade-in">
               <div className="mb-2">
                 <h3 className="text-sm font-bold text-zinc-950">
-                  3. ¿Cómo está la cobertura del suelo hoy en tu terreno?
+                  3. What is the current ground cover status in your parcel?
                 </h3>
                 <p className="text-[11px] text-zinc-500">
-                  Valida el índice NDVI y mide el riesgo de erosión hídrica:
+                  Validates Sentinel-2 NDVI index and assesses rainfall erosion vulnerability:
                 </p>
               </div>
 
               {[
                 {
                   id: 'sembrado' as const,
-                  label: 'Con cultivo sembrado',
-                  desc: 'Plantas creciendo vigorosas, follaje verde activo cubriendo el suelo.',
+                  label: 'Active Cultivated Crop',
+                  desc: 'Vigorously growing crop, active green photosynthetic canopy covering topsoil.',
                   emoji: '🌱',
                 },
                 {
                   id: 'barbecho' as const,
-                  label: 'En descanso / barbecho',
-                  desc: 'Suelo descansando con rastrojos y materia orgánica protectora.',
+                  label: 'Resting / Fallow with Mulch',
+                  desc: 'Soil resting under protective crop stubble residue and organic matter.',
                   emoji: '🍂',
                 },
                 {
                   id: 'pasto' as const,
-                  label: 'Con pasto natural',
-                  desc: 'Cobertura forrajera o pradera andina que protege el terreno.',
+                  label: 'Natural Andean Grassland',
+                  desc: 'Highland forage grassland cover protecting soil against erosion.',
                   emoji: '🌾',
                 },
                 {
                   id: 'suelo_desnudo' as const,
-                  label: 'Tierra pelada (Sin rastrojo)',
-                  desc: 'Suelo expuesto al sol y viento, alto riesgo de erosión y pérdida.',
+                  label: 'Bare Exposed Soil (No Mulch)',
+                  desc: 'Direct exposure to solar radiation and wind, high erosion and compaction hazard.',
                   emoji: '🏜️',
                 },
               ].map((opt) => {
@@ -536,30 +536,30 @@ export default function GroundTruthInteractiveWizard({
             <div className="space-y-2.5 animate-in fade-in">
               <div className="mb-2">
                 <h3 className="text-sm font-bold text-zinc-950">
-                  4. ¿De dónde proviene el agua de esta chacra?
+                  4. What is the primary water regime for this parcel?
                 </h3>
                 <p className="text-[11px] text-zinc-500">
-                  Cruza telemetría de lluvia NASA GPM para calibrar la demanda hídrica:
+                  Cross-referenced with NASA GPM rainfall telemetry to calibrate water stress:
                 </p>
               </div>
 
               {[
                 {
                   id: 'secano' as const,
-                  label: 'Solo lluvia (Secano)',
-                  desc: 'Depende 100% del ciclo natural de lluvias. Requiere cultivos rústicos.',
+                  label: 'Rainfed Only (Secano)',
+                  desc: '100% dependent on natural rainfall cycles. Requires drought-hardy crops.',
                   emoji: '🌧️',
                 },
                 {
                   id: 'auxilio' as const,
-                  label: 'Lluvia + Riego de auxilio',
-                  desc: 'Cuenta con canal rústico o reservorio para salvar sequías cortas.',
+                  label: 'Rainfed + Supplementary Irrigation',
+                  desc: 'Access to communal ditch or reservoir to mitigate short dry spells.',
                   emoji: '💧',
                 },
                 {
                   id: 'permanente' as const,
-                  label: 'Riego permanente tecnificado',
-                  desc: 'Aspersión o goteo constante. Permite cultivos de alta exigencia.',
+                  label: 'Permanent Technical Irrigation',
+                  desc: 'Pressurized sprinkler or drip irrigation. Supports intensive high-demand crops.',
                   emoji: '🚰',
                 },
               ].map((opt) => {
@@ -594,36 +594,36 @@ export default function GroundTruthInteractiveWizard({
             <div className="space-y-2.5 animate-in fade-in">
               <div className="mb-2">
                 <h3 className="text-sm font-bold text-zinc-950">
-                  5. Según la alerta El Niño: ¿Cuándo piensas sembrar?
+                  5. Based on ENSO forecasts: When is sowing planned?
                 </h3>
                 <p className="text-[11px] text-zinc-500">
-                  Ajusta fechas para evitar pérdidas por veranillos o sequía:
+                  Adjusts planting schedule to prevent losses from seasonal dry spells or delayed rainfall:
                 </p>
               </div>
 
               {[
                 {
                   id: 'esta_semana' as const,
-                  label: 'Ya empecé / Esta semana',
-                  desc: 'Labores de siembra inmediata. Se activan medidas urgentes de mulch.',
+                  label: 'Already Started / This Week',
+                  desc: 'Immediate planting. Urgent soil mulch application activated.',
                   emoji: '⚡',
                 },
                 {
                   id: '2_4_semanas' as const,
-                  label: 'En 2 a 4 semanas',
-                  desc: 'Preparación de terreno con tiempo para incorporar rastrojo.',
+                  label: 'In 2 to 4 Weeks',
+                  desc: 'Field preparation with sufficient lead time to incorporate residue.',
                   emoji: '📅',
                 },
                 {
                   id: '1_2_meses' as const,
-                  label: 'En 1 a 2 meses',
-                  desc: 'Esperando consolidación de lluvias de verano para siembra tardía.',
+                  label: 'In 1 to 2 Months',
+                  desc: 'Awaiting full consolidation of summer rains for late sowing.',
                   emoji: '⏳',
                 },
                 {
                   id: 'proxima_campana' as const,
-                  label: 'Esperaré a la próxima campaña',
-                  desc: 'Estrategia conservadora: dejar el suelo en descanso con leguminosas.',
+                  label: 'Postponed to Next Season',
+                  desc: 'Conservative strategy: rest soil with nitrogen-fixing green manure legumes.',
                   emoji: '⏸️',
                 },
               ].map((opt) => {
@@ -661,10 +661,10 @@ export default function GroundTruthInteractiveWizard({
                 <div className="flex items-center justify-between pb-2.5 border-b border-zinc-200">
                   <div>
                     <span className="text-xs font-bold text-zinc-950 block">
-                      Índice de Salud Edáfica y Resiliencia
+                      Soil Health & Resilience Score
                     </span>
                     <span className="text-[10px] text-zinc-500">
-                      Triangulado: NASA SMAP + Sentinel-2 + Prueba de Campo
+                      Triangulated: NASA SMAP + Sentinel-2 + In-Situ Field Test
                     </span>
                   </div>
                   <div className="text-right">
@@ -672,7 +672,7 @@ export default function GroundTruthInteractiveWizard({
                       {healthScore} / 100
                     </span>
                     <span className="text-[10px] font-bold text-emerald-700 block">
-                      {healthScore >= 75 ? '✓ Resiliencia Alta' : '⚠️ Resiliencia Media'}
+                      {healthScore >= 75 ? '✓ High Resilience' : '⚠️ Moderate Resilience'}
                     </span>
                   </div>
                 </div>
@@ -693,7 +693,7 @@ export default function GroundTruthInteractiveWizard({
                   >
                     <div>
                       <span className="text-xs font-bold block leading-tight">
-                        {hasWeevil ? '⚠️ Gorgojo Detectado' : '✓ Sin Gorgojo'}
+                        {hasWeevil ? '⚠️ Weevil Detected' : '✓ No Weevils Detected'}
                       </span>
                       <span className="text-[10px] opacity-75">Premnotrypes spp.</span>
                     </div>
@@ -714,9 +714,9 @@ export default function GroundTruthInteractiveWizard({
                   >
                     <div>
                       <span className="text-xs font-bold block leading-tight">
-                        {hasFrostAlert ? '❄️ Helada Observada' : '☀️ Sin Heladas'}
+                        {hasFrostAlert ? '❄️ Frost Event Observed' : '☀️ No Frost Detected'}
                       </span>
-                      <span className="text-[10px] opacity-75">Últimas 48 horas</span>
+                      <span className="text-[10px] opacity-75">Last 48 hours</span>
                     </div>
                     <span className="text-base">{hasFrostAlert ? '🥶' : '🌱'}</span>
                   </button>
@@ -725,19 +725,19 @@ export default function GroundTruthInteractiveWizard({
                 {/* Direct 4-attribute chip row (No redundant nested cards) */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1 text-[11px]">
                   <div className="bg-zinc-50 p-2 rounded-lg border border-zinc-200/80">
-                    <span className="text-[10px] text-zinc-400 block font-medium">Textura</span>
+                    <span className="text-[10px] text-zinc-400 block font-medium">Texture</span>
                     <span className="font-bold text-zinc-900 capitalize">{soilTexture}</span>
                   </div>
                   <div className="bg-zinc-50 p-2 rounded-lg border border-zinc-200/80">
-                    <span className="text-[10px] text-zinc-400 block font-medium">Profundidad</span>
+                    <span className="text-[10px] text-zinc-400 block font-medium">Depth</span>
                     <span className="font-bold text-zinc-900 capitalize">{soilStoniness}</span>
                   </div>
                   <div className="bg-zinc-50 p-2 rounded-lg border border-zinc-200/80">
-                    <span className="text-[10px] text-zinc-400 block font-medium">Cobertura</span>
+                    <span className="text-[10px] text-zinc-400 block font-medium">Cover</span>
                     <span className="font-bold text-zinc-900 capitalize">{cropCoverNdvi.replace('_', ' ')}</span>
                   </div>
                   <div className="bg-zinc-50 p-2 rounded-lg border border-zinc-200/80">
-                    <span className="text-[10px] text-zinc-400 block font-medium">Riego</span>
+                    <span className="text-[10px] text-zinc-400 block font-medium">Irrigation</span>
                     <span className="font-bold text-zinc-900 capitalize">{waterSource}</span>
                   </div>
                 </div>
@@ -756,7 +756,7 @@ export default function GroundTruthInteractiveWizard({
               className="px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Atrás</span>
+              <span>Back</span>
             </button>
           ) : (
             <button
@@ -765,7 +765,7 @@ export default function GroundTruthInteractiveWizard({
               disabled={isSubmitting}
               className="px-4 py-2.5 text-zinc-500 hover:text-zinc-800 rounded-xl text-xs font-semibold transition"
             >
-              Cancelar
+              Cancel
             </button>
           )}
 
@@ -775,7 +775,7 @@ export default function GroundTruthInteractiveWizard({
               onClick={handleNext}
               className="flex-1 py-2.5 px-4 bg-emerald-700 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs cursor-pointer"
             >
-              <span>Continuar al Paso {step + 1}</span>
+              <span>Continue to Step {step + 1}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           ) : (
@@ -788,12 +788,12 @@ export default function GroundTruthInteractiveWizard({
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-emerald-200" />
-                  <span>Sincronizando con Supabase...</span>
+                  <span>Synchronizing with Supabase...</span>
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4 text-emerald-300" />
-                  <span>Guardar Ground-Truth y Calibrar</span>
+                  <span>Save Ground-Truth & Calibrate</span>
                 </>
               )}
             </button>

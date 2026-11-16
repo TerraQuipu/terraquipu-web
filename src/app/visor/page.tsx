@@ -23,7 +23,7 @@ import { ActiveParcel, fetchRealTerrainMetrics } from '@/lib/geoUtils';
 
 const DEFAULT_PARCEL: ActiveParcel = {
   id: 'P-01',
-  name: 'Chacra Pukara • Sector Yanacona',
+  name: 'Pukara Parcel - Yanacona Sector',
   areaHa: 1.68,
   slopePct: 14.0,
   elevationMsnm: 3754,
@@ -109,7 +109,7 @@ export default function TerraQuipuSuitePage() {
 
       setIsSyncing(false);
       setDbStatus(cropsRes.error ? 'offline' : 'connected');
-      showToast('Telemetría PostGIS, NASA SMAP y Ground-Truth Supabase conectada');
+      showToast('PostGIS, NASA SMAP & Ground-Truth Supabase telemetry connected');
     }
 
     loadInitialData();
@@ -118,7 +118,7 @@ export default function TerraQuipuSuitePage() {
   const handleManualSync = async () => {
     setIsSyncing(true);
     setDbStatus('syncing');
-    showToast('Sincronizando con Supabase en tiempo real...');
+    showToast('Synchronizing with Supabase in real-time...');
 
     const [cropsRes, reportsRes, cuencasRes, climaRes] = await Promise.all([
       fetchCropMatrix(),
@@ -142,7 +142,7 @@ export default function TerraQuipuSuitePage() {
 
     setIsSyncing(false);
     setDbStatus(cropsRes.error ? 'offline' : 'connected');
-    showToast('Base de datos y reportes de agricultores sincronizados');
+    showToast('Database and farmer reports synchronized');
   };
 
   // Calculate dynamic rotation based on state and active parcel geometry
@@ -166,7 +166,7 @@ export default function TerraQuipuSuitePage() {
 
   return (
     <div className="h-screen flex flex-col bg-zinc-100 overflow-hidden">
-      {/* Top Header - Production Technician / Farmer View */}
+      {/* Top Header */}
       <TopHeader
         onSync={handleManualSync}
         isSyncing={isSyncing}
@@ -174,7 +174,7 @@ export default function TerraQuipuSuitePage() {
         onStartTour={() => tourGuideRef.current?.startTour()}
       />
 
-      {/* Main Workspace (60% OpenStreetMap Map + 40% Decision Panel) */}
+      {/* Main Workspace */}
       <main className="flex-1 relative overflow-hidden flex flex-col lg:flex-row">
         <MapViewer
           activeParcel={activeParcel}
@@ -219,7 +219,7 @@ export default function TerraQuipuSuitePage() {
       {/* Toast Notifications */}
       <Toast message={toastMessage} isVisible={toastVisible} />
 
-      {/* Floating System Architecture Guide - Only in Visor */}
+      {/* Floating System Architecture Guide */}
       <ModuleGuidePill onStartTour={() => tourGuideRef.current?.startTour()} />
 
       {/* Ground-Truth Farmer Report Detail Inspection Modal */}

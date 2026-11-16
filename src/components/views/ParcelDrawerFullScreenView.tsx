@@ -37,7 +37,7 @@ import { getCultivos } from '@/lib/supabaseClient';
 const FALLBACK_CROPS: Cultivo[] = [
   {
     crop_id: 'papa_nativa',
-    nombre_comun: 'Papa Nativa Andina',
+    nombre_comun: 'Native Andean Potato',
     nombre_cientifico: 'Solanum tuberosum subsp. andigenum',
     familia_botanica: 'Solanaceae',
     variedades_recomendadas: ['Huayro', 'Canchan', 'Amarilla Tumbay'],
@@ -57,7 +57,7 @@ const FALLBACK_CROPS: Cultivo[] = [
   },
   {
     crop_id: 'tarwi',
-    nombre_comun: 'Tarwi / Chocho',
+    nombre_comun: 'Tarwi / Andean Lupin',
     nombre_cientifico: 'Lupinus mutabilis',
     familia_botanica: 'Fabaceae',
     variedades_recomendadas: ['Andenes INIA', 'Yunguyo'],
@@ -77,7 +77,7 @@ const FALLBACK_CROPS: Cultivo[] = [
   },
   {
     crop_id: 'maiz_blanco',
-    nombre_comun: 'Maíz Blanco Gigante',
+    nombre_comun: 'Giant White Corn',
     nombre_cientifico: 'Zea mays var. amylacea',
     familia_botanica: 'Poaceae',
     variedades_recomendadas: ['Paraqay Sara', 'Urubamba'],
@@ -97,7 +97,7 @@ const FALLBACK_CROPS: Cultivo[] = [
   },
   {
     crop_id: 'quinua_real',
-    nombre_comun: 'Quinua Real del Altiplano',
+    nombre_comun: 'Real Andean Quinoa',
     nombre_cientifico: 'Chenopodium quinoa',
     familia_botanica: 'Amaranthaceae',
     variedades_recomendadas: ['Kancolla', 'Blanca de Juli', 'Pasankalla'],
@@ -117,7 +117,7 @@ const FALLBACK_CROPS: Cultivo[] = [
   },
   {
     crop_id: 'habas_verdes',
-    nombre_comun: 'Habas Verdes',
+    nombre_comun: 'Green Broad Beans',
     nombre_cientifico: 'Vicia faba',
     familia_botanica: 'Fabaceae',
     variedades_recomendadas: ['Verde Anta', 'Gigante de Coporaque'],
@@ -137,7 +137,7 @@ const FALLBACK_CROPS: Cultivo[] = [
   },
   {
     crop_id: 'cebada_grano',
-    nombre_comun: 'Cebada Grano',
+    nombre_comun: 'Malting & Grain Barley',
     nombre_cientifico: 'Hordeum vulgare',
     familia_botanica: 'Poaceae',
     variedades_recomendadas: ['Centenario', 'UNA La Molina'],
@@ -264,9 +264,9 @@ export default function ParcelDrawerFullScreenView({
 
   // Form Fields
   const [parcelName, setParcelName] = useState(
-    farmerName ? `Chacra de ${farmerName}` : 'Mi Chacra Andina'
+    farmerName ? `${farmerName}'s Parcel` : 'My Andean Parcel'
   );
-  const [notes, setNotes] = useState('Suelo franco arcilloso, delimitado con precisión satelital.');
+  const [notes, setNotes] = useState('Clay-loam topsoil, delineated via precision satellite telemetry.');
 
   // Live Supabase Crops Data (Real Data, zero mockups)
   const [dbCrops, setDbCrops] = useState<Cultivo[]>(propCultivos);
@@ -811,7 +811,7 @@ export default function ParcelDrawerFullScreenView({
                 }
               }}
               className="w-10 h-10 rounded-full bg-[#132A1C]/90 hover:bg-[#132A1C] border border-white/20 text-white flex items-center justify-center shadow-lg transition active:scale-95 cursor-pointer backdrop-blur-md shrink-0"
-              title="Volver"
+              title="Back"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
@@ -822,7 +822,7 @@ export default function ParcelDrawerFullScreenView({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Buscar comunidad o valle andino..."
+                placeholder="Search Andean community or valley..."
                 className="w-full h-10 pl-9 pr-8 rounded-full bg-[#132A1C]/90 border border-white/20 text-white placeholder-zinc-400 text-xs shadow-lg backdrop-blur-md focus:outline-hidden focus:border-[#A3E635] transition"
               />
               <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -840,7 +840,7 @@ export default function ParcelDrawerFullScreenView({
                   ? 'bg-emerald-900/90 border-[#A3E635] text-[#A3E635]'
                   : 'bg-[#132A1C]/90 border-white/20 text-white'
               }`}
-              title="Cambiar capa satelital / mapa"
+              title="Toggle satellite / topographic map"
             >
               <Layers className="w-4 h-4" />
             </button>
@@ -881,7 +881,7 @@ export default function ParcelDrawerFullScreenView({
                   }`}
                 >
                   <PenTool className="w-3 h-3" />
-                  <span>Polígono Libre (Vértices)</span>
+                  <span>Freehand Polygon (Vertices)</span>
                 </button>
 
                 <button
@@ -894,7 +894,7 @@ export default function ParcelDrawerFullScreenView({
                   }`}
                 >
                   <Sliders className="w-3 h-3" />
-                  <span>Chacra Rápida (1 Clic)</span>
+                  <span>Quick Parcel (1-Click Box)</span>
                 </button>
               </div>
 
@@ -904,7 +904,7 @@ export default function ParcelDrawerFullScreenView({
                     type="button"
                     onClick={handleUndoPoint}
                     className="p-1.5 rounded-full bg-[#132A1C]/90 text-zinc-300 hover:text-white border border-white/15 backdrop-blur-md"
-                    title="Deshacer último vértice"
+                    title="Undo last vertex"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                   </button>
@@ -946,7 +946,7 @@ export default function ParcelDrawerFullScreenView({
             </div>
             {drawMode === 'freehand' && (
               <div className="text-[9px] text-[#A3E635] font-semibold">
-                {polygonCoords.length} vértices
+                {polygonCoords.length} vertices
               </div>
             )}
           </div>
@@ -958,11 +958,11 @@ export default function ParcelDrawerFullScreenView({
             <div className="bg-black/75 backdrop-blur-sm px-3.5 py-1.5 rounded-full border border-white/20 text-[10.5px] text-white shadow-md text-center whitespace-nowrap">
               {drawMode === 'freehand'
                 ? polygonCoords.length === 0
-                  ? 'Toca el mapa para marcar el primer vértice de tu chacra'
+                  ? 'Tap map to mark the first vertex of your parcel'
                   : polygonCoords.length < 3
-                  ? `Marca ${3 - polygonCoords.length} vértice(s) más para cerrar el terreno`
-                  : 'Terreno delimitado. Toca más vértices o confirma abajo'
-                : 'Toca el mapa para posicionar el polígono de tu chacra'}
+                  ? `Mark ${3 - polygonCoords.length} more vertex/vertices to close boundary`
+                  : 'Boundary closed. Tap to add vertices or confirm below'
+                : 'Tap map to position parcel bounding box'}
             </div>
           </div>
         )}
@@ -1010,8 +1010,8 @@ export default function ParcelDrawerFullScreenView({
               <div className="bg-amber-950/90 border border-amber-500/70 rounded-2xl p-3 flex items-start gap-2.5 text-amber-200 shadow-xl backdrop-blur-md animate-in fade-in">
                 <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                 <div className="text-xs leading-relaxed">
-                  <strong className="text-amber-300 block font-semibold">Aviso de Resolución Espacial:</strong>
-                  Para parcelas mayores a 30 hectáreas, las estimaciones satelitales tendrán menor precisión debido a la heterogeneidad del relieve y mezcla de pendientes.
+                  <strong className="text-amber-300 block font-semibold">Spatial Resolution Notice:</strong>
+                  For parcels exceeding 30 hectares, satellite estimations exhibit lower precision due to topographic relief heterogeneity and mixed slope aspects.
                 </div>
               </div>
             )}
@@ -1019,12 +1019,12 @@ export default function ParcelDrawerFullScreenView({
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider block">
-                  PASO 1 DE 3 · TERRENO
+                  STEP 1 OF 3 - FIELD DELINEATION
                 </span>
                 <span className="text-xs text-zinc-300">
                   {polygonCoords.length < 3
-                    ? 'Marca al menos 3 vértices en el mapa'
-                    : `Área calculada: ${areaHa} ha (${topos} topos)`}
+                    ? 'Mark at least 3 vertices on the map'
+                    : `Calculated area: ${areaHa} ha (${topos} topos)`}
                 </span>
               </div>
 
@@ -1034,7 +1034,7 @@ export default function ParcelDrawerFullScreenView({
                 onClick={handleConfirmStep1}
                 className="px-5 py-3 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] disabled:opacity-40 text-[#132A1C] font-semibold text-xs flex items-center gap-2 shadow-lg shadow-lime-600/30 transition transform active:scale-95 cursor-pointer"
               >
-                <span>Confirmar Parcela</span>
+                <span>Confirm Parcel Boundary</span>
                 <ChevronRight className="w-4 h-4 stroke-[2.5]" />
               </button>
             </div>
@@ -1046,7 +1046,7 @@ export default function ParcelDrawerFullScreenView({
           <div className="space-y-3 animate-in fade-in">
             <div className="flex items-center justify-between">
               <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
-                CONFIRMACIÓN DE TERRENO Y TELEMETRÍA REAL
+                TERRAIN & SATELLITE TELEMETRY CONFIRMATION
               </span>
               <span className="text-[10px] text-zinc-400 font-mono">
                 {currentLat.toFixed(4)}, {currentLon.toFixed(4)}
@@ -1058,7 +1058,7 @@ export default function ParcelDrawerFullScreenView({
               <div className="bg-amber-950/90 border border-amber-500/70 rounded-2xl p-2.5 flex items-start gap-2 text-amber-200 text-xs">
                 <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <span>
-                  <strong>Aviso de Resolución Espacial:</strong> Para parcelas mayores a 30 hectáreas, las estimaciones satelitales tendrán menor precisión debido a la heterogeneidad del relieve y mezcla de pendientes.
+                  <strong>Spatial Resolution Notice:</strong> For parcels exceeding 30 hectares, satellite estimations exhibit lower precision due to topographic relief heterogeneity and mixed slope aspects.
                 </span>
               </div>
             )}
@@ -1068,7 +1068,7 @@ export default function ParcelDrawerFullScreenView({
               <div className="bg-emerald-950/80 rounded-2xl p-2.5 border border-emerald-800/60 space-y-0.5">
                 <div className="flex items-center gap-1.5 text-zinc-400 text-[10px]">
                   <Layers className="w-3 h-3 text-[#A3E635]" />
-                  <span>Área Real</span>
+                  <span>True Surface Area</span>
                 </div>
                 <div className="text-sm font-bold text-white">
                   {areaHa} ha <span className="text-[10px] text-[#A3E635]">({topos} topos)</span>
@@ -1078,7 +1078,7 @@ export default function ParcelDrawerFullScreenView({
               <div className="bg-emerald-950/80 rounded-2xl p-2.5 border border-emerald-800/60 space-y-0.5">
                 <div className="flex items-center gap-1.5 text-zinc-400 text-[10px]">
                   <Mountain className="w-3 h-3 text-amber-400" />
-                  <span>Altitud SRTM</span>
+                  <span>SRTM Elevation</span>
                 </div>
                 <div className="text-sm font-bold text-white">
                   {altitudeMsnm} msnm
@@ -1088,17 +1088,17 @@ export default function ParcelDrawerFullScreenView({
               <div className="bg-emerald-950/80 rounded-2xl p-2.5 border border-emerald-800/60 space-y-0.5">
                 <div className="flex items-center gap-1.5 text-zinc-400 text-[10px]">
                   <Droplets className="w-3 h-3 text-sky-400" />
-                  <span>Humedad SMAP</span>
+                  <span>SMAP Soil Moisture</span>
                 </div>
                 <div className="text-sm font-bold text-sky-300">
-                  {Math.round(smapMoisturePct)}% <span className="text-[9.5px] text-zinc-400 font-normal">superficial</span>
+                  {Math.round(smapMoisturePct)}% <span className="text-[9.5px] text-zinc-400 font-normal">topsoil (0-5 cm)</span>
                 </div>
               </div>
 
               <div className="bg-emerald-950/80 rounded-2xl p-2.5 border border-emerald-800/60 space-y-0.5">
                 <div className="flex items-center gap-1.5 text-zinc-400 text-[10px]">
                   <TrendingUp className="w-3 h-3 text-emerald-400" />
-                  <span>Pendiente Andén</span>
+                  <span>Terrace Slope</span>
                 </div>
                 <div className="text-sm font-bold text-white">
                   {slopePct}%
@@ -1123,7 +1123,7 @@ export default function ParcelDrawerFullScreenView({
                 onClick={handleGoToStep3}
                 className="flex-1 py-3 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] text-[#132A1C] font-semibold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-lime-600/30 transition cursor-pointer"
               >
-                <span>Siguiente: Nombre</span>
+                <span>Next: Field Identification</span>
                 <ChevronRight className="w-4 h-4 stroke-[2.5]" />
               </button>
             </div>
@@ -1135,9 +1135,9 @@ export default function ParcelDrawerFullScreenView({
           <div className="space-y-3 animate-in fade-in">
             <div>
               <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider block">
-                PASO 3 DE 3 · FINALIZAR IDENTIFICACIÓN
+                STEP 3 OF 3 - FIELD IDENTIFICATION
               </span>
-              <h3 className="text-base font-bold text-white">¿Cómo se llama tu parcela?</h3>
+              <h3 className="text-base font-bold text-white">What is the name of your parcel?</h3>
             </div>
 
             {/* Alerta de Resolución Espacial para parcelas > 30 ha */}
@@ -1145,31 +1145,31 @@ export default function ParcelDrawerFullScreenView({
               <div className="bg-amber-950/90 border border-amber-500/70 rounded-2xl p-2.5 flex items-start gap-2 text-amber-200 text-xs">
                 <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <span>
-                  <strong>Aviso de Resolución Espacial:</strong> Para parcelas mayores a 30 hectáreas, las estimaciones satelitales tendrán menor precisión debido a la heterogeneidad del relieve y mezcla de pendientes.
+                  <strong>Spatial Resolution Notice:</strong> For parcels exceeding 30 hectares, satellite estimations exhibit lower precision due to topographic relief heterogeneity and mixed slope aspects.
                 </span>
               </div>
             )}
 
             <div className="space-y-2">
               <div>
-                <label className="text-[10.5px] text-zinc-400 block mb-1">Nombre de la chacra</label>
+                <label className="text-[10.5px] text-zinc-400 block mb-1">Parcel Name</label>
                 <input
                   type="text"
                   value={parcelName}
                   onChange={(e) => setParcelName(e.target.value)}
-                  placeholder="Ej. Chacra Yanacona, Andén Huaypo"
+                  placeholder="e.g. Yanacona Parcel, Huaypo Terrace"
                   className="w-full h-10 px-3.5 rounded-xl bg-emerald-950/80 border border-emerald-800/60 text-white text-xs placeholder-zinc-500 focus:outline-hidden focus:border-[#A3E635]"
                   autoFocus
                 />
               </div>
 
               <div>
-                <label className="text-[10.5px] text-zinc-400 block mb-1">Notas de manejo (opcional)</label>
+                <label className="text-[10.5px] text-zinc-400 block mb-1">Agronomic Management Notes (Optional)</label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
-                  placeholder="Ej. Suelo con rastrojo de cebada, buena retención de humedad..."
+                  placeholder="e.g. Loamy soil with barley stover mulch, optimal moisture retention..."
                   className="w-full p-2.5 rounded-xl bg-emerald-950/80 border border-emerald-800/60 text-white text-xs placeholder-zinc-500 focus:outline-hidden focus:border-[#A3E635]"
                 />
               </div>
@@ -1194,7 +1194,7 @@ export default function ParcelDrawerFullScreenView({
                 className="flex-2 py-3 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] disabled:opacity-40 text-[#132A1C] font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-lime-600/30 transition cursor-pointer"
               >
                 <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
-                <span>Guardar y Calibrar en Terreno</span>
+                <span>Save & Calibrate In-Situ</span>
               </button>
             </div>
           </div>

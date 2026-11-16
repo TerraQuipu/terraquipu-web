@@ -17,7 +17,7 @@ export interface RegionalCommunity {
 export const REGIONAL_COMMUNITIES: RegionalCommunity[] = [
   {
     id: 'maras',
-    name: 'Maras · Valle Sagrado',
+    name: 'Maras - Sacred Valley',
     distrito: 'Maras',
     cuencaName: 'Microcuenca Vilcanota - Maras',
     lat: -13.332,
@@ -26,7 +26,7 @@ export const REGIONAL_COMMUNITIES: RegionalCommunity[] = [
   },
   {
     id: 'chinchero',
-    name: 'Chinchero · Cusco',
+    name: 'Chinchero - Cusco',
     distrito: 'Chinchero',
     cuencaName: 'Microcuenca Chinchero - Piuray',
     lat: -13.393,
@@ -35,7 +35,7 @@ export const REGIONAL_COMMUNITIES: RegionalCommunity[] = [
   },
   {
     id: 'urubamba',
-    name: 'Valle de Urubamba',
+    name: 'Urubamba Valley',
     distrito: 'Urubamba',
     cuencaName: 'Microcuenca Vilcanota - Urubamba',
     lat: -13.305,
@@ -44,7 +44,7 @@ export const REGIONAL_COMMUNITIES: RegionalCommunity[] = [
   },
   {
     id: 'anta',
-    name: 'Pampa de Anta',
+    name: 'Anta Highlands Plateau',
     distrito: 'Anta',
     cuencaName: 'Microcuenca Anta - Cusco',
     lat: -13.415,
@@ -53,7 +53,7 @@ export const REGIONAL_COMMUNITIES: RegionalCommunity[] = [
   },
   {
     id: 'ayaviri',
-    name: 'Melgar · Ayaviri',
+    name: 'Melgar - Ayaviri',
     distrito: 'Ayaviri',
     cuencaName: 'Microcuenca Ayaviri - Puno',
     lat: -14.882,
@@ -62,7 +62,7 @@ export const REGIONAL_COMMUNITIES: RegionalCommunity[] = [
   },
   {
     id: 'majes',
-    name: 'Irrigación Majes',
+    name: 'Majes Irrigation District',
     distrito: 'Majes',
     cuencaName: 'Microcuenca Majes - Arequipa',
     lat: -16.325,
@@ -71,7 +71,7 @@ export const REGIONAL_COMMUNITIES: RegionalCommunity[] = [
   },
   {
     id: 'puno',
-    name: 'Puno · Titicaca',
+    name: 'Puno - Lake Titicaca Basin',
     distrito: 'Puno',
     cuencaName: 'Microcuenca Lago Titicaca',
     lat: -15.84,
@@ -106,7 +106,7 @@ export default function KipuFarmerWelcomeView({
       if (match) return match.id;
       return 'custom';
     }
-    return 'none'; // Por defecto "Por ahora no" para no forzar lugares
+    return 'none';
   });
   const [customCommunity, setCustomCommunity] = useState(() => {
     if (initialCommunity) {
@@ -141,7 +141,7 @@ export default function KipuFarmerWelcomeView({
   const activeSelectedRegion = REGIONAL_COMMUNITIES.find((c) => c.id === selectedCommunityId);
   const effectiveCommunityName =
     selectedCommunityId === 'none'
-      ? (gpsData ? `Ubicación GPS (${gpsData.lat.toFixed(2)}°, ${gpsData.lon.toFixed(2)}°)` : 'Por definir (GPS)')
+      ? (gpsData ? `GPS Location (${gpsData.lat.toFixed(2)}°, ${gpsData.lon.toFixed(2)}°)` : 'Pending (GPS)')
       : selectedCommunityId === 'custom'
       ? customCommunity.trim()
       : activeSelectedRegion?.name || '';
@@ -168,7 +168,7 @@ export default function KipuFarmerWelcomeView({
                 lat: gpsData.lat,
                 lon: gpsData.lon,
                 altitude: 3300,
-                cuencaName: 'Ubicación GPS',
+                cuencaName: 'GPS Location',
               }
             : undefined)
         : activeSelectedRegion
@@ -180,7 +180,7 @@ export default function KipuFarmerWelcomeView({
           }
         : undefined;
 
-    onContinue(finalName, selectedCommunityId === 'none' ? 'Ubicación libre (GPS)' : effectiveCommunityName, regionData);
+    onContinue(finalName, selectedCommunityId === 'none' ? 'Dynamic GPS Location' : effectiveCommunityName, regionData);
   };
 
   return (
@@ -194,7 +194,7 @@ export default function KipuFarmerWelcomeView({
         <div className="absolute inset-0 bg-gradient-to-b from-[#0A1A0F] via-[#0A1A0F]/90 to-[#0A1A0F]" />
       </div>
 
-      {/* Top Header - Sin botón omitir */}
+      {/* Top Header */}
       <div className="relative z-10 px-5 pt-6 flex items-center justify-between">
         <button
           type="button"
@@ -203,28 +203,28 @@ export default function KipuFarmerWelcomeView({
             onBack();
           }}
           className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white flex items-center justify-center transition active:scale-95 cursor-pointer backdrop-blur-md"
-          title="Volver"
+          title="Back"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
 
         <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-          Paso 1 de 2 · Perfil del Agricultor
+          Step 1 of 2 - Farmer Profile
         </span>
 
         <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-950/80 border border-emerald-500/40 px-3 py-1 rounded-full backdrop-blur-md">
-          Obligatorio
+          Required
         </span>
       </div>
 
       {/* Main Content Area */}
       <div className="relative z-10 px-5 py-6 max-w-md mx-auto w-full space-y-6 my-auto">
-        {/* Kipu Llama Mascot Card (Duolingo Style Dialog) */}
+        {/* Kipu Llama Mascot Card */}
         <div className="flex items-start gap-3.5 bg-[#132A1C]/90 rounded-3xl p-4 border border-emerald-500/30 shadow-2xl backdrop-blur-md">
           <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 p-1 shrink-0 flex items-center justify-center shadow-md">
             <img
               src="/images/kipu_llama.png"
-              alt="Kipu el Copiloto Andino"
+              alt="Kipu the Andean Copilot"
               className="w-full h-full object-contain filter drop-shadow-md"
             />
           </div>
@@ -232,28 +232,28 @@ export default function KipuFarmerWelcomeView({
           <div className="space-y-1">
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-bold text-[#A3E635]">Kipu</span>
-              <span className="text-[10px] text-zinc-400">· Copiloto Andino</span>
+              <span className="text-[10px] text-zinc-400">- Andean Copilot</span>
             </div>
             <p className="text-xs text-zinc-200 leading-relaxed font-normal">
-              ¡Allillanchu! Para comenzar, ingresa tu nombre (obligatorio). La ubicación se adaptará por tu GPS o podrás marcarla directamente en el mapa.
+              Allillanchu! Welcome! To begin, enter your name (required). Location will calibrate via your device GPS or you can delineate your field directly on the satellite GIS map.
             </p>
           </div>
         </div>
 
         {/* Input Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* 1. Name Field (Obligatorio) */}
+          {/* 1. Name Field (Required) */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-zinc-200 flex items-center justify-between">
-              <span>Tu nombre o apodo familiar</span>
-              <span className="text-[10.5px] text-emerald-400 font-mono">* Obligatorio</span>
+              <span>Your full name or farm alias</span>
+              <span className="text-[10.5px] text-emerald-400 font-mono">* Required</span>
             </label>
             <div className="relative">
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Ingresa tu nombre (ej. Juan Quispe)"
+                placeholder="Enter your name (e.g. Juan Quispe)"
                 className={`w-full h-12 pl-11 pr-4 rounded-2xl bg-[#132A1C] border text-white placeholder-zinc-500 text-sm shadow-md focus:outline-hidden transition ${
                   touched && !isNameValid
                     ? 'border-red-500/80 focus:border-red-400'
@@ -266,19 +266,19 @@ export default function KipuFarmerWelcomeView({
             {touched && !isNameValid && (
               <p className="text-[11px] text-red-400 flex items-center gap-1">
                 <AlertCircle className="w-3.5 h-3.5" />
-                <span>Por favor ingresa tu nombre para continuar.</span>
+                <span>Please enter your name to proceed.</span>
               </p>
             )}
           </div>
 
-          {/* 2. Ubicación / Comunidad (Opcional - Opción 'Por ahora no') */}
+          {/* 2. Location / Community (Optional) */}
           <div className="space-y-2 pt-1">
             <label className="text-xs font-semibold text-zinc-200 flex items-center justify-between">
-              <span>Ubicación o comunidad</span>
-              <span className="text-[10.5px] text-zinc-400 font-mono">Opcional</span>
+              <span>Location or agroecological zone</span>
+              <span className="text-[10.5px] text-zinc-400 font-mono">Optional</span>
             </label>
 
-            {/* Opción destacada: Por ahora no */}
+            {/* Skip for now button */}
             <button
               type="button"
               onClick={() => {
@@ -300,17 +300,17 @@ export default function KipuFarmerWelcomeView({
                 </div>
                 <div className="min-w-0">
                   <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                    <span>Por ahora no</span>
+                    <span>Skip for now</span>
                     <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-900/80 text-emerald-300 border border-emerald-600/40">
-                      GPS / Omitir
+                      GPS / Direct map
                     </span>
                   </div>
                   <div className="text-[10.5px] text-zinc-400 leading-snug mt-0.5">
                     {gpsLoading
-                      ? '🛰️ Consultando señal GPS del teléfono...'
+                      ? 'Querying device GPS telemetry...'
                       : gpsData
-                      ? `✓ GPS conectado: ${gpsData.lat.toFixed(4)}°, ${gpsData.lon.toFixed(4)}°`
-                      : 'El sistema se adaptará por tu GPS o ubicarás tu chacra en el mapa satelital.'}
+                      ? `GPS connected: ${gpsData.lat.toFixed(4)}°, ${gpsData.lon.toFixed(4)}°`
+                      : 'The system will adapt via device GPS or you can delineate directly on the satellite map.'}
                   </div>
                 </div>
               </div>
@@ -321,7 +321,7 @@ export default function KipuFarmerWelcomeView({
               )}
             </button>
 
-            {/* Selector secundario de lista desplegable */}
+            {/* Secondary dropdown selector */}
             <div className="pt-1">
               <button
                 type="button"
@@ -329,10 +329,10 @@ export default function KipuFarmerWelcomeView({
                   playBubblePop();
                   setShowPlacesList(!showPlacesList);
                 }}
-                className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center gap-1.5 py-1 px-1 transition"
+                className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center gap-1.5 py-1 px-1 transition cursor-pointer"
               >
                 <MapPin className="w-3.5 h-3.5" />
-                <span>{showPlacesList ? 'Ocultar lista de comunidades' : 'O seleccionar comunidad conocida de la lista (opcional)'}</span>
+                <span>{showPlacesList ? 'Hide community list' : 'Or select regional agroclimatic zone from list (optional)'}</span>
                 <span className="text-[10px] text-zinc-500">{showPlacesList ? '▲' : '▼'}</span>
               </button>
 
@@ -356,7 +356,7 @@ export default function KipuFarmerWelcomeView({
                       >
                         <div className="min-w-0">
                           <div className="text-xs font-semibold truncate">{com.name}</div>
-                          <div className="text-[10px] text-zinc-400 font-mono">{com.altitude} msnm</div>
+                          <div className="text-[10px] text-zinc-400 font-mono">{com.altitude} m a.s.l.</div>
                         </div>
                         {isSelected && (
                           <div className="w-4 h-4 rounded-full bg-[#7BB63E] text-[#132A1C] flex items-center justify-center shrink-0">
@@ -381,7 +381,7 @@ export default function KipuFarmerWelcomeView({
                   >
                     <div className="flex items-center gap-2">
                       <MapPin className="w-3.5 h-3.5 text-[#A3E635]" />
-                      <span className="text-xs font-semibold">Otra comunidad o sector</span>
+                      <span className="text-xs font-semibold">Other community or sector</span>
                     </div>
                     {selectedCommunityId === 'custom' && (
                       <div className="w-4 h-4 rounded-full bg-[#7BB63E] text-[#132A1C] flex items-center justify-center shrink-0">
@@ -398,7 +398,7 @@ export default function KipuFarmerWelcomeView({
                     type="text"
                     value={customCommunity}
                     onChange={(e) => setCustomCommunity(e.target.value)}
-                    placeholder="Escribe el nombre de tu comunidad o localidad..."
+                    placeholder="Enter community or micro-watershed name..."
                     className="w-full h-11 px-3.5 rounded-xl bg-[#132A1C] border border-[#A3E635]/60 text-white placeholder-zinc-500 text-xs focus:outline-hidden focus:border-[#A3E635]"
                     autoFocus
                   />
@@ -409,7 +409,7 @@ export default function KipuFarmerWelcomeView({
             {touched && !isCommunityValid && (
               <p className="text-[11px] text-red-400 flex items-center gap-1 pt-0.5">
                 <AlertCircle className="w-3.5 h-3.5" />
-                <span>Por favor selecciona o ingresa tu comunidad para ubicar los satélites.</span>
+                <span>Please select or enter your community to align satellite telemetry.</span>
               </p>
             )}
           </div>
@@ -424,12 +424,12 @@ export default function KipuFarmerWelcomeView({
           disabled={touched && !isFormValid}
           className="w-full py-3.5 px-5 rounded-full bg-[#7BB63E] hover:bg-[#8CD045] disabled:opacity-50 text-[#132A1C] font-semibold text-sm shadow-xl shadow-lime-600/30 transition active:scale-95 cursor-pointer flex items-center justify-between"
         >
-          <span>Continuar a Delimitar Mi Chacra</span>
+          <span>Continue to Delineate Field</span>
           <ArrowRight className="w-4 h-4 text-[#132A1C]" />
         </button>
 
         <p className="text-center text-[10.5px] text-zinc-400 font-normal">
-          <strong className="text-emerald-400">El nombre es obligatorio.</strong> La ubicación se adaptará por GPS o podrás marcarla directamente en el mapa.
+          <strong className="text-emerald-400">Name is required.</strong> Location will calibrate via device GPS or direct satellite map delineation.
         </p>
       </div>
     </div>

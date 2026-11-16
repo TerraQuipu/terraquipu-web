@@ -98,6 +98,7 @@ export interface FarmerProfile {
   pest?: 'sano' | 'gorgojo' | 'rancha';
   pestLabel?: string;
   healthScore?: number;
+  language?: 'es' | 'qu';
 }
 
 export interface RotationRecommendation {
@@ -114,7 +115,7 @@ export interface RotationRecommendation {
 export interface DiagnosticoIncertidumbre {
   total: number;
   fiabilidad: number;
-  nivel: 'Alta (🟢)' | 'Media (🟡)' | 'Baja (🔴)';
+  nivel: 'Alta (🟢)' | 'Media (🟡)' | 'Baja (🔴)' | 'High (🟢)' | 'Medium (🟡)' | 'Low (🔴)';
   desglose: {
     clima_base: number;
     geometria_espacial: number;
