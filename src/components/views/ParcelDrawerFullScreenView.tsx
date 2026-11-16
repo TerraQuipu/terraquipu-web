@@ -229,12 +229,34 @@ export default function ParcelDrawerFullScreenView({
   polygonCoordsRef.current = polygonCoords;
 
   const [activeLayer, setActiveLayer] = useState<'sat' | 'qgis'>('sat');
-  const [altitudeMsnm, setAltitudeMsnm] = useState(3380);
+  const [altitudeMsnm, setAltitudeMsnm] = useState(() => {
+    if (!initialCommunityName) return 3380;
+    const search = initialCommunityName.toLowerCase();
+    const found = PRESET_REGIONS.find(
+      (r) =>
+        r.id === search ||
+        r.name.toLowerCase() === search ||
+        r.fullName.toLowerCase() === search ||
+        search.includes(r.id) ||
+        search.includes(r.name.toLowerCase())
+    );
+    return found ? found.altitude : 3380;
+  });
   const [slopePct, setSlopePct] = useState(12.0);
   const [smapMoisturePct, setSmapMoisturePct] = useState(18.0);
-  const [activeRegionId, setActiveRegionId] = useState(
-    initialCommunityName ? initialCommunityName.toLowerCase() : 'maras'
-  );
+  const [activeRegionId, setActiveRegionId] = useState(() => {
+    if (!initialCommunityName) return 'maras';
+    const search = initialCommunityName.toLowerCase();
+    const found = PRESET_REGIONS.find(
+      (r) =>
+        r.id === search ||
+        r.name.toLowerCase() === search ||
+        r.fullName.toLowerCase() === search ||
+        search.includes(r.id) ||
+        search.includes(r.name.toLowerCase())
+    );
+    return found ? found.id : 'maras';
+  });
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -703,7 +725,20 @@ export default function ParcelDrawerFullScreenView({
     if (!parcelName.trim()) return;
     playSuccessFanfare();
 
-    const activeRegion = PRESET_REGIONS.find((r) => r.id === activeRegionId) || PRESET_REGIONS[0];
+    const matchingRegion = PRESET_REGIONS.find((r) =>
+      r.id === activeRegionId ||
+      (initialCommunityName && (
+        r.id === initialCommunityName.toLowerCase() ||
+        r.name.toLowerCase() === initialCommunityName.toLowerCase() ||
+        r.fullName.toLowerCase() === initialCommunityName.toLowerCase() ||
+        initialCommunityName.toLowerCase().includes(r.id) ||
+        initialCommunityName.toLowerCase().includes(r.name.toLowerCase())
+      ))
+    );
+    const activeRegion = matchingRegion || PRESET_REGIONS[0];
+    const microcuencaName = initialCommunityName && !matchingRegion
+      ? `Sector ${initialCommunityName}`
+      : activeRegion.fullName;
     const centroid = calculateParcelCentroid(polygonCoords);
 
     // Salud del suelo calculada dinámicamente según telemetría SMAP y NDVI (cero valores fijos de 78)
@@ -722,10 +757,10 @@ export default function ParcelDrawerFullScreenView({
       cropCategory: 'Por calibrar',
       areaHa: areaHa,
       areaTopos: Number((areaHa * 3.3).toFixed(1)),
-      lat: centroid[0],
-      lon: centroid[1],
+      lat: centroid[0] || currentLat,
+      lon: centroid[1] || currentLon,
       altitudeMsnm: altitudeMsnm,
-      microcuenca: activeRegion.fullName,
+      microcuenca: microcuencaName,
       polygonCoords: polygonCoords,
       plantAgeDays: 0,
       estimatedYieldTons: Number((areaHa * 4.2).toFixed(1)),
@@ -749,7 +784,8 @@ export default function ParcelDrawerFullScreenView({
           onParcelCreated(calibratedParcel);
         }}
         onCancel={() => {
-          onParcelCreated(calibratingParcel);
+          // Permite retornar al paso de edición de la parcela en el drawer
+          setCalibratingParcel(null);
         }}
       />
     );
@@ -1103,6 +1139,16 @@ export default function ParcelDrawerFullScreenView({
               </span>
               <h3 className="text-base font-bold text-white">¿Cómo se llama tu parcela?</h3>
             </div>
+
+            {/* Alerta de Resolución Espacial para parcelas > 30 ha */}
+            {areaHa > 30 && (
+              <div className="bg-amber-950/90 border border-amber-500/70 rounded-2xl p-2.5 flex items-start gap-2 text-amber-200 text-xs">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <span>
+                  <strong>Aviso de Resolución Espacial:</strong> Para parcelas mayores a 30 hectáreas, las estimaciones satelitales tendrán menor precisión debido a la heterogeneidad del relieve y mezcla de pendientes.
+                </span>
+              </div>
+            )}
 
             <div className="space-y-2">
               <div>

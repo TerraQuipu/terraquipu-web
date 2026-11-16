@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   ArrowLeft,
   ChevronRight,
@@ -124,6 +124,31 @@ function resolveCropFromAnswers(respuestas: Record<string, string>): {
       photoUrl: '/images/cultivos_poster.jpg',
     };
   }
+  const tipoKey = isGrowing ? respuestas['1a_tipo'] : respuestas['2b_tipo'];
+  if (tipoKey === 'leguminosa') {
+    return {
+      cropId: 'leguminosa_custom',
+      cropName: 'Leguminosa Andina',
+      cropCategory: 'Habas',
+      photoUrl: '/images/haba_verde.jpg',
+    };
+  }
+  if (tipoKey === 'tuberculo') {
+    return {
+      cropId: 'tuberculo_custom',
+      cropName: 'Tubérculo Andino',
+      cropCategory: 'Papa nativa',
+      photoUrl: '/images/papa_nativa.jpg',
+    };
+  }
+  if (tipoKey === 'cereal_grano') {
+    return {
+      cropId: 'cereal_custom',
+      cropName: 'Cereal / Grano Andino',
+      cropCategory: 'Cebada',
+      photoUrl: '/images/trigo_viento_poster.jpg',
+    };
+  }
   if (respuestas['2'] === 'descansar') {
     return {
       cropId: 'descanso',
@@ -179,6 +204,13 @@ export default function DynamicTreeQuestionnaireView({
     100,
     Math.round(((currentQuestionIndex + 1) / totalQuestionsEstimate) * 100)
   );
+
+  // Guard against index drift if dynamic tree conditions change
+  useEffect(() => {
+    if (currentQuestionIndex >= activeQuestions.length && activeQuestions.length > 0) {
+      setCurrentQuestionIndex(Math.max(0, activeQuestions.length - 1));
+    }
+  }, [activeQuestions.length, currentQuestionIndex]);
 
   // Compute live parameters, uncertainty, rotation and preventive calendar
   const calculatedData = useMemo(() => {
@@ -238,9 +270,14 @@ export default function DynamicTreeQuestionnaireView({
     });
 
     // Calendario Preventivo Oficial (A1 - A13)
+    // Proyección del horizonte crítico estacional ENFEN / SENAMHI (3 a 4 meses ~105 días) para activar los bloques preventivos
+    const fechaT0 = new Date();
+    fechaT0.setDate(fechaT0.getDate() + 105);
+    const t0Iso = fechaT0.toISOString().split('T')[0];
+
     const v2: PrediccionZonaV2 = {
       escenario: 'deficit_lluvias',
-      T0: '2026-11-20',
+      T0: t0Iso,
       fuente_institucional: 'ENFEN / SENAMHI',
       confianza: 'alta',
     };

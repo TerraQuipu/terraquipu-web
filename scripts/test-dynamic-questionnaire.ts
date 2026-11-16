@@ -446,4 +446,61 @@ console.log('\n--- 9. PRUEBAS DE CALENDARIO PREVENTIVO Y TÁCTICO (A1 A A13) ---
   assert(Boolean(primeraAccion.confianza), 'Cada acción incluye nivel de confianza');
 }
 
+console.log('\n--- 10. PRUEBAS DE ROBUSTEZ Y NO-REGRESIÓN (BUG FIXES CRÍTICOS) ---');
+
+{
+  // 1. Verificar que diferenciaConIntencion no produce [object Object]
+  const parametros = construir_parametros({
+    '1': 'rastrojo',
+    '2': 'esta_semana',
+    '2b': 'papa',
+    '7a': 'papa',
+    '7b': 'quinua',
+    '3': 'solo_lluvia',
+    '6': 'conoce',
+    '6a': 'arena',
+  });
+  const resRotacion = ejecutar_A13(parametros.esenciales as any, parametros.complementarias as any);
+  assert(
+    resRotacion.diferenciaConIntencion !== null &&
+    !resRotacion.diferenciaConIntencion.includes('[object') &&
+    resRotacion.diferenciaConIntencion.includes('papa'),
+    `diferenciaConIntencion formatea correctamente el cultivo: "${resRotacion.diferenciaConIntencion}"`
+  );
+
+  // 2. Verificar que la proyección dinámica de T0 activa múltiples bloques preventivos con fecha actual
+  const fechaHoy = new Date();
+  const fechaT0Dinamica = new Date();
+  fechaT0Dinamica.setDate(fechaHoy.getDate() + 105);
+
+  const v2Dinamico: PrediccionZonaV2 = {
+    escenario: 'deficit_lluvias',
+    probabilidad: 80,
+    T0: fechaT0Dinamica.toISOString().split('T')[0],
+    fuente_institucional: 'SENAMHI / ENFEN',
+  };
+
+  const cuestionarioBase: CuestionarioAgricultor = {
+    esenciales: {
+      cobertura: 'rastrojo',
+      siembra: 'dos_a_cuatro_semanas',
+      cultivo_proximo: 'papa',
+    },
+    complementarias: {
+      agua: 'secano',
+      obras: 'ninguna',
+      profundidad: 'profundo',
+      bloquea_obras_profundas: false,
+      textura: { clase: 'franca', origen: 'prueba_del_punado' },
+      historial: { vez_anterior: 'haba', antes_de_esa: 'papa' },
+    },
+    adicionales: { personas: 'dos_o_tres', tiempo_semanal: 'bastante' },
+  };
+
+  const accionesDinamicas = generarCalendarioPreventivo(cuestionarioBase, v2Dinamico, undefined, undefined, fechaHoy);
+  const bloques = Array.from(new Set(accionesDinamicas.map((a) => a.bloque)));
+  assert(bloques.length >= 2, `Generó ${bloques.length} bloques temporales distintos (cobertura multi-etapa garantizada)`);
+  assert(accionesDinamicas.some((a) => a.accionCodigo === 'A1' || a.accionCodigo === 'A7'), 'Bloque 1 contiene acciones A1/A7 preventivas');
+}
+
 console.log('\n🎉 ¡TODAS LAS PRUEBAS AUTOMATIZADAS PASARON EXITOSAMENTE!');

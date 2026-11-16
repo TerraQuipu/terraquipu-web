@@ -518,10 +518,17 @@ export function ejecutar_A13(
   // Comparación con cultivo_proximo si fue indicado por el agricultor
   let diferenciaConIntencion: string | null = null;
   if (esenciales.cultivo_proximo && res.cultivo_sugerido) {
-    const proxNorm = limpiarTexto(esenciales.cultivo_proximo);
+    const proxCrop = obtenerCultivo(esenciales.cultivo_proximo);
+    const proxNorm = limpiarTexto(proxCrop);
     const sugNorm = limpiarTexto(res.cultivo_sugerido);
-    if (proxNorm && sugNorm && proxNorm !== sugNorm) {
-      diferenciaConIntencion = `Tu intención es sembrar ${esenciales.cultivo_proximo}, pero el algoritmo propone ${res.cultivo_sugerido} para mejorar la rotación. No es obligatorio cambiar, pero considera esta recomendación para proteger el suelo.`;
+    if (proxNorm && sugNorm && proxNorm !== sugNorm && proxNorm !== 'descanso') {
+      const nombreMostrar =
+        typeof esenciales.cultivo_proximo === 'object' &&
+        esenciales.cultivo_proximo !== null &&
+        'cultivo' in (esenciales.cultivo_proximo as any)
+          ? (esenciales.cultivo_proximo as any).cultivo
+          : esenciales.cultivo_proximo;
+      diferenciaConIntencion = `Tu intención es sembrar ${nombreMostrar}, pero el algoritmo propone ${res.cultivo_sugerido} para mejorar la rotación. No es obligatorio cambiar, pero considera esta recomendación para proteger el suelo.`;
     }
   }
 

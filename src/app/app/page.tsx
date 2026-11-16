@@ -71,25 +71,26 @@ export default function MobileApp() {
   const [climaNasa, setClimaNasa] = useState<ClimaNasa | null>(null);
   const [liveAgrometeo, setLiveAgrometeo] = useState<LiveAgrometeoData | null>(null);
 
-  // Farmer Profile
+  // Farmer Profile (limpio para nuevo dispositivo - sin datos fantasma)
   const [profile, setProfile] = useState<FarmerProfile>({
-    cuencaId: '29699448-afa8-4fb4-b502-24e3e577ef90',
-    cuencaName: 'Microcuenca Vilcanota - Urubamba',
-    parcelName: 'Chacra Maras',
-    distrito: 'Urubamba',
-    provincia: 'Urubamba',
-    departamento: 'Cusco',
+    farmerName: '',
+    cuencaId: '',
+    cuencaName: '',
+    parcelName: '',
+    distrito: '',
+    provincia: '',
+    departamento: '',
     moisture: 'HUMEDAD_MEDIA',
     moistureLabel: 'Húmeda y Mullida',
-    previousCropId: 'papa_nativa',
-    previousCropName: 'Papa Huayro',
+    previousCropId: '',
+    previousCropName: '',
     priority: 'tierra',
     priorityName: 'Curar y Abonar Suelo',
     lat: -13.332,
     lon: -72.158,
     altitude: 3380,
     slope: 12,
-    areaHa: 3.5,
+    areaHa: 0,
   });
 
   // Check online status and detect hardware profile
@@ -343,7 +344,7 @@ export default function MobileApp() {
             lon: newParcel.lon,
             altitude: newParcel.altitudeMsnm,
             cuencaName: newParcel.microcuenca,
-            distrito: newParcel.microcuenca.split('-')[1]?.trim() || profile.distrito,
+            distrito: profile.distrito || newParcel.microcuenca,
             previousCropName: newParcel.cropName,
             previousCropId: newParcel.cropId,
             healthScore: newParcel.healthScore,
