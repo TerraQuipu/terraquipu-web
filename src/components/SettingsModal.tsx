@@ -227,6 +227,16 @@ export default function SettingsModal({
             <span>Restablecer Configuración a Valores de Fábrica</span>
           </button>
         </div>
+
+        {/* GeoTeam Credits */}
+        <div className="pt-2 pb-1 text-center text-[10px] text-zinc-400 space-y-0.5 border-t border-zinc-200/60">
+          <div className="font-semibold text-zinc-500 uppercase tracking-wider">
+            GeoTeam • NASA Space Apps Challenge 2026
+          </div>
+          <p className="text-[9.5px] text-zinc-400 leading-relaxed">
+            Alina Castañeda · Rafael Gil · Luciana Carbajo · Angel Lopez · Reiser Soplin · Hector Ramos
+          </p>
+        </div>
       </div>
     </div>
   );

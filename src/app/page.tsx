@@ -1195,7 +1195,45 @@ export default function SuperpowerTerraquipuLanding() {
 
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 pt-10 mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-zinc-400">
+        {/* ================= GEOTEAM CREDITS STRIP ================= */}
+        <div className="max-w-7xl mx-auto px-6 pt-10 mt-10 border-t border-zinc-200/80">
+          <div className="rounded-2xl bg-zinc-50 border border-zinc-200/70 p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="font-mono text-xs uppercase tracking-wider font-bold text-zinc-900">
+                  GeoTeam • Equipo Desarrollador
+                </span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100/70 text-emerald-800 border border-emerald-300/60">
+                  NASA Space Apps Challenge 2026
+                </span>
+              </div>
+              <p className="text-[11px] text-zinc-500 font-sans">
+                Innovación tecnológica, teledetección espacial y regeneración edáfica para comunidades agrícolas andinas.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1.5 text-xs">
+              {[
+                'Alina Fernanda Castañeda Ramos',
+                'Rafael Alfonso Gil Velarde',
+                'Luciana Isabel Carbajo Chipana',
+                'Angel Lopez',
+                'Reiser Soplin Ramos',
+                'Hector Ramos Zurita',
+              ].map((member) => (
+                <span
+                  key={member}
+                  className="px-2.5 py-1 rounded-full bg-white border border-zinc-200/80 text-zinc-700 text-[11px] font-medium shadow-2xs hover:border-emerald-400 hover:text-emerald-950 transition cursor-default"
+                >
+                  {member}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 pt-6 mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-zinc-400">
           <div>© 2026 Terraquipu Project. Diseñado con sabiduría ancestral y telemetría espacial.</div>
           <div>Cusco • Valle Sagrado • Perú</div>
         </div>
