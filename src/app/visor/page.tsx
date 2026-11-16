@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import TopHeader from '@/components/layout/TopHeader';
 import Toast from '@/components/layout/Toast';
 import ModuleGuidePill from '@/components/layout/ModuleGuidePill';
 import MapViewer from '@/components/viewer/MapViewer';
 import DecisionPanel from '@/components/viewer/DecisionPanel';
 import FarmerReportDetailModal from '@/components/viewer/FarmerReportDetailModal';
+import FarmerTourGuide, { FarmerTourGuideRef } from '@/components/viewer/FarmerTourGuide';
+import { DecisionStepType } from '@/lib/farmerTour';
 import { calculateRotationSequence } from '@/lib/rotationAlgorithm';
 import {
   fetchCropMatrix,
@@ -43,6 +45,8 @@ export default function TerraQuipuSuitePage() {
   const [previousCrop, setPreviousCrop] = useState<string>('papa');
   const [priority, setPriority] = useState<string>('alimento');
   const [selectedFarmerReport, setSelectedFarmerReport] = useState<ReporteAgricultor | null>(null);
+  const [decisionStep, setDecisionStep] = useState<DecisionStepType>('parcel');
+  const tourGuideRef = useRef<FarmerTourGuideRef>(null);
 
   // Supabase states
   const [crops, setCrops] = useState<CropRecord[]>(DEFAULT_CROPS);
@@ -167,6 +171,7 @@ export default function TerraQuipuSuitePage() {
         onSync={handleManualSync}
         isSyncing={isSyncing}
         dbStatus={dbStatus}
+        onStartTour={() => tourGuideRef.current?.startTour()}
       />
 
       {/* Main Workspace (60% OpenStreetMap Map + 40% Decision Panel) */}
@@ -199,14 +204,23 @@ export default function TerraQuipuSuitePage() {
           microcuencas={microcuencas}
           onShowToast={showToast}
           onCalibrationComplete={handleCalibrationComplete}
+          activeStep={decisionStep}
+          onSetActiveStep={setDecisionStep}
         />
       </main>
+
+      {/* Farmer Walkthrough Guide (Driver.js) */}
+      <FarmerTourGuide
+        ref={tourGuideRef}
+        onSetDecisionStep={setDecisionStep}
+        onShowToast={showToast}
+      />
 
       {/* Toast Notifications */}
       <Toast message={toastMessage} isVisible={toastVisible} />
 
       {/* Floating System Architecture Guide - Only in Visor */}
-      <ModuleGuidePill />
+      <ModuleGuidePill onStartTour={() => tourGuideRef.current?.startTour()} />
 
       {/* Ground-Truth Farmer Report Detail Inspection Modal */}
       <FarmerReportDetailModal

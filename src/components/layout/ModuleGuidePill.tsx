@@ -10,7 +10,11 @@ import {
   Sparkles,
 } from 'lucide-react';
 
-export default function ModuleGuidePill() {
+interface ModuleGuidePillProps {
+  onStartTour?: () => void;
+}
+
+export default function ModuleGuidePill({ onStartTour }: ModuleGuidePillProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -55,6 +59,19 @@ export default function ModuleGuidePill() {
 
           {/* Module Cards */}
           <div className="p-3 space-y-2.5 max-h-[75vh] overflow-y-auto text-xs">
+            {onStartTour && (
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  onStartTour();
+                }}
+                className="w-full py-2 px-3 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition active:scale-95"
+              >
+                <span>🌾</span>
+                <span>Iniciar Paseo de Herramientas</span>
+              </button>
+            )}
+
             {/* 1. Visor Técnico de Campo */}
             <div className="p-2.5 rounded-xl border border-zinc-200 bg-zinc-50/70 hover:bg-zinc-100/70 transition space-y-1.5 group">
               <div className="flex items-center justify-between">

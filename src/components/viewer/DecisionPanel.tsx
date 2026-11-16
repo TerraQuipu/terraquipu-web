@@ -43,6 +43,8 @@ interface DecisionPanelProps {
   microcuencas?: MicrocuencaRecord[];
   onShowToast: (msg: string) => void;
   onCalibrationComplete?: (calibratedParcel: ActiveParcel, newReport?: ReporteAgricultor) => void;
+  activeStep?: 'parcel' | 'satellite' | 'rotation' | 'assistant';
+  onSetActiveStep?: (step: 'parcel' | 'satellite' | 'rotation' | 'assistant') => void;
 }
 
 const CROP_THUMBNAILS: Record<string, { label: string; img: string }> = {
@@ -66,9 +68,18 @@ export default function DecisionPanel({
   microcuencas,
   onShowToast,
   onCalibrationComplete,
+  activeStep: controlledActiveStep,
+  onSetActiveStep: setControlledActiveStep,
 }: DecisionPanelProps) {
   // Linear 4-Step Navigation: 'parcel' (1) | 'satellite' (2) | 'rotation' (3) | 'assistant' (4)
-  const [activeStep, setActiveStep] = useState<'parcel' | 'satellite' | 'rotation' | 'assistant'>('parcel');
+  const [internalStep, setInternalStep] = useState<'parcel' | 'satellite' | 'rotation' | 'assistant'>('parcel');
+  const activeStep = controlledActiveStep !== undefined ? controlledActiveStep : internalStep;
+  const setActiveStep = (step: 'parcel' | 'satellite' | 'rotation' | 'assistant') => {
+    if (setControlledActiveStep) {
+      setControlledActiveStep(step);
+    }
+    setInternalStep(step);
+  };
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [customName, setCustomName] = useState(activeParcel.name);
@@ -137,7 +148,7 @@ export default function DecisionPanel({
         </div>
 
         {/* 4 Sequential Step Tabs */}
-        <div className="grid grid-cols-4 gap-1 p-1 bg-zinc-100 rounded-xl border border-zinc-200 text-xs">
+        <div id="tour-decision-stepper" className="grid grid-cols-4 gap-1 p-1 bg-zinc-100 rounded-xl border border-zinc-200 text-xs">
           <button
             onClick={() => setActiveStep('parcel')}
             className={`py-1.5 px-1 rounded-lg font-semibold flex items-center justify-center gap-1 transition ${
@@ -353,7 +364,7 @@ export default function DecisionPanel({
               </div>
 
               {/* Ground-Truth 5+1 Field Calibration Card with Photographic Banner */}
-              <div className="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-xs space-y-0">
+              <div id="tour-groundtruth-card" className="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-xs space-y-0">
                 <div className="relative h-20 overflow-hidden group">
                   <img
                     src="/images/cosecha_poster.jpg"
@@ -457,7 +468,7 @@ export default function DecisionPanel({
             </div>
 
             {/* Climate Switcher (Normal vs El Niño) */}
-            <div className="bg-white border border-zinc-200 p-3.5 rounded-xl shadow-xs space-y-2.5">
+            <div id="tour-climate-mode" className="bg-white border border-zinc-200 p-3.5 rounded-xl shadow-xs space-y-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-zinc-900">Escenario Agroclimático:</span>
                 <span className="text-[10px] text-zinc-500 font-mono">SENAMHI / NOAA</span>
@@ -680,7 +691,7 @@ export default function DecisionPanel({
             </div>
 
             {/* Quick 2-Question Farmer Profile with REAL CROP IMAGES */}
-            <div className="bg-white border border-zinc-200 p-3.5 rounded-xl shadow-xs space-y-3">
+            <div id="tour-rotation-inputs" className="bg-white border border-zinc-200 p-3.5 rounded-xl shadow-xs space-y-3">
               {/* Question 1: Previous Crop with Images */}
               <div>
                 <label className="block text-xs font-bold text-zinc-900 mb-1.5">
@@ -751,7 +762,7 @@ export default function DecisionPanel({
             </div>
 
             {/* Scientific Recommendation Highlight Card with REAL CROP IMAGE */}
-            <div className="bg-emerald-900 text-white p-4 rounded-xl shadow-md space-y-3 border border-emerald-800">
+            <div id="tour-rotation-recommendation" className="bg-emerald-900 text-white p-4 rounded-xl shadow-md space-y-3 border border-emerald-800">
               <div className="flex items-start gap-3">
                 <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-emerald-400/60 shadow-xs flex-shrink-0">
                   <img
@@ -908,6 +919,7 @@ export default function DecisionPanel({
                 ← Satélite
               </button>
               <button
+                id="tour-save-cloud"
                 onClick={() => {
                   setIsSavedModalOpen(true);
                   onShowToast(
