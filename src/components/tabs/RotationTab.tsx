@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { FarmerProfile, ParcelItem } from '@/lib/types';
 import {
   Tractor,
@@ -10,16 +10,13 @@ import {
   ChevronRight,
   ArrowRight,
   Gauge,
-  Check,
-  Calendar,
   Sparkles,
   Wheat,
-  Sun,
   Layers,
   MapPin,
   Plus,
 } from 'lucide-react';
-import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
+import { playBubblePop } from '@/lib/soundEffects';
 import { getStoredParcels, getActiveParcel, setActiveParcelId } from '@/lib/deviceProfile';
 
 interface RotationTabProps {
@@ -27,6 +24,148 @@ interface RotationTabProps {
   onNavigateToCopiloto?: (voice?: 'astro' | 'kipu') => void;
   onToast?: (msg: string) => void;
   onOpenQgisDrawer?: () => void;
+}
+
+interface MonthInfo {
+  short: string;
+  title: string;
+  year: number;
+}
+
+function getUpcomingMonths(baseDate: Date, count: number, offset = 0): MonthInfo[] {
+  const shortNames = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DIC'];
+  const titleNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Dic'];
+  const list: MonthInfo[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const d = new Date(baseDate.getFullYear(), baseDate.getMonth() + offset + i, 1);
+    list.push({
+      short: shortNames[d.getMonth()],
+      title: titleNames[d.getMonth()],
+      year: d.getFullYear(),
+    });
+  }
+  return list;
+}
+
+interface AgronomicCropData {
+  id: string;
+  name: string;
+  balanceN: number;
+  balanceLabel: string;
+  isPositive: boolean;
+  description: string;
+  successor: {
+    name: string;
+    balanceN: number;
+    balanceLabel: string;
+    isPositive: boolean;
+    description: string;
+  };
+}
+
+const AGRONOMIC_MAP: Record<string, AgronomicCropData> = {
+  papa: {
+    id: 'papa_nativa',
+    name: 'Papa Nativa Andina',
+    balanceN: -70,
+    balanceLabel: '-70',
+    isPositive: false,
+    description: 'Demanda nitrógeno. Consume los nutrientes del suelo preparado.',
+    successor: {
+      name: 'Tarwi y Habas',
+      balanceN: 95,
+      balanceLabel: '+95',
+      isPositive: true,
+      description: 'Leguminosas fijan nitrógeno en las raíces y rompen el ciclo del gorgojo.',
+    },
+  },
+  habas: {
+    id: 'habas',
+    name: 'Habas Andinas',
+    balanceN: 75,
+    balanceLabel: '+75',
+    isPositive: true,
+    description: 'Leguminosa fijadora simbiótica. Enriquece el suelo con nitrógeno orgánico.',
+    successor: {
+      name: 'Maíz Blanco Gigante',
+      balanceN: -50,
+      balanceLabel: '-50',
+      isPositive: false,
+      description: 'Gramínea de alto rendimiento que aprovecha el nitrógeno residual de las habas.',
+    },
+  },
+  tarwi: {
+    id: 'tarwi',
+    name: 'Tarwi / Chocho',
+    balanceN: 95,
+    balanceLabel: '+95',
+    isPositive: true,
+    description: 'Poderoso fijador de nitrógeno (+95 kg N/ha) y biofumigante natural con alcaloides.',
+    successor: {
+      name: 'Papa Nativa',
+      balanceN: -70,
+      balanceLabel: '-70',
+      isPositive: false,
+      description: 'Aprovecha al máximo el nitrógeno y suelo desinfectado dejado por el tarwi.',
+    },
+  },
+  maiz: {
+    id: 'maiz_blanco',
+    name: 'Maíz Blanco Gigante',
+    balanceN: -50,
+    balanceLabel: '-50',
+    isPositive: false,
+    description: 'Gramínea extractora moderada de nitrógeno. Aporta abundante rastrojo superficial.',
+    successor: {
+      name: 'Tarwi y Habas',
+      balanceN: 95,
+      balanceLabel: '+95',
+      isPositive: true,
+      description: 'Restaura los macronutrientes consumidos y mejora la microbiología del suelo.',
+    },
+  },
+  quinua: {
+    id: 'quinua',
+    name: 'Quinua Roja / Real',
+    balanceN: -30,
+    balanceLabel: '-30',
+    isPositive: false,
+    description: 'Demanda moderada de fertilidad con gran rusticidad y tolerancia a sequías.',
+    successor: {
+      name: 'Habas serranas',
+      balanceN: 75,
+      balanceLabel: '+75',
+      isPositive: true,
+      description: 'Recupera la capa fértil antes de volver a sembrar cultivos de raíz.',
+    },
+  },
+  cebada: {
+    id: 'cebada',
+    name: 'Cebada Grano',
+    balanceN: -30,
+    balanceLabel: '-30',
+    isPositive: false,
+    description: 'Cereal rústico de ciclo corto. Tolera heladas y aporta rastrojo para mulch.',
+    successor: {
+      name: 'Tarwi y Habas',
+      balanceN: 95,
+      balanceLabel: '+95',
+      isPositive: true,
+      description: 'Leguminosa que restaura nitrógeno y aprovecha la cobertura del rastrojo.',
+    },
+  },
+};
+
+function getCropAgronomics(parcel: ParcelItem | null): AgronomicCropData {
+  if (!parcel) return AGRONOMIC_MAP.papa;
+  const raw = `${parcel.cropId || ''} ${parcel.cropName || ''} ${parcel.cropCategory || ''}`.toLowerCase();
+  if (raw.includes('tarwi') || raw.includes('chocho')) return AGRONOMIC_MAP.tarwi;
+  if (raw.includes('haba')) return AGRONOMIC_MAP.habas;
+  if (raw.includes('maiz') || raw.includes('maíz')) return AGRONOMIC_MAP.maiz;
+  if (raw.includes('quinua')) return AGRONOMIC_MAP.quinua;
+  if (raw.includes('cebada')) return AGRONOMIC_MAP.cebada;
+  return AGRONOMIC_MAP.papa;
 }
 
 export default function RotationTab({
@@ -39,8 +178,10 @@ export default function RotationTab({
   const [parcels, setParcels] = useState<ParcelItem[]>([]);
   const [activeParcel, setActiveParcel] = useState<ParcelItem | null>(null);
   const [rotateAreaHa, setRotateAreaHa] = useState<number>(profile.areaHa || 1.73);
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
   useEffect(() => {
+    setCurrentDate(new Date());
     const list = getStoredParcels();
     setParcels(list);
     const active = getActiveParcel();
@@ -67,13 +208,155 @@ export default function RotationTab({
     setRotateAreaHa(val);
   };
 
+  // Dynamic upcoming months
+  const immediateMonths = useMemo(() => getUpcomingMonths(currentDate, 4, 0), [currentDate]);
+  const secondaryMonths = useMemo(() => getUpcomingMonths(currentDate, 3, 4), [currentDate]);
+
+  // Agronomic data for the active parcel
+  const activeCropAgro = useMemo(() => getCropAgronomics(activeParcel), [activeParcel]);
+
+  // Dynamic campaign year string
+  const campaignYear = currentDate.getFullYear();
+  const nextYear = campaignYear + 1;
+
+  // Timeline tasks adapted to the active parcel crop
+  const getImmediateTasks = () => {
+    const crop = activeParcel?.cropName || activeCropAgro.name;
+    const raw = (activeParcel?.cropCategory || crop).toLowerCase();
+
+    if (raw.includes('tarwi') || raw.includes('chocho') || raw.includes('haba')) {
+      return [
+        {
+          title: 'Preparación de cama de siembra',
+          subtitle: `Semana 3 · ${crop} · Nivelación del terreno`,
+          icon: <Tractor className="w-4 h-4 text-emerald-700" />,
+        },
+        {
+          title: 'Siembra e inoculación de nódulos',
+          subtitle: 'Primera lluvia · Incorporación de cepas fijadoras de N',
+          icon: <Sprout className="w-4 h-4 text-emerald-700" />,
+        },
+        {
+          title: 'Deshierbe manual y aporque ligero',
+          subtitle: 'Cada 15 días · Oxigenación de las raíces',
+          icon: <Leaf className="w-4 h-4 text-emerald-700" />,
+        },
+        {
+          title: 'Monitoreo de floración y humedad',
+          subtitle: 'Llenado de vainas · Calibrar radar SMAP',
+          icon: <Droplets className="w-4 h-4 text-emerald-700" />,
+        },
+      ];
+    }
+
+    if (raw.includes('maiz') || raw.includes('maíz')) {
+      return [
+        {
+          title: 'Surcos en contorno y abonado base',
+          subtitle: `Semana 3 · ${crop} · Incorporar guano de corral`,
+          icon: <Tractor className="w-4 h-4 text-emerald-700" />,
+        },
+        {
+          title: 'Siembra de maíz en golpe',
+          subtitle: 'Primeras lluvias firmes · Densidad óptima de semilla',
+          icon: <Sprout className="w-4 h-4 text-emerald-700" />,
+        },
+        {
+          title: 'Primer aporque y deshierbe',
+          subtitle: 'Soporte del tallo contra viento y retención de humedad',
+          icon: <Leaf className="w-4 h-4 text-emerald-700" />,
+        },
+        {
+          title: 'Monitoreo de crecimiento y SMAP',
+          subtitle: 'Control preventivo de humedad y espigado',
+          icon: <Droplets className="w-4 h-4 text-emerald-700" />,
+        },
+      ];
+    }
+
+    if (raw.includes('quinua')) {
+      return [
+        {
+          title: 'Preparación de cama fina y mullida',
+          subtitle: `Semana 3 · ${crop} · Nivelación del suelo`,
+          icon: <Tractor className="w-4 h-4 text-emerald-700" />,
+        },
+        {
+          title: 'Siembra en líneas continuas',
+          subtitle: 'Primeras lluvias · Distribución superficial de semilla',
+          icon: <Sprout className="w-4 h-4 text-emerald-700" />,
+        },
+        {
+          title: 'Deshierbe y primer raleo',
+          subtitle: 'A los 25 días · Espaciamiento óptimo entre plantas',
+          icon: <Leaf className="w-4 h-4 text-emerald-700" />,
+        },
+        {
+          title: 'Monitoreo de panoja y rusticidad',
+          subtitle: 'Resistencia a heladas · Calibrar radar SMAP',
+          icon: <Droplets className="w-4 h-4 text-emerald-700" />,
+        },
+      ];
+    }
+
+    if (raw.includes('cebada')) {
+      return [
+        {
+          title: 'Preparación de suelo y surcado',
+          subtitle: `Semana 3 · ${crop} · Cama de siembra rústica`,
+          icon: <Tractor className="w-4 h-4 text-emerald-700" />,
+        },
+        {
+          title: 'Siembra de grano y abonado',
+          subtitle: 'Primeras lluvias · Incorporación de abono orgánico',
+          icon: <Sprout className="w-4 h-4 text-emerald-700" />,
+        },
+        {
+          title: 'Monitoreo de macollamiento',
+          subtitle: 'Desarrollo vegetativo vigoroso contra heladas',
+          icon: <Leaf className="w-4 h-4 text-emerald-700" />,
+        },
+        {
+          title: 'Calibración SMAP para espigado',
+          subtitle: 'Retención de humedad antes de la fase de grano',
+          icon: <Droplets className="w-4 h-4 text-emerald-700" />,
+        },
+      ];
+    }
+
+    return [
+      {
+        title: 'Preparar surcos en contorno',
+        subtitle: `Semana 3 · ${crop} · Retención de humedad`,
+        icon: <Tractor className="w-4 h-4 text-emerald-700" />,
+      },
+      {
+        title: 'Siembra y abonado de fondo',
+        subtitle: 'Primeras lluvias · Distribución de semilla seleccionada',
+        icon: <Sprout className="w-4 h-4 text-emerald-700" />,
+      },
+      {
+        title: 'Aporque alto y cobertura de rastrojo',
+        subtitle: 'Cada 10 días · Evitar evaporación del suelo',
+        icon: <Leaf className="w-4 h-4 text-emerald-700" />,
+      },
+      {
+        title: 'Medir humedad del suelo y tubérculos',
+        subtitle: 'Desarrollo vegetativo · Calibrar SMAP',
+        icon: <Droplets className="w-4 h-4 text-emerald-700" />,
+      },
+    ];
+  };
+
+  const immediateTasks = getImmediateTasks();
+
   return (
     <div className="space-y-4 animate-in fade-in pb-20">
       {/* 1. Header Section */}
       <div className="flex items-start justify-between px-1 pt-1">
         <div>
           <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-900/60 block">
-            PLAN DE CAMPAÑA · 2026 / 2027
+            PLAN DE CAMPAÑA · {campaignYear} / {nextYear}
           </span>
           <h1 className="text-xl sm:text-2xl font-semibold text-[#132A1C] leading-tight">
             Rotar hoy,{' '}
@@ -112,7 +395,7 @@ export default function RotationTab({
                   <MapPin className={`w-3.5 h-3.5 ${isSel ? 'text-[#A3E635]' : 'text-zinc-400'}`} />
                   <span>{p.name.split('•')[0].trim()}</span>
                   <span className={`text-[10px] ${isSel ? 'text-zinc-300' : 'text-zinc-400'}`}>
-                    ({p.cropCategory})
+                    ({p.cropCategory || p.cropName})
                   </span>
                 </button>
               );
@@ -161,7 +444,9 @@ export default function RotationTab({
           }`}
         >
           <span className="block leading-tight">Cronograma inmediato</span>
-          <span className="text-[9.5px] font-normal text-zinc-500 block">Nov 2026 a Feb 2027</span>
+          <span className="text-[9.5px] font-normal text-zinc-500 block">
+            {immediateMonths[0]?.title} {immediateMonths[0]?.year} a {immediateMonths[3]?.title} {immediateMonths[3]?.year}
+          </span>
         </button>
 
         <button
@@ -176,8 +461,10 @@ export default function RotationTab({
               : 'text-zinc-600 hover:text-zinc-900'
           }`}
         >
-          <span className="block leading-tight">Época seca</span>
-          <span className="text-[9.5px] font-normal text-zinc-500 block">May a Ago 2027</span>
+          <span className="block leading-tight">Campaña siguiente</span>
+          <span className="text-[9.5px] font-normal text-zinc-500 block">
+            {secondaryMonths[0]?.title} {secondaryMonths[0]?.year} a {secondaryMonths[2]?.title} {secondaryMonths[2]?.year}
+          </span>
         </button>
       </div>
 
@@ -194,175 +481,122 @@ export default function RotationTab({
           <div className="space-y-2 relative">
             <div className="absolute left-[31px] top-6 bottom-6 w-0.5 bg-[#E5ECE2] z-0" />
 
-            {/* NOV 2026 */}
-            <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#7BB63E] ring-4 ring-lime-100 mb-1" />
-                  <span className="text-[9.5px] font-bold text-emerald-900 uppercase">NOV</span>
-                  <span className="text-[8px] text-zinc-400 font-mono">2026</span>
-                </div>
-                <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
-                  <Tractor className="w-4 h-4 text-emerald-700" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-xs font-semibold text-[#132A1C] truncate">
-                    Preparar surcos en contorno
-                  </h3>
-                  <p className="text-[10px] text-zinc-500 truncate mt-0.5">
-                    Semana 3 · {activeParcel?.cropName || 'Papa nativa'} · Retención de humedad
-                  </p>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
-            </div>
+            {immediateMonths.map((m, idx) => {
+              const task = immediateTasks[idx] || immediateTasks[0];
+              const isFirst = idx === 0;
+              return (
+                <div
+                  key={`${m.short}-${m.year}`}
+                  className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
+                      <span
+                        className={`w-2.5 h-2.5 rounded-full mb-1 ${
+                          isFirst
+                            ? 'bg-[#7BB63E] ring-4 ring-lime-100'
+                            : 'bg-zinc-300 ring-4 ring-zinc-100'
+                        }`}
+                      />
+                      <span
+                        className={`text-[9.5px] uppercase font-semibold ${
+                          isFirst ? 'font-bold text-emerald-900' : 'text-zinc-600'
+                        }`}
+                      >
+                        {m.short}
+                      </span>
+                      <span className="text-[8px] text-zinc-400 font-mono">{m.year}</span>
+                    </div>
 
-            {/* DIC 2026 */}
-            <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
-                  <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
-                  <span className="text-[9.5px] font-semibold text-zinc-600 uppercase">DIC</span>
-                  <span className="text-[8px] text-zinc-400 font-mono">2026</span>
-                </div>
-                <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
-                  <Sprout className="w-4 h-4 text-emerald-700" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-xs font-semibold text-[#132A1C] truncate">
-                    Sembrar Tarwi y Haba
-                  </h3>
-                  <p className="text-[10px] text-zinc-500 truncate mt-0.5">
-                    Primera lluvia · Asociar cultivos fijadores
-                  </p>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
-            </div>
+                    <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
+                      {task.icon}
+                    </div>
 
-            {/* ENE 2027 */}
-            <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
-                  <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
-                  <span className="text-[9.5px] font-semibold text-zinc-600 uppercase">ENE</span>
-                  <span className="text-[8px] text-zinc-400 font-mono">2027</span>
+                    <div className="min-w-0">
+                      <h3 className="text-xs font-semibold text-[#132A1C] truncate">
+                        {task.title}
+                      </h3>
+                      <p className="text-[10px] text-zinc-500 truncate mt-0.5">
+                        {task.subtitle}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
                 </div>
-                <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
-                  <Leaf className="w-4 h-4 text-emerald-700" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-xs font-semibold text-[#132A1C] truncate">
-                    Revisar cobertura de rastrojo
-                  </h3>
-                  <p className="text-[10px] text-zinc-500 truncate mt-0.5">
-                    Cada 10 días · Evitar evaporación del suelo
-                  </p>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
-            </div>
-
-            {/* FEB 2027 */}
-            <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
-                  <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
-                  <span className="text-[9.5px] font-semibold text-zinc-600 uppercase">FEB</span>
-                  <span className="text-[8px] text-zinc-400 font-mono">2027</span>
-                </div>
-                <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
-                  <Droplets className="w-4 h-4 text-emerald-700" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-xs font-semibold text-[#132A1C] truncate">
-                    Medir humedad del suelo
-                  </h3>
-                  <p className="text-[10px] text-zinc-500 truncate mt-0.5">
-                    Después de lluvias fuertes · Calibrar SMAP
-                  </p>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
-            </div>
+              );
+            })}
           </div>
         ) : (
           <div className="space-y-2 relative">
             <div className="absolute left-[31px] top-6 bottom-6 w-0.5 bg-[#E5ECE2] z-0" />
 
-            {/* MAY 2027 */}
-            <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#7BB63E] ring-4 ring-lime-100 mb-1" />
-                  <span className="text-[9.5px] font-bold text-emerald-900 uppercase">MAY</span>
-                  <span className="text-[8px] text-zinc-400 font-mono">2027</span>
-                </div>
-                <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
-                  <Wheat className="w-4 h-4 text-emerald-700" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-xs font-semibold text-[#132A1C] truncate">
-                    Cosecha y trilla de granos
-                  </h3>
-                  <p className="text-[10px] text-zinc-500 truncate mt-0.5">
-                    Selección de semilla y clasificación de rastrojo
-                  </p>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
-            </div>
+            {secondaryMonths.map((m, idx) => {
+              const dryTasks = [
+                {
+                  title: 'Cosecha y selección de grano',
+                  subtitle: 'Selección de semilla y clasificación de rastrojo',
+                  icon: <Wheat className="w-4 h-4 text-emerald-700" />,
+                },
+                {
+                  title: 'Mulch protector contra heladas',
+                  subtitle: 'Extender rastrojo de cebada o chala · Cobertura 8 cm',
+                  icon: <Leaf className="w-4 h-4 text-emerald-700" />,
+                },
+                {
+                  title: 'Descanso del suelo y rotación',
+                  subtitle: `Preparar terreno para rotar con ${activeCropAgro.successor.name}`,
+                  icon: <Layers className="w-4 h-4 text-emerald-700" />,
+                },
+              ];
+              const task = dryTasks[idx] || dryTasks[0];
+              const isFirst = idx === 0;
 
-            {/* JUN 2027 */}
-            <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
-                  <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
-                  <span className="text-[9.5px] font-semibold text-zinc-600 uppercase">JUN</span>
-                  <span className="text-[8px] text-zinc-400 font-mono">2027</span>
-                </div>
-                <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
-                  <Leaf className="w-4 h-4 text-emerald-700" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-xs font-semibold text-[#132A1C] truncate">
-                    Mulch protector contra heladas
-                  </h3>
-                  <p className="text-[10px] text-zinc-500 truncate mt-0.5">
-                    Extender rastrojo de cebada · Cobertura 8 cm
-                  </p>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
-            </div>
+              return (
+                <div
+                  key={`${m.short}-${m.year}`}
+                  className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
+                      <span
+                        className={`w-2.5 h-2.5 rounded-full mb-1 ${
+                          isFirst
+                            ? 'bg-[#7BB63E] ring-4 ring-lime-100'
+                            : 'bg-zinc-300 ring-4 ring-zinc-100'
+                        }`}
+                      />
+                      <span
+                        className={`text-[9.5px] uppercase font-semibold ${
+                          isFirst ? 'font-bold text-emerald-900' : 'text-zinc-600'
+                        }`}
+                      >
+                        {m.short}
+                      </span>
+                      <span className="text-[8px] text-zinc-400 font-mono">{m.year}</span>
+                    </div>
 
-            {/* JUL 2027 */}
-            <div className="relative z-10 bg-white rounded-2xl p-3 shadow-xs border border-[#E5ECE2] flex items-center justify-between gap-3 hover:border-emerald-300 transition">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex flex-col items-center justify-center shrink-0 w-9 text-center">
-                  <span className="w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-zinc-100 mb-1" />
-                  <span className="text-[9.5px] font-semibold text-zinc-600 uppercase">JUL</span>
-                  <span className="text-[8px] text-zinc-400 font-mono">2027</span>
+                    <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
+                      {task.icon}
+                    </div>
+
+                    <div className="min-w-0">
+                      <h3 className="text-xs font-semibold text-[#132A1C] truncate">
+                        {task.title}
+                      </h3>
+                      <p className="text-[10px] text-zinc-500 truncate mt-0.5">
+                        {task.subtitle}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
                 </div>
-                <div className="w-8 h-8 rounded-xl bg-[#EAF3E3] flex items-center justify-center text-emerald-800 shrink-0">
-                  <Layers className="w-4 h-4 text-emerald-700" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-xs font-semibold text-[#132A1C] truncate">
-                    Descanso del suelo y pastoreo
-                  </h3>
-                  <p className="text-[10px] text-zinc-500 truncate mt-0.5">
-                    Abonado orgánico natural con ganado
-                  </p>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
-            </div>
+              );
+            })}
           </div>
         )}
       </div>
 
-      {/* 4. Section: NUTRIENTES QUE SE QUEDAN */}
+      {/* 4. Section: NUTRIENTES QUE SE QUEDAN (DINÁMICO CON DATOS VERÍDICOS) */}
       <div className="space-y-2.5">
         <div className="px-1">
           <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-900/60 block">
@@ -372,7 +606,7 @@ export default function RotationTab({
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Card 1 */}
+          {/* Card 1: Campaña 01 (Cultivo real de la parcela activa) */}
           <div className="flex-1 bg-white rounded-2xl p-3.5 shadow-xs border border-[#E5ECE2] space-y-2">
             <div className="w-7 h-7 rounded-lg bg-[#EAF3E3] flex items-center justify-center text-emerald-800">
               <Sprout className="w-4 h-4 text-emerald-700" />
@@ -380,20 +614,25 @@ export default function RotationTab({
             <span className="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400 block">
               CAMPAÑA 01
             </span>
-            <h4 className="text-xs font-semibold text-[#132A1C]">
-              {activeParcel?.cropCategory || 'Papa nativa'}
+            <h4 className="text-xs font-semibold text-[#132A1C] truncate">
+              {activeParcel?.cropName || activeCropAgro.name}
             </h4>
-            <div className="text-sm font-semibold text-rose-700">
-              -70 <span className="text-[10px] font-normal text-zinc-500">kg N/ha</span>
+            <div
+              className={`text-sm font-semibold ${
+                activeCropAgro.isPositive ? 'text-emerald-700' : 'text-rose-700'
+              }`}
+            >
+              {activeCropAgro.balanceLabel}{' '}
+              <span className="text-[10px] font-normal text-zinc-500">kg N/ha</span>
             </div>
             <p className="text-[10px] text-zinc-500 leading-snug">
-              Demanda nitrógeno. Aprovecha el suelo abonado.
+              {activeCropAgro.description}
             </p>
           </div>
 
           <ArrowRight className="w-4 h-4 text-zinc-400 shrink-0" />
 
-          {/* Card 2 */}
+          {/* Card 2: Campaña 02 (Sucesor agronómico favorable) */}
           <div className="flex-1 bg-white rounded-2xl p-3.5 shadow-xs border border-[#E5ECE2] space-y-2">
             <div className="w-7 h-7 rounded-lg bg-[#EAF3E3] flex items-center justify-center text-emerald-800">
               <Leaf className="w-4 h-4 text-emerald-700" />
@@ -401,12 +640,19 @@ export default function RotationTab({
             <span className="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400 block">
               CAMPAÑA 02
             </span>
-            <h4 className="text-xs font-semibold text-[#132A1C]">Tarwi y Haba</h4>
-            <div className="text-sm font-semibold text-emerald-700">
-              +95 <span className="text-[10px] font-normal text-zinc-500">kg N/ha</span>
+            <h4 className="text-xs font-semibold text-[#132A1C] truncate">
+              {activeCropAgro.successor.name}
+            </h4>
+            <div
+              className={`text-sm font-semibold ${
+                activeCropAgro.successor.isPositive ? 'text-emerald-700' : 'text-rose-700'
+              }`}
+            >
+              {activeCropAgro.successor.balanceLabel}{' '}
+              <span className="text-[10px] font-normal text-zinc-500">kg N/ha</span>
             </div>
             <p className="text-[10px] text-zinc-500 leading-snug">
-              Leguminosas fijan nitrógeno en las raíces.
+              {activeCropAgro.successor.description}
             </p>
           </div>
         </div>
@@ -470,7 +716,7 @@ export default function RotationTab({
               S/ {calculatedSavings.toLocaleString('es-PE')}
             </span>
             <span className="text-[9.5px] text-zinc-400 block mt-0.5">
-              Cálculo para {rotateAreaHa.toFixed(1)} ha rotadas con Tarwi
+              Cálculo para {rotateAreaHa.toFixed(1)} ha rotadas con leguminosas
             </span>
           </div>
           <div className="w-10 h-10 rounded-2xl bg-emerald-900/60 border border-emerald-500/30 flex items-center justify-center text-[#A3E635]">

@@ -114,12 +114,12 @@ export function getStoredParcels(): ParcelItem[] {
   if (typeof window === 'undefined') return DEFAULT_PARCELS;
   try {
     const raw = localStorage.getItem(PARCELS_STORAGE_KEY);
-    if (!raw) {
+    if (raw === null) {
       localStorage.setItem(PARCELS_STORAGE_KEY, JSON.stringify(DEFAULT_PARCELS));
       return DEFAULT_PARCELS;
     }
     const parcels = JSON.parse(raw);
-    return Array.isArray(parcels) && parcels.length > 0 ? parcels : DEFAULT_PARCELS;
+    return Array.isArray(parcels) ? parcels : DEFAULT_PARCELS;
   } catch (e) {
     return DEFAULT_PARCELS;
   }

@@ -1,34 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, MapPin, Sparkles, Sprout, User } from 'lucide-react';
+import { ArrowLeft, ArrowRight, User } from 'lucide-react';
 import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
-
-export interface SelectedCommunity {
-  id: string;
-  name: string;
-  fullName: string;
-  lat: number;
-  lon: number;
-  altitude: number;
-}
-
-export const ONBOARDING_COMMUNITIES: SelectedCommunity[] = [
-  { id: 'maras', name: 'Maras', fullName: 'Maras · Valle Sagrado', lat: -13.332, lon: -72.158, altitude: 3380 },
-  { id: 'chinchero', name: 'Chinchero', fullName: 'Chinchero · Cusco', lat: -13.393, lon: -72.049, altitude: 3760 },
-  { id: 'urubamba', name: 'Urubamba', fullName: 'Valle de Urubamba', lat: -13.305, lon: -72.115, altitude: 2870 },
-  { id: 'anta', name: 'Anta', fullName: 'Pampa de Anta', lat: -13.415, lon: -72.235, altitude: 3450 },
-  { id: 'ayaviri', name: 'Ayaviri', fullName: 'Melgar · Ayaviri', lat: -14.882, lon: -70.589, altitude: 3910 },
-  { id: 'majes', name: 'Majes', fullName: 'Irrigación Majes', lat: -16.325, lon: -72.208, altitude: 1400 },
-  { id: 'puno', name: 'Puno', fullName: 'Puno · Titicaca', lat: -15.84, lon: -70.021, altitude: 3812 },
-];
 
 interface KipuFarmerWelcomeViewProps {
   onBack: () => void;
-  onContinue: (farmerName: string, community: SelectedCommunity) => void;
+  onContinue: (farmerName: string) => void;
   onSkip: () => void;
   initialName?: string;
-  initialCommunityId?: string;
 }
 
 export default function KipuFarmerWelcomeView({
@@ -36,19 +16,14 @@ export default function KipuFarmerWelcomeView({
   onContinue,
   onSkip,
   initialName = '',
-  initialCommunityId = 'maras',
 }: KipuFarmerWelcomeViewProps) {
   const [name, setName] = useState(initialName);
-  const [selectedCommunityId, setSelectedCommunityId] = useState(initialCommunityId);
-
-  const selectedCommunity =
-    ONBOARDING_COMMUNITIES.find((c) => c.id === selectedCommunityId) || ONBOARDING_COMMUNITIES[0];
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     playSuccessFanfare();
     const finalName = name.trim() || 'Miguel';
-    onContinue(finalName, selectedCommunity);
+    onContinue(finalName);
   };
 
   return (
@@ -93,7 +68,7 @@ export default function KipuFarmerWelcomeView({
       </div>
 
       {/* Main Content Area */}
-      <div className="relative z-10 px-5 py-6 max-w-md mx-auto w-full space-y-5 my-auto">
+      <div className="relative z-10 px-5 py-6 max-w-md mx-auto w-full space-y-6 my-auto">
         {/* Kipu Llama Mascot Card (Duolingo Style Dialog) */}
         <div className="flex items-start gap-3.5 bg-[#132A1C]/90 rounded-3xl p-4 border border-emerald-500/30 shadow-2xl backdrop-blur-md">
           <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 p-1 shrink-0 flex items-center justify-center shadow-md">
@@ -136,51 +111,6 @@ export default function KipuFarmerWelcomeView({
             <p className="text-[10px] text-zinc-400">
               Así te saludará Kipu y personalizará los avisos satelitales en tu chacra.
             </p>
-          </div>
-
-          {/* Valley / Community Selector */}
-          <div className="space-y-2 pt-1">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-medium text-zinc-300">
-                ¿En qué valle o comunidad cultivas?
-              </label>
-              <span className="text-[10px] text-[#A3E635] font-mono">
-                {selectedCommunity.altitude} msnm
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
-              {ONBOARDING_COMMUNITIES.map((com) => {
-                const isSelected = selectedCommunityId === com.id;
-                return (
-                  <button
-                    key={com.id}
-                    type="button"
-                    onClick={() => {
-                      playBubblePop();
-                      setSelectedCommunityId(com.id);
-                    }}
-                    className={`p-2.5 rounded-2xl text-left transition cursor-pointer flex items-center justify-between border ${
-                      isSelected
-                        ? 'bg-[#7BB63E] text-[#132A1C] border-[#A3E635] shadow-md font-semibold'
-                        : 'bg-[#132A1C]/80 text-zinc-300 border-white/10 hover:bg-[#132A1C]'
-                    }`}
-                  >
-                    <div className="min-w-0 pr-1">
-                      <div className="text-xs truncate font-medium">{com.name}</div>
-                      <div
-                        className={`text-[9.5px] truncate ${
-                          isSelected ? 'text-[#132A1C]/80' : 'text-zinc-400'
-                        }`}
-                      >
-                        {com.altitude} msnm
-                      </div>
-                    </div>
-                    {isSelected && <Check className="w-4 h-4 text-[#132A1C] shrink-0" />}
-                  </button>
-                );
-              })}
-            </div>
           </div>
         </form>
       </div>

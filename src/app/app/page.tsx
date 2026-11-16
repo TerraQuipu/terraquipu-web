@@ -51,6 +51,7 @@ export type OnboardingPhase = 'none' | 'welcome' | 'kipu_name' | 'parcel_setup';
 export default function MobileApp() {
   const [currentScreen, setCurrentScreen] = useState<ScreenState>('inicio');
   const [previousScreen, setPreviousScreen] = useState<ScreenState>('inicio');
+  const [selectedParcelForDetail, setSelectedParcelForDetail] = useState<string | null>(null);
   const [copilotVoice, setCopilotVoice] = useState<'astro' | 'kipu'>('astro');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
@@ -274,23 +275,17 @@ export default function MobileApp() {
     );
   }
 
-  // Paso 2 de Onboarding: Kipu Copiloto pregunta Nombre y Comunidad
+  // Paso 2 de Onboarding: Kipu Copiloto pregunta Nombre
   if (onboardingPhase === 'kipu_name') {
     return (
       <div className="flex flex-col h-full min-h-screen bg-[#0A1A0F]">
         <KipuFarmerWelcomeView
           initialName={profile.farmerName || ''}
-          initialCommunityId={profile.distrito ? profile.distrito.toLowerCase() : 'maras'}
           onBack={() => setOnboardingPhase('welcome')}
-          onContinue={(farmerName, community) => {
+          onContinue={(farmerName) => {
             setProfile((prev) => ({
               ...prev,
               farmerName,
-              cuencaName: community.fullName,
-              distrito: community.name,
-              lat: community.lat,
-              lon: community.lon,
-              altitude: community.altitude,
               parcelName: `Chacra de ${farmerName}`,
             }));
             setOnboardingPhase('parcel_setup');
@@ -328,6 +323,8 @@ export default function MobileApp() {
             lat: newParcel.lat,
             lon: newParcel.lon,
             altitude: newParcel.altitudeMsnm,
+            cuencaName: newParcel.microcuenca,
+            distrito: newParcel.microcuenca.split('-')[1]?.trim() || profile.distrito,
             previousCropName: newParcel.cropName,
             previousCropId: newParcel.cropId,
           };
@@ -470,7 +467,10 @@ export default function MobileApp() {
             smapPercent={smapPercent}
             hardwareId={hardwareId}
             onOpenWizard={() => navigateTo('diagnostico')}
-            onNavigateToParcelas={() => navigateTo('parcelas')}
+            onNavigateToParcelas={(parcelId?: string) => {
+              setSelectedParcelForDetail(parcelId || null);
+              navigateTo('parcelas');
+            }}
             onNavigateToRotacion={() => navigateTo('rotacion')}
             onNavigateToCopiloto={() => navigateTo('copiloto')}
             onOpenNews={() => navigateTo('noticias')}
@@ -484,6 +484,8 @@ export default function MobileApp() {
             profile={profile}
             cultivos={cultivos}
             hardwareId={hardwareId}
+            selectedParcelId={selectedParcelForDetail}
+            onClearSelectedParcel={() => setSelectedParcelForDetail(null)}
             onToast={triggerToast}
             onRecalibrate={() => setShowOnboarding(true)}
             onNavigateToInicio={() => navigateTo('inicio')}
@@ -556,7 +558,10 @@ export default function MobileApp() {
       {currentScreen !== 'diagnostico' && (
         <BottomNav
           activeTab={currentScreen === 'inicio' || currentScreen === 'parcelas' || currentScreen === 'rotacion' || currentScreen === 'copiloto' ? currentScreen : 'inicio'}
-          onSelectTab={(tab) => navigateTo(tab)}
+          onSelectTab={(tab) => {
+            if (tab === 'parcelas') setSelectedParcelForDetail(null);
+            navigateTo(tab);
+          }}
           onOpenDiagnostic={() => navigateTo('diagnostico')}
           onOpenQgisDrawer={() => navigateTo('visor_qgis')}
         />

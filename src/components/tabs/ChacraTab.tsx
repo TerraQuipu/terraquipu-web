@@ -37,6 +37,8 @@ interface ChacraTabProps {
   cultivos?: Cultivo[];
   isElNino?: boolean;
   hardwareId?: string;
+  selectedParcelId?: string | null;
+  onClearSelectedParcel?: () => void;
   onToast: (msg: string) => void;
   onRecalibrate?: () => void;
   onNavigateToInicio?: () => void;
@@ -52,6 +54,8 @@ export default function ChacraTab({
   cultivos = [],
   isElNino = false,
   hardwareId,
+  selectedParcelId,
+  onClearSelectedParcel,
   onToast,
   onRecalibrate,
   onNavigateToInicio,
@@ -82,11 +86,17 @@ export default function ChacraTab({
   const [layerDrought, setLayerDrought] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
 
-  // Load parcels on mount
+  // Load parcels on mount and select target parcel if specified
   useEffect(() => {
     const loaded = getStoredParcels();
     setParcels(loaded);
-  }, []);
+    if (selectedParcelId) {
+      const target = loaded.find((p) => p.id === selectedParcelId);
+      if (target) {
+        setSelectedParcel(target);
+      }
+    }
+  }, [selectedParcelId]);
 
   const handleToggleSmap = () => {
     playBubblePop();
@@ -318,6 +328,7 @@ export default function ChacraTab({
             onClick={() => {
               playBubblePop();
               setSelectedParcel(null);
+              if (onClearSelectedParcel) onClearSelectedParcel();
             }}
             className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 hover:text-emerald-950 transition cursor-pointer"
           >
