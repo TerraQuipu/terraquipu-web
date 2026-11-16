@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, User, MapPin, AlertCircle, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, User, MapPin, AlertCircle, Check, Navigation } from 'lucide-react';
 import { playBubblePop, playSuccessFanfare } from '@/lib/soundEffects';
 
 export interface RegionalCommunity {
@@ -106,7 +106,7 @@ export default function KipuFarmerWelcomeView({
       if (match) return match.id;
       return 'custom';
     }
-    return '';
+    return 'none'; // Por defecto "Por ahora no" para no forzar lugares
   });
   const [customCommunity, setCustomCommunity] = useState(() => {
     if (initialCommunity) {
@@ -117,16 +117,37 @@ export default function KipuFarmerWelcomeView({
     }
     return '';
   });
+  const [gpsData, setGpsData] = useState<{ lat: number; lon: number } | null>(null);
+  const [gpsLoading, setGpsLoading] = useState(false);
+  const [showPlacesList, setShowPlacesList] = useState(false);
   const [touched, setTouched] = useState(false);
+
+  const requestGps = () => {
+    if (typeof window !== 'undefined' && 'geolocation' in navigator) {
+      setGpsLoading(true);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setGpsData({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+          setGpsLoading(false);
+        },
+        () => {
+          setGpsLoading(false);
+        },
+        { timeout: 6000, enableHighAccuracy: true }
+      );
+    }
+  };
 
   const activeSelectedRegion = REGIONAL_COMMUNITIES.find((c) => c.id === selectedCommunityId);
   const effectiveCommunityName =
-    selectedCommunityId === 'custom'
+    selectedCommunityId === 'none'
+      ? (gpsData ? `Ubicación GPS (${gpsData.lat.toFixed(2)}°, ${gpsData.lon.toFixed(2)}°)` : 'Por definir (GPS)')
+      : selectedCommunityId === 'custom'
       ? customCommunity.trim()
       : activeSelectedRegion?.name || '';
 
   const isNameValid = name.trim().length >= 2;
-  const isCommunityValid = effectiveCommunityName.length >= 2;
+  const isCommunityValid = selectedCommunityId === 'none' || effectiveCommunityName.length >= 2;
   const isFormValid = isNameValid && isCommunityValid;
 
   const handleSubmit = (e?: React.FormEvent) => {
@@ -140,16 +161,26 @@ export default function KipuFarmerWelcomeView({
 
     playSuccessFanfare();
     const finalName = name.trim();
-    const regionData = activeSelectedRegion
-      ? {
-          lat: activeSelectedRegion.lat,
-          lon: activeSelectedRegion.lon,
-          altitude: activeSelectedRegion.altitude,
-          cuencaName: activeSelectedRegion.cuencaName,
-        }
-      : undefined;
+    const regionData =
+      selectedCommunityId === 'none'
+        ? (gpsData
+            ? {
+                lat: gpsData.lat,
+                lon: gpsData.lon,
+                altitude: 3300,
+                cuencaName: 'Ubicación GPS',
+              }
+            : undefined)
+        : activeSelectedRegion
+        ? {
+            lat: activeSelectedRegion.lat,
+            lon: activeSelectedRegion.lon,
+            altitude: activeSelectedRegion.altitude,
+            cuencaName: activeSelectedRegion.cuencaName,
+          }
+        : undefined;
 
-    onContinue(finalName, effectiveCommunityName, regionData);
+    onContinue(finalName, selectedCommunityId === 'none' ? 'Ubicación libre (GPS)' : effectiveCommunityName, regionData);
   };
 
   return (
@@ -204,7 +235,7 @@ export default function KipuFarmerWelcomeView({
               <span className="text-[10px] text-zinc-400">· Copiloto Andino</span>
             </div>
             <p className="text-xs text-zinc-200 leading-relaxed font-normal">
-              ¡Allillanchu! Para calibrar con precisión los satélites en tu chacra, ingresa tu nombre y confirma tu comunidad.
+              ¡Allillanchu! Para comenzar, ingresa tu nombre (obligatorio). La ubicación se adaptará por tu GPS o podrás marcarla directamente en el mapa.
             </p>
           </div>
         </div>
@@ -240,79 +271,140 @@ export default function KipuFarmerWelcomeView({
             )}
           </div>
 
-          {/* 2. Community / Location Selection (Obligatorio) */}
+          {/* 2. Ubicación / Comunidad (Opcional - Opción 'Por ahora no') */}
           <div className="space-y-2 pt-1">
             <label className="text-xs font-semibold text-zinc-200 flex items-center justify-between">
-              <span>Tu comunidad, valle o distrito</span>
-              <span className="text-[10.5px] text-emerald-400 font-mono">* Obligatorio</span>
+              <span>Ubicación o comunidad</span>
+              <span className="text-[10.5px] text-zinc-400 font-mono">Opcional</span>
             </label>
 
-            <div className="grid grid-cols-2 gap-2">
-              {REGIONAL_COMMUNITIES.map((com) => {
-                const isSelected = selectedCommunityId === com.id;
-                return (
+            {/* Opción destacada: Por ahora no */}
+            <button
+              type="button"
+              onClick={() => {
+                playBubblePop();
+                setSelectedCommunityId('none');
+                requestGps();
+              }}
+              className={`w-full p-3 rounded-2xl text-left border transition cursor-pointer flex items-center justify-between gap-3 ${
+                selectedCommunityId === 'none'
+                  ? 'bg-emerald-950 border-[#A3E635] ring-2 ring-[#A3E635]/40 text-white shadow-md'
+                  : 'bg-[#132A1C]/80 border-white/15 text-zinc-300 hover:bg-[#132A1C] hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                  selectedCommunityId === 'none' ? 'bg-[#7BB63E] text-[#132A1C]' : 'bg-white/10 text-zinc-300'
+                }`}>
+                  <Navigation className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span>Por ahora no</span>
+                    <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-900/80 text-emerald-300 border border-emerald-600/40">
+                      GPS / Omitir
+                    </span>
+                  </div>
+                  <div className="text-[10.5px] text-zinc-400 leading-snug mt-0.5">
+                    {gpsLoading
+                      ? '🛰️ Consultando señal GPS del teléfono...'
+                      : gpsData
+                      ? `✓ GPS conectado: ${gpsData.lat.toFixed(4)}°, ${gpsData.lon.toFixed(4)}°`
+                      : 'El sistema se adaptará por tu GPS o ubicarás tu chacra en el mapa satelital.'}
+                  </div>
+                </div>
+              </div>
+              {selectedCommunityId === 'none' && (
+                <div className="w-5 h-5 rounded-full bg-[#7BB63E] text-[#132A1C] flex items-center justify-center shrink-0">
+                  <Check className="w-3.5 h-3.5 stroke-[3]" />
+                </div>
+              )}
+            </button>
+
+            {/* Selector secundario de lista desplegable */}
+            <div className="pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  playBubblePop();
+                  setShowPlacesList(!showPlacesList);
+                }}
+                className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center gap-1.5 py-1 px-1 transition"
+              >
+                <MapPin className="w-3.5 h-3.5" />
+                <span>{showPlacesList ? 'Ocultar lista de comunidades' : 'O seleccionar comunidad conocida de la lista (opcional)'}</span>
+                <span className="text-[10px] text-zinc-500">{showPlacesList ? '▲' : '▼'}</span>
+              </button>
+
+              {showPlacesList && (
+                <div className="grid grid-cols-2 gap-2 pt-2 animate-in fade-in">
+                  {REGIONAL_COMMUNITIES.map((com) => {
+                    const isSelected = selectedCommunityId === com.id;
+                    return (
+                      <button
+                        key={com.id}
+                        type="button"
+                        onClick={() => {
+                          playBubblePop();
+                          setSelectedCommunityId(com.id);
+                        }}
+                        className={`p-2.5 rounded-2xl text-left border transition cursor-pointer flex items-center justify-between gap-1.5 ${
+                          isSelected
+                            ? 'bg-emerald-950 border-[#A3E635] ring-2 ring-[#A3E635]/40 text-white shadow-md'
+                            : 'bg-[#132A1C]/80 border-white/15 text-zinc-300 hover:bg-[#132A1C] hover:text-white'
+                        }`}
+                      >
+                        <div className="min-w-0">
+                          <div className="text-xs font-semibold truncate">{com.name}</div>
+                          <div className="text-[10px] text-zinc-400 font-mono">{com.altitude} msnm</div>
+                        </div>
+                        {isSelected && (
+                          <div className="w-4 h-4 rounded-full bg-[#7BB63E] text-[#132A1C] flex items-center justify-center shrink-0">
+                            <Check className="w-3 h-3 stroke-[3]" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+
                   <button
-                    key={com.id}
                     type="button"
                     onClick={() => {
                       playBubblePop();
-                      setSelectedCommunityId(com.id);
+                      setSelectedCommunityId('custom');
                     }}
-                    className={`p-2.5 rounded-2xl text-left border transition cursor-pointer flex items-center justify-between gap-1.5 ${
-                      isSelected
+                    className={`p-2.5 rounded-2xl text-left border transition cursor-pointer flex items-center justify-between col-span-2 ${
+                      selectedCommunityId === 'custom'
                         ? 'bg-emerald-950 border-[#A3E635] ring-2 ring-[#A3E635]/40 text-white shadow-md'
                         : 'bg-[#132A1C]/80 border-white/15 text-zinc-300 hover:bg-[#132A1C] hover:text-white'
                     }`}
                   >
-                    <div className="min-w-0">
-                      <div className="text-xs font-semibold truncate">{com.name}</div>
-                      <div className="text-[10px] text-zinc-400 font-mono">{com.altitude} msnm</div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-3.5 h-3.5 text-[#A3E635]" />
+                      <span className="text-xs font-semibold">Otra comunidad o sector</span>
                     </div>
-                    {isSelected && (
+                    {selectedCommunityId === 'custom' && (
                       <div className="w-4 h-4 rounded-full bg-[#7BB63E] text-[#132A1C] flex items-center justify-center shrink-0">
                         <Check className="w-3 h-3 stroke-[3]" />
                       </div>
                     )}
                   </button>
-                );
-              })}
-
-              <button
-                type="button"
-                onClick={() => {
-                  playBubblePop();
-                  setSelectedCommunityId('custom');
-                }}
-                className={`p-2.5 rounded-2xl text-left border transition cursor-pointer flex items-center justify-between col-span-2 ${
-                  selectedCommunityId === 'custom'
-                    ? 'bg-emerald-950 border-[#A3E635] ring-2 ring-[#A3E635]/40 text-white shadow-md'
-                    : 'bg-[#132A1C]/80 border-white/15 text-zinc-300 hover:bg-[#132A1C] hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-3.5 h-3.5 text-[#A3E635]" />
-                  <span className="text-xs font-semibold">Otra comunidad o sector</span>
                 </div>
-                {selectedCommunityId === 'custom' && (
-                  <div className="w-4 h-4 rounded-full bg-[#7BB63E] text-[#132A1C] flex items-center justify-center shrink-0">
-                    <Check className="w-3 h-3 stroke-[3]" />
-                  </div>
-                )}
-              </button>
-            </div>
+              )}
 
-            {selectedCommunityId === 'custom' && (
-              <div className="pt-1.5 animate-in fade-in">
-                <input
-                  type="text"
-                  value={customCommunity}
-                  onChange={(e) => setCustomCommunity(e.target.value)}
-                  placeholder="Escribe el nombre de tu comunidad o localidad..."
-                  className="w-full h-11 px-3.5 rounded-xl bg-[#132A1C] border border-[#A3E635]/60 text-white placeholder-zinc-500 text-xs focus:outline-hidden focus:border-[#A3E635]"
-                  autoFocus
-                />
-              </div>
-            )}
+              {selectedCommunityId === 'custom' && showPlacesList && (
+                <div className="pt-2 animate-in fade-in">
+                  <input
+                    type="text"
+                    value={customCommunity}
+                    onChange={(e) => setCustomCommunity(e.target.value)}
+                    placeholder="Escribe el nombre de tu comunidad o localidad..."
+                    className="w-full h-11 px-3.5 rounded-xl bg-[#132A1C] border border-[#A3E635]/60 text-white placeholder-zinc-500 text-xs focus:outline-hidden focus:border-[#A3E635]"
+                    autoFocus
+                  />
+                </div>
+              )}
+            </div>
 
             {touched && !isCommunityValid && (
               <p className="text-[11px] text-red-400 flex items-center gap-1 pt-0.5">
@@ -337,7 +429,7 @@ export default function KipuFarmerWelcomeView({
         </button>
 
         <p className="text-center text-[10.5px] text-zinc-400 font-normal">
-          El nombre y la comunidad son obligatorios para personalizar los pronósticos NASA in situ.
+          <strong className="text-emerald-400">El nombre es obligatorio.</strong> La ubicación se adaptará por GPS o podrás marcarla directamente en el mapa.
         </p>
       </div>
     </div>
